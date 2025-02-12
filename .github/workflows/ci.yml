@@ -51,6 +51,45 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  test:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_DB: rails_test
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+        DISABLE_BOOTSNAP: "1"
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Install libvips
+          run: sudo apt-get update && sudo apt-get install -y libvips
+
+        - name: Install Ruby and gems
+          uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 18
+        - run: npm ci
+        - name: Set up database schema
+          run: bin/rails db:schema:load
+
+        - name: Run tests
+          run: bundle exec rspec
   deploy:
     name: Déploiement sur Scalingo
     runs-on: ubuntu-latest
