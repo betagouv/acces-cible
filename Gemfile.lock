@@ -577,6 +577,7 @@ DEPENDENCIES
   stimulus-rails
   turbo-rails
   tzinfo-data
+  view_component
   whiny_validation
 
 BUNDLED WITH

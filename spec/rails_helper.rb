@@ -56,6 +56,13 @@ RSpec.configure do |config|
     require "axe-rspec"
   end
 
+  # Component-specific config
+  config.include Capybara::RSpecMatchers, type: :component
+  config.include ViewComponent::TestHelpers, type: :component
+  config.before(type: :component) do
+    require "view_component/test_helpers"
+  end
+
   # RSpec Rails uses metadata to mix in different behaviours to your tests,
   # for example enabling you to call `get` and `post` in request specs. e.g.:
   #
