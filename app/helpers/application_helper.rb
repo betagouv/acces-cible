@@ -21,6 +21,10 @@ module ApplicationHelper
     end
   end
 
+  def dsfr_table(caption:, size: :md, scroll: true, border: false, **html_attributes, &block)
+    render(Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block)
+  end
+
   def root? = request.path == "/"
 
   def time_ago(datetime)
