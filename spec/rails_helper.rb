@@ -49,6 +49,13 @@ RSpec.configure do |config|
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 
+  # Feature-specific config
+  config.include Capybara::DSL, type: :feature
+  config.include Capybara::RSpecMatchers, type: :feature
+  config.before(type: :feature) do
+    require "axe-rspec"
+  end
+
   # RSpec Rails uses metadata to mix in different behaviours to your tests,
   # for example enabling you to call `get` and `post` in request specs. e.g.:
   #
