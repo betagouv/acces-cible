@@ -77,8 +77,13 @@ GEM
     ast (2.4.2)
     base64 (0.2.0)
     benchmark (0.4.0)
+    better_errors (2.10.1)
+      erubi (>= 1.0.0)
+      rack (>= 0.9.0)
+      rouge (>= 1.0.0)
     bigdecimal (3.1.9)
-    bindex (0.8.1)
+    binding_of_caller (1.0.1)
+      debug_inspector (>= 1.2.0)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
     brakeman (7.0.0)
@@ -139,6 +144,7 @@ GEM
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    debug_inspector (1.2.0)
     diff-lcs (1.5.1)
     drb (2.2.1)
     dsfr-assets (1.13.0.1)
@@ -287,6 +293,8 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-rails (0.3.11)
+      pry (>= 0.13.0)
     psych (5.2.3)
       date
       stringio
@@ -345,6 +353,7 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
+    rouge (4.5.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -422,6 +431,8 @@ GEM
       google-protobuf (~> 4.29)
     securerandom (0.4.1)
     shellany (0.0.1)
+    shoulda-matchers (6.4.0)
+      activesupport (>= 5.2.0)
     solid_cable (3.0.5)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -459,15 +470,13 @@ GEM
       activesupport (>= 5.2.0, < 8.1)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
-    web-console (4.2.1)
-      actionview (>= 6.0.0)
-      activemodel (>= 6.0.0)
-      bindex (>= 0.4.0)
-      railties (>= 6.0.0)
     websocket-driver (0.7.7)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whiny_validation (1.1)
+      activemodel
+      activesupport
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.1)
@@ -487,6 +496,8 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  better_errors
+  binding_of_caller
   bootsnap
   brakeman
   capybara
@@ -505,6 +516,7 @@ DEPENDENCIES
   importmap-rails
   pg (~> 1.1)
   propshaft
+  pry-rails
   puma (>= 5.0)
   rails (~> 8.0.1)
   rails-i18n
@@ -516,13 +528,14 @@ DEPENDENCIES
   rubocop-rails-omakase
   rubocop-rspec
   rubocop-rspec_rails
+  shoulda-matchers
   solid_cable
   solid_cache
   solid_queue
   stimulus-rails
   turbo-rails
   tzinfo-data
-  web-console
+  whiny_validation
 
 BUNDLED WITH
    2.6.3

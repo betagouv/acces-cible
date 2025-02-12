@@ -36,6 +36,11 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# DSFR utilities
+gem "dsfr-assets"
+gem "dsfr_form_builder"
+gem "dsfr-view-components"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: [:mri, :windows], require: "debug/prelude"
@@ -52,14 +57,13 @@ group :development, :test do
 end
 
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
+  # Print validation error messages in console
+  gem "whiny_validation"
+  # Open pry when using rails console
+  gem "pry-rails"
+  gem "better_errors"
+  gem "binding_of_caller"
 end
-
-gem "dsfr-assets"
-gem "dsfr_form_builder"
-gem "dsfr-view-components"
-
 
 group :test do
   gem "capybara"
@@ -74,4 +78,6 @@ group :test do
   gem "rubocop-rspec"
   gem "rubocop-rspec_rails"
   gem "rspec"
+  # Simplify testing common Rails functionality
+  gem "shoulda-matchers"
 end
