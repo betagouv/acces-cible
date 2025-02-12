@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      dockerfile: Dockerfile.dev
+    image: acces_cible
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./:/app"
+      - "/app/node_modules"

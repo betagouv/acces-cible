@@ -1,0 +1,15 @@
+<% if flash.any? %>
+  <div class="flash fr-mb-3w">
+    <% if flash[:notice].present?  %>
+      <div class="fr-alert fr-alert--info">
+        <h3 class="fr-alert__title"><%= flash[:notice] %></h3>
+      </div>
+    <% end %>
+
+    <% if flash[:alert].present?  %>
+      <div class="fr-alert fr-alert--warning">
+        <h3 class="fr-alert__title"><%= flash[:alert] %></h3>
+      </div>
+    <% end %>
+  </div>
+<% end %>
