@@ -130,7 +130,7 @@ GEM
       capybara (>= 3.11, < 4)
       cucumber (>= 5, < 10)
       railties (>= 5.2, < 9)
-    cucumber-tag-expressions (6.1.1)
+    cucumber-tag-expressions (6.1.2)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)
