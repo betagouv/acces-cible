@@ -1,0 +1,5 @@
+// Rend les formulaires button_to "transparents" pour les styles
+// Permet d'utiliser des liens et des boutons dans un btn-group
+form.button_to {
+  display: contents;
+}
