@@ -45,6 +45,10 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
 end
 
 group :development do
@@ -56,16 +60,11 @@ gem "dsfr-assets"
 gem "dsfr_form_builder"
 gem "dsfr-view-components"
 
-group :development, :test do
-  gem "rspec-rails"
-end
 
 group :test do
   gem "capybara"
   gem "cucumber-rails", require: false
   gem "database_cleaner"
-  gem "factory_bot_rails"
-  gem "faker", require: false
   gem "guard"
   gem "guard-cucumber"
   gem "guard-rspec"
