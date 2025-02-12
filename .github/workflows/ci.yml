@@ -2,8 +2,13 @@ name: CI
 
 on:
   push:
+    branches:
+      - '**'  # This will match all branches
+  pull_request:  # Added to also run on PRs
+
 jobs:
   scan_ruby:
+    name: Brakeman
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +25,7 @@ jobs:
         run: bin/brakeman --no-pager
 
   scan_js:
+    name: JS audit
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +42,7 @@ jobs:
         run: bin/importmap audit
 
   lint:
+    name: Rubocop
     runs-on: ubuntu-latest
 
     steps:
@@ -52,12 +59,13 @@ jobs:
         run: bin/rubocop -f github
 
   test:
+    name: Rspec
     if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
     runs-on: ubuntu-latest
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:16
         ports:
           - "5432:5432"
         env:
@@ -65,31 +73,33 @@ jobs:
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
 
-      env:
-        RAILS_ENV: test
-        DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
-        DISABLE_BOOTSNAP: "1"
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+      DISABLE_BOOTSNAP: "1"
 
-        - name: Install libvips
-          run: sudo apt-get update && sudo apt-get install -y libvips
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Install Ruby and gems
-          uses: ruby/setup-ruby@v1
-          with:
-            bundler-cache: true
+      - name: Install libvips
+        run: sudo apt-get update && sudo apt-get install -y libvips
 
-        - uses: actions/setup-node@v4
-          with:
-            node-version: 18
-        - run: npm ci
-        - name: Set up database schema
-          run: bin/rails db:schema:load
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
 
-        - name: Run tests
-          run: bundle exec rspec
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - name: Set up database schema
+        run: bin/rails db:schema:load
+
+      - name: Run tests
+        run: bundle exec rspec
+
   deploy:
     name: Déploiement sur Scalingo
     runs-on: ubuntu-latest
