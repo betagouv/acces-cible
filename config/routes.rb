@@ -10,6 +10,11 @@ Rails.application.routes.draw do
     get "donnees-personnelles", as: :donnees_personnelles
   end
 
+  scope controller: :errors, via: :all do
+    match "/404", action: :not_found
+    match "/500", action: :internal_server_error
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

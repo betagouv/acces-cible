@@ -5,6 +5,11 @@ fr:
     service_name: "Accès cible"
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
+  errors:
+    not_found:
+      title: "Page non trouvée (erreur 404)"
+    internal_server_error:
+      title: "Problème technique (erreur 500)"
   pages:
     accessibilite:
       title: Déclaration d’accessibilité
