@@ -40,6 +40,13 @@ module AccesCible
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.
-    config.generators.system_tests = nil
+    config.generators do |generate|
+      generate.helper = false
+      generate.controller_specs = false
+      generate.request_specs = false
+      generate.routing_specs = false
+      generate.view_specs = false
+      generate.system_tests = false
+    end
   end
 end
