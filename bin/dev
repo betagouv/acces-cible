@@ -1,8 +1,19 @@
 #!/usr/bin/env sh
 
-if ! gem list foreman -i --silent; then
-  echo "Installing foreman..."
-  gem install foreman
-fi
+# Stop dangling processes, if any
+lsof -t -i:3000 | xargs -r kill # Puma
 
-exec foreman start -f Procfile.dev "$@"
+# Ensure required dependencies are present
+# Simplifies switching branches and bisecting
+bundle check &> /dev/null || bundle install
+
+# Use Overmind if present
+if command -v overmind &> /dev/null; then
+  # Remove dangling socks from overmind
+  rm -f ".overmind.sock"
+  bundle exec overmind start -f Procfile.dev --no-port "$@"
+else # Fallback to Foreman
+  echo “Installing foreman…”
+  gem install foreman
+  bundle exec foreman start -f Procfile.dev --no-port "$@"
+fi
