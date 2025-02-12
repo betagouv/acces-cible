@@ -1,8 +1,51 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+require:
+  - rubocop-factory_bot
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
+AllCops:
+  DisplayCopNames: true
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "db/migrate/*"
+    - "node_modules/**/*"
+    - "vendor/**/*"
+
 # Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+# Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: "no_space"
+
+# Ignore block length in config files
+Metrics/BlockLength:
+  Exclude:
+    - "config/environments/*.rb"
+    - "config/routes.rb"
+
+# Allow numbers in variable names in specs
+Naming/VariableNumber:
+  Exclude:
+    - "spec/**/*.rb"
+
+# Rspec
+RSpec/ImplicitExpect:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: "double_quotes"
+Style/SymbolArray:
+  EnforcedStyle: "brackets"
+# Trailing commas make nicer diffs
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/WordArray:
+  EnforcedStyle: "brackets"
