@@ -20,7 +20,6 @@ Bundler.require(*Rails.groups)
 
 module AccesCible
   class Application < Rails::Application
-    config.i18n.default_locale = :fr
     require "dsfr/components"
     require "dsfr/assets"
     # Initialize configuration defaults for originally generated Rails version.
