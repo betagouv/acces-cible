@@ -2,7 +2,7 @@
   <div class="fr-container">
     <div class="fr-footer__body">
       <div class="fr-footer__brand fr-enlarge-link">
-        <a href="/" title="Retour à l’accueil du site - acces_cible">
+        <a href="/" title="Retour à l’accueil du site - <%= t("global.service_name") %>">
           <p class="fr-logo">
             <%= t("global.service_name") %>
           </p>
@@ -29,23 +29,27 @@
     <div class="fr-footer__bottom">
       <ul class="fr-footer__bottom-list">
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Plan du site</a>
+          <%= link_to "Plan du site", plan_path, class: "fr-footer__bottom-link" %>
         </li>
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Accessibilité : non/partiellement/totalement conforme</a>
+          <%= link_to "Contact", contact_path, class: "fr-footer__bottom-link" %>
         </li>
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Mentions légales</a>
+          <%= link_to "Accessibilité : non conforme", accessibilite_path, class: "fr-footer__bottom-link" %>
         </li>
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Données personnelles</a>
+          <%= link_to "Mentions légales", mentions_legales_path, class: "fr-footer__bottom-link" %>
         </li>
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Gestion des cookies</a>
+          <%= link_to "Données personnelles", donnees_personnelles_path, class: "fr-footer__bottom-link" %>
+        </li>
+        <li class="fr-footer__bottom-item">
+          <%= link_to "Gestion des cookies", cookies_path, class: "fr-footer__bottom-link" %>
         </li>
       </ul>
       <div class="fr-footer__bottom-copy">
-        <p>Sauf mention contraire, tous les contenus de ce site sont sous <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank">licence etalab-2.0</a>
+        <p>Sauf mention contraire, tous les contenus de ce site sont sous
+          <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank">licence etalab-2.0</a>
         </p>
       </div>
     </div>

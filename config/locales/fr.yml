@@ -4,3 +4,19 @@ fr:
     sponsor_html: "Direction<br>Interministérielle<br>du Numérique"
     service_name: "Accès cible"
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
+
+  pages:
+    accessibilite:
+      title: Déclaration d’accessibilité
+    accueil:
+      title: Accueil
+    contact:
+      title: Contact
+    cookies:
+      title: Gestion des cookies
+    donnees_personnelles:
+      title: Gestion des données personnelles
+    mentions_legales:
+      title: Mentions légales
+    plan:
+      title: Plan du site
