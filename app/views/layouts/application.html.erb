@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title><%= content_for(:title) || "Acces Cible" %></title>
+    <title><%= head_title %></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
     <%= csrf_meta_tags %>
@@ -26,6 +26,7 @@
     <div class="fr-container">
       <main class="fr-py-2w" id="main">
         <%= render "shared/flash" %>
+        <h1><%= page_title %></h1>
         <%= yield %>
       </main>
     </div>
