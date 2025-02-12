@@ -22,12 +22,15 @@ AllCops:
 # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 Layout/SpaceInsideArrayLiteralBrackets:
   EnforcedStyle: "no_space"
+  Exclude:
+    - "db/*schema.rb"
 
 # Ignore block length in config files
 Metrics/BlockLength:
   Exclude:
     - "config/environments/*.rb"
     - "config/routes.rb"
+    - "db/*.rb"
 
 # Allow numbers in variable names in specs
 Naming/VariableNumber:
