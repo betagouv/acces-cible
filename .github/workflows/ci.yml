@@ -90,10 +90,6 @@ jobs:
         with:
           bundler-cache: true
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: npm ci
       - name: Set up database schema
         run: bin/rails db:schema:load
 
