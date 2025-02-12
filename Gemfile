@@ -44,7 +44,7 @@ gem "view_component"
 
 # DSFR utilities
 gem "dsfr-assets"
-gem "dsfr_form_builder"
+gem "dsfr-form_builder"
 gem "dsfr-view-components"
 
 group :development, :test do

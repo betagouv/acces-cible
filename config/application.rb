@@ -24,7 +24,7 @@ module AccesCible
     require "dsfr/assets"
 
     # Use Dsfr::FormBuilder automatically
-    config.action_view.default_form_builder = DsfrFormBuilder::FormBuilder
+    config.action_view.default_form_builder = Dsfr::FormBuilder
 
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
