@@ -52,8 +52,9 @@ group :development do
   gem "web-console"
 end
 
-gem "dsfr-view-components"
 gem "dsfr-assets"
+gem "dsfr_form_builder"
+gem "dsfr-view-components"
 
 group :development, :test do
   gem "rspec-rails"

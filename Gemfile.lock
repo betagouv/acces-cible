@@ -147,6 +147,10 @@ GEM
       html-attributes-utils (~> 1)
       pagy (~> 6)
       view_component (~> 3)
+    dsfr_form_builder (0.0.1)
+      actionview (>= 6.1, < 9.0)
+      activemodel (>= 6.1, < 9.0)
+      activesupport (>= 6.1, < 9.0)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
@@ -492,6 +496,7 @@ DEPENDENCIES
   debug
   dsfr-assets
   dsfr-view-components
+  dsfr_form_builder
   factory_bot_rails
   faker
   guard
