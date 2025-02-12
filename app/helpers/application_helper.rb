@@ -26,4 +26,8 @@ module ApplicationHelper
   def time_ago(datetime)
     t("shared.time_ago", time: distance_of_time_in_words_to_now(datetime))
   end
+
+  def paginate
+    render "shared/paginate", pagy: @pagy if @pagy && @pagy.pages > 1
+  end
 end

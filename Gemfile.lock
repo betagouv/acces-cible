@@ -302,6 +302,7 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     ostruct (0.6.1)
+    pagy (9.3.3)
     parallel (1.26.3)
     parser (3.3.7.1)
       ast (~> 2.4.1)
@@ -555,6 +556,7 @@ DEPENDENCIES
   guard-cucumber
   guard-rspec
   importmap-rails
+  pagy
   pg (~> 1.1)
   propshaft
   pry-rails

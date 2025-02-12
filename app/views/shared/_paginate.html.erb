@@ -1,0 +1,54 @@
+<nav role="navigation" class="fr-pagination" aria-label="Pagination">
+  <ul class="fr-pagination__list">
+    <li>
+      <% if pagy.page == 1 %>
+        <a class="fr-pagination__link fr-pagination__link--first" aria-disabled="true" role="link">
+          Première page
+        </a>
+      <% else %>
+        <%= link_to "Première page", pagy_url_for(pagy, 1), class: "fr-pagination__link fr-pagination__link--first" %>
+      <% end %>
+    </li>
+    <li>
+      <% if pagy.page == 1 %>
+        <a class="fr-pagination__link fr-pagination__link--prev" aria-disabled="true" role="link">
+          Page précédente
+        </a>
+      <% else %>
+        <%= link_to "Page précédente", pagy_url_for(pagy, pagy.prev), class: "fr-pagination__link fr-pagination__link--prev" %>
+      <% end%>
+    </li>
+    <% pagy.series.each do |item| -%>
+      <%# series example: [1, :gap, 7, 8, "9", 10, 11, :gap, 36] %>
+      <li>
+        <% if item == :gap -%>
+          <span class="fr-pagination__link">…</span>
+        <% elsif item.is_a?(String) -%><%# string => current page %>
+          <a class="fr-pagination__link" aria-current="page" title="Page <%= item %>">
+            <%= item %>
+          </a>
+        <% else -%>
+          <%= link_to item, pagy_url_for(pagy, item), class: "fr-pagination__link", title: "Page #{item}" %>
+        <% end -%>
+      </li>
+    <% end  -%>
+    <li>
+      <% if !pagy.next %>
+        <a class="fr-pagination__link fr-pagination__link--next" aria-disabled="true" role="link">
+          Page suivante
+        </a>
+      <% else %>
+        <%= link_to "Page suivante", pagy_url_for(pagy, pagy.prev), class: "fr-pagination__link fr-pagination__link--next" %>
+      <% end%>
+    </li>
+    <li>
+      <% if pagy.page == pagy.last %>
+        <a class="fr-pagination__link fr-pagination__link--last" aria-disabled="true" role="link">
+          Dernière page
+        </a>
+      <% else %>
+        <%= link_to "Dernière page", pagy_url_for(pagy, pagy.last), class: "fr-pagination__link fr-pagination__link--last" %>
+      <% end %>
+    </li>
+  </ul>
+</nav>
