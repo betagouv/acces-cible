@@ -431,7 +431,7 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (6.4.0)
       activesupport (>= 5.2.0)
-    solid_cable (3.0.5)
+    solid_cable (3.0.7)
       actioncable (>= 7.2)
       activejob (>= 7.2)
       activerecord (>= 7.2)
