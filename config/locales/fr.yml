@@ -8,6 +8,7 @@ fr:
   shared:
     actions: "Actions"
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+    time_ago: "il y a %{time}"
 
   errors:
     not_found:
