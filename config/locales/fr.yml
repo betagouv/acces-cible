@@ -5,6 +5,10 @@ fr:
     service_name: "Accès cible"
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
+  shared:
+    actions: "Actions"
+    confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+
   errors:
     not_found:
       title: "Page non trouvée (erreur 404)"
