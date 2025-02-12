@@ -28,6 +28,9 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
+# Ignore spec run results
+spec/examples.txt
+
 /public/assets
 
 # Ignore master key for decrypting credentials and more.
