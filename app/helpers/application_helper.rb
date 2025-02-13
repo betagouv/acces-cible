@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   # Automagically fetch title from @title, content_for(:title), resource.to_title, or controller/action/title I18n lookup
   def page_title
     return @title unless @title.blank?
