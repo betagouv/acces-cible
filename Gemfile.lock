@@ -194,6 +194,8 @@ GEM
     ffi (1.17.1-x86_64-linux-gnu)
     ffi (1.17.1-x86_64-linux-musl)
     formatador (1.1.0)
+    friendly_id (5.5.1)
+      activerecord (>= 4.0.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -557,6 +559,7 @@ DEPENDENCIES
   dsfr-view-components
   factory_bot_rails
   faker
+  friendly_id
   guard
   guard-cucumber
   guard-rspec

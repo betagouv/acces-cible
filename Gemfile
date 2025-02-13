@@ -49,6 +49,8 @@ gem "dsfr-assets"
 gem "dsfr-form_builder"
 gem "dsfr-view-components"
 
+gem "friendly_id"
+
 group :development, :test do
   gem "pry-rails"
 
