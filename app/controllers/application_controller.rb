@@ -2,6 +2,8 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  helper_method :resource, :resource_model
+
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
     respond_to do |format|
       format.any  { head :not_found }
@@ -16,6 +18,18 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def resource_model
+    controller_path.classify.demodulize.safe_constantize
+  end
+
+  def resource
+    @resource ||= instance_variable_get(instance_variable_name)
+  end
+
+  def instance_variable_name
+    @instance_variable_name ||= "@#{action_name == "index" ? controller_name : controller_name.singularize}"
+  end
 
   def get_request? = request.request_method_symbol == :get
 end

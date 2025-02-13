@@ -8,4 +8,6 @@ class ApplicationRecord < ActiveRecord::Base
     alias human human_attribute_name
     def human_count(count, attr = nil) = human(attr || :count, count:)
   end
+
+  def to_title = respond_to?(:name) ? name : to_s
 end
