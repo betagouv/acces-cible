@@ -9,6 +9,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
 require "rspec/rails"
+require "database_cleaner"
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -48,6 +49,20 @@ RSpec.configure do |config|
 
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
+
+  # Setup Database cleaner to avoid state leaks between tests
+  config.before(:suite) do
+    DatabaseCleaner.clean_with :truncation, except: [:ar_internal_metadata]
+  end
+
+  config.before do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.start
+  end
+
+  config.append_after do
+    DatabaseCleaner.clean
+  end
 
   # Feature-specific config
   config.include Capybara::DSL, type: :feature
