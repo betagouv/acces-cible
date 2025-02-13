@@ -9,7 +9,7 @@
   <% t.with_body do %>
     <% @sites.each do |site| %>
       <tr>
-        <td><%= link_to site.name, site %></td>
+        <td><%= link_to site.url_without_scheme, site %></td>
         <td>
           <%= l site.updated_at, format: :compact %>
           <br>

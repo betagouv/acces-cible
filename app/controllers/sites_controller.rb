@@ -4,7 +4,7 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    @sites = Site.all
+    @pagy, @sites = pagy Site.includes(:audit)
   end
 
   # GET /sites/1
@@ -18,7 +18,7 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    @site = Site.new(site_params)
+    @site = Site.find_or_create_by_url(site_params)
     if @site.save
       redirect_to @site, notice: t(".notice")
     else
@@ -44,7 +44,7 @@ class SitesController < ApplicationController
   private
 
   def set_site
-    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new
+    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new_with_audit
   end
 
   def redirect_old_slugs

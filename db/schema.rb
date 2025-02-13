@@ -10,9 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_13_082907) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_13_152147) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "audits", force: :cascade do |t|
+    t.bigint "site_id", null: false
+    t.string "url", null: false
+    t.string "status", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
+    t.index ["attempts"], name: "index_audits_on_retryable", where: "(((status)::text = 'failed'::text) AND (attempts > 0))"
+    t.index ["site_id"], name: "index_audits_on_site_id"
+    t.index ["status", "run_at"], name: "index_audits_on_status_and_run_at"
+    t.index ["url"], name: "index_audits_on_url"
+  end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
     t.string "slug", null: false
@@ -32,4 +47,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_13_082907) do
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_sites_on_slug", unique: true
   end
+
+  add_foreign_key "audits", "sites"
 end
