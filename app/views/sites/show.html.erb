@@ -1,0 +1,16 @@
+<p>
+  <strong><%= Site.human :url %> :</strong>
+  <%= link_to @site.url, @site.url, target: :_blank %>
+</p>
+<p>
+  <strong><%= Site.human :updated_at %> :</strong>
+  <%= l @site.updated_at, format: :long %>
+  (<%= time_ago @site.updated_at %>).
+</p>
+
+<br>
+
+<div class="fr-btn-group fr-mb-2w">
+  <%= button_to "Supprimer ce site", @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= link_to "Revenir à la liste", { action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+</div>

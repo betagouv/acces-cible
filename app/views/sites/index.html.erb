@@ -1,0 +1,26 @@
+<%= dsfr_table(caption: "Liste des sites") do |t| %>
+  <% t.with_head do %>
+    <tr>
+      <th scope="col"><%= Site.human(:url) %></th>
+      <th scope="col"><%= Site.human(:updated_at) %></th>
+      <th scope="col"><%= t("shared.actions") %></th>
+    </tr>
+  <% end %>
+  <% t.with_body do %>
+    <% @sites.each do |site| %>
+      <tr>
+        <td><%= link_to site.name, site %></td>
+        <td>
+          <%= l site.updated_at, format: :compact %>
+          <br>
+          (<%= time_ago site.updated_at %>)
+        </td>
+        <td><%= link_to "Voir le site", site.url, target: :_blank %></td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= paginate %>
+
+<%= link_to "Ajouter un site", { action: :new }, class: "fr-btn" %>

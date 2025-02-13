@@ -1,0 +1,7 @@
+<%= form_with(model: site) do |f| %>
+  <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: "Saisissez une url valide, commençant par https:// ou http://" %>
+
+  <%= f.submit "Enregistrer", name: nil, class: "fr-btn", data: { disable_with: "Enregistrement…" } %>
+
+  <%= link_to "Annuler", { action: site.persisted? ? :show : :index }, class: "fr-btn fr-btn--secondary" %>
+<% end %>
