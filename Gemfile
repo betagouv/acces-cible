@@ -50,8 +50,7 @@ gem "dsfr-form_builder"
 gem "dsfr-view-components"
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: [:mri, :windows], require: "debug/prelude"
+  gem "pry-rails"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
@@ -68,7 +67,6 @@ group :development do
   # Print validation error messages in console
   gem "whiny_validation"
   # Open pry when using rails console
-  gem "pry-rails"
   gem "better_errors"
   gem "binding_of_caller"
 end

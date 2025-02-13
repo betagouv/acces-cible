@@ -159,9 +159,6 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
     date (3.4.1)
-    debug (1.10.0)
-      irb (~> 1.10)
-      reline (>= 0.3.8)
     debug_inspector (1.2.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -555,7 +552,6 @@ DEPENDENCIES
   cucumber-rails
   dartsass-rails
   database_cleaner
-  debug
   dsfr-assets
   dsfr-form_builder
   dsfr-view-components
