@@ -14,4 +14,8 @@ class ApplicationController < ActionController::Base
       format.html { render "errors#internal_server_error", status: :internal_server_error }
     end
   end
+
+  private
+
+  def get_request? = request.request_method_symbol == :get
 end
