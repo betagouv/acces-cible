@@ -38,6 +38,9 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# Add optimized Active Record association methods
+gem "activerecord-has_some_of_many"
+
 # Pagination
 gem "pagy"
 
@@ -48,6 +51,8 @@ gem "view_component"
 gem "dsfr-assets"
 gem "dsfr-form_builder"
 gem "dsfr-view-components"
+
+gem "friendly_id"
 
 group :development, :test do
   gem "pry-rails"

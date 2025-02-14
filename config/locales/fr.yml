@@ -10,6 +10,26 @@ fr:
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     time_ago: "il y a %{time}"
 
+  time:
+    formats:
+      compact: "%Y/%m/%d"
+
+  errors:
+    attributes:
+      url:
+        invalid: invalide
+
+  activerecord:
+    attributes:
+      site:
+        created_at: Date de création
+        updated_at: Date de mise à jour
+        url: Adresse du site
+        count:
+          zero: Aucun site
+          one: Un site
+          other: "%{count} sites"
+
   errors:
     not_found:
       title: "Page non trouvée (erreur 404)"
@@ -30,3 +50,16 @@ fr:
       title: Mentions légales
     plan:
       title: Plan du site
+  sites:
+    index:
+      title: Tous les sites
+    new:
+      title: Ajouter un site
+    create:
+      notice: Site ajouté
+    edit:
+      title: Modifier le site
+    update:
+      notice: Site modifié
+    destroy:
+      notice: Site supprimé
