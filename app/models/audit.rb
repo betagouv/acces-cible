@@ -14,13 +14,12 @@ class Audit < ApplicationRecord
   scope :due, -> { pending.where("run_at <= now()") }
   scope :past, -> { where(status: [:passed, :failed]) }
   scope :scheduled, -> { where("run_at > now()") }
-  scope :retryable, -> { failed.where(attempts: ...MAX_ATTEMPTS) }
-  scope :to_run, -> { due.or(retryable) }
+  scope :to_run, -> { due.or(where(status: :retryable)) }
   scope :clean, -> { passed.where(attempts: 0) }
-  scope :late, -> { pending.where("run_at <= ?", 1.hour.ago) }
+  scope :late, -> { pending.where("run_at <= ?", MAX_RUNTIME.ago) }
   scope :retried, -> { passed.where(attempts: 1..) }
   scope :stalled, -> { running.where("run_at < ?", MAX_RUNTIME.ago) }
-  scope :crashed, -> { failed.where(attempts: MAX_ATTEMPTS) }
+  scope :crashed, -> { failed.where(attempts: MAX_ATTEMPTS..) }
 
   delegate :hostname, :path, to: :parsed_url
 

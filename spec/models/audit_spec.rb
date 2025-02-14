@@ -63,11 +63,11 @@ RSpec.describe Audit do
 
     it ".to_run returns due and retryable audits" do
       past_pending = create(:audit, :pending, site:, run_at: 1.hour.ago)
-      retryable = create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS - 1)
+      retryable = create(:audit, :retryable, site:)
 
       # Create records that shouldn't be included
       create(:audit, :pending, site:, run_at: 1.hour.from_now) # not due
-      create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS) # not retryable
+      create(:audit, :failed, site:) # wrong status
       create(:audit, :passed, site:) # wrong status
 
       expect(described_class.to_run).to match_array([past_pending, retryable])
@@ -81,6 +81,7 @@ RSpec.describe Audit do
       let!(:retried_audit) { create(:audit, :passed, site:, attempts: 2, created_at: 3.days.ago) }
       let!(:running_audit) { create(:audit, :running, site:, run_at: 2.hours.ago, created_at: 2.days.ago) }
       let!(:crashed_audit) { create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS, created_at: 1.day.ago) }
+      let!(:retryable_audit) { create(:audit, :retryable, site:, created_at: 1.hour.ago) }
 
       it ".past returns passed and failed audits" do
         expect(described_class.past).to contain_exactly(passed_audit, failed_audit, retried_audit, crashed_audit)
@@ -90,8 +91,8 @@ RSpec.describe Audit do
         expect(described_class.scheduled).to eq([future_audit])
       end
 
-      it ".retryable returns failed audits with attempts less than MAX_ATTEMPTS" do
-        expect(described_class.retryable).to eq([failed_audit])
+      it ".retryable returns audits with retryable status" do
+        expect(described_class.retryable).to eq([retryable_audit])
       end
 
       it ".clean returns passed audits with no attempts" do
@@ -130,19 +131,19 @@ RSpec.describe Audit do
 
   describe "#due?" do
     it "returns true for pending audits with past run_at" do
-      audit.status = "pending"
+      audit.status = :pending
       audit.run_at = 1.minute.ago
       expect(audit).to be_due
     end
 
     it "returns false for pending audits with future run_at" do
-      audit.status = "pending"
+      audit.status = :pending
       audit.run_at = 1.minute.from_now
       expect(audit).not_to be_due
     end
 
     it "returns false for non-pending audits" do
-      audit.status = "running"
+      audit.status = :running
       audit.run_at = 1.minute.ago
       expect(audit).not_to be_due
     end
