@@ -1,6 +1,8 @@
 class Check < ApplicationRecord
-  MAX_ATTEMPTS = Audit::MAX_ATTEMPTS
-  MAX_RUNTIME = Audit::MAX_RUNTIME
+  MAX_ATTEMPTS = 3
+  MAX_RUNTIME = 1.hour.freeze
+  TYPES = [
+  ].freeze
 
   belongs_to :audit
 
@@ -21,6 +23,11 @@ class Check < ApplicationRecord
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
+
+    def types
+      @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
+    end
+    def classes = types.values
   end
 
   def run_at = super || audit&.run_at || Time.current
