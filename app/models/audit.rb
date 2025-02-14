@@ -3,6 +3,7 @@ class Audit < ApplicationRecord
   MAX_RUNTIME = 1.hour.freeze
 
   belongs_to :site, touch: true
+  has_many :checks, dependent: :destroy
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { URI.parse(url).normalize.to_s }
@@ -11,8 +12,8 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(url, '^https?://(www\.)?', '') ASC")) }
-  scope :due, -> { pending.where("run_at <= now()") }
-  scope :past, -> { where(status: [:passed, :failed]) }
+  scope :due, -> { where("run_at <= now()") }
+  scope :past, -> { where(status: [:passed, :failed]).due }
   scope :scheduled, -> { where("run_at > now()") }
   scope :to_run, -> { due.or(where(status: :retryable)) }
   scope :clean, -> { passed.where(attempts: 0) }

@@ -2,7 +2,7 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { order("audits.created_at DESC") }, class_name: "Audit"
+  has_one_of_many :audit, -> { past.order("audits.created_at DESC") }
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 

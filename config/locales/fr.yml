@@ -21,6 +21,22 @@ fr:
 
   activerecord:
     attributes:
+      check:
+        type: Type de contrôle
+        status: État
+        run_at: Contrôle prévu le
+        checked_at: Contrôle effectué le
+        attempts: Tentatives
+        count:
+          zero: Aucun contrôle
+          one: Un contrôle
+          other: "%{count} contrôles"
+      check/status:
+        pending: Planifié
+        running: En cours
+        passed: Effectué
+        retryable: À retenter
+        failed: Échoué
       site:
         created_at: Date de création
         updated_at: Date de mise à jour

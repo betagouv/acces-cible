@@ -53,24 +53,23 @@ RSpec.describe Audit do
       expect(described_class.sort_by_url).to eq([alpha, beta, gamma])
     end
 
-    it ".due returns pending audits with run_at in the past" do
+    it ".due returns audits with run_at in the past" do
       past_pending = create(:audit, :pending, site:, run_at: 1.hour.ago)
+      past_passed = create(:audit, :passed, site:, run_at: 2.hours.ago)
       create(:audit, :pending, site:, run_at: 1.hour.from_now) # future
-      create(:audit, :passed, site:, run_at: 2.hours.ago)      # not pending
 
-      expect(described_class.due).to eq([past_pending])
+      expect(described_class.due).to match_array([past_pending, past_passed])
     end
 
     it ".to_run returns due and retryable audits" do
-      past_pending = create(:audit, :pending, site:, run_at: 1.hour.ago)
+      past_audit = create(:audit, :passed, site:, run_at: 1.hour.ago)
       retryable = create(:audit, :retryable, site:)
 
       # Create records that shouldn't be included
-      create(:audit, :pending, site:, run_at: 1.hour.from_now) # not due
-      create(:audit, :failed, site:) # wrong status
-      create(:audit, :passed, site:) # wrong status
+      create(:audit, :pending, site:, run_at: 1.hour.from_now) # future run_at
+      create(:audit, :failed, site:, run_at: 1.hour.from_now) # future run_at
 
-      expect(described_class.to_run).to match_array([past_pending, retryable])
+      expect(described_class.to_run).to match_array([past_audit, retryable])
     end
 
     context "with audits" do
