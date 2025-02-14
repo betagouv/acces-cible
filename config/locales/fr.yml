@@ -37,6 +37,13 @@ fr:
         passed: Effectué
         retryable: À retenter
         failed: Échoué
+      checks/accessibility_mention:
+        type: Mention du niveau d'accessibilité
+      checks/accessibility_mention/mentions:
+        "": Absente
+        non: Non conforme
+        partiellement: Partiellement conforme
+        totalement: Totalement conforme
       site:
         created_at: Date de création
         updated_at: Date de mise à jour

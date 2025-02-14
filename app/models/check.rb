@@ -2,6 +2,7 @@ class Check < ApplicationRecord
   MAX_ATTEMPTS = 3
   MAX_RUNTIME = 1.hour.freeze
   TYPES = [
+    :accessibility_mention,
   ].freeze
 
   belongs_to :audit
