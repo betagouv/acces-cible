@@ -36,4 +36,11 @@ module ApplicationHelper
   def paginate
     render "shared/paginate", pagy: @pagy if @pagy && @pagy.pages > 1
   end
+
+  def badge(status, text = nil, tooltip: false, &block)
+    status, text = *status if status.is_a?(Array)
+    text ||= yield(block)
+    html_attributes = tooltip ? { role: :tooltip, tabindex: 0, title: text } : {}
+    dsfr_badge(status:, html_attributes:) { tooltip ? tag.span(class: "fr-sr-only") { text } : text }
+  end
 end

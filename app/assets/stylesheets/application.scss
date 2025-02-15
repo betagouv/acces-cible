@@ -3,3 +3,9 @@
 form.button_to {
   display: contents;
 }
+
+// Centre l'icône quand le badge n'a pas de texte visible
+.fr-badge[role=tooltip]::before {
+  margin-right: -.125rem;
+  cursor: help;
+}
