@@ -44,6 +44,8 @@ fr:
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
+      checks/language_indication:
+        type: Indication de la langue
       site:
         created_at: Date de création
         updated_at: Date de mise à jour

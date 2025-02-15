@@ -3,6 +3,7 @@ class Check < ApplicationRecord
   MAX_RUNTIME = 1.hour.freeze
   TYPES = [
     :accessibility_mention,
+    :language_indication,
   ].freeze
 
   belongs_to :audit
