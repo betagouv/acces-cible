@@ -2,7 +2,10 @@
   <% t.with_head do %>
     <tr>
       <th scope="col"><%= Site.human(:url) %></th>
-      <th scope="col"><%= Site.human(:updated_at) %></th>
+      <% Check.classes.collect(&:table_header).each do |header| %>
+        <th scope="col" class="fr-cell--center"><%= header %></th>
+      <% end %>
+      <th scope="col"><%= Site.human(:last_audited_at) %></th>
       <th scope="col"><%= t("shared.actions") %></th>
     </tr>
   <% end %>
@@ -10,10 +13,13 @@
     <% @sites.each do |site| %>
       <tr>
         <td><%= link_to site.url_without_scheme, site %></td>
+        <% site.audit.all_checks.each do |check| %>
+          <td class="fr-cell--center"><%= badge check.to_badge, tooltip: true %></td>
+        <% end %>
         <td>
-          <%= l site.updated_at, format: :compact %>
+          <%= l site.audit.run_at, format: :compact %>
           <br>
-          (<%= time_ago site.updated_at %>)
+          (<%= time_ago site.audit.run_at %>)
         </td>
         <td><%= link_to "Voir le site", site.url, target: :_blank %></td>
       </tr>

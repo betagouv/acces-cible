@@ -2,17 +2,22 @@ module Checks
   class AccessibilityMention < Check
     MENTION_REGEX = /accessibilit[ée]\s*:?\s*(?<level>non|partiellement|totalement)\s+conforme/iu
 
-    def mention? = data[:mention].present?
-    def human_mention = human("mentions.", count: nil)[mention.to_s.to_sym]
+    store_accessor :data, :mention
+
+    def mention? = mention.present?
+
+    def custom_badge_text = human("mentions.", count: nil)[mention.to_s.to_sym]
+    def custom_badge_status
+      { nil => :error,
+        non: :warning,
+        partiellement: :new,
+        totalement: :success }[mention&.to_sym]
+    end
 
     private
 
     def analyze!
       { mention: find_mention }
-    end
-
-    def mention
-      data[:mention]&.to_sym
     end
 
     def find_mention

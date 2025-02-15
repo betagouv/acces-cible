@@ -1,5 +1,16 @@
 module Checks
   class LanguageIndication < Check
+    store_accessor :data, :indication
+
+    def custom_badge_text = indication || human(:empty)
+    def custom_badge_status
+      case indication
+      when nil, "" then :error
+      when /^(?:FR)(?:[_-][A-Z]{2})?$/i then :success
+      else :warning
+      end
+    end
+
     private
 
     def analyze!

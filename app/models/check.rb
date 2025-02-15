@@ -25,6 +25,7 @@ class Check < ApplicationRecord
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
+    def table_header = human("checks.#{model_name.element}.table_header") || human_type
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
@@ -39,6 +40,10 @@ class Check < ApplicationRecord
   def due? = pending? && run_at <= Time.current
   def runnable? = due? || retryable?
   def root_page = Page.new(audit.url)
+
+  def to_badge
+    [status_to_badge_level, passed? ? custom_badge_text : human_status]
+  end
 
   def run
     return false unless runnable?
@@ -58,4 +63,13 @@ class Check < ApplicationRecord
   private
 
   def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+
+  def status_to_badge_level
+    case
+    when passed? then custom_badge_status || :success
+    when pending?, running? then :info
+    when retryable? then :warning
+    when failed? then :error
+    end
+  end
 end

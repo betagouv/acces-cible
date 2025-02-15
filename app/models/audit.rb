@@ -40,4 +40,8 @@ class Audit < ApplicationRecord
       send(name) || send(:"create_#{name}")
     end
   end
+
+  def all_checks
+    Check.types.keys.map { |name| send(name) || send(:"build_#{name}") }
+  end
 end

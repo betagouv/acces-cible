@@ -39,6 +39,7 @@ fr:
         failed: Échoué
       checks/accessibility_mention:
         type: Mention du niveau d'accessibilité
+        table_header: Mention
       checks/accessibility_mention/mentions:
         "": Absente
         non: Non conforme
@@ -46,10 +47,14 @@ fr:
         totalement: Totalement conforme
       checks/language_indication:
         type: Indication de la langue
+        table_header: Langue
+        empty: Absente
+
       site:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
+        last_audited_at: Dernier audit
         count:
           zero: Aucun site
           one: Un site
