@@ -8,6 +8,8 @@ class Site < ApplicationRecord
 
   delegate :url, :url_without_scheme, to: :audit
 
+  scope :sort_by_audit_url, -> { joins(:audits).merge(Audit.sort_by_url) }
+
   class << self
     def find_or_create_by_url(attributes)
       url = attributes.to_h.delete(:url)

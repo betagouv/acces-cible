@@ -14,7 +14,7 @@ class Audit < ApplicationRecord
   enum :status, ["pending", "running", "passed", "retryable", "failed"].index_by(&:itself), validate: true, default: :pending
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
-  scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(url, '^https?://(www\.)?', '') ASC")) }
+  scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :due, -> { where("run_at <= now()") }
   scope :past, -> { where(status: [:passed, :failed]).due }
   scope :scheduled, -> { where("run_at > now()") }
