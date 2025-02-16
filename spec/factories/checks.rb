@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :check do
-    audit { association :audit, checks: [instance] }
+  factory :accessibility_mention_check, class: "Checks::AccessibilityMention", aliases: [:check] do
+    audit { association :audit, accessibility_mention: instance }
   end
 end
