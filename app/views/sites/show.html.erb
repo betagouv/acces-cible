@@ -2,11 +2,13 @@
   <strong><%= Site.human :url %> :</strong>
   <%= link_to @site.url, @site.url, target: :_blank %>
 </p>
+<% if @site.audit.checked_at %>
 <p>
   <strong><%= Site.human :last_audit_at %> :</strong>
-  <%= l @site.audit.run_at, format: :long %>
-  (<%= time_ago @site.audit.run_at %>).
+  <%= l @site.audit.checked_at, format: :long %>
+  (<%= time_ago @site.audit.checked_at %>).
 </p>
+<% end %>
 <% @site.audit.all_checks.each do |check| %>
   <p>
     <strong><%= check.human_type %> :</strong>

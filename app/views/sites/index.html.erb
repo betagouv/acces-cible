@@ -17,9 +17,11 @@
           <td class="fr-cell--center"><%= badge check.to_badge, tooltip: true %></td>
         <% end %>
         <td>
-          <%= l site.audit.run_at, format: :compact %>
-          <br>
-          (<%= time_ago site.audit.run_at %>)
+          <% if site.audit.checked_at %>
+            <%= l site.audit.checked_at, format: :compact %>
+            <br>
+            (<%= time_ago site.audit.checked_at %>)
+          <% end %>
         </td>
         <td><%= link_to "Voir le site", site.url, target: :_blank %></td>
       </tr>

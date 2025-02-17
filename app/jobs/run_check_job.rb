@@ -6,5 +6,6 @@ class RunCheckJob < ApplicationJob
     check.run
 
     UpdateAuditStatusJob.with(check.audit).perform_later
+    check.audit.update(checked_at: Time.zone.now)
   end
 end
