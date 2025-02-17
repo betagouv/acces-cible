@@ -8,7 +8,13 @@ class Site < ApplicationRecord
 
   delegate :url, :url_without_scheme, to: :audit
 
-  scope :sort_by_audit_url, -> { joins(:audits).merge(Audit.sort_by_url) }
+  scope :sort_by_audit_url, -> do
+    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
+    subquery = joins(:audits)
+      .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")
+      .order("sites.id, sortable_url")
+    from(subquery, :sites).order(:sortable_url)
+  end
 
   class << self
     def find_or_create_by_url(attributes)
