@@ -18,7 +18,7 @@ module Checks
     end
 
     def find_language_indication
-      root.dom.root.attributes["lang"]&.value
+      root_page.dom.root.attributes["lang"]&.value
     end
   end
 end
