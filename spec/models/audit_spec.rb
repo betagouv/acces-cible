@@ -11,6 +11,9 @@ RSpec.describe Audit do
 
   describe "associations" do
     it { is_expected.to belong_to(:site).touch(true) }
+    Check.names.each do |name|
+      it { is_expected.to have_one(name).dependent(:destroy) }
+    end
   end
 
   describe "validations" do
@@ -29,7 +32,7 @@ RSpec.describe Audit do
     it do
       should define_enum_for(:status)
         .validating
-        .with_values(["pending", "running", "passed", "retryable", "failed"].index_by(&:itself))
+        .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
         .backed_by_column_of_type(:string)
         .with_default(:pending)
     end
@@ -37,6 +40,7 @@ RSpec.describe Audit do
 
   describe "scopes" do
     before { site.audit.destroy }
+
     it ".sort_by_newest returns audits in descending order by creation date" do
       oldest = create(:audit, site:, created_at: 3.days.ago)
       older = create(:audit, site:, created_at: 2.days.ago)
@@ -46,123 +50,11 @@ RSpec.describe Audit do
     end
 
     it ".sort_by_url orders by URL ignoring protocol and www" do
+      gamma = create(:audit, site:, url: "https://www.gamma.com")
       alpha = create(:audit, site:, url: "https://alpha.com/path")
       beta = create(:audit, site:, url: "http://www.beta.com")
-      gamma = create(:audit, site:, url: "https://www.gamma.com")
 
       expect(described_class.sort_by_url).to eq([alpha, beta, gamma])
-    end
-
-    it ".due returns pending audits with run_at in the past" do
-      past_pending = create(:audit, :pending, site:, run_at: 1.hour.ago)
-      create(:audit, :pending, site:, run_at: 1.hour.from_now) # future
-      create(:audit, :passed, site:, run_at: 2.hours.ago)      # not pending
-
-      expect(described_class.due).to eq([past_pending])
-    end
-
-    it ".to_run returns due and retryable audits" do
-      past_pending = create(:audit, :pending, site:, run_at: 1.hour.ago)
-      retryable = create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS - 1)
-
-      # Create records that shouldn't be included
-      create(:audit, :pending, site:, run_at: 1.hour.from_now) # not due
-      create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS) # not retryable
-      create(:audit, :passed, site:) # wrong status
-
-      expect(described_class.to_run).to match_array([past_pending, retryable])
-    end
-
-    context "with audits" do
-      let!(:passed_audit) { create(:audit, :passed, site:, created_at: 7.days.ago, url: "https://beta.com") }
-      let!(:failed_audit) { create(:audit, :failed, site:, created_at: 6.days.ago, url: "https://alpha.com") }
-      let!(:pending_audit) { create(:audit, :pending, site:, run_at: 1.hour.ago, created_at: 5.days.ago) }
-      let!(:future_audit) { create(:audit, :pending, site:, run_at: 1.hour.from_now, created_at: 4.days.ago) }
-      let!(:retried_audit) { create(:audit, :passed, site:, attempts: 2, created_at: 3.days.ago) }
-      let!(:running_audit) { create(:audit, :running, site:, run_at: 2.hours.ago, created_at: 2.days.ago) }
-      let!(:crashed_audit) { create(:audit, :failed, site:, attempts: Audit::MAX_ATTEMPTS, created_at: 1.day.ago) }
-
-      it ".past returns passed and failed audits" do
-        expect(described_class.past).to contain_exactly(passed_audit, failed_audit, retried_audit, crashed_audit)
-      end
-
-      it ".scheduled returns audits with future run_at" do
-        expect(described_class.scheduled).to eq([future_audit])
-      end
-
-      it ".retryable returns failed audits with attempts less than MAX_ATTEMPTS" do
-        expect(described_class.retryable).to eq([failed_audit])
-      end
-
-      it ".clean returns passed audits with no attempts" do
-        expect(described_class.clean).to eq([passed_audit])
-      end
-
-      it ".late returns pending audits overdue by an hour" do
-        expect(described_class.late).to eq([pending_audit])
-      end
-
-      it ".retried returns passed audits with attempts" do
-        expect(described_class.retried).to eq([retried_audit])
-      end
-
-      it ".stalled returns running audits older than MAX_RUNTIME" do
-        expect(described_class.stalled).to eq([running_audit])
-      end
-
-      it ".crashed returns failed audits with MAX_ATTEMPTS" do
-        expect(described_class.crashed).to eq([crashed_audit])
-      end
-    end
-  end
-
-  describe "#run_at" do
-    it "returns the set time when present" do
-      time = 1.hour.from_now
-      audit.run_at = time
-      expect(audit.run_at).to be_within(1.second).of(time)
-    end
-
-    it "returns current time when not set" do
-      expect(audit.run_at).to be_within(1.second).of(Time.zone.now)
-    end
-  end
-
-  describe "#due?" do
-    it "returns true for pending audits with past run_at" do
-      audit.status = "pending"
-      audit.run_at = 1.minute.ago
-      expect(audit).to be_due
-    end
-
-    it "returns false for pending audits with future run_at" do
-      audit.status = "pending"
-      audit.run_at = 1.minute.from_now
-      expect(audit).not_to be_due
-    end
-
-    it "returns false for non-pending audits" do
-      audit.status = "running"
-      audit.run_at = 1.minute.ago
-      expect(audit).not_to be_due
-    end
-  end
-
-  describe "#runnable?" do
-    it "returns true when due" do
-      allow(audit).to receive(:due?).and_return(true)
-      expect(audit).to be_runnable
-    end
-
-    it "returns true when retryable" do
-      allow(audit).to receive(:retryable?).and_return(true)
-      expect(audit).to be_runnable
-    end
-
-    it "returns false when neither due nor retryable" do
-      allow(audit).to receive(:due?).and_return(false)
-      allow(audit).to receive(:retryable?).and_return(false)
-      expect(audit).not_to be_runnable
     end
   end
 
@@ -172,7 +64,6 @@ RSpec.describe Audit do
       expect(audit.parsed_url).to be_a(URI::HTTPS)
       expect(audit.parsed_url.to_s).to eq(audit.url)
     end
-    # Skip memoization test because framework operation use URI.parse too
   end
 
   describe "#url_without_scheme" do
@@ -191,6 +82,49 @@ RSpec.describe Audit do
       first_result = audit.url_without_scheme
       allow(audit).to receive(:hostname).and_return("different.com")
       expect(audit.url_without_scheme).to eq(first_result)
+    end
+  end
+
+  describe "#all_checks" do
+    let(:audit) { build(:audit) }
+    it "returns all checks, building missing ones" do
+      checks = audit.all_checks
+      expect(checks.size).to eq(Check.types.size)
+      expect(checks.all?(&:new_record?)).to be true
+    end
+  end
+
+  describe "#create_checks" do
+    let(:audit) { create(:audit) }
+    it "creates all check types" do
+      expect(audit.create_checks.size).to eq(Check.types.size)
+
+      Check.types.keys.each do |name|
+        expect(audit.public_send(name)).to be_persisted
+      end
+    end
+  end
+
+  describe "#derive_status_from_checks" do
+    let(:audit) { create(:audit) }
+
+    it "sets status to pending when any check is new" do
+      audit = build(:audit)
+      audit.derive_status_from_checks
+      expect(audit.status).to eq("pending")
+    end
+
+    it "sets status to mixed when checks have different statuses" do
+      audit.all_checks.first.update!(status: :passed)
+      audit.all_checks.last.update!(status: :failed)
+      audit.derive_status_from_checks
+      expect(audit.status).to eq("mixed")
+    end
+
+    it "sets status to match checks when all have same status" do
+      audit.all_checks.each { |check| check.update(status: :passed) }
+      audit.derive_status_from_checks
+      expect(audit.status).to eq("passed")
     end
   end
 end

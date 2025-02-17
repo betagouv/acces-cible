@@ -21,10 +21,40 @@ fr:
 
   activerecord:
     attributes:
+      check:
+        type: Type de contrôle
+        status: État
+        run_at: Contrôle prévu le
+        checked_at: Contrôle effectué le
+        attempts: Tentatives
+        count:
+          zero: Aucun contrôle
+          one: Un contrôle
+          other: "%{count} contrôles"
+      check/status:
+        pending: Planifié
+        running: En cours
+        passed: Effectué
+        retryable: À retenter
+        failed: Échoué
+      checks/accessibility_mention:
+        type: Mention du niveau d'accessibilité
+        table_header: Mention
+      checks/accessibility_mention/mentions:
+        "": Absente
+        non: Non conforme
+        partiellement: Partiellement conforme
+        totalement: Totalement conforme
+      checks/language_indication:
+        type: Indication de la langue
+        table_header: Langue
+        empty: Absente
+
       site:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
+        last_audited_at: Dernier audit
         count:
           zero: Aucun site
           one: Un site

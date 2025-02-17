@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_13_152147) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_16_205241) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,14 +19,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_13_152147) do
     t.string "url", null: false
     t.string "status", null: false
     t.integer "attempts", default: 0, null: false
-    t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
     t.index ["attempts"], name: "index_audits_on_retryable", where: "(((status)::text = 'failed'::text) AND (attempts > 0))"
     t.index ["site_id"], name: "index_audits_on_site_id"
-    t.index ["status", "run_at"], name: "index_audits_on_status_and_run_at"
     t.index ["url"], name: "index_audits_on_url"
+  end
+
+  create_table "checks", force: :cascade do |t|
+    t.bigint "audit_id", null: false
+    t.string "type", null: false
+    t.string "status", null: false
+    t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "checked_at"
+    t.integer "attempts", default: 0, null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "scheduled", default: false, null: false
+    t.index ["attempts"], name: "index_checks_on_retryable", where: "(((status)::text = 'failed'::text) AND (attempts > 0))"
+    t.index ["audit_id"], name: "index_checks_on_audit_id"
+    t.index ["status", "run_at"], name: "index_checks_on_status_and_run_at"
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
@@ -49,4 +63,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_13_152147) do
   end
 
   add_foreign_key "audits", "sites"
+  add_foreign_key "checks", "audits"
 end

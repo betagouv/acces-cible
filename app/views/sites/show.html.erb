@@ -3,10 +3,16 @@
   <%= link_to @site.url, @site.url, target: :_blank %>
 </p>
 <p>
-  <strong><%= Site.human :updated_at %> :</strong>
-  <%= l @site.updated_at, format: :long %>
-  (<%= time_ago @site.updated_at %>).
+  <strong><%= Site.human :last_audit_at %> :</strong>
+  <%= l @site.audit.run_at, format: :long %>
+  (<%= time_ago @site.audit.run_at %>).
 </p>
+<% @site.audit.all_checks.each do |check| %>
+  <p>
+    <strong><%= check.human_type %> :</strong>
+    <%= badge check.to_badge %>
+  </p>
+<% end %>
 
 <br>
 

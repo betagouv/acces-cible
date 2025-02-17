@@ -2,11 +2,13 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { order("audits.created_at DESC") }, class_name: "Audit"
+  has_one_of_many :audit, -> { past.order("audits.created_at DESC") }
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
   delegate :url, :url_without_scheme, to: :audit
+
+  scope :sort_by_audit_url, -> { joins(:audits).merge(Audit.sort_by_url) }
 
   class << self
     def find_or_create_by_url(attributes)
