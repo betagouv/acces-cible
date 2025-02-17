@@ -1,4 +1,4 @@
-class ScheduleChecksJob< ApplicationJob
+class ScheduleChecksJob < ApplicationJob
   def perform
     Check.to_schedule.find_each do |check|
       Check.transaction do
