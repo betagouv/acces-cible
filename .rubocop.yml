@@ -1,11 +1,12 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
-require:
-  - rubocop-factory_bot
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+require:
+  - rubocop-factory_bot
   - rubocop-rspec_rails
 
 AllCops:
