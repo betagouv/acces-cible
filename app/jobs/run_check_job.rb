@@ -1,11 +1,11 @@
 class RunCheckJob < ApplicationJob
-  def perform
-    check = params.values_at(:check)
-    return unless check.runnable?
+  def perform(check)
+    return unless check.due?
 
     check.run
 
-    UpdateAuditStatusJob.with(check.audit).perform_later
     check.audit.update(checked_at: Time.zone.now)
+
+    UpdateAuditStatusJob.perform_later(check.audit)
   end
 end
