@@ -10,6 +10,7 @@ Link = Data.define(:href, :text) do
     else raise ArgumentError
     end
   end
+
   def to_str = href
-  def ==(other) = href == other.href
+  def ==(other) = href == other
 end
