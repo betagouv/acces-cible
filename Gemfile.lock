@@ -122,6 +122,9 @@ GEM
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
+    crack (1.0.0)
+      bigdecimal
+      rexml
     crass (1.0.6)
     cucumber (9.2.1)
       builder (~> 3.2)
@@ -238,6 +241,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    hashdiff (1.1.2)
     html-attributes-utils (1.0.2)
       activesupport (>= 6.1.4.4)
     i18n (1.14.7)
@@ -529,6 +533,10 @@ GEM
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
+    webmock (3.25.0)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
@@ -603,6 +611,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   view_component
+  webmock
   whiny_validation
 
 RUBY VERSION

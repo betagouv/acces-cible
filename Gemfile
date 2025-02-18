@@ -94,6 +94,9 @@ group :test do
   # Simplify testing common Rails functionality
   gem "shoulda-matchers"
 
+  # Allow stubbing requests during tests
+  gem "webmock"
+
   # Allow testing accessibility using Axe-core. Only available in JS feature tests
   gem "axe-core-capybara", "~> 4.9"
   gem "axe-core-rspec", "~> 4.8"
