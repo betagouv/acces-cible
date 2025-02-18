@@ -2,6 +2,8 @@ module Checks
   class LanguageIndication < Check
     store_accessor :data, :indication
 
+    private
+
     def custom_badge_text = indication || human(:empty)
     def custom_badge_status
       case indication
@@ -10,8 +12,6 @@ module Checks
       else :warning
       end
     end
-
-    private
 
     def analyze!
       { indication: find_language_indication }

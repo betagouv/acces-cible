@@ -59,10 +59,10 @@ class Check < ApplicationRecord
     case
     when pending? then :info
     when failed? then :error
-    when passed? && respond_to?(:custom_badge_status) then custom_badge_status
+    when passed? && respond_to?(:custom_badge_status, true) then custom_badge_status
     else :success
     end
   end
 
-  def status_to_badge_text = passed? && respond_to?(:custom_badge_text) ? custom_badge_text : human_status
+  def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
 end
