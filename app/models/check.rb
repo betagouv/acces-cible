@@ -34,6 +34,7 @@ class Check < ApplicationRecord
   def to_partial_path = self.class.model_name.collection.singularize
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = Page.new(audit.url)
+  def crawl = Crawler.new(audit.url)
 
   def to_badge
     [status_to_badge_level, status_to_badge_text]
