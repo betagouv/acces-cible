@@ -5,7 +5,7 @@
       <% Check.classes.collect(&:table_header).each do |header| %>
         <th scope="col" class="fr-cell--center"><%= header %></th>
       <% end %>
-      <th scope="col"><%= Site.human(:last_audited_at) %></th>
+      <th scope="col"><%= Site.human(:last_audit_at) %></th>
       <th scope="col"><%= t("shared.actions") %></th>
     </tr>
   <% end %>

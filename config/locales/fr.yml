@@ -54,7 +54,7 @@ fr:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
-        last_audited_at: Dernier audit
+        last_audit_at: Dernier audit
         count:
           zero: Aucun site
           one: Un site
