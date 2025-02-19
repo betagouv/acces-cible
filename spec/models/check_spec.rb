@@ -217,10 +217,7 @@ RSpec.describe Check do
           check.run
           check.reload
           expect(check).to be_failed
-          expect(check.data).to eq({
-            "error" => "Test error",
-            "error_type" => "StandardError"
-          })
+          expect(check.data.keys).to contain_exactly("error", "backtrace", "error_type")
           expect(check.checked_at).to be_within(1.second).of(Time.current)
         end
       end

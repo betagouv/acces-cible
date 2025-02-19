@@ -47,7 +47,7 @@ class Check < ApplicationRecord
     self.status = :passed
   rescue StandardError => e
     self.status = :failed
-    self.data = { error: e.message, error_type: e.class.name }
+    self.data = { error: e.message, error_type: e.class.name, backtrace: e.backtrace }
   ensure
     self.checked_at = Time.zone.now
     save
