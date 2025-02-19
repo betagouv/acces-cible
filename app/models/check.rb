@@ -38,7 +38,7 @@ class Check < ApplicationRecord
   def crawl = Crawler.new(audit.url)
 
   def to_badge
-    [status_to_badge_level, status_to_badge_text]
+    [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
   def run
@@ -67,4 +67,5 @@ class Check < ApplicationRecord
   end
 
   def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
+  def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 end
