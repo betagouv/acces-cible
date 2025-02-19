@@ -13,10 +13,11 @@ module Checks
     def custom_badge_link = url
 
     def analyze!
-      page = find_page
+      return {} unless page = find_page
+
       {
-        url: page&.url,
-        title: page&.title
+        url: page.url,
+        title: page.title
       }
     end
 

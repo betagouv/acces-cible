@@ -37,13 +37,10 @@ RSpec.describe Checks::AccessibilityPage do
       })
     end
 
-    it "returns hash with nil values when page is not found" do
+    it "returns empty hash when page is not found" do
       allow(check).to receive(:find_page).and_return(nil)
       result = check.send(:analyze!)
-      expect(result).to eq({
-        url: nil,
-        title: nil
-      })
+      expect(result).to eq({})
     end
   end
 
