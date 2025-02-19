@@ -37,10 +37,16 @@ module ApplicationHelper
     render "shared/paginate", pagy: @pagy if @pagy && @pagy.pages > 1
   end
 
-  def badge(status, text = nil, tooltip: false, &block)
-    status, text = *status if status.is_a?(Array)
+  def badge(status, text = nil, link: nil, tooltip: false, &block)
+    status, text, link = *status if status.is_a?(Array)
     text ||= yield(block)
-    html_attributes = tooltip ? { role: :tooltip, tabindex: 0, title: text } : {}
-    dsfr_badge(status:, html_attributes:) { tooltip ? tag.span(class: "fr-sr-only") { text } : text }
+    case
+    when tooltip && link
+      dsfr_badge(status:, html_attributes: { role: :tooltip, title: text }) { link_to text, link, class: "fr-sr-only", target: :_blank, rel: :noopenner }
+    when tooltip
+      dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
+    when link then dsfr_badge(status:) { link_to text, link }
+    else dsfr_badge(status:) { text }
+    end
   end
 end
