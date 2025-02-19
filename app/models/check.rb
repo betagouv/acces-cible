@@ -5,6 +5,7 @@ class Check < ApplicationRecord
   ].freeze
 
   belongs_to :audit
+  has_one :site, through: :audit
 
   enum :status, ["pending", "passed", "failed"].index_by(&:itself), validate: true, default: :pending
 
