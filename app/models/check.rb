@@ -1,6 +1,7 @@
 class Check < ApplicationRecord
   TYPES = [
     :accessibility_mention,
+    :accessibility_page,
     :language_indication,
   ].freeze
 
