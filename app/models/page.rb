@@ -14,7 +14,10 @@ class Page < Data.define(:url, :root)
     end
   end
 
-  def initialize(url:, root: nil)
+  def initialize(url:, root: nil, html: nil)
+    # Allow setting HTML directly to simplify testing and avoid network calls.
+    # The `html` method overwrites the instance variable, so we need to set it explicitly
+    @html = html
     super(url: URI.parse(url), root: URI.parse(root || url))
   end
 
@@ -28,8 +31,8 @@ class Page < Data.define(:url, :root)
   def external_links = links - internal_links
 
  def html
-   Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-     response = Net::HTTP.get_response(URI.parse(url))
+   @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
+     response = Net::HTTP.get_response(url)
      if response["Content-Type"]&.include?("text/html")
        response.body
      else
