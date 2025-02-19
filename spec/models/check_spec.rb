@@ -164,11 +164,12 @@ RSpec.describe Check do
       context "when check is passed" do
         let(:check) { build(:check, status: :passed) }
 
-        it "returns success level and custom text if available" do
+        it "returns success level, custom text, and custom link if available" do
           allow(check).to receive(:respond_to?).and_return(true)
           allow(check).to receive(:custom_badge_status).and_return(:success)
           allow(check).to receive(:custom_badge_text).and_return("Custom text")
-          expect(subject).to eq([:success, "Custom text"])
+          allow(check).to receive(:custom_badge_link).and_return("https://example.com/")
+          expect(subject).to eq([:success, "Custom text", "https://example.com/"])
         end
 
         it "returns success level and human status if no custom text" do

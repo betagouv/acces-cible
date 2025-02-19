@@ -4,8 +4,22 @@ form.button_to {
   display: contents;
 }
 
-// Centre l'icône quand le badge n'a pas de texte visible
-.fr-badge[role=tooltip]::before {
-  margin-right: -.125rem;
-  cursor: help;
+.fr-badge {
+  // Ajoute un outline quand il contient un lien caché qui a le focus
+  &:has(a:focus) {
+    outline-color: #0a76f6;
+    outline-style: solid;
+    outline-width: 2px;
+    a {
+      outline: none;
+    }
+  }
+  &[role=tooltip] {
+    outline-offset: 0;
+    // Centre l'icône quand le badge n'a pas de texte visible
+    &::before {
+      margin-right: -.125rem;
+      cursor: help;
+    }
+  }
 }
