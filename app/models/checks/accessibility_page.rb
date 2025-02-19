@@ -34,6 +34,8 @@ module Checks
     end
 
     def likelihood_of(link)
+      return 0 unless link.is_a?(Link)
+
       [
         link.text.match?(DECLARATION),
         link.href.match?("(declaration-)?accessibilite"),

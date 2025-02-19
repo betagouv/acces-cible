@@ -116,30 +116,21 @@ RSpec.describe Checks::AccessibilityPage do
   end
 
   describe "#likelihood_of" do
-    let(:link) { double("Link") }
-
-    before do
-      allow(link).to receive(:text).and_return("Some text")
-      allow(link).to receive(:href).and_return("#{root_url}/some-path")
-    end
-
     it "returns -1 if neither text nor href mention accessibility" do
+      link = build(:link, href: "#{root_url}/path", text: "text")
       expect(check.send(:likelihood_of, link)).to eq(-1)
     end
 
-    it "returns 0 if declaration is in text" do
-      allow(link).to receive(:text).and_return("Déclaration d'accessibilité")
+    it "returns 0 if declaration is in text or in href" do
+      link = build(:link, href: "#{root_url}/path", text: "Déclaration d'accessibilité")
       expect(check.send(:likelihood_of, link)).to eq 0
-    end
 
-    it "returns 0 if accessibility is in href" do
-      allow(link).to receive(:href).and_return("#{root_url}/declaration-accessibilite")
+      link = build(:link, href: "#{root_url}/declaration-accessibilite", text: "text")
       expect(check.send(:likelihood_of, link)).to eq 0
     end
 
     it "returns 1 if both text and href have matches" do
-      allow(link).to receive(:href).and_return("#{root_url}/declaration-accessibilite")
-      allow(link).to receive(:text).and_return("Accessibilité : partiellement conforme")
+      link = build(:link, href: "#{root_url}/declaration-accessibilite", text: "Déclaration d'accessibilité")
       expect(check.send(:likelihood_of, link)).to eq 1
     end
   end
