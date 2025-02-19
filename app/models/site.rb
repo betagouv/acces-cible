@@ -51,7 +51,8 @@ class Site < ApplicationRecord
     audit = audits.build(url: new_url)
   end
 
-  def to_title = url_without_scheme
+  def name = super.presence || url_without_scheme
+  alias to_title name
   def audit = super || audits.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 end
