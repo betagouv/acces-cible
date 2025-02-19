@@ -1,7 +1,7 @@
 fr:
   global:
-    sponsor: "Direction Interministérielle du Numérique"
-    sponsor_html: "Direction<br>Interministérielle<br>du Numérique"
+    sponsor: "Gouvernement"
+    sponsor_html: "Gouvernement"
     service_name: "Accès cible"
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
