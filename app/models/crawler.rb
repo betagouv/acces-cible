@@ -13,7 +13,9 @@ class Crawler
   end
 
   def find(&block)
-    detect(&block) or raise NoMatchError
+    found = nil
+    detect { |page, queue| found = page if block.call(page, queue) }
+    found or raise NoMatchError
   end
 
   private
@@ -22,8 +24,6 @@ class Crawler
   attr_reader :root, :crawled, :crawl_up_to
 
   def each
-    return to_enum(:each) unless block_given?
-
     while queue.any? && crawled.size < crawl_up_to
       page = get_page
       next unless page
