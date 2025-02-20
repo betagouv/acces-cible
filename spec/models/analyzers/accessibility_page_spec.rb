@@ -118,6 +118,7 @@ RSpec.describe Analyzers::AccessibilityPage do
 
   describe "#compliance_rate" do
     {
+      "avec un taux de conformité 81,25%" => 81.25,
       "taux de conformité de 75%" => 75,
       "conforme à 80,5%" => 80.5,
       "révèle que 90.5%" => 90.5,
@@ -133,6 +134,7 @@ RSpec.describe Analyzers::AccessibilityPage do
   describe "#standard" do
     {
       "conforme au RGAA version 4.1." => "RGAA version 4.1",
+      "les administrations, RGAA version 4.1.2, " => "RGAA version 4.1.2",
       "RGAA v4.1.1" => "RGAA v4.1.1",
       "au RGAA" => "RGAA",
       "des critères WCAG" => "WCAG"

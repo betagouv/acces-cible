@@ -3,7 +3,7 @@ module Analyzers
     DECLARATION = /Déclaration d('|')accessibilité( RGAA)?/i
     ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
     DATE_PATTERN = /(?:réalisé(?:e)?(?:\s+le)?|du|en)\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéû]+)\s+(\d{4})/i
-    COMPLIANCE_PATTERN = /(?:taux de conformité(?:.+?)(?:est )?de|conforme à|révèle que(?:.+?)?(?:est )?à?) (\d+(?:,\d+)?(?:\.\d+)?)(?:\s*%| pour cent)/i
+    COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité|conforme à|révèle que).*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
     AUDITOR_PATTERN = /(?:par(?:\s+la)?(?:\s+société)?|par)\s+([^,]+?)(?:,| révèle| sur)/i
 
