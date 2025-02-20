@@ -70,6 +70,29 @@ RSpec.describe Analyzers::AccessibilityPage do
     end
   end
 
+  describe "#find_page" do
+    let(:non_matching_page) { build(:page, url: "https://example.com", links: [build(:link, href: matching_page_url)]) }
+    let(:matching_page) { build(:page, url: matching_page_url, title: "Accessibility") }
+    let(:matching_page_url) { "https://example.com/accessibility" }
+    let(:analyzer) { described_class.send(:new, page: non_matching_page) }
+    let(:crawler) { instance_double(Crawler) }
+
+    before do
+      allow(analyzer).to receive(:crawler).and_return(crawler)
+      allow(analyzer).to receive(:accessibility_page?).with(non_matching_page).and_return(false)
+      allow(analyzer).to receive(:accessibility_page?).with(matching_page).and_return(true)
+      allow(analyzer).to receive(:sort_queue_by_likelihood)
+    end
+
+    it "finds a matching page through crawling links" do
+      expect(crawler).to receive(:find)
+        .and_yield(non_matching_page, LinkList.new(non_matching_page.url))
+        .and_yield(matching_page, LinkList.new(matching_page_url))
+
+      expect(analyzer.send(:find_page)).to eq(matching_page)
+    end
+  end
+
   describe "#accessibility_page?" do
     it "returns true when declaration is in title" do
       page = build(:page, title: "Déclaration d'accessibilité")
