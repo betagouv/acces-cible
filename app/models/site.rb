@@ -18,7 +18,7 @@ class Site < ApplicationRecord
 
   class << self
     def find_or_create_by_url(attributes)
-      url = attributes.to_h.fetch(:url)
+      url = attributes.to_h.fetch(:url).strip
       attributes.delete(:name) if attributes[:name].blank?
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]

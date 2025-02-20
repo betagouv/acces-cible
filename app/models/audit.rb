@@ -5,7 +5,7 @@ class Audit < ApplicationRecord
   end
 
   validates :url, presence: true, url: true
-  normalizes :url, with: ->(url) { URI.parse(url).normalize.to_s }
+  normalizes :url, with: ->(url) { URI.parse(url.strip).normalize.to_s }
 
   enum :status, [
     "pending",    # Initial state, no checks started
