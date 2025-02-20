@@ -57,6 +57,19 @@ RSpec.describe Analyzers::AccessibilityPage do
     end
   end
 
+  describe "#sort_queue_by_likelihood(queue)" do
+    let(:basic_link) { build(:link, text: "Accessibilité", href: "/accessibilite") }
+    let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
+    let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
+    let(:queue) { LinkList.new(basic_link, declaration_link, unrelated_link) }
+
+    it "sorts the queue, with the likeliest links first" do
+      expect(queue.to_a).to eq([basic_link, declaration_link, unrelated_link])
+      analyzer.send(:sort_queue_by_likelihood, queue)
+      expect(queue.to_a).to eq([declaration_link, basic_link, unrelated_link])
+    end
+  end
+
   describe "#accessibility_page?" do
     it "returns true when declaration is in title" do
       page = build(:page, title: "Déclaration d'accessibilité")
