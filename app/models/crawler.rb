@@ -30,7 +30,7 @@ class Crawler
 
       enqueue page.internal_links
       yield page, queue
-      break if queue.empty? || queue == crawled
+      break if queue.empty?
     end
   end
 
