@@ -7,7 +7,7 @@ Link = Data.define(:href, :text) do
     case source
     when Link then source
     when String, URI then Link.new(href: source)
-    else raise ArgumentError
+    else raise ArgumentError.new("#{source.class.name} is not allowed in Link.from")
     end
   end
 
