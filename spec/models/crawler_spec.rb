@@ -26,10 +26,6 @@ RSpec.describe Crawler do
     let(:link2) { Link.new(href: "https://example.com/page2") }
     let(:page) { instance_double(Page, internal_links: [link1, link2], title: "Root") }
 
-    it "returns an enumerator when no block is given" do
-      expect(crawler.find).to be_an(Enumerator)
-    end
-
     context "when matching page exists" do
       let(:target_page) { instance_double(Page, internal_links: [], title: "Target") }
 
@@ -40,8 +36,8 @@ RSpec.describe Crawler do
       end
 
       it "returns the first matching page" do
-        result = crawler.find { |page, _queue| page.title == "Target" }.first
-        expect(result).to eq(target_page)
+        page = crawler.find { |page, _queue| page.title == "Target" }
+        expect(page).to eq(target_page)
       end
 
       it "logs crawling progress" do

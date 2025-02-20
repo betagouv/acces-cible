@@ -26,11 +26,10 @@ class LinkList
     self
   end
 
-  def sort_by
+  def sort_by!
     return self if size < 2
 
-    list = list.sort { |a, b|  yield(a, b) }
-    self
+    list.sort_by! { |a, b|  yield(a, b) }
   end
 
   def include?(link) = to_set.include? Link.from(link).href
