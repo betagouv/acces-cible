@@ -64,14 +64,15 @@ module Analyzers
       end
     end
 
+    # Used by sort_by, most relevant links need to have a negative score to come first in the queue
     def likelihood_of(link)
-      return 0 unless link.is_a?(Link)
+      return unless link.is_a?(Link)
 
       [
         link.text.match?(DECLARATION),
         link.href.match?("(declaration-)?accessibilite"),
         link.text.match?(Checks::AccessibilityMention::MENTION_REGEX)
-      ].count(&:itself).then { |n| n.zero? ? -1 : n - 1 }
+      ].count(&:itself).then { |n| n.zero? ? 1 : -n + 1 }
     end
 
     private

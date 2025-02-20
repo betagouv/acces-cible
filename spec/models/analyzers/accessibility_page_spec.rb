@@ -40,20 +40,20 @@ RSpec.describe Analyzers::AccessibilityPage do
     let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
 
-    it "scores declaration links highest" do
-      expect(analyzer.likelihood_of(declaration_link)).to eq(1)
+    it "returns nil for non-Link objects" do
+      expect(analyzer.likelihood_of("not a link")).to eq(nil)
     end
 
-    it "scores basic accessibility links in the middle" do
+    it "returns  1 for links not matching any criteria" do
+      expect(analyzer.likelihood_of(unrelated_link)).to eq(1)
+    end
+
+    it "returns  0 for links matching only one criteria" do
       expect(analyzer.likelihood_of(basic_link)).to eq(0)
     end
 
-    it "scores unrelated links lowest" do
-      expect(analyzer.likelihood_of(unrelated_link)).to eq(-1)
-    end
-
-    it "returns 0 for non-Link objects" do
-      expect(analyzer.likelihood_of("not a link")).to eq(0)
+    it "returns -1 for links matching two criteria or more" do
+      expect(analyzer.likelihood_of(declaration_link)).to eq(-1)
     end
   end
 
