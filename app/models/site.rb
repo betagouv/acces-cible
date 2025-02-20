@@ -18,32 +18,11 @@ class Site < ApplicationRecord
 
   class << self
     def find_or_create_by_url(attributes)
-      url = attributes.to_h.delete(:url)
-      attributes.to_h.delete(:name) if attributes[:name].blank?
+      url = attributes.to_h.fetch(:url)
+      attributes.delete(:name) if attributes[:name].blank?
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
-      joins(:audits).find_by(audits: { url: normalized_url })&.tap { it.update(attributes) } \
-        || create_with_audit(url:, **attributes)
-    end
-
-    def create_with_audit(url: nil, **attributes)
-      new_with_audit(url:, **attributes).tap(&:save)
-    end
-
-    def new_with_audit(url: nil, **attributes)
-      new(attributes).tap { |site| site.audits.build(url:) }
-    end
-  end
-
-  def new(attributes = nil)
-    return super if attributes.nil?
-
-    attributes = attributes.to_h.symbolize_keys
-
-    if url = attributes.delete(:url)
-      self.class.find_or_create_by(url:, **attributes)
-    else
-      super
+      joins(:audits).find_by(audits: { url: normalized_url })&.tap { it.update(attributes) } || create(attributes)
     end
   end
 
