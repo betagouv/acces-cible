@@ -32,10 +32,10 @@ class LinkList
     list.sort_by! { |a, b|  yield(a, b) }
   end
 
-  def include?(link) = to_set.include? Link.from(link).href
+  def include?(link) = to_a.include? Link.from(link).href
   def shift = empty? ? raise(EmptyListError.new) : list.shift
-  def ==(other) = to_set == other.to_set
-  def to_set = list.collect(&:href).to_set
+  def ==(other) = to_a == other.to_a
+  def to_a = list.collect(&:href)
 
   private
 

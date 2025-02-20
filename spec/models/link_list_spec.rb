@@ -97,9 +97,9 @@ RSpec.describe LinkList do
   end
 
   describe "#==" do
-    it "considers lists equal if they have the same links regardless of order" do
+    it "considers lists equal if they have the same links in the same order" do
       list1 = LinkList.new(link1, link2)
-      list2 = LinkList.new(link2, link1)
+      list2 = LinkList.new(link1, link2)
       expect(list1 == list2).to be true
     end
 
@@ -110,10 +110,10 @@ RSpec.describe LinkList do
     end
   end
 
-  describe "#to_set" do
-    it "returns a set of hrefs" do
+  describe "#to_a" do
+    it "returns an array of hrefs" do
       list = LinkList.new(link1, link2)
-      expect(list.to_set).to eq(Set.new(["https://example1.com", "https://example2.com"]))
+      expect(list.to_a).to eq(["https://example1.com", "https://example2.com"])
     end
   end
 
