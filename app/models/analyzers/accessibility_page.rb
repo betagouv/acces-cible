@@ -12,7 +12,7 @@ module Analyzers
 
     class << self
       def analyze(crawler)
-        new(crawler).data
+        new(crawler:).data
       end
     end
 
