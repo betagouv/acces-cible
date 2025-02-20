@@ -37,6 +37,7 @@ class Check < ApplicationRecord
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = Page.new(audit.url)
   def crawl = Crawler.new(audit.url)
+  def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
 
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact
