@@ -21,7 +21,7 @@ class Check < ApplicationRecord
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
-    def table_header = human("checks.#{model_name.element}.table_header") || human_type
+    def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
