@@ -1,3 +1,13 @@
+// Avoid "the notch" on iPhones and Pixel phones
+@supports (width: env(safe-area-inset-left)) {
+  @media only screen and (orientation: landscape) {
+    body main {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  }
+}
+
 // Rend les formulaires button_to "transparents" pour les styles
 // Permet d'utiliser des liens et des boutons dans un btn-group
 form.button_to {
