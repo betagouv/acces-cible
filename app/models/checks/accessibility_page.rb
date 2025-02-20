@@ -8,6 +8,6 @@ module Checks
     def custom_badge_text = found? ? human(:link_to, name: site&.name) : human(:not_found)
     def custom_badge_status = found? ? :success : :error
     def custom_badge_link = url
-    def analyze! = Analyzers::AccessibilityPage.analyze(crawl)
+    def analyze! = Analyzers::AccessibilityPage.analyze(crawler)
   end
 end

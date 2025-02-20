@@ -36,7 +36,7 @@ class Check < ApplicationRecord
   def to_partial_path = self.class.model_name.collection.singularize
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = Page.new(audit.url)
-  def crawl = Crawler.new(audit.url)
+  def crawler = Crawler.new(audit.url)
   def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
 
   def to_badge
