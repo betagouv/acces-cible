@@ -6,7 +6,7 @@ Link = Data.define(:href, :text) do
   def self.from(source)
     case source
     when Link then source
-    when String then Link.new(href: source)
+    when String, URI then Link.new(href: source)
     else raise ArgumentError
     end
   end
