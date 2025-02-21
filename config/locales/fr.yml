@@ -61,6 +61,9 @@ fr:
         updated_at: Date de mise à jour
         url: Adresse du site
         last_audit_at: Dernier audit
+        detail: Détails
+        view: Voir la fiche
+        view_name: Voir la fiche de %{name}
         count:
           zero: Aucun site
           one: Un site
