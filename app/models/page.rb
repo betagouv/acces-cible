@@ -58,8 +58,6 @@ class Page < Data.define(:url, :root)
         relative_path = href.start_with?("/") ? href[1..-1] : href
         uri = URI.parse(root.to_s.chomp("/") + "/" + relative_path)
       end
-      uri.fragment = nil
-      uri.query = nil
       Link.new(uri, link.text)
     end.compact
   end
