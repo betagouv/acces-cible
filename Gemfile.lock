@@ -400,7 +400,7 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
-    rexml (3.4.0)
+    rexml (3.4.1)
     rouge (4.5.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -482,7 +482,7 @@ GEM
     sass-embedded (1.85.0-x86_64-linux-musl)
       google-protobuf (~> 4.29)
     securerandom (0.4.1)
-    selenium-webdriver (4.28.0)
+    selenium-webdriver (4.29.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -608,7 +608,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   rubocop-rspec
   rubocop-rspec_rails
-  selenium-webdriver (~> 4.27)
+  selenium-webdriver (~> 4.29)
   sentry-rails
   sentry-ruby
   shoulda-matchers
