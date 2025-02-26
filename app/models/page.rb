@@ -2,6 +2,7 @@ require "net/http"
 
 class Page < Data.define(:url, :root)
   CACHE_TTL = 10.minutes
+  SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
 
   class InvalidTypeError < StandardError
     def initialize(url, content_type)
@@ -29,6 +30,7 @@ class Page < Data.define(:url, :root)
   def headings = dom.css("h1,h2,h3,h4,h5,h6").collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
+  def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
 
  def html
    @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
@@ -52,7 +54,7 @@ class Page < Data.define(:url, :root)
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"]
       uri = URI.parse(href)
-      next if uri.path && File.extname(uri.path).match?(/\.(pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i)
+      next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
       if uri.relative?
         relative_path = href.start_with?("/") ? href[1..-1] : href
