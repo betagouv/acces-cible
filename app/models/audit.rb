@@ -1,5 +1,5 @@
 class Audit < ApplicationRecord
-  belongs_to :site, touch: true
+  belongs_to :site, touch: true, counter_cache: true
   Check.types.each do |name, klass|
     has_one name, class_name: klass.name, dependent: :destroy
   end
