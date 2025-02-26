@@ -33,6 +33,12 @@ class Audit < ApplicationRecord
     Check.names.map { |name| send(name) || send(:"create_#{name}") }
   end
 
+  def run!
+    all_checks.each(&:run)
+    derive_status_from_checks
+    set_checked_at
+  end
+
   def derive_status_from_checks
     new_status = if all_checks.any?(&:new_record?)
        :pending

@@ -33,6 +33,9 @@ class Site < ApplicationRecord
   def name = super.presence || url_without_scheme
   alias to_title name
   def audit = super || audits.last || audits.build
-  def audit! = audits.create(url:)
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+
+  def audit!
+    audits.create(url:).tap(&:run!).tap(&:persisted?)
+  end
 end
