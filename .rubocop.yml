@@ -39,10 +39,23 @@ Naming/VariableNumber:
     - "spec/**/*.rb"
 
 # Rspec
+RSpec/ExampleLength:
+  Enabled: false
 RSpec/ImplicitExpect:
+  Enabled: false
+RSpec/ImplicitSubject:
+  Enabled: false
+RSpec/IndexedLet:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false
+RSpec/MessageSpies:
   Enabled: false
 RSpec/MultipleExpectations:
   Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  AllowSubject: true
+  Max: 10
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"
