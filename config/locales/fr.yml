@@ -25,22 +25,23 @@ fr:
         created_at: Enregistré le
         checked_at: Executé le
         status: État
+        count:
+          zero: Aucun audit
+          one: Un audit
+          other: "%{count} audits"
       audit/status:
         pending: Planifié
         running: En cours
         passed: Effectué
         retryable: À retenter
         failed: Échoué
+
       check:
         type: Type de contrôle
         status: État
         run_at: Contrôle prévu le
         checked_at: Contrôle effectué le
         attempts: Tentatives
-        count:
-          zero: Aucun contrôle
-          one: Un contrôle
-          other: "%{count} contrôles"
       check/status:
         pending: Planifié
         running: En cours
@@ -70,6 +71,9 @@ fr:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
+        audits: Tous les audits
+        audit_history: Historique des audits (%{total})
+        audits_count: Audits
         last_audit_at: Dernier audit
         detail: Détails
         view: Voir la fiche
@@ -112,3 +116,6 @@ fr:
       notice: Site modifié
     destroy:
       notice: Site supprimé
+  audits:
+    create:
+      notice: Audit créé

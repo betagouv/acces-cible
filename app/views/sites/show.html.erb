@@ -28,11 +28,18 @@
       </p>
     <% end %>
   </div>
+  <div class="fr-col-12 fr-col-md-4">
+    <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: @site.audits_count), right: true) do |sidemenu| %>
+      <% @site.audits.past.sort_by_newest.each do |audit| %>
+        <% sidemenu.with_item text: l(audit.created_at, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
+      <% end %>
+    <% end %>
+  </div>
 </div>
 
 <br>
 
 <div class="fr-btn-group fr-mb-2w">
   <%= button_to "Supprimer ce site", @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= link_to "Revenir à la liste", { action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  <%= link_to "Revenir à la liste", { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 </div>
