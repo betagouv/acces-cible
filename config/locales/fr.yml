@@ -26,6 +26,7 @@ fr:
         created_at: Enregistré le
         checked_at: Executé le
         status: État
+        new: "Nouvel audit"
         count:
           zero: Aucun audit
           one: Un audit
