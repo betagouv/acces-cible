@@ -21,6 +21,16 @@ fr:
 
   activerecord:
     attributes:
+      audit:
+        created_at: Enregistré le
+        checked_at: Executé le
+        status: État
+      audit/status:
+        pending: Planifié
+        running: En cours
+        passed: Effectué
+        retryable: À retenter
+        failed: Échoué
       check:
         type: Type de contrôle
         status: État

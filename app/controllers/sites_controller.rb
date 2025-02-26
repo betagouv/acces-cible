@@ -8,7 +8,9 @@ class SitesController < ApplicationController
   end
 
   # GET /sites/1
-  def show; end
+  def show
+    @audit = @site.audit
+  end
 
   # GET /sites/new
   def new; end
