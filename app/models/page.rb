@@ -30,6 +30,7 @@ class Page < Data.define(:url, :root)
   def headings = dom.css("h1,h2,h3,h4,h5,h6").collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
+  def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
 
  def html
    @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
