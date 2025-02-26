@@ -43,4 +43,9 @@ class Audit < ApplicationRecord
     end
     update(status: new_status)
   end
+
+  def set_checked_at
+    latest_checked_at = all_checks.collect(&:checked_at).sort.last
+    update(checked_at: latest_checked_at)
+  end
 end
