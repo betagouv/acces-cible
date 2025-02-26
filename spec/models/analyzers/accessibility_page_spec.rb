@@ -41,14 +41,14 @@ RSpec.describe Analyzers::AccessibilityPage do
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
 
     it "returns nil for non-Link objects" do
-      expect(analyzer.likelihood_of("not a link")).to eq(nil)
+      expect(analyzer.likelihood_of("not a link")).to be_nil
     end
 
-    it "returns  1 for links not matching any criteria" do
+    it "returns 1 for links not matching any criteria" do
       expect(analyzer.likelihood_of(unrelated_link)).to eq(1)
     end
 
-    it "returns  0 for links matching only one criteria" do
+    it "returns 0 for links matching only one criteria" do
       expect(analyzer.likelihood_of(basic_link)).to eq(0)
     end
 

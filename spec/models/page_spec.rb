@@ -66,11 +66,13 @@ RSpec.describe Page do
     end
 
     it "attempts to use the cache" do
-      expect(Rails.cache).to receive(:fetch)
+      allow(Rails.cache).to receive(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
-        .and_return(body)
+        .and_return("<html><body>Cached content</body></html>")
+      page.html  # This is the action that should trigger the cache fetch
 
-      page.html
+      expect(Rails.cache).to have_received(:fetch)
+        .with(parsed_url, expires_in: described_class::CACHE_TTL)
     end
 
     context "when the response is not HTML" do

@@ -1,8 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Audit do
-  let(:site) { create(:site) }
   subject(:audit) { build(:audit, site: nil) }
+
+  let(:site) { create(:site) }
 
   it "has a valid factory" do
     audit = build(:audit)
@@ -11,6 +12,7 @@ RSpec.describe Audit do
 
   describe "associations" do
     it { is_expected.to belong_to(:site).touch(true) }
+
     Check.names.each do |name|
       it { is_expected.to have_one(name).dependent(:destroy) }
     end
@@ -80,13 +82,14 @@ RSpec.describe Audit do
     it "memoizes the result" do
       audit.url = "https://example.com"
       first_result = audit.url_without_scheme
-      allow(audit).to receive(:hostname).and_return("different.com")
+      allow(audit).to receive(:hostname).and_return("different.com") # rubocop:disable RSpec/SubjectStub
       expect(audit.url_without_scheme).to eq(first_result)
     end
   end
 
   describe "#all_checks" do
     let(:audit) { build(:audit) }
+
     it "returns all checks, building missing ones" do
       checks = audit.all_checks
       expect(checks.size).to eq(Check.types.size)
@@ -96,6 +99,7 @@ RSpec.describe Audit do
 
   describe "#create_checks" do
     let(:audit) { create(:audit) }
+
     it "creates all check types" do
       expect(audit.create_checks.size).to eq(Check.types.size)
 
