@@ -5,7 +5,7 @@ class Audit < ApplicationRecord
   end
 
   validates :url, presence: true, url: true
-  normalizes :url, with: ->(url) { URI.parse(url).normalize.to_s }
+  normalizes :url, with: ->(url) { URI.parse(url.strip).normalize.to_s }
 
   enum :status, [
     "pending",    # Initial state, no checks started
@@ -16,7 +16,7 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :past, -> { where(status: [:passed, :failed]) }
+  scope :past, -> { where.not(status: :pending) }
 
   delegate :hostname, :path, to: :parsed_url
 

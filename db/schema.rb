@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_16_205241) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_17_085742) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_16_205241) do
     t.integer "attempts", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "checked_at"
     t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
     t.index ["attempts"], name: "index_audits_on_retryable", where: "(((status)::text = 'failed'::text) AND (attempts > 0))"
     t.index ["site_id"], name: "index_audits_on_site_id"

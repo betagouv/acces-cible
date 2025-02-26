@@ -32,6 +32,7 @@ Metrics/BlockLength:
     - "config/environments/*.rb"
     - "config/routes.rb"
     - "db/*.rb"
+    - "spec/**/*.rb"
 
 # Allow numbers in variable names in specs
 Naming/VariableNumber:

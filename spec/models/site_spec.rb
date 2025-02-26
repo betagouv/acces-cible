@@ -24,7 +24,7 @@ RSpec.describe Site do
     let(:http_url) { "http://example.com" }
 
     context "when site with URL exists" do
-      let!(:existing_site) { described_class.create_with_audit(url:) }
+      let!(:existing_site) { described_class.create(url:) }
 
       it "returns existing site for exact URL match" do
         expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
@@ -55,30 +55,6 @@ RSpec.describe Site do
     end
   end
 
-  describe ".new_with_audit" do
-    it "builds a new site with associated audit" do
-      site = described_class.new_with_audit(url:)
-
-      expect(site).to be_new_record
-      expect(site.audits.size).to eq(1)
-      expect(site.audit).to eq(site.audits.first)
-      expect(site.audit.url).to eq(url)
-    end
-  end
-
-  describe ".create_with_audit" do
-    it "creates a new site with associated audit" do
-      expect {
-        site = described_class.create_with_audit(url:)
-        expect(site).to be_persisted
-        expect(site.audits.size).to eq(1)
-        expect(site.audit).to be_persisted
-        expect(site.audit.url).to eq(url)
-      }.to change(described_class, :count).by(1)
-       .and change(Audit, :count).by(1)
-    end
-  end
-
   describe "#to_title" do
     let(:site) { create(:site, url:) }
     let!(:audit) { create(:audit, site:) }
@@ -95,7 +71,7 @@ RSpec.describe Site do
 
   describe "friendly_id" do
     let(:url) { "https://example.com/path?query=1" }
-    let(:site) { described_class.create_with_audit(url:) }
+    let(:site) { create(:site, url:) }
 
     it "generates slug from url_without_scheme" do
       expect(site.slug).to be_present

@@ -1,5 +1,5 @@
 class SitesController < ApplicationController
-  before_action :set_site, except: :index
+  before_action :set_site, except: [:index, :create]
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
 
   # GET /sites
@@ -19,7 +19,7 @@ class SitesController < ApplicationController
   # POST /sites
   def create
     @site = Site.find_or_create_by_url(site_params)
-    if @site.save
+    if @site.persisted?
       redirect_to @site, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
@@ -44,7 +44,7 @@ class SitesController < ApplicationController
   private
 
   def set_site
-    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new_with_audit
+    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new
   end
 
   def redirect_old_slugs

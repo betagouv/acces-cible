@@ -1,10 +1,12 @@
 class Check < ApplicationRecord
   TYPES = [
     :accessibility_mention,
+    :accessibility_page,
     :language_indication,
   ].freeze
 
   belongs_to :audit
+  has_one :site, through: :audit
 
   enum :status, ["pending", "passed", "failed"].index_by(&:itself), validate: true, default: :pending
 
@@ -19,7 +21,7 @@ class Check < ApplicationRecord
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
-    def table_header = human("checks.#{model_name.element}.table_header") || human_type
+    def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
@@ -34,9 +36,11 @@ class Check < ApplicationRecord
   def to_partial_path = self.class.model_name.collection.singularize
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = Page.new(audit.url)
+  def crawler = Crawler.new(audit.url)
+  def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
 
   def to_badge
-    [status_to_badge_level, status_to_badge_text]
+    [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
   def run
@@ -44,7 +48,7 @@ class Check < ApplicationRecord
     self.status = :passed
   rescue StandardError => e
     self.status = :failed
-    self.data = { error: e.message, error_type: e.class.name }
+    self.data = { error: e.message, error_type: e.class.name, backtrace: e.backtrace }
   ensure
     self.checked_at = Time.zone.now
     save
@@ -59,10 +63,11 @@ class Check < ApplicationRecord
     case
     when pending? then :info
     when failed? then :error
-    when passed? && respond_to?(:custom_badge_status) then custom_badge_status
+    when passed? && respond_to?(:custom_badge_status, true) then custom_badge_status
     else :success
     end
   end
 
-  def status_to_badge_text = passed? && respond_to?(:custom_badge_text) ? custom_badge_text : human_status
+  def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
+  def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 end

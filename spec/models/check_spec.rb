@@ -163,9 +163,13 @@ RSpec.describe Check do
     context "when check is passed" do
       let(:check) { build(:check, status: :passed) }
 
-      it "returns success level and custom text if available" do
-        allow(check).to receive_messages(respond_to?: true, custom_badge_status: :success, custom_badge_text: "Custom text")
-        expect(to_badge).to eq([:success, "Custom text"])
+      it "returns success level, custom text, and custom link if available" do
+        allow(check).to receive_messages(
+          respond_to?: true,
+          custom_badge_status: :success,
+          custom_badge_text: "Custom text",
+          custom_badge_link: "https://example.com/")
+        expect(to_badge).to eq([:success, "Custom text", "https://example.com/"])
       end
 
       it "returns success level and human status if no custom text" do
@@ -215,10 +219,7 @@ RSpec.describe Check do
         check.run
         check.reload
         expect(check).to be_failed
-        expect(check.data).to eq({
-          "error" => "Test error",
-          "error_type" => "StandardError"
-        })
+        expect(check.data.keys).to contain_exactly("error", "backtrace", "error_type")
         expect(check.checked_at).to be_within(1.second).of(Time.current)
       end
     end

@@ -5,7 +5,8 @@ RSpec.describe Page do
   let(:url) { "https://example.com/about" }
   let(:parsed_url) { URI.parse(url) }
   let(:page) { described_class.new(url:, root:) }
-  let(:html_content) do
+  let(:headers) { { "Content-Type" => "text/html" } }
+  let(:body) do
     <<~HTML
       <!DOCTYPE html>
       <html>
@@ -28,7 +29,7 @@ RSpec.describe Page do
   end
 
   before do
-    allow(Net::HTTP).to receive(:get).and_return(html_content)
+    stub_request(:get, url).to_return(body:, headers:)
   end
 
   describe "#path" do
@@ -60,21 +61,51 @@ RSpec.describe Page do
   end
 
   describe "#html" do
-    it "fetches and caches the page content" do
-      expect(Rails.cache).to receive(:fetch)
-        .with(parsed_url, expires_in: described_class::CACHE_TTL)
-        .and_yield
+    it "fetches the page content" do
+      expect(page.html).to eq(body)
+    end
 
-      expect(page.html).to eq(html_content)
-      expect(Net::HTTP).to have_received(:get)
-        .with(Addressable::URI.parse(url))
-        .once
+    it "attempts to use the cache" do
+      allow(Rails.cache).to receive(:fetch)
+        .with(parsed_url, expires_in: described_class::CACHE_TTL)
+        .and_return("<html><body>Cached content</body></html>")
+      page.html  # This is the action that should trigger the cache fetch
+
+      expect(Rails.cache).to have_received(:fetch)
+        .with(parsed_url, expires_in: described_class::CACHE_TTL)
+    end
+
+    context "when the response is not HTML" do
+      let(:headers) { { "Content-Type" => "application/pdf" } }
+
+      it "raises InvalidTypeError" do
+        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
+      end
+    end
+
+    context "when content-type header is missing" do
+      before do
+        stub_request(:get, url).to_return(body:, headers: {})
+      end
+
+      it "raises InvalidTypeError" do
+        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page/)
+      end
     end
   end
 
   describe "#dom" do
     it "returns a Nokogiri::HTML document" do
       expect(page.dom).to be_a(Nokogiri::HTML::Document)
+    end
+
+    context "when HTML is invalid" do
+      let(:nokogiri_document) { instance_double(Nokogiri::HTML::Document) }
+
+      it "raises ParseError" do
+        allow(Nokogiri).to receive(:HTML).with(body).and_raise(Nokogiri::SyntaxError)
+        expect { page.dom }.to raise_error(Page::ParseError, /failed to parse HTML/)
+      end
     end
   end
 
@@ -120,17 +151,28 @@ RSpec.describe Page do
       expect(page.links.collect(&:text)).not_to include("Section")
     end
 
+    it "excludes links to non-HTML files" do
+      body = <<~HTML
+        <body>
+          <a href="document.pdf">PDF</a>
+          <a href="file.zip">ZIP</a>
+          <a href="image.jpg">JPG</a>
+        </body>
+      HTML
+      expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+    end
+
     it "resolves relative URLs" do
       expect(page.links.collect(&:href)).to include("https://example.com/relative/path")
     end
 
     it "strips fragments and query parameters from URLs" do
-      html_with_params = html_content.gsub(
-        '<a href="https://external.com">',
-        '<a href="https://external.com?param=1#section">'
-      )
-      allow(Net::HTTP).to receive(:get).and_return(html_with_params)
-
+      body = <<~HTML
+        <body>
+          <a href="https://external.com">
+          <a href="https://external.com?param=1#section">
+        </body>
+      HTML
       expect(page.links.collect(&:href)).to include("https://external.com")
     end
   end

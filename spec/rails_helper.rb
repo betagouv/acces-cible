@@ -50,6 +50,9 @@ RSpec.configure do |config|
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 
+  require "webmock/rspec"
+  WebMock.disable_net_connect!
+
   # Setup Database cleaner to avoid state leaks between tests
   config.before(:suite) do
     DatabaseCleaner.clean_with :truncation, except: [:ar_internal_metadata]

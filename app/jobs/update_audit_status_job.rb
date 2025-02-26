@@ -1,6 +1,5 @@
 class UpdateAuditStatusJob < ApplicationJob
-  def perform
-    audit = params.values_at(:audit)
+  def perform(audit)
     audit.derive_status_from_checks
   end
 end

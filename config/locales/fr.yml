@@ -1,7 +1,7 @@
 fr:
   global:
-    sponsor: "Direction Interministérielle du Numérique"
-    sponsor_html: "Direction<br>Interministérielle<br>du Numérique"
+    sponsor: "Gouvernement"
+    sponsor_html: "Gouvernement"
     service_name: "Accès cible"
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
@@ -49,12 +49,21 @@ fr:
         type: Indication de la langue
         table_header: Langue
         empty: Absente
+        totalement: Totalement conforme
+      checks/accessibility_page:
+        type: Page accessibilité
+        table_header: Page
+        link_to: "Page d'accessibilité de %{name}"
+        not_found: Non trouvée
 
       site:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
-        last_audited_at: Dernier audit
+        last_audit_at: Dernier audit
+        detail: Détails
+        view: Voir la fiche
+        view_name: Voir la fiche de %{name}
         count:
           zero: Aucun site
           one: Un site

@@ -4,9 +4,3 @@ production:
     priority: 2
     queue: background
     schedule: every minute
-
-development:
-  schedule_audits:
-    class: ScheduleAuditsJob
-    queue: background
-    schedule: every minute

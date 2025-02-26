@@ -4,8 +4,6 @@ module Checks
 
     store_accessor :data, :mention
 
-    def mention? = mention.present?
-
     private
 
     def custom_badge_text = human("mentions.", count: nil)[mention.to_s.to_sym]

@@ -31,12 +31,18 @@ gem "tzinfo-data", platforms: [:windows, :jruby]
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
+# Add a web interface to control jobs
+gem "mission_control-jobs", "~> 1.0"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
+
+# Monitor errors and performance
+gem "sentry-ruby"
+gem "sentry-rails"
 
 # Add optimized Active Record association methods
 gem "activerecord-has_some_of_many"
@@ -92,8 +98,11 @@ group :test do
   # Simplify testing common Rails functionality
   gem "shoulda-matchers"
 
+  # Allow stubbing requests during tests
+  gem "webmock"
+
   # Allow testing accessibility using Axe-core. Only available in JS feature tests
   gem "axe-core-capybara", "~> 4.9"
   gem "axe-core-rspec", "~> 4.8"
-  gem "selenium-webdriver", "~> 4.27"
+  gem "selenium-webdriver", "~> 4.29"
 end

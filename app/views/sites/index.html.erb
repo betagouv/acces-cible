@@ -2,26 +2,28 @@
   <% t.with_head do %>
     <tr>
       <th scope="col"><%= Site.human(:url) %></th>
+      <th scope="col"><%= Site.human(:detail) %></th>
       <% Check.classes.collect(&:table_header).each do |header| %>
         <th scope="col" class="fr-cell--center"><%= header %></th>
       <% end %>
-      <th scope="col"><%= Site.human(:last_audited_at) %></th>
-      <th scope="col"><%= t("shared.actions") %></th>
+      <th scope="col"><%= Site.human(:last_audit_at) %></th>
     </tr>
   <% end %>
   <% t.with_body do %>
     <% @sites.each do |site| %>
       <tr>
-        <td><%= link_to site.url_without_scheme, site %></td>
+        <td><%= link_to site.url_without_scheme, site.url, target: :_blank %></td>
+        <td><%= link_to Site.human(:view), site, title: Site.human(:view_name, name: site.name) %></td>
         <% site.audit.all_checks.each do |check| %>
           <td class="fr-cell--center"><%= badge check.to_badge, tooltip: true %></td>
         <% end %>
         <td>
-          <%= l site.audit.run_at, format: :compact %>
-          <br>
-          (<%= time_ago site.audit.run_at %>)
+          <% if site.audit.checked_at %>
+            <%= l site.audit.checked_at, format: :compact %>
+            <br>
+            (<%= time_ago site.audit.checked_at %>)
+          <% end %>
         </td>
-        <td><%= link_to "Voir le site", site.url, target: :_blank %></td>
       </tr>
     <% end %>
   <% end %>
