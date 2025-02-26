@@ -40,6 +40,6 @@
 <br>
 
 <div class="fr-btn-group fr-mb-2w">
-  <%= button_to "Supprimer ce site", @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= link_to "Revenir à la liste", { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  <%= button_to Site.human(:delete), @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= link_to t("shared.back_to_list"), { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 </div>

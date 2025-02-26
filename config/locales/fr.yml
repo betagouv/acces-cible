@@ -9,6 +9,7 @@ fr:
     actions: "Actions"
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     time_ago: "il y a %{time}"
+    back_to_list: "Revenir à la liste"
 
   time:
     formats:
@@ -78,6 +79,7 @@ fr:
         detail: Détails
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
+        delete: Supprimer ce site
         count:
           zero: Aucun site
           one: Un site
