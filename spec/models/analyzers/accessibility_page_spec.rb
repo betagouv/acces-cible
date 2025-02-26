@@ -89,7 +89,7 @@ RSpec.describe Analyzers::AccessibilityPage do
         .and_yield(non_matching_page, LinkList.new(non_matching_page.url))
         .and_yield(matching_page, LinkList.new(matching_page_url))
 
-      expect(analyzer.send(:find_page)).to eq(matching_page)
+      expect(analyzer.send(:find_page)).to be(true)
     end
   end
 

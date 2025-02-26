@@ -81,9 +81,12 @@ module Analyzers
 
     def find_page
       crawler.find do |current_page, queue|
-        return current_page if accessibility_page?(current_page)
-
-        sort_queue_by_likelihood(queue)
+        if accessibility_page?(current_page)
+          true
+        else
+          sort_queue_by_likelihood(queue)
+          false
+        end
       end
     end
 
