@@ -57,6 +57,15 @@ RSpec/MultipleExpectations:
 RSpec/MultipleMemoizedHelpers:
   AllowSubject: true
   Max: 10
+RSpec/NestedGroups:
+  Max: 4
+RSpec/ContextWording:
+  Prefixes:
+    - when
+    - and
+    - with
+    - without
+    - for
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"
