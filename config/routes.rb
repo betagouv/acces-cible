@@ -1,6 +1,8 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
-  resources :sites
+  resources :sites do
+    resources :audits, only: [:create, :show]
+  end
 
   # Static pages
   scope controller: :pages do

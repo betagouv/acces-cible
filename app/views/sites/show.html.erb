@@ -1,24 +1,46 @@
-<p>
-  <strong><%= Site.human :url %> :</strong>
-  <%= link_to @site.url, @site.url, target: :_blank %>
-</p>
-<% if @site.audit.checked_at %>
-<p>
-  <strong><%= Site.human :last_audit_at %> :</strong>
-  <%= l @site.audit.checked_at, format: :long %>
-  (<%= time_ago @site.audit.checked_at %>).
-</p>
-<% end %>
-<% @site.audit.all_checks.each do |check| %>
-  <p>
-    <strong><%= check.human_type %> :</strong>
-    <%= badge check.to_badge %>
-  </p>
-<% end %>
+<div class="fr-grid-row">
+  <div class="fr-col-12 fr-col-md-8">
+    <p>
+      <strong><%= Site.human :url %> :</strong>
+      <%= link_to @site.url, @site.url, target: :_blank %>
+    </p>
+    <p>
+      <strong><%= Audit.human :created_at %> :</strong>
+      <%= l @audit.created_at, format: :long %>
+      (<%= time_ago @audit.created_at %>).
+    </p>
+    <% if @audit.checked_at %>
+      <p>
+        <strong><%= Audit.human :checked_at %> :</strong>
+        <%= l @audit.checked_at, format: :long %>
+        (<%= time_ago @audit.checked_at %>).
+      </p>
+      <% @audit.all_checks.each do |check| %>
+        <p>
+          <strong><%= check.human_type %> :</strong>
+          <%= badge check.to_badge %>
+        </p>
+      <% end %>
+    <% else %>
+      <p>
+        <strong><%= Audit.human(:status) %> :</strong>
+        <%= Audit.human("audit/status.pending") %>
+      </p>
+    <% end %>
+  </div>
+  <div class="fr-col-12 fr-col-md-4">
+    <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: @site.audits_count), right: true) do |sidemenu| %>
+      <% @site.audits.past.sort_by_newest.each do |audit| %>
+        <% sidemenu.with_item text: l(audit.created_at, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
 
 <br>
 
 <div class="fr-btn-group fr-mb-2w">
-  <%= button_to "Supprimer ce site", @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= link_to "Revenir à la liste", { action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  <%= button_to Audit.human(:new), [@site, :audits], method: :post, class: "fr-btn" %>
+  <%= button_to Site.human(:delete), @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= link_to t("shared.back_to_list"), { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 </div>

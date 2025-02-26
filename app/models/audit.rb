@@ -1,5 +1,5 @@
 class Audit < ApplicationRecord
-  belongs_to :site, touch: true
+  belongs_to :site, touch: true, counter_cache: true
   Check.types.each do |name, klass|
     has_one name, class_name: klass.name, dependent: :destroy
   end
@@ -33,6 +33,12 @@ class Audit < ApplicationRecord
     Check.names.map { |name| send(name) || send(:"create_#{name}") }
   end
 
+  def run!
+    all_checks.each(&:run)
+    derive_status_from_checks
+    set_checked_at
+  end
+
   def derive_status_from_checks
     new_status = if all_checks.any?(&:new_record?)
        :pending
@@ -42,5 +48,10 @@ class Audit < ApplicationRecord
        :mixed
     end
     update(status: new_status)
+  end
+
+  def set_checked_at
+    latest_checked_at = all_checks.collect(&:checked_at).sort.last
+    update(checked_at: latest_checked_at)
   end
 end

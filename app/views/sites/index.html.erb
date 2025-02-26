@@ -22,6 +22,8 @@
             <%= l site.audit.checked_at, format: :compact %>
             <br>
             (<%= time_ago site.audit.checked_at %>)
+          <% else %>
+            <%= Audit.human("audit/status.pending") %>
           <% end %>
         </td>
       </tr>

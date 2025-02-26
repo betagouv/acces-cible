@@ -9,6 +9,7 @@ fr:
     actions: "Actions"
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     time_ago: "il y a %{time}"
+    back_to_list: "Revenir à la liste"
 
   time:
     formats:
@@ -21,16 +22,28 @@ fr:
 
   activerecord:
     attributes:
+      audit:
+        created_at: Enregistré le
+        checked_at: Executé le
+        status: État
+        new: "Nouvel audit"
+        count:
+          zero: Aucun audit
+          one: Un audit
+          other: "%{count} audits"
+      audit/status:
+        pending: Planifié
+        running: En cours
+        passed: Effectué
+        retryable: À retenter
+        failed: Échoué
+
       check:
         type: Type de contrôle
         status: État
         run_at: Contrôle prévu le
         checked_at: Contrôle effectué le
         attempts: Tentatives
-        count:
-          zero: Aucun contrôle
-          one: Un contrôle
-          other: "%{count} contrôles"
       check/status:
         pending: Planifié
         running: En cours
@@ -60,10 +73,14 @@ fr:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
+        audits: Tous les audits
+        audit_history: Historique des audits (%{total})
+        audits_count: Audits
         last_audit_at: Dernier audit
         detail: Détails
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
+        delete: Supprimer ce site
         count:
           zero: Aucun site
           one: Un site
@@ -102,3 +119,6 @@ fr:
       notice: Site modifié
     destroy:
       notice: Site supprimé
+  audits:
+    create:
+      notice: Audit créé
