@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Site, type: :model do
+RSpec.describe Site do
   let(:url) { "https://example.com/" }
 
   describe "associations" do
