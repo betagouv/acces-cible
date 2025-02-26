@@ -24,7 +24,13 @@ module ApplicationHelper
   end
 
   def dsfr_table(caption:, size: :md, scroll: true, border: false, **html_attributes, &block)
-    render(Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block)
+    render Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block
+  end
+
+  def dsfr_sidemenu(title:, button: nil, sticky: false, full_height: false, right: false, &block)
+    component = Dsfr::SidemenuComponent.new(title:, button:, sticky:, full_height:, right:)
+    yield(component) if block_given?
+    render component
   end
 
   def root? = request.path == "/"
