@@ -9,6 +9,7 @@ class Check < ApplicationRecord
   has_one :site, through: :audit
 
   enum :status, ["pending", "passed", "failed"].index_by(&:itself), validate: true, default: :pending
+  store_accessor :data, :error, :error_type, :backtrace
 
   delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
@@ -53,6 +54,10 @@ class Check < ApplicationRecord
     self.checked_at = Time.zone.now
     save
     passed?
+  end
+
+  def original_error
+    error_type.constantize.new(error).tap { it.set_backtrace(backtrace) } if error
   end
 
   private
