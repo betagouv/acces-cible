@@ -36,7 +36,8 @@ module ApplicationHelper
   def root? = request.path == "/"
 
   def time_ago(datetime)
-    t("shared.time_ago", time: distance_of_time_in_words_to_now(datetime))
+    time = distance_of_time_in_words_to_now(datetime)
+    t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
   end
 
   def paginate
