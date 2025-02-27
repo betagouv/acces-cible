@@ -2,8 +2,16 @@ class Crawler
   include Enumerable
   MAX_CRAWLED_PAGES = 100
 
-  class NoMatchError < StandardError; end
-  class CrawlLimitReachedError < StandardError; end
+  class NoMatchError < StandardError
+    def initialize(root, crawled, &block)
+      super("Crawled #{crawled.size} pages starting from #{root} but #{block} found no match.")
+    end
+  end
+  class CrawlLimitReachedError < StandardError
+    def initialize(root, crawl_up_to)
+      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
+    end
+  end
 
   def initialize(root, crawl_up_to: nil)
     @root = Link.new(root)
@@ -15,7 +23,7 @@ class Crawler
   def find(&block)
     found = nil
     detect { |page, queue| found = page if block.call(page, queue) }
-    found or raise NoMatchError
+    found or raise NoMatchError.new(root, crawled, &block)
   end
 
   private
@@ -24,9 +32,10 @@ class Crawler
   attr_reader :root, :crawled, :crawl_up_to
 
   def each
-    while queue.any? && crawled.size < crawl_up_to
-      page = get_page
-      next unless page
+    while queue.any?
+      raise CrawlLimitReachedError.new(root, crawl_up_to) if crawled.size >= crawl_up_to
+
+      next unless page = get_page
 
       enqueue page.internal_links
       yield page, queue
