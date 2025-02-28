@@ -11,13 +11,12 @@ class Page < Data.define(:url, :root)
   end
   class ParseError < StandardError
     def initialize(url, message)
-      super("Nokogiri failed to parse HTML from #{url}: #{message}")
+      super("Failed to parse HTML from #{url}: #{message}")
     end
   end
 
   def initialize(url:, root: nil, html: nil)
     # Allow setting HTML directly to simplify testing and avoid network calls.
-    # The `html` method overwrites the instance variable, so we need to set it explicitly
     @html = html
     super(url: URI.parse(url), root: URI.parse(root || url))
   end
@@ -34,12 +33,15 @@ class Page < Data.define(:url, :root)
 
  def html
    @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-     response = Net::HTTP.get_response(url)
-     if response["Content-Type"]&.include?("text/html")
-       response.body
-     else
-       raise InvalidTypeError.new url, response["Content-Type"]
+     body, headers = Browser.fetch(url.to_s)
+     content_type = headers["Content-Type"]
+     if content_type && !content_type.include?("text/html")
+       raise InvalidTypeError.new url, content_type
      end
+     body
+   rescue Ferrum::Error => e
+     Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
+     raise e
    end
  end
 
@@ -48,7 +50,6 @@ class Page < Data.define(:url, :root)
  rescue Nokogiri::SyntaxError => e
    raise ParseError.new url, e.message
  end
-
 
   def links
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|

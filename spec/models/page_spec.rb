@@ -4,7 +4,7 @@ RSpec.describe Page do
   let(:root) { "https://example.com" }
   let(:url) { "https://example.com/about" }
   let(:parsed_url) { URI.parse(url) }
-  let(:page) { described_class.new(url:, root:) }
+  let(:page) { build(:page, url:, root:, html: body) }
   let(:headers) { { "Content-Type" => "text/html" } }
   let(:body) do
     <<~HTML
@@ -68,28 +68,21 @@ RSpec.describe Page do
     it "attempts to use the cache" do
       allow(Rails.cache).to receive(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
-        .and_return("<html><body>Cached content</body></html>")
-      page.html  # This is the action that should trigger the cache fetch
 
+      build(:page, url:).html
       expect(Rails.cache).to have_received(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
     end
 
     context "when the response is not HTML" do
-      let(:headers) { { "Content-Type" => "application/pdf" } }
+      let(:body) { nil }
 
       it "raises InvalidTypeError" do
+        allow(Browser).to receive(:fetch)
+          .with(url)
+          .and_return([nil, { "Content-Type" => "application/pdf" }])
+
         expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
-      end
-    end
-
-    context "when content-type header is missing" do
-      before do
-        stub_request(:get, url).to_return(body:, headers: {})
-      end
-
-      it "raises InvalidTypeError" do
-        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page/)
       end
     end
   end
@@ -104,7 +97,7 @@ RSpec.describe Page do
 
       it "raises ParseError" do
         allow(Nokogiri).to receive(:HTML).with(body).and_raise(Nokogiri::SyntaxError)
-        expect { page.dom }.to raise_error(Page::ParseError, /failed to parse HTML/)
+        expect { page.dom }.to raise_error(Page::ParseError, /Failed to parse HTML/)
       end
     end
   end

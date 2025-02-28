@@ -33,14 +33,17 @@ class Browser
 
   class << self
     def fetch(url)
-      page = instance.send(:browser).create_page
-      page.go_to(url)
-      page
+      instance.fetch(url)
     end
   end
 
-  def kill
-    @browser = nil
+  def fetch(url)
+    page = browser.create_page
+    page.goto(url)
+    [page.body, page.headers.get]
+  rescue Ferrum::Error => e
+    Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
+    raise e
   end
 
   private
@@ -49,11 +52,15 @@ class Browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
         browser.headers.set(HEADERS)
-        # Skip resources to preserve bandwidth
         browser.network.intercept
         browser.on(:request) do |request|
-          request.url.end_with?(*BLOCKED_EXTENSIONS) ? request.abort : request.continue
+          if request.url.end_with?(*BLOCKED_EXTENSIONS)
+            request.abort
+          else
+            request.continue
+          end
         end
+        browser
       end
     end
   end
@@ -65,7 +72,11 @@ class Browser
         timeout: TIMEOUT,
         window_size: WINDOW_SIZE,
         extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
-        browser_options: { "disable-blink-features": "AutomationControlled" }
+        browser_options: {
+          "disable-blink-features": "AutomationControlled",
+          "disable-popup-blocking": true,
+          "disable-notifications": true
+        }
       }.tap do |options|
         options[:browser_path] = browser_path if Rails.env.production?
         options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
@@ -74,4 +85,15 @@ class Browser
   end
 
   def browser_path = ENV["GOOGLE_CHROME_BIN"]
+
+  def stub(request)
+    uri = URI.parse(request.url)
+    stub = WebMock::StubRegistry.instance.request_stubbed?(WebMock::RequestSignature.new(:get, uri))
+    response = stub.response
+    request.respond(
+      status: response.status[0],
+      headers: { "content-type" => "text/html" },
+      body: response.body
+    )
+  end
 end
