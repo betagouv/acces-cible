@@ -3,7 +3,8 @@
 class Browser
   include Singleton
 
-  TIMEOUT = 5 # seconds
+  PAGE_TIMEOUT = 5 # seconds
+  PROCESS_TIMEOUT = 10 # seconds
   WINDOW_SIZE = [1366, 768] # width, height
 
   HEADERS = {
@@ -69,8 +70,9 @@ class Browser
     @settings ||= begin
       {
         headless: :new,
-        timeout: TIMEOUT,
+        timeout: PAGE_TIMEOUT,
         window_size: WINDOW_SIZE,
+        process_timeout: PROCESS_TIMEOUT,
         extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
         browser_options: {
           "disable-blink-features": "AutomationControlled",
@@ -78,13 +80,11 @@ class Browser
           "disable-notifications": true
         }
       }.tap do |options|
-        options[:browser_path] = browser_path if Rails.env.production?
+        options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
         options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
       end.freeze
     end
   end
-
-  def browser_path = ENV["GOOGLE_CHROME_BIN"]
 
   def stub(request)
     uri = URI.parse(request.url)
