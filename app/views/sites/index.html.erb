@@ -18,10 +18,10 @@
           <td class="fr-cell--center"><%= badge check.to_badge, tooltip: true %></td>
         <% end %>
         <td>
-          <% if site.audit.checked_at %>
-            <%= l site.audit.checked_at, format: :compact %>
+          <% if checked_at = site.audit.checked_at %>
+            <%= time_tag checked_at, l(checked_at, format: :compact), title: l(checked_at, format: :long) %>
             <br>
-            (<%= time_ago site.audit.checked_at %>)
+            (<%= time_ago checked_at %>)
           <% else %>
             <%= Audit.human("audit/status.pending") %>
           <% end %>
