@@ -5,14 +5,14 @@
       <%= link_to @site.url, @site.url, target: :_blank %>
     </p>
     <p>
-      <strong><%= Audit.human :created_at %> :</strong>
-      <%= l @audit.created_at, format: :long %>
+      <strong><%= Site.human :created_at %> :</strong>
+      <%= time_tag @audit.created_at, l(@audit.created_at, format: :long) %>
       (<%= time_ago @audit.created_at %>).
     </p>
     <% if @audit.checked_at %>
       <p>
         <strong><%= Audit.human :checked_at %> :</strong>
-        <%= l @audit.checked_at, format: :long %>
+        <%= time_tag @audit.checked_at, l(@audit.checked_at, format: :long) %>
         (<%= time_ago @audit.checked_at %>).
       </p>
       <% @audit.all_checks.each do |check| %>

@@ -23,8 +23,7 @@ fr:
   activerecord:
     attributes:
       audit:
-        created_at: Enregistrée le
-        checked_at: Executée le
+        checked_at: Executé le
         status: État
         new: "Nouvelle vérification"
         count:
@@ -70,7 +69,7 @@ fr:
         not_found: Non trouvée
 
       site:
-        created_at: Date de création
+        created_at: Enregistré le
         updated_at: Date de mise à jour
         url: Adresse du site
         audits: Toutes les vérifications
