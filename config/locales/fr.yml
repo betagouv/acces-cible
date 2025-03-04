@@ -23,14 +23,14 @@ fr:
   activerecord:
     attributes:
       audit:
-        created_at: Enregistré le
-        checked_at: Executé le
+        created_at: Enregistrée le
+        checked_at: Executée le
         status: État
-        new: "Nouvel audit"
+        new: "Nouvelle vérification"
         count:
-          zero: Aucun audit
-          one: Un audit
-          other: "%{count} audits"
+          zero: Aucune vérification
+          one: Une vérification
+          other: "%{count} vérifications"
       audit/status:
         pending: Planifié
         running: En cours
@@ -41,8 +41,8 @@ fr:
       check:
         type: Type de contrôle
         status: État
-        run_at: Contrôle prévu le
-        checked_at: Contrôle effectué le
+        run_at: Vérification prévue le
+        checked_at: Vérification effectuée le
         attempts: Tentatives
       check/status:
         pending: Planifié
@@ -73,10 +73,10 @@ fr:
         created_at: Date de création
         updated_at: Date de mise à jour
         url: Adresse du site
-        audits: Tous les audits
-        audit_history: Historique des audits (%{total})
-        audits_count: Audits
-        last_audit_at: Dernier audit
+        audits: Toutes les vérifications
+        audit_history: Historique des vérifications (%{total})
+        audits_count: Vérifications
+        last_audit_at: Dernière vérification
         detail: Détails
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
@@ -121,4 +121,4 @@ fr:
       notice: Site supprimé
   audits:
     create:
-      notice: Audit créé
+      notice: Vérification créée
