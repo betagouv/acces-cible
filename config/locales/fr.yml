@@ -64,9 +64,9 @@ fr:
         empty: Absente
         totalement: Totalement conforme
       checks/accessibility_page:
-        type: Page accessibilité
-        table_header: Page
-        link_to: "Page d'accessibilité de %{name}"
+        type: Déclaration d'accessibilité
+        table_header: Déclaration
+        link_to: "Déclaration d'accessibilité de %{name}"
         not_found: Non trouvée
 
       site:
