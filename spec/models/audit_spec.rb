@@ -43,10 +43,10 @@ RSpec.describe Audit do
   describe "scopes" do
     before { site.audit.destroy }
 
-    it ".sort_by_newest returns audits in descending order by creation date" do
-      oldest = create(:audit, site:, created_at: 3.days.ago)
-      older = create(:audit, site:, created_at: 2.days.ago)
-      newer = create(:audit, site:, created_at: 1.day.ago)
+    it ".sort_by_newest returns audits in descending order by checked_at date" do
+      oldest = create(:audit, site:, checked_at: 3.days.ago)
+      older = create(:audit, site:, checked_at: 2.days.ago)
+      newer = create(:audit, site:, checked_at: 1.day.ago)
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
