@@ -4,7 +4,7 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    @pagy, @sites = pagy Site.sort_by_audit_url.includes(:audit)
+    @pagy, @sites = pagy Site.sort_by_audit_date.includes(:audit)
   end
 
   # GET /sites/1
