@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd vendor/javascript/
+npx extract-stealth-evasions
+cd -

@@ -48,7 +48,7 @@ RSpec.describe Crawler do
       it "respects crawl limit" do
         limited_crawler = described_class.new(root_url, crawl_up_to: 1)
         expect { limited_crawler.find { |page, _queue| page.title == "Target" } }
-          .to raise_error(Crawler::NoMatchError)
+          .to raise_error(Crawler::CrawlLimitReachedError)
       end
     end
 
