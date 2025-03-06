@@ -1,5 +1,7 @@
 module Checks
   class LanguageIndication < Check
+    PRIORITY = 5
+
     store_accessor :data, :indication
 
     private

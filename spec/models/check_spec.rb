@@ -224,4 +224,32 @@ RSpec.describe Check do
       end
     end
   end
+
+  describe "#priority" do
+    context "when subclass defines PRIORITY" do
+      let(:custom_check_class) do
+        Class.new(described_class) do
+          # Define the constant on our anonymous class
+          const_set(:PRIORITY, 5)
+        end
+      end
+
+      it "uses the subclass priority" do
+        check = custom_check_class.new
+        expect(check.priority).to eq(5)
+      end
+    end
+
+    context "when subclass doesn't define PRIORITY" do
+      let(:default_check_class) do
+        Class.new(described_class)
+        # No PRIORITY constant defined
+      end
+
+      it "defaults to Check::PRIORITY" do
+        check = default_check_class.new
+        expect(check.priority).to eq(described_class::PRIORITY)
+      end
+    end
+  end
 end

@@ -5,6 +5,8 @@ class Check < ApplicationRecord
     :language_indication,
   ].freeze
 
+  PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
+
   belongs_to :audit
   has_one :site, through: :audit
 
@@ -14,11 +16,14 @@ class Check < ApplicationRecord
   delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
 
+  after_initialize :set_priority
+
   scope :due, -> { pending.where("run_at <= now()") }
   scope :scheduled, -> { where(scheduled: true) }
   scope :unscheduled, -> { where(scheduled: false) }
   scope :to_schedule, -> { due.unscheduled }
   scope :to_run, -> { due.scheduled }
+  scope :prioritized, -> { order(:priority) }
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
@@ -75,4 +80,6 @@ class Check < ApplicationRecord
 
   def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
+
+  def set_priority = self.priority = self.class::PRIORITY
 end
