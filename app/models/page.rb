@@ -13,7 +13,7 @@ class Page
     end
   end
 
-  attr_reader :url, :root, :html, :headers
+  attr_reader :url, :root, :html, :headers, :actual_url
 
   def initialize(url:, root: nil, html: nil)
     @url = URI.parse(url)
@@ -23,6 +23,7 @@ class Page
 
   def path = url.to_s.delete_prefix(root.to_s)
   def root? = url == root
+  def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
   def title = dom.title&.squish
   def text = dom.text&.squish

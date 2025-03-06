@@ -60,6 +60,24 @@ RSpec.describe Page do
     end
   end
 
+  describe "#redirected?" do
+    context "when actual_url is the original URL" do
+      it "returns false" do
+        allow(page).to receive(:actual_url).and_return(parsed_url)
+
+        expect(page.redirected?).to be false
+      end
+    end
+
+    context "when actual_url is different from the original URL" do
+      it "returns true" do
+        allow(page).to receive(:actual_url).and_return(root)
+
+        expect(page.redirected?).to be true
+      end
+    end
+  end
+
   describe "#fetch" do
     let(:body) { nil }
 
