@@ -29,18 +29,18 @@ class Page < Data.define(:url, :root)
   def external_links = links - internal_links
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
 
- def html
-   @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-     body, headers = Browser.fetch(url.to_s)
-     content_type = headers["Content-Type"]
-     if content_type && !content_type.include?("text/html")
-       raise InvalidTypeError.new url, content_type
-     end
-     body
-   rescue Ferrum::Error => e
-     Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
-     raise e
-   end
+  def html
+    @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
+      body, headers = Browser.fetch(url.to_s)
+      content_type = headers["Content-Type"]
+      if content_type && !content_type.include?("text/html")
+        raise InvalidTypeError.new url, content_type
+      end
+      body
+    rescue Ferrum::Error => e
+      Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
+      raise e
+    end
  end
 
  def dom
