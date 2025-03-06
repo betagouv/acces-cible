@@ -152,7 +152,7 @@ RSpec.describe Check do
     it "returns a Page with the audit URL" do
       audit = build(:audit, url: "https://example.com/")
       check = build(:check, audit:)
-      expect(Page).to receive(:new).with("https://example.com/")
+      expect(Page).to receive(:new).with(url: "https://example.com/")
       check.root_page
     end
   end

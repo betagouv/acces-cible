@@ -1,4 +1,4 @@
-class Page < Data.define(:url, :root)
+class Page
   CACHE_TTL = 10.minutes
   SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
 
@@ -13,10 +13,12 @@ class Page < Data.define(:url, :root)
     end
   end
 
+  attr_reader :url, :root, :headers
+
   def initialize(url:, root: nil, html: nil)
-    # Allow setting HTML directly to simplify testing and avoid network calls.
+    @url = URI.parse(url)
+    @root = URI.parse(root || url)
     @html = html
-    super(url: URI.parse(url), root: URI.parse(root || url))
   end
 
   def path = url.to_s.delete_prefix(root.to_s)
@@ -30,7 +32,7 @@ class Page < Data.define(:url, :root)
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
 
   def html
-    @html || Rails.cache.fetch(url, expires_in: CACHE_TTL) do
+    @html ||= Rails.cache.fetch(url, expires_in: CACHE_TTL) do
       body, headers = Browser.fetch(url.to_s)
       content_type = headers["Content-Type"]
       if content_type && !content_type.include?("text/html")

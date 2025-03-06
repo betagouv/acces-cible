@@ -46,7 +46,7 @@ class Crawler
   def get_page
     crawled << link = queue.shift
     Rails.logger.info { "#{crawled.size}: Crawling #{link.href}" }
-    Page.new(link.href, root)
+    Page.new(url: link.href, root:)
   rescue StandardError => e
     case e
     when Page::InvalidTypeError

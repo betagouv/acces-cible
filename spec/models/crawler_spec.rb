@@ -31,7 +31,7 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(link1.href, root_url)
+          .with(url: link1.href, root: root_url)
           .and_return(target_page)
       end
 
@@ -55,7 +55,7 @@ RSpec.describe Crawler do
     context "when no matching page exists" do
       before do
         allow(Page).to receive(:new)
-          .with(anything, root_url)
+          .with(url: anything, root: root_url)
           .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
@@ -82,10 +82,10 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(root_url, root_url)
+          .with(url: root_url, root: root_url)
           .and_return(root_page)
         allow(Page).to receive(:new)
-          .with(anything, root_url)
+          .with(url: anything, root: root_url)
           .and_return(crawled_page)
       end
 

@@ -41,7 +41,7 @@ class Check < ApplicationRecord
   def human_checked_at = checked_at ? l(checked_at, format: :long) : nil
   def to_partial_path = self.class.model_name.collection.singularize
   def due? = persisted? && pending? && run_at <= Time.current
-  def root_page = Page.new(audit.url)
+  def root_page = Page.new(url: audit.url)
   def crawler = Crawler.new(audit.url)
   def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
 
