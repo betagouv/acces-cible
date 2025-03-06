@@ -1,5 +1,3 @@
-require "net/http"
-
 class Page < Data.define(:url, :root)
   CACHE_TTL = 10.minutes
   SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
