@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :page do
-    sequence(:url) { |n| "https://www.example-#{n}.com/" }
-    root { url }
+    url { "https://www.example.com/" }
+    root { nil }
 
     transient do
       title { nil }
