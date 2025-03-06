@@ -172,7 +172,7 @@ GEM
     diff-lcs (1.6.0)
     drb (2.2.1)
     dsfr-assets (1.13.0.1)
-    dsfr-form_builder (0.0.4)
+    dsfr-form_builder (0.0.5)
       actionview (>= 6.1, < 9.0)
       activemodel (>= 6.1, < 9.0)
       activesupport (>= 6.1, < 9.0)
