@@ -131,4 +131,43 @@ RSpec.describe Audit do
       expect(audit.status).to eq("passed")
     end
   end
+
+  describe "#checked?(name)" do
+    subject(:checked) { audit.checked?(name) }
+
+    let(:audit) { build(:audit) }
+    let(:name) { Check.names.first }
+
+    context "when check has not run" do
+      before do
+        allow(audit).to receive(name).and_return(nil)
+      end
+
+      it "returns nil" do
+        expect(checked).to be_nil
+      end
+    end
+
+    context "when check has failed" do
+      before do
+        check = instance_double(Check.types[name].name, passed?: false)
+        allow(audit).to receive(name).and_return(check)
+      end
+
+      it "returns false" do
+        expect(checked).to be false
+      end
+    end
+
+    context "when check has passed" do
+      before do
+        check = instance_double(Check.types[name].name, passed?: true)
+        allow(audit).to receive(name).and_return(check)
+      end
+
+      it "returns true" do
+        expect(checked).to be true
+      end
+    end
+  end
 end

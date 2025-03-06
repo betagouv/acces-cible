@@ -54,4 +54,8 @@ class Audit < ApplicationRecord
     latest_checked_at = all_checks.collect(&:checked_at).sort.last
     update(checked_at: latest_checked_at)
   end
+
+  def checked?(name)
+    public_send(name)&.passed?
+  end
 end
