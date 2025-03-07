@@ -39,6 +39,10 @@ class Audit < ApplicationRecord
     set_checked_at
   end
 
+  def check_status(check)
+    (send(check)&.status || :pending).to_s.inquiry
+  end
+
   def derive_status_from_checks
     new_status = if all_checks.any?(&:new_record?)
        :pending

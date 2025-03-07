@@ -7,6 +7,7 @@ module Checks
     end
 
     PRIORITY = 0 # This needs to run before all other checks
+    REQUIREMENTS = nil
 
     store_accessor :data, :original_url, :redirect_url
 

@@ -7,6 +7,7 @@ class Check < ApplicationRecord
   ].freeze
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
+  REQUIREMENTS = [:reachable]
 
   belongs_to :audit
   has_one :site, through: :audit
@@ -45,19 +46,34 @@ class Check < ApplicationRecord
   def root_page = @root_page ||= Page.new(url: audit.url)
   def crawler = Crawler.new(audit.url)
   def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
+  def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
+  def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
+  def blocked? = requirements&.any? { audit.check_status(it).failed? } || false
+  def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
 
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
+  def reschedule!
+    transaction do
+      RunCheckJob.set(wait_for: 1.minute).perform_later(self)
+      update!(status: :pending, checked_at: nil, scheduled: true)
+    end
+  end
+
   def run
-    self.data = analyze!
-    self.status = :passed
-  rescue StandardError => e
-    self.status = :failed
-    self.data = { error: e.message, error_type: e.class.name, backtrace: Rails.backtrace_cleaner.clean(e.backtrace) }
-  ensure
-    self.checked_at = Time.zone.now
+    return reschedule! if waiting?
+
+    begin
+      self.checked_at = Time.zone.now
+      self.data = analyze!
+      self.status = :passed
+      passed?
+    rescue StandardError => e
+      self.status = :failed
+      self.data = { error: e.message, error_type: e.class.name, backtrace: Rails.backtrace_cleaner.clean(e.backtrace) }
+    end
     save
     passed?
   end
