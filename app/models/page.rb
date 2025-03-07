@@ -13,11 +13,12 @@ class Page
     end
   end
 
-  attr_reader :url, :root, :html, :headers, :actual_url
+  attr_reader :url, :root, :status, :html, :headers, :actual_url
 
   def initialize(url:, root: nil, html: nil)
     @url = URI.parse(url)
     @root = URI.parse(root || url)
+    @status = 200
     @html = html
     fetch if html.nil?
   end
@@ -32,6 +33,8 @@ class Page
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
+  def success? = status == 200
+  def error? = status > 399
 
   def dom
     Nokogiri::HTML(html)
