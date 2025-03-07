@@ -60,29 +60,51 @@ RSpec.describe Page do
     end
   end
 
-  describe "#html" do
+  describe "#redirected?" do
+    context "when actual_url is the original URL" do
+      it "returns false" do
+        allow(page).to receive(:actual_url).and_return(parsed_url)
+
+        expect(page.redirected?).to be false
+      end
+    end
+
+    context "when actual_url is different from the original URL" do
+      it "returns true" do
+        allow(page).to receive(:actual_url).and_return(root)
+
+        expect(page.redirected?).to be true
+      end
+    end
+  end
+
+  describe "#fetch" do
+    let(:body) { nil }
+
+    before do
+      allow(Browser).to receive(:fetch)
+        .with(url)
+        .and_return({ body:, status: 200, headers:, current_url: parsed_url })
+    end
+
     it "fetches the page content" do
-      expect(page.html).to eq(body)
+      expect(page.html).to be_nil
     end
 
     it "attempts to use the cache" do
       allow(Rails.cache).to receive(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
 
-      build(:page, url:).html
+      page
       expect(Rails.cache).to have_received(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
     end
 
     context "when the response is not HTML" do
-      let(:body) { nil }
+      let(:headers) { { "Content-Type" => "application/pdf" } }
 
       it "raises InvalidTypeError" do
-        allow(Browser).to receive(:fetch)
-          .with(url)
-          .and_return([nil, { "Content-Type" => "application/pdf" }])
-
-        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
+        expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
   end

@@ -9,6 +9,7 @@ fr:
     actions: "Actions"
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     time_ago: "il y a %{time}"
+    time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
 
   time:
@@ -67,6 +68,10 @@ fr:
         table_header: Déclaration
         link_to: "Déclaration d'accessibilité de %{name}"
         not_found: Non trouvée
+      checks/reachable:
+        type: Site joignable
+        redirected: Redirection
+        reachable: Joignable à l'adresse indiquée
 
       site:
         created_at: Enregistré le
