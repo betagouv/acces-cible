@@ -90,15 +90,4 @@ class Browser
       end.freeze
     end
   end
-
-  def stub(request)
-    uri = URI.parse(request.url)
-    stub = WebMock::StubRegistry.instance.request_stubbed?(WebMock::RequestSignature.new(:get, uri))
-    response = stub.response
-    request.respond(
-      status: response.status[0],
-      headers: { "content-type" => "text/html" },
-      body: response.body
-    )
-  end
 end
