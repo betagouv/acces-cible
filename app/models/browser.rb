@@ -41,7 +41,12 @@ class Browser
   def fetch(url)
     page = browser.create_page
     page.goto(url)
-    [page.body, page.network.response.headers, page.current_url]
+    {
+      body: page.body,
+      status: page.network.status,
+      headers: page.network.response.headers,
+      current_url: URI.parse(page.current_url)
+    }
   rescue Ferrum::Error => e
     Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
     raise e

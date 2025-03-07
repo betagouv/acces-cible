@@ -57,12 +57,12 @@ class Page
 
   def fetch
     Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-      @html, @headers, final_url = Browser.fetch(url.to_s)
-      @actual_url = URI.parse(final_url || url)
+      @actual_url, @status, @headers, @html = Browser.fetch(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
       if content_type && !content_type.include?("text/html")
         raise InvalidTypeError.new url, content_type
       end
+      html
     rescue Ferrum::Error => e
       Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
       raise e
