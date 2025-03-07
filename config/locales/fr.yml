@@ -68,6 +68,10 @@ fr:
         table_header: Déclaration
         link_to: "Déclaration d'accessibilité de %{name}"
         not_found: Non trouvée
+      checks/reachable:
+        type: Site joignable
+        redirected: Redirection
+        reachable: Joignable à l'adresse indiquée
 
       site:
         created_at: Enregistré le
