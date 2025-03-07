@@ -101,11 +101,9 @@ RSpec.describe Page do
     end
 
     context "when the response is not HTML" do
-      it "raises InvalidTypeError" do
-        allow(Browser).to receive(:fetch)
-          .with(url)
-          .and_return([nil, { "Content-Type" => "application/pdf" }])
+      let(:headers) { { "Content-Type" => "application/pdf" } }
 
+      it "raises InvalidTypeError" do
         expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
