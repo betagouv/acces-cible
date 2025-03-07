@@ -18,7 +18,8 @@ class Page
   def initialize(url:, root: nil, html: nil)
     @url = URI.parse(url)
     @root = URI.parse(root || url)
-    @html = html || fetch
+    @html = html
+    fetch if html.nil?
   end
 
   def path = url.to_s.delete_prefix(root.to_s)
@@ -62,7 +63,7 @@ class Page
       if content_type && !content_type.include?("text/html")
         raise InvalidTypeError.new url, content_type
       end
-      html
+      [@actual_url, @status, @headers, @html]
     rescue Ferrum::Error => e
       Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
       raise e
