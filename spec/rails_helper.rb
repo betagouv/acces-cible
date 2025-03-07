@@ -67,6 +67,9 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
+  # Allow using freeze_time, travel, travel_to, and travel_back
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Feature-specific config
   config.include Capybara::DSL, type: :feature
   config.include Capybara::RSpecMatchers, type: :feature
