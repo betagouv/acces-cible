@@ -32,6 +32,17 @@ class Browser
     IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"].freeze
   ].flatten.freeze
 
+  BLOCKED_DOMAINS = [
+    "google-analytics.com",
+    "googletagmanager.com",
+    "facebook.net",
+    "facebook.com",
+    "twitter.com",
+    "linkedin.com",
+    "doubleclick.net",
+    "adservice.google.com"
+  ].freeze
+
   class << self
     def fetch(url)
       instance.fetch(url)
@@ -61,6 +72,8 @@ class Browser
         browser.network.intercept
         browser.on(:request) do |request|
           if request.url.end_with?(*BLOCKED_EXTENSIONS)
+            request.abort
+          elsif BLOCKED_DOMAINS.any? { |domain| request.url.include?(domain) }
             request.abort
           else
             request.continue
