@@ -19,8 +19,7 @@ class Page
     @url = URI.parse(url)
     @root = URI.parse(root || url)
     @status = 200
-    @html = html
-    fetch if html.nil?
+    @html = html || fetch&.last
   end
 
   def path = url.to_s.delete_prefix(root.to_s)
