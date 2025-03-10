@@ -4,15 +4,21 @@ module Checks
     DECLARATION = /Déclaration d('|')accessibilité( RGAA)?/i
     ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
 
-    store_accessor :data, :url
+    store_accessor :data, :url, :title
+
+    def found? = url.present?
 
     private
 
-    def found? = url.present?
     def custom_badge_text = found? ? human(:link_to, name: site&.name) : human(:not_found)
     def custom_badge_status = found? ? :success : :error
     def custom_badge_link = url
-    def analyze! = { url: find_page&.url }
+
+    def analyze!
+      return {} unless (page = find_page)
+
+      { url: page.url, title: page.title }
+    end
 
     def find_page
       crawler.find do |current_page, queue|

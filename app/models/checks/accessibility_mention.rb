@@ -5,9 +5,11 @@ module Checks
 
     store_accessor :data, :mention
 
+    def mention_text = human("mentions.", count: nil)[mention.to_s.to_sym]
+
     private
 
-    def custom_badge_text = human("mentions.", count: nil)[mention.to_s.to_sym]
+    def custom_badge_text = mention_text
     def custom_badge_status
       { nil => :error,
         non: :warning,

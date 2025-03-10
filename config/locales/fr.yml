@@ -67,6 +67,7 @@ fr:
         table_header: Audit
         found_all: Déclaration complète
         missing_data: Déclaration incomplète
+        unknown: Non détecté
         audit_date: Date de l'audit
         compliance_rate: Taux de conformité
         standard: Référentiel
@@ -74,6 +75,7 @@ fr:
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
         table_header: Déclaration
+        view_page: "Voir la déclaration"
         link_to: "Déclaration d'accessibilité de %{name}"
         not_found: Non trouvée
       checks/language_indication:

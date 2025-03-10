@@ -43,7 +43,7 @@ class Check < ApplicationRecord
   def run_at = super || Time.current
   def human_status = Check.human("status.#{status}")
   def human_checked_at = checked_at ? l(checked_at, format: :long) : nil
-  def to_partial_path = self.class.model_name.collection.singularize
+  def to_partial_path = model_name.i18n_key.to_s
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = @root_page ||= Page.new(url: audit.url)
   def crawler = Crawler.new(audit.url)
