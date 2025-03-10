@@ -4,6 +4,7 @@ class Check < ApplicationRecord
     :language_indication,
     :accessibility_mention,
     :find_accessibility_page,
+    :analyze_accessibility_page,
   ].freeze
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first

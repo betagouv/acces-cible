@@ -16,6 +16,9 @@ fr:
   time:
     formats:
       compact: "%Y/%m/%d"
+  date:
+    formats:
+      compact: "%Y/%m/%d"
 
   errors:
     attributes:
@@ -59,6 +62,15 @@ fr:
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
+      checks/analyze_accessibility_page:
+        type: Informations sur l'audit
+        table_header: Audit
+        found_all: Déclaration complète
+        missing_data: Déclaration incomplète
+        audit_date: Date de l'audit
+        compliance_rate: Taux de conformité
+        standard: Référentiel
+        auditor: Audit réalisé par
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
         table_header: Déclaration
