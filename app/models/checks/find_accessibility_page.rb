@@ -1,5 +1,5 @@
 module Checks
-  class AccessibilityPage < Check
+  class FindAccessibilityPage < Check
     PRIORITY = 20
 
     store_accessor :data, :url, :title, :audit_date, :compliance_rate, :standard, :auditor

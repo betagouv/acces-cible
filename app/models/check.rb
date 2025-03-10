@@ -2,7 +2,7 @@ class Check < ApplicationRecord
   TYPES = [
     :reachable,
     :accessibility_mention,
-    :accessibility_page,
+    :find_accessibility_page,
     :language_indication,
   ].freeze
 

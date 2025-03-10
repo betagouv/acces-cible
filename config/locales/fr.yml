@@ -59,16 +59,16 @@ fr:
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
+      checks/find_accessibility_page:
+        type: Déclaration d'accessibilité
+        table_header: Déclaration
+        link_to: "Déclaration d'accessibilité de %{name}"
+        not_found: Non trouvée
       checks/language_indication:
         type: Indication de la langue
         table_header: Langue
         empty: Absente
         totalement: Totalement conforme
-      checks/accessibility_page:
-        type: Déclaration d'accessibilité
-        table_header: Déclaration
-        link_to: "Déclaration d'accessibilité de %{name}"
-        not_found: Non trouvée
       checks/reachable:
         type: Site joignable
         redirected: Redirection

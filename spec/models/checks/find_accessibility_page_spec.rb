@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Checks::AccessibilityPage do
+RSpec.describe Checks::FindAccessibilityPage do
   let(:root_url) { "https://example.com" }
   let(:audit) { build(:audit) }
   let(:check) { described_class.new(audit:) }
