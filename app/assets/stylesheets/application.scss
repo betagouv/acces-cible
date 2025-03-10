@@ -26,10 +26,14 @@ form.button_to {
   }
   &[role=tooltip] {
     outline-offset: 0;
-    // Centre l'icône quand le badge n'a pas de texte visible
     &::before {
-      margin-right: -.125rem;
+      margin-right: -.125rem; // Centre l'icône quand le badge n'a pas de texte visible
+    }
+    &:not(a) {
       cursor: help;
+    }
+    &[target=_blank]::after {
+      display: none; // Masque l'icône nouvelle fenêtre en mode tooltip
     }
   }
 }

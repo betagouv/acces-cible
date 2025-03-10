@@ -11,6 +11,7 @@ fr:
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
+    new_window: " (nouvelle fenêtre)"
 
   time:
     formats:
