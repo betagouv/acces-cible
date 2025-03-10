@@ -1,9 +1,10 @@
 class Check < ApplicationRecord
   TYPES = [
     :reachable,
-    :accessibility_mention,
-    :accessibility_page,
     :language_indication,
+    :accessibility_mention,
+    :find_accessibility_page,
+    :analyze_accessibility_page,
   ].freeze
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
@@ -32,16 +33,17 @@ class Check < ApplicationRecord
     def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
 
     def types
-      @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
+      @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }.sort_by { |_name, klass| klass.priority }.to_h
     end
     def names = types.keys
     def classes = types.values
+    def priority = self::PRIORITY
   end
 
   def run_at = super || Time.current
   def human_status = Check.human("status.#{status}")
   def human_checked_at = checked_at ? l(checked_at, format: :long) : nil
-  def to_partial_path = self.class.model_name.collection.singularize
+  def to_partial_path = model_name.i18n_key.to_s
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = @root_page ||= Page.new(url: audit.url)
   def crawler = Crawler.new(audit.url)
@@ -98,5 +100,5 @@ class Check < ApplicationRecord
   def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
-  def set_priority = self.priority = self.class::PRIORITY
+  def set_priority = self.priority = self.class.priority
 end

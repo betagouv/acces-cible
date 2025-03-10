@@ -49,7 +49,9 @@ module ApplicationHelper
     text ||= yield(block)
     case
     when tooltip && link
-      dsfr_badge(status:, html_attributes: { role: :tooltip, title: text }) { link_to text, link, class: "fr-sr-only", target: :_blank, rel: :noopenner }
+      link_to link, class: class_names("fr-badge", "fr-badge--#{status}"), role: :tooltip, title: text + t("shared.new_window"), target: :_blank, rel: :noopenner do
+        tag.span(class: "fr-sr-only") { text }
+      end
     when tooltip
       dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
     when link then dsfr_badge(status:) { link_to text, link }

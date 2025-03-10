@@ -1,0 +1,13 @@
+<div id="<%= dom_id check %>">
+  <h2 class="fr-h4"><%= check.human_type %></h2>
+  <%= badge check.to_badge %>
+
+  <% if check.passed? %>
+    <ul>
+      <li><strong><%= check.human(:compliance_rate) %></strong> : <%= number_to_percentage(check.compliance_rate, precision: 0) || check.human(:unknown) %></li>
+      <li><strong><%= check.human(:audit_date) %></strong> : <%= check.audit_date ? l(check.audit_date.to_date) : check.human(:unknown) %></li>
+      <li><strong><%= check.human(:standard) %></strong> : <%= check.standard || check.human(:unknown) %></li>
+      <li><strong><%= check.human(:auditor) %></strong> : <%= check.auditor || check.human(:unknown) %></li>
+    </ul>
+  <% end %>
+</div>

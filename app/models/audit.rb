@@ -30,7 +30,8 @@ class Audit < ApplicationRecord
   end
 
   def create_checks
-    Check.names.map { |name| send(name) || send(:"create_#{name}") }
+    all_checks.select(&:new_record?).each(&:save)
+    all_checks
   end
 
   def run!
