@@ -1,9 +1,9 @@
 class Check < ApplicationRecord
   TYPES = [
     :reachable,
+    :language_indication,
     :accessibility_mention,
     :find_accessibility_page,
-    :language_indication,
   ].freeze
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
@@ -32,10 +32,11 @@ class Check < ApplicationRecord
     def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
 
     def types
-      @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }
+      @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }.sort_by { |_name, klass| klass.priority }.to_h
     end
     def names = types.keys
     def classes = types.values
+    def priority = self::PRIORITY
   end
 
   def run_at = super || Time.current
@@ -98,5 +99,5 @@ class Check < ApplicationRecord
   def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
-  def set_priority = self.priority = self.class::PRIORITY
+  def set_priority = self.priority = self.class.priority
 end
