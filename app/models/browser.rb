@@ -11,6 +11,8 @@ class Browser
     [1280, 800],
     [1920, 1080]
   ].freeze
+  CHROME_VERSIONS = (101..134).to_a.freeze
+  MACOS_VERSIONS = ["10_15_7", "13_4_1", "13_6_6", "14_1_2", "14_7_1", "14_7_3", "15_1_1"].freeze
 
   HEADERS = {
     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -19,15 +21,13 @@ class Browser
     "Cache-Control" => "no-cache",
     "Pragma" => "no-cache",
     "Priority" => "u=0, i",
-    "Sec-Ch-Ua" => '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
     "Sec-Ch-Ua-Mobile" => "?0",
-    "Sec-Ch-Ua-Platform" => "\"macOS\"",
     "Sec-Fetch-Dest" => "document",
     "Sec-Fetch-Mode" => "navigate",
     "Sec-Fetch-Site" => "cross-site",
     "Sec-Fetch-User" => "?1",
+    "Sec-Ch-Ua-Platform" => "\"macOS\"",
     "Upgrade-Insecure-Requests" => "1",
-    "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
   }.freeze
 
   BLOCKED_EXTENSIONS = [
@@ -116,6 +116,7 @@ class Browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
         browser.headers.set(HEADERS)
+        browser.headers.add(random_user_agent)
         browser.network.intercept
         browser.on(:request) do |request|
           if request.url.end_with?(*BLOCKED_EXTENSIONS)
@@ -162,5 +163,14 @@ class Browser
     else
       Rails.logger.info { "No pending requests found for #{url}" }
     end
+  end
+
+  def random_user_agent
+    macos_version = MACOS_VERSIONS.sample
+    chrome_version = CHROME_VERSIONS.sample
+    {
+      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
+      "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
+    }
   end
 end
