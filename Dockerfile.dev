@@ -1,4 +1,4 @@
-FROM ruby:3.4.1-slim
+FROM ruby:3.4.2-slim
 
 EXPOSE 3000
 
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recomme
 # do the bundle install in another directory with the strict essential
 # (Gemfile and Gemfile.lock) to allow further steps to be cached
 WORKDIR /bundle
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 RUN bundle install
 
 # Move to the main folder
