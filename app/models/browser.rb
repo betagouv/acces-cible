@@ -142,6 +142,10 @@ class Browser
       }.tap do |options|
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
         options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
+
+        if ENV["WITHIN_DOCKER"].present?
+          options[:browser_options].merge!("no-sandbox" => nil)
+        end
       end.freeze
     end
   end

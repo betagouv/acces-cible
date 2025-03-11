@@ -13,6 +13,9 @@ down:
 sh:
 	$(DOCKER-RUN) web bash
 
+cl:
+	$(DOCKER-RUN) web ./bin/rails c
+
 lint:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rubocop
 
