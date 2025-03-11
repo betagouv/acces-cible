@@ -74,5 +74,7 @@ Style/SymbolArray:
 # Trailing commas make nicer diffs
 Style/TrailingCommaInArrayLiteral:
   Enabled: false
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
 Style/WordArray:
   EnforcedStyle: "brackets"
