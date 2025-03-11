@@ -7,6 +7,8 @@ class Browser
   PROCESS_TIMEOUT = 10 # seconds
   WINDOW_SIZE = [1366, 768] # width, height
 
+  DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+
   HEADERS = {
     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "Accept-Encoding" => "gzip, deflate, br, zstd",
@@ -21,8 +23,7 @@ class Browser
     "Sec-Fetch-Mode" => "navigate",
     "Sec-Fetch-Site" => "cross-site",
     "Sec-Fetch-User" => "?1",
-    "Upgrade-Insecure-Requests" => "1",
-    "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    "Upgrade-Insecure-Requests" => "1"
   }.freeze
 
   BLOCKED_EXTENSIONS = [
@@ -50,7 +51,7 @@ class Browser
   end
 
   def fetch(url)
-    page = browser.create_page
+    page = browser.create_page.tap { |p| p.headers.set(HEADERS) }
     pending_requests = {}
 
     # Setup network request tracking
@@ -110,7 +111,7 @@ class Browser
   def browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
-        browser.headers.set(HEADERS)
+        browser.default_user_agent = DEFAULT_USER_AGENT
         browser.network.intercept
         browser.on(:request) do |request|
           if request.url.end_with?(*BLOCKED_EXTENSIONS)
