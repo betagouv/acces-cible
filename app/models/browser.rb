@@ -106,7 +106,7 @@ class Browser
       Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
       raise e
     ensure
-      page&.close # Prevent memory leaks
+      reset
     end
   end
 
@@ -130,6 +130,12 @@ class Browser
         browser
       end
     end
+  end
+
+  def reset
+    browser&.reset
+    browser&.quit
+    @browser = nil
   end
 
   def settings
