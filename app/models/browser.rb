@@ -55,21 +55,21 @@ class Browser
   end
 
   def get(url)
-    page = browser.create_page
     begin
-      page.network.wait_for_idle(timeout: 2)
-      begin
-        page.go_to(url)
-      rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError
-        Rails.logger.warn { "Network idle timeout for #{url}, proceeding with current state" }
+      page = browser.create_page.tap do |setup|
+        setup.headers.set(HEADERS)
+        setup.headers.add(random_user_agent)
+        setup.network.wait_for_idle(timeout: 2)
       end
+      page.go_to(url)
+    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError
+      Rails.logger.warn { "Network idle timeout for #{url}, proceeding with current state" }
       {
         body: page.body,
         status: page.network.status || 200,
         headers: page.network.response&.headers || {},
         current_url: URI.parse(page.current_url)
       }
-    end
     rescue Ferrum::Error => ferrum_error
       Rails.logger.error { "Browser error fetching #{url}: #{ferrum_error.message}" }
       raise ferrum_error
@@ -83,8 +83,6 @@ class Browser
   def browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
-        browser.headers.set(HEADERS)
-        browser.headers.add(random_user_agent)
         browser.network.intercept
         browser.on(:request) do |request|
           if request.url.end_with?(*BLOCKED_EXTENSIONS)
