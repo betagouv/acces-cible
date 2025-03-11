@@ -1,5 +1,7 @@
 FROM ruby:3.4.2-slim
 
+ENV WITHIN_DOCKER=1
+
 EXPOSE 3000
 
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y build-essential libpq-dev

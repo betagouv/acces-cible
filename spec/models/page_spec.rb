@@ -82,7 +82,7 @@ RSpec.describe Page do
     let(:body) { nil }
 
     before do
-      allow(Browser).to receive(:fetch)
+      allow(Browser).to receive(:get)
         .with(url)
         .and_return({ body:, status: 200, headers:, current_url: parsed_url })
     end
