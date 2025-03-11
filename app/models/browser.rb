@@ -69,9 +69,10 @@ class Browser
         headers: page.network.response&.headers || {},
         current_url: URI.parse(page.current_url)
       }
-    rescue Ferrum::Error => e
-      Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
-      raise e
+    end
+    rescue Ferrum::Error => ferrum_error
+      Rails.logger.error { "Browser error fetching #{url}: #{ferrum_error.message}" }
+      raise ferrum_error
     ensure
       reset
     end
