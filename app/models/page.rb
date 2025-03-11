@@ -60,7 +60,7 @@ class Page
 
   def fetch
     Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-      @actual_url, @status, @headers, @html = Browser.fetch(url.to_s).values_at(:current_url, :status, :headers, :body)
+      @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
       if content_type && !content_type.include?("text/html")
         raise InvalidTypeError.new url, content_type

@@ -44,12 +44,12 @@ class Browser
   ].freeze
 
   class << self
-    def fetch(url)
-      instance.fetch(url)
+    def get(url)
+      instance.get(url)
     end
   end
 
-  def fetch(url)
+  def get(url)
     page = browser.create_page
     pending_requests = {}
 
