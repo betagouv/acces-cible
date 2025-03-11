@@ -56,46 +56,13 @@ class Browser
 
   def get(url)
     page = browser.create_page
-    pending_requests = {}
-
-    # Setup network request tracking
-    page.on(:request) do |request|
-      pending_requests[request.id] = {
-        url: request.url,
-        resource_type: request.resource_type,
-        started_at: Time.current
-      }
-      Rails.logger.debug { "Request started: #{request.id} - #{request.url} (#{request.resource_type})" }
-    end
-
-    page.on(:request_failed) do |request|
-      Rails.logger.debug { "Request failed: #{request.id} - #{request.url} (#{request.resource_type})" }
-      pending_requests.delete(request.id)
-    end
-
-    page.on(:response) do |response|
-      if pending_requests[response.request.id]
-        Rails.logger.debug { "Response received: #{response.request.id} - #{response.request.url} (#{response.status})" }
-        pending_requests.delete(response.request.id)
-      end
-    end
     begin
-      page.go_to(url)
+      page.network.wait_for_idle(timeout: 2)
       begin
-        page.network.wait_for_idle(timeout: 2)
-      rescue Ferrum::TimeoutError
-        log_pending_requests(pending_requests, url)
+        page.go_to(url)
+      rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError
         Rails.logger.warn { "Network idle timeout for #{url}, proceeding with current state" }
       end
-      {
-        body: page.body,
-        status: page.network.status,
-        headers: page.network.response&.headers || {},
-        current_url: URI.parse(page.current_url)
-      }
-    rescue Ferrum::PendingConnectionsError
-      log_pending_requests(pending_requests, url)
-      Rails.logger.warn { "Pending connections for #{url}, proceeding with current state" }
       {
         body: page.body,
         status: page.network.status || 200,
@@ -155,19 +122,6 @@ class Browser
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
         options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
       end.freeze
-    end
-  end
-
-  def log_pending_requests(pending_requests, url)
-    if pending_requests.any?
-      Rails.logger.error { "===== PENDING REQUESTS for #{url} =====" }
-      pending_requests.each do |id, details|
-        duration = Time.current - details[:started_at]
-        Rails.logger.error { "  [#{id}] #{details[:url]} (#{details[:resource_type]}) - Pending for #{duration.round(2)}s" }
-      end
-      Rails.logger.error { "=====================================" }
-    else
-      Rails.logger.info { "No pending requests found for #{url}" }
     end
   end
 
