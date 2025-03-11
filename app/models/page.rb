@@ -34,6 +34,7 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == 200
   def error? = status > 399
+  def refresh = Rails.cache.clear(url) && fetch
 
   def dom
     Nokogiri::HTML(html)

@@ -5,7 +5,12 @@ class Browser
 
   PAGE_TIMEOUT = 5 # seconds
   PROCESS_TIMEOUT = 10 # seconds
-  WINDOW_SIZE = [1366, 768] # width, height
+  WINDOW_SIZES = [
+    [1366, 768],
+    [1440, 900],
+    [1280, 800],
+    [1920, 1080]
+  ].freeze
 
   HEADERS = {
     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -131,7 +136,7 @@ class Browser
       {
         headless: :new,
         timeout: PAGE_TIMEOUT,
-        window_size: WINDOW_SIZE,
+        window_size: WINDOW_SIZES.sample,
         process_timeout: PROCESS_TIMEOUT,
         extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
         browser_options: {
