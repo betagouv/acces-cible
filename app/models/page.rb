@@ -34,7 +34,7 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == 200
   def error? = status > 399
-  def refresh = Rails.cache.clear(url) && fetch
+  def refresh = fetch(clear: true)
 
   def dom
     Nokogiri::HTML(html)
@@ -59,7 +59,8 @@ class Page
 
   private
 
-  def fetch
+  def fetch(clear: false)
+    Rails.cache.clear(url) if clear
     Rails.cache.fetch(url, expires_in: CACHE_TTL) do
       @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
