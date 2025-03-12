@@ -16,8 +16,8 @@ class Page
   attr_reader :url, :root, :status, :html, :headers, :actual_url
 
   def initialize(url:, root: nil, html: nil)
-    @url = URI.parse(url)
-    @root = URI.parse(root || url)
+    @url = Link.normalize(url)
+    @root = Link.normalize(root || url)
     @status = 200
     @html = html || fetch&.last
   end
@@ -48,13 +48,10 @@ class Page
       uri = URI.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
-      if uri.relative?
-        relative_path = href.start_with?("/") ? href[1..-1] : href
-        uri = URI.parse(root.to_s.chomp("/") + "/" + relative_path)
-      end
+      href = "#{url.origin}/#{href}" if uri.relative?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
-      Link.new(uri, text)
-    end.compact
+      Link.new(href:, text:)
+    end.uniq.compact
   end
 
   private

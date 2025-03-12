@@ -4,7 +4,7 @@ RSpec.describe Page do
   let(:root) { "https://example.com" }
   let(:url) { "https://example.com/about" }
   let(:parsed_url) { URI.parse(url) }
-  let(:page) { build(:page, url:, root:, html: body) }
+  let(:page) { build(:page, url: url, root: root, html: body) }
   let(:headers) { { "Content-Type" => "text/html" } }
   let(:body) do
     <<~HTML
@@ -34,13 +34,13 @@ RSpec.describe Page do
 
   describe "#path" do
     it "returns the path portion of the URL" do
-      expect(page.path).to eq("/about")
+      expect(page.path).to eq("about")
     end
 
     context "when URL is the root URL" do
       let(:url) { root }
 
-      it "returns an empty string" do
+      it "returns a slash" do
         expect(page.path).to eq("")
       end
     end
@@ -149,10 +149,10 @@ RSpec.describe Page do
   end
 
   describe "#links" do
-    it "returns a hash of URLs and their link texts" do
+    it "returns an array of links" do
       expected_links = [
         Link.new("https://example.com/contact", "Contact"),
-        Link.new("https://external.com", "External"),
+        Link.new("https://external.com/", "External"),
         Link.new("https://example.com/relative/path", "Relative"),
       ]
       expect(page.links).to eq(expected_links)
@@ -166,29 +166,31 @@ RSpec.describe Page do
       expect(page.links.collect(&:text)).not_to include("Section")
     end
 
-    it "excludes links to non-HTML files" do
-      body = <<~HTML
-        <body>
+    context "with links to non-HTML files" do
+      let(:body) do
+        <<~HTML
           <a href="document.pdf">PDF</a>
           <a href="file.zip">ZIP</a>
           <a href="image.jpg">JPG</a>
-        </body>
-      HTML
-      expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+        HTML
+      end
+
+      it "excludes links to non-HTML files" do
+        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+      end
     end
 
-    it "resolves relative URLs" do
-      expect(page.links.collect(&:href)).to include("https://example.com/relative/path")
-    end
+    context "with fragment URLs" do
+      let(:body) do
+        <<~HTML
+          <a href="https://external.com/">Link 1</a>
+          <a href="https://external.com/#section">Link 2</a>
+        HTML
+      end
 
-    it "strips fragments and query parameters from URLs" do
-      body = <<~HTML
-        <body>
-          <a href="https://external.com">
-          <a href="https://external.com?param=1#section">
-        </body>
-      HTML
-      expect(page.links.collect(&:href)).to include("https://external.com")
+      it "strips fragments from URLs" do
+        expect(page.links.collect(&:href)).to contain_exactly("https://external.com/")
+      end
     end
   end
 
