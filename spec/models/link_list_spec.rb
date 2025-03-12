@@ -114,7 +114,7 @@ RSpec.describe LinkList do
   describe "#to_a" do
     it "returns an array of hrefs" do
       list = described_class.new(link1, link2)
-      expect(list.to_a).to eq(["https://example1.com", "https://example2.com"])
+      expect(list.to_a).to eq(["https://example1.com/", "https://example2.com/"])
     end
   end
 

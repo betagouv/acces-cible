@@ -16,14 +16,14 @@ class Page
   attr_reader :url, :root, :status, :html, :headers, :actual_url
 
   def initialize(url:, root: nil, html: nil)
-    @url = URI.parse(url)
-    @root = URI.parse(root || url)
+    @url = Link.normalize(url)
+    @root = Link.normalize(root || url)
     @status = 200
     @html = html || fetch&.last
   end
 
-  def path = url.to_s.delete_prefix(root.to_s)
   def root? = url == root
+  def path = url.to_s.delete_prefix(root.to_s)
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
   def title = dom.title&.squish
@@ -34,7 +34,7 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == 200
   def error? = status > 399
-  def refresh = Rails.cache.clear(url) && fetch
+  def refresh = fetch(clear: true)
 
   def dom
     Nokogiri::HTML(html)
@@ -48,18 +48,16 @@ class Page
       uri = URI.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
-      if uri.relative?
-        relative_path = href.start_with?("/") ? href[1..-1] : href
-        uri = URI.parse(root.to_s.chomp("/") + "/" + relative_path)
-      end
+      href = "#{url.origin}/#{href}" if uri.relative?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
-      Link.new(uri, text)
-    end.compact
+      Link.new(href:, text:)
+    end.uniq.compact
   end
 
   private
 
-  def fetch
+  def fetch(clear: false)
+    Rails.cache.clear(url) if clear
     Rails.cache.fetch(url, expires_in: CACHE_TTL) do
       @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
