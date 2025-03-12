@@ -164,4 +164,78 @@ RSpec.describe Link do
       end
     end
   end
+
+  describe "#<=>" do
+    it "allows sorting by href" do
+      links = [
+        described_class.new(href: "http://example.com/c.html"),
+        described_class.new(href: "http://example.com/a.html"),
+        described_class.new(href: "http://example.com/b.html")
+      ]
+
+      sorted = links.sort
+      expect(sorted.map(&:href)).to eq([
+        "http://example.com/a.html",
+        "http://example.com/b.html",
+        "http://example.com/c.html"
+      ])
+    end
+  end
+
+  describe "#eql?" do
+    it "deduplicates identical links with uniq" do
+      links = [
+        described_class.new(href: "http://example.com/page.html"),
+        described_class.new(href: "http://example.com/page.html"),
+        described_class.new(href: "http://example.com/page.html")
+      ]
+
+      unique_links = links.uniq
+      expect(unique_links.size).to eq(1)
+    end
+
+    it "deduplicates links that normalize to the same URL" do
+      links = [
+        described_class.new(href: "http://example.com/page.html"),
+        described_class.new(href: "http://example.com/folder/../page.html"),
+        described_class.new(href: "http://example.com/./page.html")
+      ]
+
+      unique_links = links.uniq
+      expect(unique_links.size).to eq(1)
+    end
+
+    it "works correctly with Set" do
+      links = [
+        described_class.new(href: "http://example.com/page1.html"),
+        described_class.new(href: "http://example.com/page1.html"),
+        described_class.new(href: "http://example.com/page2.html")
+      ]
+
+      set = Set.new(links)
+      expect(set.size).to eq(2)
+    end
+
+    it "works correctly with Hash keys" do
+      link1 = described_class.new(href: "http://example.com/page.html")
+      link2 = described_class.new(href: "http://example.com/folder/../page.html")
+
+      hash = { link1 => "value1" }
+      hash[link2] = "value2"
+
+      expect(hash.size).to eq(1)
+      expect(hash[link1]).to eq("value2")
+    end
+
+    it "deduplicates but preserves text from the first occurrence" do
+      links = [
+        described_class.new(href: "http://example.com/page.html", text: "First text"),
+        described_class.new(href: "http://example.com/page.html", text: "Second text")
+      ]
+
+      unique_links = links.uniq
+      expect(unique_links.size).to eq(1)
+      expect(unique_links.first.text).to eq("First text")
+    end
+  end
 end

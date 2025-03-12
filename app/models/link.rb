@@ -1,4 +1,6 @@
 Link = Data.define(:href, :text) do
+  include Comparable
+
   class << self
     def from(source)
       case source
@@ -26,6 +28,7 @@ Link = Data.define(:href, :text) do
   end
 
   delegate :normalize, to: :class
+  delegate :hash, to: :href
 
   def initialize(href:, text: nil)
     super(href: normalize(href).to_s, text: text&.squish || "")
@@ -33,4 +36,6 @@ Link = Data.define(:href, :text) do
 
   def to_str = href
   def ==(other) = href == other.to_str
+  def <=>(other) = other.is_a?(Link) ? href <=> other.href : nil
+  def eql?(other) = other.is_a?(Link) && href == other.href
 end
