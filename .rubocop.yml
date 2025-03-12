@@ -60,11 +60,12 @@ RSpec/NestedGroups:
   Max: 4
 RSpec/ContextWording:
   Prefixes:
-    - when
     - and
+    - for
+    - when
     - with
     - without
-    - for
+    - returns
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"
