@@ -1,16 +1,36 @@
 Link = Data.define(:href, :text) do
-  def initialize(href:, text: nil)
-    super(href: href.to_s, text: text&.squish || "")
-  end
+  class << self
+    def from(source)
+      case source
+      when Link then source
+      when String, URI then Link.new(href: source)
+      else raise ArgumentError.new("#{source.class.name} is not allowed in Link.from")
+      end
+    end
 
-  def self.from(source)
-    case source
-    when Link then source
-    when String, URI then Link.new(href: source)
-    else raise ArgumentError.new("#{source.class.name} is not allowed in Link.from")
+    def normalize(href)
+      uri = URI.parse(href.dup)
+      uri.fragment = nil # Fragments shouldn't change the target document
+
+      return uri if uri.relative?
+      return URI.join(uri, "/") if uri.path.empty?
+
+      origin = uri.origin
+      origin = "#{origin}/" unless origin.end_with?("/") # Ensure the origin ends with a slash for proper joining
+      normalized_path = File.expand_path(uri.path, "/")
+      normalized_path = normalized_path[1..-1] if normalized_path.start_with?("/")
+      query = uri.query.nil? ? "" : "?#{uri.query}"
+
+      URI.join(origin, normalized_path) + query
     end
   end
 
+  delegate :normalize, to: :class
+
+  def initialize(href:, text: nil)
+    super(href: normalize(href).to_s, text: text&.squish || "")
+  end
+
   def to_str = href
-  def ==(other) = href == other
+  def ==(other) = href == other.to_str
 end
