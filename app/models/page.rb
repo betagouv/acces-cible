@@ -22,8 +22,8 @@ class Page
     @html = html || fetch&.last
   end
 
-  def path = url.to_s.delete_prefix(root.to_s)
   def root? = url == root
+  def path = url.to_s.delete_prefix(root.to_s)
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
   def title = dom.title&.squish
