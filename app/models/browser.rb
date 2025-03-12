@@ -49,9 +49,7 @@ class Browser
   ].freeze
 
   class << self
-    def get(url)
-      instance.get(url)
-    end
+    delegate_missing_to :instance
   end
 
   def get(url)
