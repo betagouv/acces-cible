@@ -55,26 +55,14 @@ class Browser
   end
 
   def get(url)
-    begin
-      page = browser.create_page.tap do |setup|
-        setup.headers.set(HEADERS)
-        setup.headers.add(random_user_agent)
-        setup.network.wait_for_idle(timeout: 2)
-      end
+    with_page do |page|
       page.go_to(url)
-    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError
-      Rails.logger.warn { "Network idle timeout for #{url}, proceeding with current state" }
       {
         body: page.body,
         status: page.network.status || 200,
         headers: page.network.response&.headers || {},
         current_url: URI.parse(page.current_url)
       }
-    rescue Ferrum::Error => ferrum_error
-      Rails.logger.error { "Browser error fetching #{url}: #{ferrum_error.message}" }
-      raise ferrum_error
-    ensure
-      reset
     end
   end
 
@@ -102,6 +90,31 @@ class Browser
     browser&.reset
     browser&.quit
     @browser = nil
+  end
+
+  def with_page
+    begin
+      page = create_page
+      result = yield(page)
+      result
+    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
+      Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
+      raise e unless defined?(page) && page
+      yield(page) # Try again to get what we can from the page
+    rescue Ferrum::Error => ferrum_error
+      Rails.logger.error { "Browser error: #{ferrum_error.message}" }
+      raise ferrum_error
+    ensure
+      reset
+    end
+  end
+
+  def create_page
+    browser.create_page.tap do |page|
+      page.headers.set(HEADERS)
+      page.headers.add(random_user_agent)
+      page.network.wait_for_idle(timeout: 2)
+    end
   end
 
   def settings
