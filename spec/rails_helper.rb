@@ -55,6 +55,7 @@ RSpec.configure do |config|
 
   # Setup Database cleaner to avoid state leaks between tests
   config.before(:suite) do
+    DatabaseCleaner.allow_remote_database_url = true
     DatabaseCleaner.clean_with :truncation, except: [:ar_internal_metadata]
   end
 
