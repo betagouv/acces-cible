@@ -48,7 +48,6 @@ class Check < ApplicationRecord
   def due? = persisted? && pending? && run_at <= Time.current
   def root_page = @root_page ||= Page.new(url: audit.url)
   def crawler = Crawler.new(audit.url)
-  def reschedule = update(status: :pending, scheduled: false, checked_at: nil)
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? } || false
@@ -58,7 +57,7 @@ class Check < ApplicationRecord
     [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
-  def reschedule!
+  def schedule!
     transaction do
       RunCheckJob.set(wait_for: 1.minute).perform_later(self)
       update!(status: :pending, checked_at: nil, scheduled: true)
@@ -66,7 +65,7 @@ class Check < ApplicationRecord
   end
 
   def run
-    return reschedule! if waiting?
+    return schedule! if waiting?
 
     begin
       self.checked_at = Time.zone.now

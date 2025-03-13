@@ -22,7 +22,7 @@ class SitesController < ApplicationController
   def create
     @site = Site.find_or_create_by_url(site_params)
     if @site.persisted?
-      @site.audit.run! if @site.audit.pending?
+      @site.audit.schedule if @site.audit.pending?
       redirect_to @site, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
