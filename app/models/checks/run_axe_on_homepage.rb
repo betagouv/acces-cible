@@ -5,7 +5,7 @@ module Checks
     store_accessor :data, :passes, :incomplete, :inapplicable, :violations, :total_issues
 
     def failures = violations&.size
-    def failure_rate = total_issues ? failures / (total_issues || 0) : nil
+    def failure_rate = total_issues ? failures / (total_issues || 0).to_f : nil
 
     private
 
