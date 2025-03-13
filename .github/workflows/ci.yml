@@ -85,6 +85,16 @@ jobs:
       - name: Install libvips
         run: sudo apt-get update && sudo apt-get install -y libvips
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
+
+      - name: Fix GA Chrome Permissions
+        run: |
+          sudo chown root:root /opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome-sandbox
+          sudo chmod 4755 /opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome-sandbox
+
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:
