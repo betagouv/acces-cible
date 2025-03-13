@@ -5,7 +5,7 @@ RSpec.describe Browser do
     subject(:axe_check) { described_class.axe_check(url) }
 
     let(:url) { "https://example.com" }
-    let(:ferrum_browser) { Ferrum::Browser.new(headless: true) }
+    let(:ferrum_browser) { described_class.instance.send(:browser) }
     let(:page) { ferrum_browser.create_page }
     let(:html) do
       <<~HTML
@@ -29,21 +29,11 @@ RSpec.describe Browser do
     end
 
     before do
-      allow(described_class.instance).to receive(:with_page) do |&block|
-        begin
-          block.call(page)
-        ensure
-          ferrum_browser.quit
-        end
-      end
+      allow(described_class.instance).to receive(:with_page).and_yield(page)
 
       allow(page).to receive(:go_to) do |_url|
         page.evaluate("document.documentElement.innerHTML = `#{html}`")
       end
-    end
-
-    after do
-      ferrum_browser.quit rescue nil
     end
 
     it "visits the provided URL" do
