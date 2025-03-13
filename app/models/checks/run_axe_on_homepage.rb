@@ -2,12 +2,24 @@ module Checks
   class RunAxeOnHomepage < Check
     PRIORITY = 30
 
-    store_accessor :data, :passes, :incomplete, :inapplicable, :violations, :total_issues
+    store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :issues_total
 
-    def failures = violations&.size
-    def failure_rate = total_issues ? failures / (total_issues || 0).to_f : nil
+    def applicable_total = passes + incomplete + violations
+    def checks_total = applicable_total + inapplicable
+    def success_rate = (passes + incomplete) / applicable_total.to_f * 100
+    def human_success_rate = helpers.number_to_percentage(success_rate, precision: 2, strip_insignificant_zeros: true)
 
     private
+
+    def custom_badge_text = human_success_rate
+    def custom_badge_status
+      case success_rate
+      when 100 then :success
+      when 50..100 then :new
+      when 1..50 then :warning
+      else :error
+      end
+    end
 
     def analyze!
       return unless (results = Browser.axe_check(audit.url))
@@ -16,8 +28,9 @@ module Checks
         passes: results["passes"]&.count || 0,
         incomplete: results["incomplete"]&.count || 0,
         inapplicable: results["inapplicable"]&.count || 0,
-        violations: format(results["violations"]),
-        total_issues: results["violations"]&.sum { |v| v["nodes"]&.count || 0 } || 0,
+        violations: results["violations"]&.count || 0,
+        violation_data: format(results["violations"]),
+        issues_total: results["violations"]&.sum { |v| v["nodes"]&.count || 0 } || 0,
       }
     end
 

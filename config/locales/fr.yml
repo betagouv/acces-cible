@@ -90,12 +90,13 @@ fr:
       checks/run_axe_on_homepage:
         type: "Contrôles automatiques : page d'accueil"
         redirected: Contrôles
-        passes: Contrôles passés
+        passes: Contrôles réussis
         incomplete: Contrôles incomplets
         inapplicable: Contrôles inapplicables
         violations: Contrôles échoués
-        total_issues: Contrôles effectués
-        failure_rate: Taux d'erreur
+        checks_total: Contrôles effectués
+        issues_total: Erreurs relevées
+        success_rate: Taux de réussite
         unknown: Inconnu
 
       site:
