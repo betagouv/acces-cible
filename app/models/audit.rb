@@ -24,6 +24,7 @@ class Audit < ApplicationRecord
 
   def parsed_url = @parsed_url ||= URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
+  def checks = Check.find_by(audit: self)
 
   def all_checks
     Check.names.map { |name| send(name) || send(:"build_#{name}") }
