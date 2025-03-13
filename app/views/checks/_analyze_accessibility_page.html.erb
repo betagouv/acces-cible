@@ -5,7 +5,14 @@
   <% if check.passed? %>
     <ul>
       <li><strong><%= check.human(:compliance_rate) %></strong> : <%= number_to_percentage(check.compliance_rate, precision: 0) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:audit_date) %></strong> : <%= check.audit_date ? l(check.audit_date.to_date) : check.human(:unknown) %></li>
+      <li><strong><%= check.human(:audit_date) %></strong> :
+        <% if check.audit_date %>
+          <%= l(check.audit_date.to_date) %>
+          (<%= time_ago check.audit_date.to_date %>)
+        <% else %>
+          <%= check.human(:unknown) %>
+        <% end %>
+      </li>
       <li><strong><%= check.human(:standard) %></strong> : <%= check.standard || check.human(:unknown) %></li>
       <li><strong><%= check.human(:auditor) %></strong> : <%= check.auditor || check.human(:unknown) %></li>
     </ul>
