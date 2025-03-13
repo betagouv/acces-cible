@@ -48,6 +48,8 @@ class Browser
     "adservice.google.com"
   ].freeze
 
+  AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
+
   class << self
     delegate_missing_to :instance
   end
@@ -61,6 +63,20 @@ class Browser
         headers: page.network.response&.headers || {},
         current_url: URI.parse(page.current_url)
       }
+    end
+  end
+
+  def axe_check(url)
+    with_page do |page|
+      page.bypass_csp
+      page.go_to(url)
+      page.add_script_tag(content: File.read(AXE_SOURCE_PATH))
+      # FIXME: evaluate returns an empty hash
+      page.evaluate <<~JS
+        axe.run(document, { standards: "wcag2aa", reporter: "v2" })
+           .then((results) => results)
+           .catch((err) => {error: err.toString()})
+      JS
     end
   end
 

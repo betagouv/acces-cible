@@ -87,6 +87,16 @@ fr:
         type: Site joignable
         redirected: Redirection
         reachable: Joignable à l'adresse indiquée
+      checks/run_axe_on_homepage:
+        type: "Contrôles automatiques : page d'accueil"
+        redirected: Contrôles
+        passes: Contrôles passés
+        incomplete: Contrôles incomplets
+        inapplicable: Contrôles inapplicables
+        violations: Contrôles échoués
+        total_issues: Contrôles effectués
+        failure_rate: Taux d'erreur
+        unknown: Inconnu
 
       site:
         created_at: Enregistré le
