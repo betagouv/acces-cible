@@ -37,3 +37,12 @@ form.button_to {
     }
   }
 }
+
+.link--icon-only {
+  background-image: none; // Underline uses a background-image
+  &.fr-link--icon-left::before,
+  &.fr-link--icon-right::after {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
