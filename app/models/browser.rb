@@ -71,11 +71,8 @@ class Browser
       page.bypass_csp
       page.go_to(url)
       page.add_script_tag(content: File.read(AXE_SOURCE_PATH))
-      # FIXME: evaluate returns an empty hash
-      page.evaluate <<~JS
-        axe.run(document, { standards: "wcag2aa", reporter: "v2" })
-           .then((results) => results)
-           .catch((err) => {error: err.toString()})
+      page.evaluate_async(<<~JS, PAGE_TIMEOUT)
+        axe.run(document, { standards: "wcag2aa", reporter: "v2" }).then(results => __f(results))
       JS
     end
   end

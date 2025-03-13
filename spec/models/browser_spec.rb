@@ -57,15 +57,15 @@ RSpec.describe Browser do
     end
 
     it "returns accessibility results" do
-      result = axe_check
+      results = axe_check
 
-      expect(result).to be_a(Hash)
-      expect(result).to have_key("violations")
-      expect(result).to have_key("passes")
+      expect(results).to be_a(Hash)
+      expect(results).to have_key("violations")
+      expect(results).to have_key("passes")
 
-      # With real axe running, we should find the img missing alt issue
-      img_violation = result["violations"].find { |v| v["id"] == "image-alt" }
-      expect(img_violation).to be_present
+      violation_ids = results["violations"].collect { |rule| rule["id"] }
+      expected_ids = ["document-title", "html-has-lang", "image-alt", "label", "landmark-one-main", "link-name", "page-has-heading-one", "region"]
+      expect(violation_ids).to match_array(expected_ids)
     end
 
     context "when browser encounters a timeout" do
