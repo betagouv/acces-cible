@@ -10,10 +10,6 @@ module Checks
     private
 
     def analyze!
-      { output: run_axe_checks }
-    end
-
-    def run_axe_checks
       return unless (results = Browser.axe_check(audit.url))
 
       {
