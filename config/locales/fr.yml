@@ -58,7 +58,7 @@ fr:
         type: Mention du niveau d'accessibilité
         table_header: Mention
       checks/accessibility_mention/mentions:
-        "": Absente
+        none: Absente
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme

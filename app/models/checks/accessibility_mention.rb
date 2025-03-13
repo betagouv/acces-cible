@@ -5,7 +5,7 @@ module Checks
 
     store_accessor :data, :mention
 
-    def mention_text = human("mentions.", count: nil)[mention.to_s.to_sym]
+    def mention_text = human("mentions.#{mention || 'none'}")
 
     private
 
