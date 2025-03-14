@@ -44,6 +44,6 @@ class Site < ApplicationRecord
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 
   def audit!
-    audits.create(url:).tap(&:run!).tap(&:persisted?)
+    audits.create(url:).tap(&:schedule).tap(&:persisted?)
   end
 end

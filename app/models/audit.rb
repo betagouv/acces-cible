@@ -24,6 +24,8 @@ class Audit < ApplicationRecord
 
   def parsed_url = @parsed_url ||= URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
+  def checks = Check.find_by(audit: self)
+  def schedule = RunAuditJob.perform_later(self)
 
   def all_checks
     Check.names.map { |name| send(name) || send(:"build_#{name}") }
@@ -32,12 +34,6 @@ class Audit < ApplicationRecord
   def create_checks
     all_checks.select(&:new_record?).each(&:save)
     all_checks
-  end
-
-  def run!
-    all_checks.each(&:run)
-    derive_status_from_checks
-    set_checked_at
   end
 
   def check_status(check)
@@ -56,7 +52,7 @@ class Audit < ApplicationRecord
   end
 
   def set_checked_at
-    latest_checked_at = all_checks.collect(&:checked_at).sort.last
+    latest_checked_at = checks.collect(&:checked_at).compact.sort.last
     update(checked_at: latest_checked_at)
   end
 

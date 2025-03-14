@@ -197,11 +197,11 @@ RSpec.describe Check do
     context "when check is waiting on requirements" do
       before do
         allow(check).to receive(:waiting?).and_return(true)
-        allow(check).to receive(:reschedule!)
+        allow(check).to receive(:schedule!)
       end
 
-      it "reschedules the check" do
-        expect(check).to receive(:reschedule!)
+      it "schedules the check" do
+        expect(check).to receive(:schedule!)
         check.run
       end
 
