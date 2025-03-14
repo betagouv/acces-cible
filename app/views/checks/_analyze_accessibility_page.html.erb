@@ -7,8 +7,8 @@
       <li><strong><%= check.human(:compliance_rate) %></strong> : <%= number_to_percentage(check.compliance_rate, precision: 2, strip_insignificant_zeros: true) || check.human(:unknown) %></li>
       <li><strong><%= check.human(:audit_date) %></strong> :
         <% if check.audit_date %>
-          <%= l(check.audit_date.to_date) %>
-          (<%= time_ago check.audit_date.to_date %>)
+          <%= l(check.audit_date) %>
+          (<%= time_ago check.audit_date %>)
         <% else %>
           <%= check.human(:unknown) %>
         <% end %>

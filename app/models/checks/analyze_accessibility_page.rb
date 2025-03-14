@@ -13,6 +13,8 @@ module Checks
 
     store_accessor :data, :audit_date, :compliance_rate, :standard, :auditor
 
+    def audit_date = super&.to_date
+
     def find_audit_date
       date_matches = page.text.scan(AUDIT_DATE_PATTERN).map do |full_date, day_str, month_str, year_str, day_num, month_num, year_num|
         begin
