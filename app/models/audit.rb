@@ -36,12 +36,6 @@ class Audit < ApplicationRecord
     all_checks
   end
 
-  def run!
-    all_checks.each(&:run)
-    derive_status_from_checks
-    set_checked_at
-  end
-
   def check_status(check)
     (send(check)&.status || :pending).to_s.inquiry
   end
