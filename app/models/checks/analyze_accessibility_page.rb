@@ -70,8 +70,9 @@ module Checks
     private
 
     def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
-    def found_all? = [:audit_date, :compliance_rate, :standard, :auditor].all? { send(it).present? }
-    def custom_badge_status = found_all? ? :success : :warning
+    def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
+    def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
+    def custom_badge_status = found_required? ? :success : :warning
     def custom_badge_text = found_all? ? human(:found_all) : human(:missing_data)
 
     def analyze!
