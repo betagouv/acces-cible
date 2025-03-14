@@ -39,6 +39,24 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     end
   end
 
+  describe "#find_audit_update_date" do
+    {
+      "Au 6 décembre 2024, La DILA indique qu'aucune modification n'a été réalisée sur le téléservice. Par conséquent le taux de conformité est inchangé depuis le précédent audit." => Date.new(2024, 12, 6),
+      "Suite à un audit de recette effectué en interne par l'Expert Accessibilité de la DILA réalisé le 16 juin 2023, le taux de conformité au RGAA v 4.1 est dorénavant de 88,52 %." => Date.new(2023, 6, 16),
+      "Audit réalisé le 1er décembre 2024. Suite à un audit de recette effectué en interne par l'Expert Accessibilité de la DILA réalisé le 16 août 2024, le taux de conformité au RGAA v 4.1 est dorénavant de 88,52 %." => nil, # audit_date est postérieure
+      "Mise à jour le 7 mars 2024 suite à la correction de plusieurs non-conformités." => Date.new(2024, 3, 7),
+      "Au 31 janvier 2024, une nouvelle évaluation a été effectuée." => Date.new(2024, 1, 31),
+      "Audit initial réalisé en mai 2023. Actualisation réalisée le 4 avril 2024." => Date.new(2024, 4, 4),
+      "Une mention de date qui n'a pas de mots-clés le 15 septembre 2024." => nil,
+      "Une date invalide du 35 mai 2024 pour une mise à jour." => nil
+    }.each do |text, expected_date|
+      it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}' from '#{text}'" do
+        allow(check).to receive_messages(page: build(:page, body: text), audit_date: expected_date ? expected_date - 1.year : nil)
+        expect(check.find_audit_update_date).to eq(expected_date)
+      end
+    end
+  end
+
   describe "#find_compliance_rate" do
     {
       "avec un taux de conformité 81,25%" => 81.25,

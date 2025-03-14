@@ -13,6 +13,12 @@
           <%= check.human(:unknown) %>
         <% end %>
       </li>
+      <% if check.audit_update_date %>
+        <li><strong><%= check.human(:audit_update_date) %></strong> :
+          <%= l(check.audit_update_date) %>
+          (<%= time_ago check.audit_update_date %>)
+        </li>
+      <% end %>
       <li><strong><%= check.human(:standard) %></strong> : <%= check.standard || check.human(:unknown) %></li>
       <li><strong><%= check.human(:auditor) %></strong> : <%= check.auditor || check.human(:unknown) %></li>
     </ul>
