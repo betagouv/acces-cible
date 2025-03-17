@@ -10,5 +10,5 @@ Sentry.init do |config|
   config.traces_sample_rate = 0.005
 
   config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
-  config.environment = :stating if ENV["APP_URL"].to_s.ends_with?("incubateur.net")
+  config.environment = :staging if ENV["APP_URL"].to_s.ends_with?("incubateur.net")
 end
