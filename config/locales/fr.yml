@@ -52,7 +52,7 @@ fr:
         pending: Planifié
         running: En cours
         passed: Effectué
-        retryable: À retenter
+        blocked: Inapplicable
         failed: Échoué
       checks/accessibility_mention:
         type: Mention du niveau d'accessibilité

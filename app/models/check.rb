@@ -14,7 +14,7 @@ class Check < ApplicationRecord
   belongs_to :audit
   has_one :site, through: :audit
 
-  enum :status, ["pending", "passed", "failed"].index_by(&:itself), validate: true, default: :pending
+  enum :status, ["pending", "passed", "failed", "blocked"].index_by(&:itself), validate: true, default: :pending
   store_accessor :data, :error, :error_type, :backtrace
 
   delegate :parsed_url, to: :audit
@@ -52,6 +52,8 @@ class Check < ApplicationRecord
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? } || false
   def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
+  def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false)
+  def fail! = update(status: :failed, checked_at: Time.zone.now, scheduled: false)
 
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact
@@ -66,6 +68,7 @@ class Check < ApplicationRecord
 
   def run
     return schedule! if waiting?
+    return blocked! if blocked?
 
     begin
       self.checked_at = Time.zone.now
