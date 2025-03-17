@@ -1,5 +1,5 @@
 class Audit < ApplicationRecord
-  belongs_to :site, touch: true
+  belongs_to :site, touch: true, counter_cache: true
   Check.types.each do |name, klass|
     has_one name, class_name: klass.name, dependent: :destroy
   end
@@ -14,7 +14,7 @@ class Audit < ApplicationRecord
     "failed",     # All checks failed
   ].index_by(&:itself), validate: true, default: :pending
 
-  scope :sort_by_newest, -> { order(created_at: :desc) }
+  scope :sort_by_newest, -> { order(checked_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :past, -> { where.not(status: :pending) }
 
@@ -24,13 +24,20 @@ class Audit < ApplicationRecord
 
   def parsed_url = @parsed_url ||= URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
+  def checks = Check.where(audit: self)
+  def schedule = RunAuditJob.perform_later(self)
 
   def all_checks
     Check.names.map { |name| send(name) || send(:"build_#{name}") }
   end
 
   def create_checks
-    Check.names.map { |name| send(name) || send(:"create_#{name}") }
+    all_checks.select(&:new_record?).each(&:save)
+    all_checks
+  end
+
+  def check_status(check)
+    (send(check)&.status || :pending).to_s.inquiry
   end
 
   def derive_status_from_checks
@@ -42,5 +49,14 @@ class Audit < ApplicationRecord
        :mixed
     end
     update(status: new_status)
+  end
+
+  def set_checked_at
+    latest_checked_at = checks.collect(&:checked_at).compact.sort.last
+    update(checked_at: latest_checked_at)
+  end
+
+  def checked?(name)
+    public_send(name)&.passed?
   end
 end

@@ -1,11 +1,11 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
-require:
-  - rubocop-factory_bot
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-factory_bot
   - rubocop-rspec_rails
 
 AllCops:
@@ -39,10 +39,33 @@ Naming/VariableNumber:
     - "spec/**/*.rb"
 
 # Rspec
+RSpec/ExampleLength:
+  Enabled: false
 RSpec/ImplicitExpect:
+  Enabled: false
+RSpec/ImplicitSubject:
+  Enabled: false
+RSpec/IndexedLet:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false
+RSpec/MessageSpies:
   Enabled: false
 RSpec/MultipleExpectations:
   Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  AllowSubject: true
+  Max: 10
+RSpec/NestedGroups:
+  Max: 4
+RSpec/ContextWording:
+  Prefixes:
+    - and
+    - for
+    - when
+    - with
+    - without
+    - returns
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"
@@ -50,6 +73,8 @@ Style/SymbolArray:
   EnforcedStyle: "brackets"
 # Trailing commas make nicer diffs
 Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 Style/WordArray:
   EnforcedStyle: "brackets"

@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.0.2"
 gem "rails-i18n"
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
@@ -60,6 +60,12 @@ gem "dsfr-view-components"
 
 gem "friendly_id"
 
+# Crawl websites using a headless Chrome browser, controlled by Ferrum
+# Use brotli and zstd compression to save bandwidth
+gem "ferrum"
+gem "brotli"
+gem "zstd-ruby"
+
 group :development, :test do
   gem "pry-rails"
 
@@ -104,5 +110,5 @@ group :test do
   # Allow testing accessibility using Axe-core. Only available in JS feature tests
   gem "axe-core-capybara", "~> 4.9"
   gem "axe-core-rspec", "~> 4.8"
-  gem "selenium-webdriver", "~> 4.27"
+  gem "selenium-webdriver", "~> 4.29"
 end

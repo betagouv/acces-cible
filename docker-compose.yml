@@ -3,8 +3,19 @@ services:
     build:
       dockerfile: Dockerfile.dev
     image: acces_cible
+    environment:
+      DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
     ports:
       - "3000:3000"
     volumes:
       - "./:/app"
       - "/app/node_modules"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 'dummy'
+      PGPORT: 5433
+    volumes:
+      - "./tmp/db:/var/lib/postgresql/data"
+    ports:
+      - "5433:5433"

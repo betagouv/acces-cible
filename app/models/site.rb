@@ -2,7 +2,7 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { past.order("audits.created_at DESC") }, dependent: :destroy
+  has_one_of_many :audit, -> { past.sort_by_newest }, dependent: :destroy
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
@@ -14,6 +14,14 @@ class Site < ApplicationRecord
       .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")
       .order("sites.id, sortable_url")
     from(subquery, :sites).order(:sortable_url)
+  end
+  scope :sort_by_audit_date, -> do
+    joins("LEFT JOIN (
+        SELECT site_id, MAX(checked_at) as latest_check
+        FROM audits
+        GROUP BY site_id
+      ) latest_audits ON sites.id = latest_audits.site_id")
+    .order("latest_audits.latest_check DESC NULLS LAST, sites.created_at DESC")
   end
 
   class << self
@@ -34,4 +42,8 @@ class Site < ApplicationRecord
   alias to_title name
   def audit = super || audits.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+
+  def audit!
+    audits.create(url:).tap(&:schedule).tap(&:persisted?)
+  end
 end

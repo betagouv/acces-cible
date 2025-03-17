@@ -1,8 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Audit do
-  let(:site) { create(:site) }
   subject(:audit) { build(:audit, site: nil) }
+
+  let(:site) { create(:site) }
 
   it "has a valid factory" do
     audit = build(:audit)
@@ -11,6 +12,7 @@ RSpec.describe Audit do
 
   describe "associations" do
     it { is_expected.to belong_to(:site).touch(true) }
+
     Check.names.each do |name|
       it { is_expected.to have_one(name).dependent(:destroy) }
     end
@@ -41,10 +43,10 @@ RSpec.describe Audit do
   describe "scopes" do
     before { site.audit.destroy }
 
-    it ".sort_by_newest returns audits in descending order by creation date" do
-      oldest = create(:audit, site:, created_at: 3.days.ago)
-      older = create(:audit, site:, created_at: 2.days.ago)
-      newer = create(:audit, site:, created_at: 1.day.ago)
+    it ".sort_by_newest returns audits in descending order by checked_at date" do
+      oldest = create(:audit, site:, checked_at: 3.days.ago)
+      older = create(:audit, site:, checked_at: 2.days.ago)
+      newer = create(:audit, site:, checked_at: 1.day.ago)
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
@@ -80,13 +82,14 @@ RSpec.describe Audit do
     it "memoizes the result" do
       audit.url = "https://example.com"
       first_result = audit.url_without_scheme
-      allow(audit).to receive(:hostname).and_return("different.com")
+      allow(audit).to receive(:hostname).and_return("different.com") # rubocop:disable RSpec/SubjectStub
       expect(audit.url_without_scheme).to eq(first_result)
     end
   end
 
   describe "#all_checks" do
     let(:audit) { build(:audit) }
+
     it "returns all checks, building missing ones" do
       checks = audit.all_checks
       expect(checks.size).to eq(Check.types.size)
@@ -96,6 +99,7 @@ RSpec.describe Audit do
 
   describe "#create_checks" do
     let(:audit) { create(:audit) }
+
     it "creates all check types" do
       expect(audit.create_checks.size).to eq(Check.types.size)
 
@@ -125,6 +129,45 @@ RSpec.describe Audit do
       audit.all_checks.each { |check| check.update(status: :passed) }
       audit.derive_status_from_checks
       expect(audit.status).to eq("passed")
+    end
+  end
+
+  describe "#checked?(name)" do
+    subject(:checked) { audit.checked?(name) }
+
+    let(:audit) { build(:audit) }
+    let(:name) { Check.names.first }
+
+    context "when check has not run" do
+      before do
+        allow(audit).to receive(name).and_return(nil)
+      end
+
+      it "returns nil" do
+        expect(checked).to be_nil
+      end
+    end
+
+    context "when check has failed" do
+      before do
+        check = instance_double(Check.types[name].name, passed?: false)
+        allow(audit).to receive(name).and_return(check)
+      end
+
+      it "returns false" do
+        expect(checked).to be false
+      end
+    end
+
+    context "when check has passed" do
+      before do
+        check = instance_double(Check.types[name].name, passed?: true)
+        allow(audit).to receive(name).and_return(check)
+      end
+
+      it "returns true" do
+        expect(checked).to be true
+      end
     end
   end
 end

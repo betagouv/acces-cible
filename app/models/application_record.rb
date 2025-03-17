@@ -3,6 +3,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   delegate :l, to: :I18n
   delegate :human, :human_count, to: :class
+  delegate :helpers, to: ApplicationController
 
   class << self
     alias human human_attribute_name

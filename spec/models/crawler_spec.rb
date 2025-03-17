@@ -31,7 +31,7 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(link1.href, root_url)
+          .with(url: link1.href, root: root_url)
           .and_return(target_page)
       end
 
@@ -48,14 +48,14 @@ RSpec.describe Crawler do
       it "respects crawl limit" do
         limited_crawler = described_class.new(root_url, crawl_up_to: 1)
         expect { limited_crawler.find { |page, _queue| page.title == "Target" } }
-          .to raise_error(Crawler::NoMatchError)
+          .to raise_error(Crawler::CrawlLimitReachedError)
       end
     end
 
     context "when no matching page exists" do
       before do
         allow(Page).to receive(:new)
-          .with(anything, root_url)
+          .with(url: anything, root: root_url)
           .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
@@ -82,10 +82,10 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(root_url, root_url)
+          .with(url: root_url, root: root_url)
           .and_return(root_page)
         allow(Page).to receive(:new)
-          .with(anything, root_url)
+          .with(url: anything, root: root_url)
           .and_return(crawled_page)
       end
 

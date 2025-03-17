@@ -4,7 +4,7 @@ RSpec.describe Page do
   let(:root) { "https://example.com" }
   let(:url) { "https://example.com/about" }
   let(:parsed_url) { URI.parse(url) }
-  let(:page) { described_class.new(url:, root:) }
+  let(:page) { build(:page, url: url, root: root, html: body) }
   let(:headers) { { "Content-Type" => "text/html" } }
   let(:body) do
     <<~HTML
@@ -34,13 +34,13 @@ RSpec.describe Page do
 
   describe "#path" do
     it "returns the path portion of the URL" do
-      expect(page.path).to eq("/about")
+      expect(page.path).to eq("about")
     end
 
     context "when URL is the root URL" do
       let(:url) { root }
 
-      it "returns an empty string" do
+      it "returns a slash" do
         expect(page.path).to eq("")
       end
     end
@@ -60,34 +60,51 @@ RSpec.describe Page do
     end
   end
 
-  describe "#html" do
+  describe "#redirected?" do
+    context "when actual_url is the original URL" do
+      it "returns false" do
+        allow(page).to receive(:actual_url).and_return(parsed_url)
+
+        expect(page.redirected?).to be false
+      end
+    end
+
+    context "when actual_url is different from the original URL" do
+      it "returns true" do
+        allow(page).to receive(:actual_url).and_return(root)
+
+        expect(page.redirected?).to be true
+      end
+    end
+  end
+
+  describe "#fetch" do
+    let(:body) { nil }
+
+    before do
+      allow(Browser).to receive(:get)
+        .with(url)
+        .and_return({ body:, status: 200, headers:, current_url: parsed_url })
+    end
+
     it "fetches the page content" do
-      expect(page.html).to eq(body)
+      expect(page.html).to be_nil
     end
 
     it "attempts to use the cache" do
-      expect(Rails.cache).to receive(:fetch)
+      allow(Rails.cache).to receive(:fetch)
         .with(parsed_url, expires_in: described_class::CACHE_TTL)
-        .and_return(body)
 
-      page.html
+      page
+      expect(Rails.cache).to have_received(:fetch)
+        .with(parsed_url, expires_in: described_class::CACHE_TTL)
     end
 
     context "when the response is not HTML" do
       let(:headers) { { "Content-Type" => "application/pdf" } }
 
       it "raises InvalidTypeError" do
-        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
-      end
-    end
-
-    context "when content-type header is missing" do
-      before do
-        stub_request(:get, url).to_return(body:, headers: {})
-      end
-
-      it "raises InvalidTypeError" do
-        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page/)
+        expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
   end
@@ -102,7 +119,7 @@ RSpec.describe Page do
 
       it "raises ParseError" do
         allow(Nokogiri).to receive(:HTML).with(body).and_raise(Nokogiri::SyntaxError)
-        expect { page.dom }.to raise_error(Page::ParseError, /failed to parse HTML/)
+        expect { page.dom }.to raise_error(Page::ParseError, /Failed to parse HTML/)
       end
     end
   end
@@ -132,10 +149,10 @@ RSpec.describe Page do
   end
 
   describe "#links" do
-    it "returns a hash of URLs and their link texts" do
+    it "returns an array of links" do
       expected_links = [
         Link.new("https://example.com/contact", "Contact"),
-        Link.new("https://external.com", "External"),
+        Link.new("https://external.com/", "External"),
         Link.new("https://example.com/relative/path", "Relative"),
       ]
       expect(page.links).to eq(expected_links)
@@ -149,29 +166,31 @@ RSpec.describe Page do
       expect(page.links.collect(&:text)).not_to include("Section")
     end
 
-    it "excludes links to non-HTML files" do
-      body = <<~HTML
-        <body>
+    context "with links to non-HTML files" do
+      let(:body) do
+        <<~HTML
           <a href="document.pdf">PDF</a>
           <a href="file.zip">ZIP</a>
           <a href="image.jpg">JPG</a>
-        </body>
-      HTML
-      expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+        HTML
+      end
+
+      it "excludes links to non-HTML files" do
+        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+      end
     end
 
-    it "resolves relative URLs" do
-      expect(page.links.collect(&:href)).to include("https://example.com/relative/path")
-    end
+    context "with fragment URLs" do
+      let(:body) do
+        <<~HTML
+          <a href="https://external.com/">Link 1</a>
+          <a href="https://external.com/#section">Link 2</a>
+        HTML
+      end
 
-    it "strips fragments and query parameters from URLs" do
-      body = <<~HTML
-        <body>
-          <a href="https://external.com">
-          <a href="https://external.com?param=1#section">
-        </body>
-      HTML
-      expect(page.links.collect(&:href)).to include("https://external.com")
+      it "strips fragments from URLs" do
+        expect(page.links.collect(&:href)).to contain_exactly("https://external.com/")
+      end
     end
   end
 

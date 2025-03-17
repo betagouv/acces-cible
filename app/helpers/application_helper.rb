@@ -24,13 +24,20 @@ module ApplicationHelper
   end
 
   def dsfr_table(caption:, size: :md, scroll: true, border: false, **html_attributes, &block)
-    render(Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block)
+    render Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block
+  end
+
+  def dsfr_sidemenu(title:, button: nil, sticky: false, full_height: false, right: false, &block)
+    component = Dsfr::SidemenuComponent.new(title:, button:, sticky:, full_height:, right:)
+    yield(component) if block_given?
+    render component
   end
 
   def root? = request.path == "/"
 
   def time_ago(datetime)
-    t("shared.time_ago", time: distance_of_time_in_words_to_now(datetime))
+    time = distance_of_time_in_words_to_now(datetime)
+    t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
   end
 
   def paginate
@@ -42,7 +49,9 @@ module ApplicationHelper
     text ||= yield(block)
     case
     when tooltip && link
-      dsfr_badge(status:, html_attributes: { role: :tooltip, title: text }) { link_to text, link, class: "fr-sr-only", target: :_blank, rel: :noopenner }
+      link_to link, class: class_names("fr-badge", "fr-badge--#{status}"), role: :tooltip, title: text + t("shared.new_window"), target: :_blank, rel: :noopenner do
+        tag.span(class: "fr-sr-only") { text }
+      end
     when tooltip
       dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
     when link then dsfr_badge(status:) { link_to text, link }

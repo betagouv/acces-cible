@@ -43,6 +43,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     [:sm, :md, :lg].each do |size|
       context "when size is :#{size}" do
         let(:params) { { caption: "Test Table", size: size } }
+
         it "renders with correct size class" do
           render_inline(component)
           if size == :md

@@ -1,12 +1,15 @@
 module Checks
   class AccessibilityMention < Check
+    PRIORITY = 10
     MENTION_REGEX = /accessibilit[ée]\s*:?\s*(?<level>non|partiellement|totalement)\s+conforme/iu
 
     store_accessor :data, :mention
 
+    def mention_text = human("mentions.#{mention || 'none'}")
+
     private
 
-    def custom_badge_text = human("mentions.", count: nil)[mention.to_s.to_sym]
+    def custom_badge_text = mention_text
     def custom_badge_status
       { nil => :error,
         non: :warning,

@@ -55,6 +55,7 @@ RSpec.configure do |config|
 
   # Setup Database cleaner to avoid state leaks between tests
   config.before(:suite) do
+    DatabaseCleaner.allow_remote_database_url = true
     DatabaseCleaner.clean_with :truncation, except: [:ar_internal_metadata]
   end
 
@@ -66,6 +67,9 @@ RSpec.configure do |config|
   config.append_after do
     DatabaseCleaner.clean
   end
+
+  # Allow using freeze_time, travel, travel_to, and travel_back
+  config.include ActiveSupport::Testing::TimeHelpers
 
   # Feature-specific config
   config.include Capybara::DSL, type: :feature

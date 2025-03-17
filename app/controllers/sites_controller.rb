@@ -4,11 +4,13 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    @pagy, @sites = pagy Site.sort_by_audit_url.includes(:audit)
+    @pagy, @sites = pagy Site.sort_by_audit_date.includes(:audit)
   end
 
   # GET /sites/1
-  def show; end
+  def show
+    @audit = @site.audit
+  end
 
   # GET /sites/new
   def new; end
@@ -20,6 +22,7 @@ class SitesController < ApplicationController
   def create
     @site = Site.find_or_create_by_url(site_params)
     if @site.persisted?
+      @site.audit.schedule if @site.audit.pending?
       redirect_to @site, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
