@@ -28,6 +28,7 @@ class Check < ApplicationRecord
   scope :to_schedule, -> { due.unscheduled }
   scope :to_run, -> { due.scheduled }
   scope :prioritized, -> { order(:priority) }
+  scope :errored, ->(type = nil) { type ? where("data->>'error_type' = ?", type) : where("data ? 'error_type'") }
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
