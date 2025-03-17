@@ -94,6 +94,7 @@ class Check < ApplicationRecord
   def status_to_badge_level
     case
     when pending? then :info
+    when blocked? then :warning
     when failed? then :error
     when passed? && respond_to?(:custom_badge_status, true) then custom_badge_status
     else :success

@@ -3,45 +3,46 @@ module Checks
     PRIORITY = 21
     REQUIREMENTS = [:find_accessibility_page]
 
-    DATE_PATTERN = /(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4}))/i
+    AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
+    AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
     COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité|conforme à|révèle que).*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
     AUDITOR_PATTERN = /(?:par(?:\s+la)?(?:\s+société)?|par)\s+([^,]+?)(?:,| révèle| sur)/i
+    UPDATE_AUDIT_PATTERNS = [
+      /Au\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4}).*(?:indique|mentionne).*(?:depuis|après).*(?:précédent|dernier)\s+audit/i,
+      /Suite\s+à.*(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})).*(?:dorénavant|désormais|maintenant|actuellement)/i,
+      /(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4}))/i
+    ].freeze
+    UPDATE_AUDIT_KEYWORDS = [
+      "suite à", "actualisation", "actualisé", "mis à jour", "mise à jour", "modification",
+      "revu", "révisé", "révision", "réévaluation", "nouvelle évaluation",
+      "dorénavant", "désormais", "maintenant", "actuellement", "inchangé",
+    ].freeze
 
     LAW_DATE = Date.new(2005, 2, 11)
 
-    store_accessor :data, :audit_date, :compliance_rate, :standard, :auditor
+    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor
+
+    def audit_date = super&.to_date
+    def audit_update_date = super&.to_date
 
     def find_audit_date
-      date_matches = page.text.scan(DATE_PATTERN).map do |day_str, month_str, year_str, day_num, month_num, year_num|
+      date_matches = page.text.scan(AUDIT_DATE_PATTERN).map do |full_date, day_str, month_str, year_str, day_num, month_num, year_num|
         begin
           if day_num && month_num && year_num
             day, month, year = day_num.to_i, month_num.to_i, year_num.to_i
           else
-            day, month, year = (day_str || "1").to_i, month_names[month_str.downcase], year_str.to_i
+            day, month, year = (day_str || 1).to_i, month_names[month_str.downcase], year_str.to_i
           end
-
           date = Date.new(year, month, day)
 
-          next if date == LAW_DATE
-          next if year < 2010 # Skip old dates
+          next if date == LAW_DATE || year < 2010
 
-          score = 0 # Calculate score for each date to find the most likely audit date
-
-          # Check proximity to audit-related keywords
-          date_str = day_num ? "#{day_num}#{month_num}#{year_num}" :  "#{day_str} #{month_str} #{year_str}"
-
-          position = page.text.index(date_str) || 0
+          score = 0
+          score += 1 if year >= 2020
+          position = page.text.index(full_date) || 0
           nearby_text = page.text[([position - 100, 0].max)..([position + 100, page.text.length].min)] || ""
-          audit_keywords = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"]
-          score += audit_keywords.count { |kw| nearby_text.match?(/#{kw}/i) }
-
-          # Dates in sentences with audit-related words get a higher score
-          surrounding_sentence = page.text.split(/[.!?]/).find { |sentence| sentence.include?(date_str) } || ""
-          score += 3 if audit_keywords.any? { |kw| surrounding_sentence.match?(/#{kw}/i) }
-
-          score += 1 if year >= 2020 # Recent dates are more likely to be audit dates
-
+          score += AUDIT_DATE_KEYWORDS.count { |kw| nearby_text.match?(/#{kw}/i) }
           [date, score]
         rescue Date::Error, NoMethodError
           nil
@@ -50,6 +51,39 @@ module Checks
 
       # Return the date with highest score, or nil if no valid dates found
       date_matches.max_by { |date, score| score }&.first
+    end
+
+    def find_audit_update_date
+      return unless audit_date
+
+      date_matches = []
+      UPDATE_AUDIT_PATTERNS.each do |pattern|
+        page.text.scan(pattern).each do |day_str, month_str, year_str, day_num, month_num, year_num|
+          begin
+            if day_num && month_num && year_num
+              day, month, year = day_num.to_i, month_num.to_i, year_num.to_i
+            else
+              day, month, year = (day_str || 1).to_i, month_names[month_str.downcase], year_str.to_i
+            end
+            date = Date.new(year, month, day)
+            next if date < audit_date || year < 2010
+
+            score = 0
+            score += 1 if year >= audit_date.year + 3.years
+            date_str = day_num ? "#{day_num}/#{month_num}/#{year_num}" : "#{day_str} #{month_str} #{year_str}"
+            position = page.text.index(date_str) || 0
+            nearby_text = page.text[([position - 150, 0].max)..([position + 150, page.text.length].min)] || ""
+            UPDATE_AUDIT_KEYWORDS.each { |keyword| score += 1 if nearby_text.match?(/#{Regexp.escape(keyword)}/i) }
+            next if score.zero?
+
+            date_matches << [date, score]
+          rescue Date::Error, NoMethodError
+            nil
+          end
+        end
+      end
+
+      date_matches.max_by { |date, score| [date, score] }&.first
     end
 
     def find_compliance_rate
@@ -70,13 +104,15 @@ module Checks
     private
 
     def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
-    def found_all? = [:audit_date, :compliance_rate, :standard, :auditor].all? { send(it).present? }
-    def custom_badge_status = found_all? ? :success : :warning
+    def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
+    def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
+    def custom_badge_status = found_required? ? :success : :warning
     def custom_badge_text = found_all? ? human(:found_all) : human(:missing_data)
 
     def analyze!
       {
         audit_date: find_audit_date,
+        audit_update_date: find_audit_update_date,
         compliance_rate: find_compliance_rate,
         standard: find_standard,
         auditor: find_auditor
