@@ -9,7 +9,7 @@ RSpec.describe Check do
     it do
       should define_enum_for(:status)
         .validating
-        .with_values(["pending", "passed", "failed"].index_by(&:itself))
+        .with_values(["pending", "passed", "failed", "blocked"].index_by(&:itself))
         .backed_by_column_of_type(:string)
         .with_default(:pending)
     end
@@ -192,7 +192,7 @@ RSpec.describe Check do
   end
 
   describe "#run" do
-    let(:check) { build(:check, audit: nil) }
+    let(:check) { build(:check) }
 
     context "when check is waiting on requirements" do
       before do
