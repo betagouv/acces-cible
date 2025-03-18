@@ -22,11 +22,12 @@ module Dsfr
     attr_reader :caption, :size, :border, :scroll, :html_attributes
 
     def table_classes
-      classes = ["fr-table"]
-      classes << "fr-table--#{size}" if [:sm, :lg].include?(size)
-      classes << "fr-table--border" if border
-      classes << "fr-table--no-scroll" unless scroll
-      classes.join(" ")
+      class_names(
+        "fr-table",
+        "fr-table--#{size}" => [:sm, :lg].include?(size),
+        "fr-table--border" => border,
+        "fr-table--no-scroll" => !scroll
+      )
     end
   end
 end
