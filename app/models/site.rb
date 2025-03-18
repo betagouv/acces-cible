@@ -8,22 +8,6 @@ class Site < ApplicationRecord
 
   delegate :url, :url_without_scheme, to: :audit
 
-  scope :sort_by_audit_url, -> do
-    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
-    subquery = joins(:audits)
-      .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")
-      .order("sites.id, sortable_url")
-    from(subquery, :sites).order(:sortable_url)
-  end
-  scope :sort_by_audit_date, -> do
-    joins("LEFT JOIN (
-        SELECT site_id, MAX(checked_at) as latest_check
-        FROM audits
-        GROUP BY site_id
-      ) latest_audits ON sites.id = latest_audits.site_id")
-    .order("latest_audits.latest_check DESC NULLS LAST, sites.created_at DESC")
-  end
-
   class << self
     def find_or_create_by_url(attributes)
       url = attributes.to_h.fetch(:url).strip

@@ -20,47 +20,37 @@ RSpec.describe Site do
     end
   end
 
-  describe "scopes" do
-    it ".sort_by_audit_date orders sites by their most recent audit checked_at date" do
-      site1 = build(:site, audits: [build(:audit, checked_at: 1.day.ago)]).tap(&:save)
-      site2 = build(:site, audits: [build(:audit, checked_at: 5.days.ago)]).tap(&:save)
-      site3 = build(:site, audits: [build(:audit, checked_at: 2.days.ago)]).tap(&:save)
+  describe ".find_or_create_by_url" do
+    let(:http_url) { "http://example.com" }
 
-      expect(described_class.sort_by_audit_date).to eq([site1, site3, site2])
-    end
+    context "when site with URL exists" do
+      let!(:existing_site) { described_class.create(url:) }
 
-    describe ".find_or_create_by_url" do
-      let(:http_url) { "http://example.com" }
-
-      context "when site with URL exists" do
-        let!(:existing_site) { described_class.create(url:) }
-
-        it "returns existing site for exact URL match" do
-          expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
-        end
-
-        it "returns existing site when only scheme differs" do
-          expect(described_class.find_or_create_by_url(url: http_url)).to eq(existing_site)
-        end
-
-        it "finds site with historical URLs" do
-          new_url = "https://new-example.com"
-          existing_site.audits.create!(url: new_url)
-
-          expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
-          expect(described_class.find_or_create_by_url(url: new_url)).to eq(existing_site)
-        end
+      it "returns existing site for exact URL match" do
+        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
       end
 
-      context "when site does not exist" do
-        it "creates a new site with audit" do
-          expect {
-            site = described_class.find_or_create_by_url(url:)
-            expect(site).to be_persisted
-            expect(site.audit.url).to eq(url)
-          }.to change(described_class, :count).by(1)
-          .and change(Audit, :count).by(1)
-        end
+      it "returns existing site when only scheme differs" do
+        expect(described_class.find_or_create_by_url(url: http_url)).to eq(existing_site)
+      end
+
+      it "finds site with historical URLs" do
+        new_url = "https://new-example.com"
+        existing_site.audits.create!(url: new_url)
+
+        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
+        expect(described_class.find_or_create_by_url(url: new_url)).to eq(existing_site)
+      end
+    end
+
+    context "when site does not exist" do
+      it "creates a new site with audit" do
+        expect {
+          site = described_class.find_or_create_by_url(url:)
+          expect(site).to be_persisted
+          expect(site.audit.url).to eq(url)
+        }.to change(described_class, :count).by(1)
+        .and change(Audit, :count).by(1)
       end
     end
   end
