@@ -66,6 +66,9 @@ RSpec/ContextWording:
     - with
     - without
     - returns
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - "spec/components/**/*.rb"
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"
