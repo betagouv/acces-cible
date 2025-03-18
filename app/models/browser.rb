@@ -49,6 +49,7 @@ class Browser
   ].freeze
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
+  AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
 
   class << self
     delegate_missing_to :instance
@@ -71,8 +72,10 @@ class Browser
       page.bypass_csp
       page.go_to(url)
       page.add_script_tag(content: File.read(AXE_SOURCE_PATH))
+      locale = File.read(AXE_LOCALE_PATH)
       page.evaluate_async(<<~JS, PAGE_TIMEOUT)
-        axe.run(document, { standards: "wcag2aa", reporter: "v2" }).then(results => __f(results))
+        axe.configure({locale: #{locale} })
+        axe.run(document, { standards: "wcag2aa", reporter: "v2"}).then(results => __f(results))
       JS
     end
   end
