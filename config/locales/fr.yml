@@ -37,6 +37,12 @@ fr:
         prev: Page précédente
         next: Page suivante
         page: "Page %{page}"
+      table:
+        lines:
+          zero: Aucune ligne
+          one: Une ligne
+          other: "%{count} lignes"
+
   activerecord:
     attributes:
       audit:

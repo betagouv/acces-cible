@@ -23,8 +23,8 @@ module ApplicationHelper
     end
   end
 
-  def dsfr_table(caption:, size: :md, scroll: true, border: false, **html_attributes, &block)
-    render Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block
+  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, **html_attributes, &block)
+    render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, html_attributes:), &block
   end
 
   def dsfr_sidemenu(title:, button: nil, sticky: false, full_height: false, right: false, &block)

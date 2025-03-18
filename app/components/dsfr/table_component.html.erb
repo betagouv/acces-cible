@@ -16,4 +16,14 @@
       </div>
     </div>
   </div>
+  <div class="fr-table__footer">
+    <div class="fr-table__footer--start">
+      <p class="fr-table__detail"><%= total_lines %></p>
+    </div>
+    <% if pagination? %>
+      <div class="fr-table__footer--middle">
+        <%= pagination %>
+      </div>
+    <% end %>
+  </div>
 </div>
