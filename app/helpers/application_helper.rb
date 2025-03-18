@@ -33,6 +33,19 @@ module ApplicationHelper
     render component
   end
 
+  def sort_link(text, param, **options)
+    permitted_params = params.permit(:page)
+    current_sort = params.dig(:sort, param)&.downcase&.to_sym
+    direction = current_sort == :asc ? :desc : :asc
+    link_params = permitted_params.merge(sort: { param => direction })
+    options[:class] = class_names(
+      options.delete(:class),
+      "fr-link fr-link--icon-right fr-icon-arrow-#{direction == :asc ? :down : :up}-s-fill" => current_sort.present?
+    ).presence
+    options[:title] ||= t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
+    link_to text, url_for(params: link_params), **options
+  end
+
   def root? = request.path == "/"
 
   def time_ago(datetime)
