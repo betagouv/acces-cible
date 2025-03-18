@@ -3,8 +3,8 @@
     <tr>
       <th scope="col"><%= Site.human(:detail) %></th>
       <th scope="col"><%= Site.human(:url) %></th>
-      <% Check.classes.collect(&:table_header).each do |header| %>
-        <th scope="col" class="fr-cell--center"><%= header %></th>
+      <% Check.classes.each do |klass| %>
+        <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
       <% end %>
       <th scope="col"><%= Site.human(:last_audit_at) %></th>
     </tr>
