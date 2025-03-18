@@ -1,0 +1,7 @@
+<nav role="navigation" class="fr-pagination" aria-label="<%= human(:label) %>">
+  <ul class="fr-pagination__list">
+    <% items.each do |item, attributes| %>
+      <li <%= tag.attributes attributes %>><%= item %></li>
+    <% end %>
+  </ul>
+</nav>

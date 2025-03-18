@@ -33,6 +33,10 @@ module ApplicationHelper
     render component
   end
 
+  def dsfr_pagination
+    render Dsfr::PaginationComponent.new(pagy: @pagy)
+  end
+
   def sort_link(text, param, **options)
     permitted_params = params.permit(:page)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
@@ -51,10 +55,6 @@ module ApplicationHelper
   def time_ago(datetime)
     time = distance_of_time_in_words_to_now(datetime)
     t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
-  end
-
-  def paginate
-    render "shared/paginate", pagy: @pagy if @pagy && @pagy.pages > 1
   end
 
   def badge(status, text = nil, link: nil, tooltip: false, &block)

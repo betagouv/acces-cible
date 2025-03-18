@@ -28,6 +28,15 @@ fr:
       url:
         invalid: invalide
 
+  viewcomponent:
+    dsfr:
+      pagination:
+        label: Pagination
+        first: Première page
+        last: Dernière page
+        prev: Page précédente
+        next: Page suivante
+        page: "Page %{page}"
   activerecord:
     attributes:
       audit:
