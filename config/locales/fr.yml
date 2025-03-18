@@ -90,6 +90,7 @@ fr:
         reachable: Joignable à l'adresse indiquée
       checks/run_axe_on_homepage:
         type: "Contrôles automatiques : page d'accueil"
+        table_header: "🤖 : Accueil"
         redirected: Contrôles
         passes: Contrôles réussis
         incomplete: Contrôles incomplets
