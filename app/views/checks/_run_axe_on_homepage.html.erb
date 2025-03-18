@@ -12,4 +12,20 @@
       <li><strong><%= check.human(:success_rate) %></strong> : <%= check.human_success_rate %></li>
     </ul>
   <% end %>
+
+  <%= dsfr_accordion do |accordion| %>
+    <% check.violation_data.each do |violation| %>
+      <% accordion.with_section title: "[#{violation.human_impact}] #{violation.help} (#{violation.nodes_count})" do %>
+        <p><%= dsfr_link_to violation.description, violation.help_url, target: :_blank, rel: :noopener %></p>
+        <p><%= check.human(:elements) %> : <%= violation.nodes_count %></p>
+        <% if violation.nodes %>
+          <ol>
+            <% violation.nodes_html.each do |html| %>
+            <li><%= html %></li>
+            <% end %>
+          </ol>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

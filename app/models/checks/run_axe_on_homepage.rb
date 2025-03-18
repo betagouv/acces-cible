@@ -9,6 +9,10 @@ module Checks
     def success_rate = (passes + incomplete) / applicable_total.to_f * 100
     def human_success_rate = helpers.number_to_percentage(success_rate, precision: 2, strip_insignificant_zeros: true)
 
+    def violation_data
+      data["violation_data"]&.map { |data| AxeViolation.new(**data) } || []
+    end
+
     private
 
     def custom_badge_text = human_success_rate
