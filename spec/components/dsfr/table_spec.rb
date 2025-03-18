@@ -171,4 +171,37 @@ RSpec.describe Dsfr::TableComponent, type: :component do
       expect(component_with_pagination.send(:pagination?)).to be true
     end
   end
+
+  describe "footer_actions" do
+    it "renders footer actions in the end footer section" do
+      render_inline(component) do |c|
+        c.with_footer_action { '<button class="fr-btn">Action 1</button>'.html_safe }
+        c.with_footer_action { '<button class="fr-btn">Action 2</button>'.html_safe }
+      end
+
+      expect(rendered_component).to have_css("div.fr-table__footer--end") do |footer_end|
+        expect(footer_end).to have_css("ul.fr-btns-group") do |buttons_group|
+          expect(buttons_group).to have_css("li button.fr-btn", text: "Action 1")
+          expect(buttons_group).to have_css("li button.fr-btn", text: "Action 2")
+        end
+      end
+    end
+
+    it "does not render the end footer section when no footer actions are provided" do
+      expect(rendered_component).not_to have_css("div.fr-table__footer--end")
+    end
+  end
+
+  describe "footer_actions?" do
+    it "returns true when footer actions are provided" do
+      component_with_actions = component
+      component_with_actions.with_footer_action { "Action" }
+
+      expect(component_with_actions.send(:footer_actions?)).to be true
+    end
+
+    it "returns false when no footer actions are provided" do
+      expect(component.send(:footer_actions?)).to be false
+    end
+  end
 end
