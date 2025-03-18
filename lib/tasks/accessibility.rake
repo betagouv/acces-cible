@@ -4,8 +4,10 @@ namespace :accessibility do
     require "open-uri"
     require "digest"
 
-    axe_vendor_path = Rails.root.join("vendor/javascript/axe.min.js")
     axe_cdn_url = "https://cdn.jsdelivr.net/npm/axe-core/axe.min.js"
+    axe_vendor_path = Rails.root.join("vendor/javascript/axe.min.js")
+    axe_locale_url = "https://cdn.jsdelivr.net/npm/axe-core/locales/fr.json"
+    axe_locale_path = Rails.root.join("vendor/javascript/axe.fr.json")
 
     new_content = URI.open(axe_cdn_url).read
     new_digest = Digest::SHA256.hexdigest new_content
@@ -17,15 +19,16 @@ namespace :accessibility do
     else
       FileUtils.mkdir_p File.dirname(axe_vendor_path)
       File.write(axe_vendor_path, new_content)
-      puts "Added axe-core@#{axe_version} to #{axe_vendor_path}"
+      File.write(axe_locale_path, URI.open(axe_locale_url).read)
+      puts "Added axe-core@#{axe_version} with French locale to #{axe_vendor_path}"
     end
 
     if system("git diff --name-only --cached --quiet")
       puts "Git staging area already contains changes, skipping commit"
       next
     else
-      system("git add #{axe_vendor_path}")
-      system("git commit -m 'chore: Update #{axe_vendor_path.basename} to #{axe_version}'")
+      system("git add #{axe_vendor_path} #{axe_locale_path}")
+      system("git commit -m 'chore: Update #{axe_vendor_path.basename} and French locale to #{axe_version}'")
       puts "Committed axe-core update to git"
     end
   end
