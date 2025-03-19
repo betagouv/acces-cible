@@ -62,6 +62,8 @@ module ApplicationHelper
     content_for :boxed_layout, boxed
   end
 
+  def or_separator = tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
+
   def badge(status, text = nil, link: nil, tooltip: false, &block)
     status, text, link = *status if status.is_a?(Array)
     text ||= yield(block)

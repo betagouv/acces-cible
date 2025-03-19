@@ -15,6 +15,7 @@ fr:
     sort_by: "Trier par %{column} %{direction}"
     asc: ascendant
     desc: descendant
+    or: ou
 
   time:
     formats:
