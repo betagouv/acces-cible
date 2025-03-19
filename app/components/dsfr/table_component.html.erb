@@ -20,12 +20,12 @@
     <div class="fr-table__footer--start">
       <p class="fr-table__detail"><%= total_lines %></p>
     </div>
-    <% if pagination? %>
+    <% if pagination? -%>
       <div class="fr-table__footer--middle">
         <%= pagination %>
       </div>
-    <% end %>
-    <% if footer_actions? %>
+    <%- end %>
+    <% if footer_actions? -%>
       <div class="fr-table__footer--end">
         <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-md fr-btns-group--icon-left">
           <% footer_actions.each do |action| %>
@@ -33,6 +33,6 @@
           <% end %>
         </ul>
       </div>
-    <% end %>
+    <%- end %>
   </div>
 </div>
