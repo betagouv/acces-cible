@@ -27,6 +27,7 @@ class Check < ApplicationRecord
   scope :unscheduled, -> { where(scheduled: false) }
   scope :to_schedule, -> { due.unscheduled }
   scope :to_run, -> { due.scheduled }
+  scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
   scope :errored, ->(type = nil) { type ? where("data->>'error_type' = ?", type) : where("data ? 'error_type'") }
 

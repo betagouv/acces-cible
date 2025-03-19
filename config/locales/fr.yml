@@ -67,6 +67,10 @@ fr:
         run_at: Vérification prévue le
         checked_at: Vérification effectuée le
         attempts: Tentatives
+        count:
+          zero: Aucun contrôle
+          one: Un contrôle
+          other: "%{count} contrôles"
       check/status:
         pending: Planifié
         running: En cours
