@@ -127,6 +127,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.2)
     cucumber (9.2.1)
       builder (~> 3.2)
       cucumber-ci-environment (> 9, < 11)
@@ -593,6 +594,7 @@ DEPENDENCIES
   brakeman
   brotli
   capybara
+  csv
   cucumber-rails
   dartsass-rails
   database_cleaner

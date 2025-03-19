@@ -21,6 +21,9 @@ gem "stimulus-rails"
 # Use Dart SASS [https://github.com/rails/dartsass-rails]
 gem "dartsass-rails"
 
+# Bundle CSV, since it is no longer in standard library
+gem "csv"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
