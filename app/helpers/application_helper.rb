@@ -57,6 +57,11 @@ module ApplicationHelper
     t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
   end
 
+  def use_centered_layout(boxed: true)
+    content_for :center_layout, true
+    content_for :boxed_layout, boxed
+  end
+
   def badge(status, text = nil, link: nil, tooltip: false, &block)
     status, text, link = *status if status.is_a?(Array)
     text ||= yield(block)

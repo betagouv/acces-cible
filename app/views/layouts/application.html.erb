@@ -26,9 +26,21 @@
 
     <div class="fr-container">
       <main class="fr-py-2w" id="main">
-        <%= render "shared/flash" %>
-        <h1><%= page_title %></h1>
-        <%= yield %>
+        <% if content_for?(:center_layout) %>
+          <div class="fr-container fr-mt-8v fr-mt-md-14v fr-mb-2v fr-mb-md-8v <%= "fr-background-alt--grey fr-py-10v fr-py-md-14v" if content_for?(:boxed_layout) %>">
+            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+              <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
+                <%= render "shared/flash" %>
+                <h1><%= page_title %></h1>
+                <%= yield %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <%= render "shared/flash" %>
+          <h1><%= page_title %></h1>
+          <%= yield %>
+        <% end %>
       </main>
     </div>
 
