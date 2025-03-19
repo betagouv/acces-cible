@@ -137,6 +137,7 @@ fr:
         detail: Détails
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
+        export_to_csv: Télécharger en CSV
         delete: Supprimer ce site
         count:
           zero: Aucun site

@@ -4,7 +4,11 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    @pagy, @sites = pagy Site.includes(:audit).sort_by(params)
+    sites = Site.includes(:audit).sort_by(params)
+    respond_to do |format|
+      format.html { @pagy, @sites = pagy sites }
+      format.csv  { send_data sites.to_csv, filename: sites.to_csv_filename }
+    end
   end
 
   # GET /sites/1
