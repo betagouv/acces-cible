@@ -4,11 +4,14 @@ module Dsfr
   class TableComponent < ApplicationComponent
     renders_one :head
     renders_one :body
+    renders_one :pagination, -> { PaginationComponent.new(pagy: @pagy) }
+    renders_many :footer_actions
 
     SIZES = [:sm, :md, :lg].freeze
 
-    def initialize(caption:, size: :md, scroll: true, border: false, html_attributes: {})
+    def initialize(caption:, pagy:, size: :md, scroll: true, border: false, html_attributes: {})
       @caption = caption
+      @pagy = pagy
       @size = size.to_sym
       @scroll = scroll
       @border = border
@@ -19,14 +22,17 @@ module Dsfr
 
     private
 
-    attr_reader :caption, :size, :border, :scroll, :html_attributes
+    attr_reader :caption, :pagy, :size, :border, :scroll, :html_attributes
 
     def table_classes
-      classes = ["fr-table"]
-      classes << "fr-table--#{size}" if [:sm, :lg].include?(size)
-      classes << "fr-table--border" if border
-      classes << "fr-table--no-scroll" unless scroll
-      classes.join(" ")
+      class_names(
+        "fr-table",
+        "fr-table--#{size}" => [:sm, :lg].include?(size),
+        "fr-table--border" => border,
+        "fr-table--no-scroll" => !scroll
+      )
     end
+
+    def total_lines = human(:lines, count: pagy.count)
   end
 end

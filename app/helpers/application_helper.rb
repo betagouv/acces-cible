@@ -23,8 +23,8 @@ module ApplicationHelper
     end
   end
 
-  def dsfr_table(caption:, size: :md, scroll: true, border: false, **html_attributes, &block)
-    render Dsfr::TableComponent.new(caption:, size:, scroll:, border:, html_attributes:), &block
+  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, **html_attributes, &block)
+    render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, html_attributes:), &block
   end
 
   def dsfr_sidemenu(title:, button: nil, sticky: false, full_height: false, right: false, &block)
@@ -33,15 +33,28 @@ module ApplicationHelper
     render component
   end
 
+  def dsfr_pagination
+    render Dsfr::PaginationComponent.new(pagy: @pagy)
+  end
+
+  def sort_link(text, param, **options)
+    permitted_params = params.permit(:page)
+    current_sort = params.dig(:sort, param)&.downcase&.to_sym
+    direction = current_sort == :asc ? :desc : :asc
+    link_params = permitted_params.merge(sort: { param => direction })
+    options[:class] = class_names(
+      options.delete(:class),
+      "fr-link fr-link--icon-right fr-icon-arrow-#{direction == :asc ? :down : :up}-s-fill" => current_sort.present?
+    ).presence
+    options[:title] ||= t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
+    link_to text, url_for(params: link_params), **options
+  end
+
   def root? = request.path == "/"
 
   def time_ago(datetime)
     time = distance_of_time_in_words_to_now(datetime)
     t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
-  end
-
-  def paginate
-    render "shared/paginate", pagy: @pagy if @pagy && @pagy.pages > 1
   end
 
   def badge(status, text = nil, link: nil, tooltip: false, &block)

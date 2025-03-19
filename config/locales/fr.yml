@@ -12,10 +12,14 @@ fr:
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
     new_window: " (nouvelle fenêtre)"
+    sort_by: "Trier par %{column} %{direction}"
+    asc: ascendant
+    desc: descendant
 
   time:
     formats:
       compact: "%Y/%m/%d"
+      file: "%Y%m%d-%Hh%M"
   date:
     formats:
       compact: "%Y/%m/%d"
@@ -24,6 +28,21 @@ fr:
     attributes:
       url:
         invalid: invalide
+
+  viewcomponent:
+    dsfr:
+      pagination:
+        label: Pagination
+        first: Première page
+        last: Dernière page
+        prev: Page précédente
+        next: Page suivante
+        page: "Page %{page}"
+      table:
+        lines:
+          zero: Aucune ligne
+          one: Une ligne
+          other: "%{count} lignes"
 
   activerecord:
     attributes:
@@ -118,6 +137,7 @@ fr:
         detail: Détails
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
+        export_to_csv: Télécharger en CSV
         delete: Supprimer ce site
         count:
           zero: Aucun site
