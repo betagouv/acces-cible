@@ -4,9 +4,9 @@ module Checks
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :issues_total
 
-    def applicable_total = passes + incomplete + violations
-    def checks_total = applicable_total + inapplicable
-    def success_rate = (passes + incomplete) / applicable_total.to_f * 100
+    def applicable_total = passed? ? passes + incomplete + violations : nil
+    def checks_total = passed? ? applicable_total + inapplicable : nil
+    def success_rate = passed? ? (passes + incomplete) / applicable_total.to_f * 100 : nil
     def human_success_rate = helpers.number_to_percentage(success_rate, precision: 2, strip_insignificant_zeros: true)
 
     def violation_data
