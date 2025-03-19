@@ -6,7 +6,7 @@ fr:
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
   shared:
-    actions: "Actions"
+    actions: Actions
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     cancel: Annuler
     send: Envoyer
