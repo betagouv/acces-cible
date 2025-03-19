@@ -8,6 +8,10 @@ fr:
   shared:
     actions: "Actions"
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+    cancel: Annuler
+    send: Envoyer
+    save: Enregistrer
+    saving: Enregistrement…
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
@@ -135,6 +139,7 @@ fr:
         created_at: Enregistré le
         updated_at: Date de mise à jour
         url: Adresse du site
+        url_hint: Saisissez une url valide, commençant par https:// ou http://
         audits: Toutes les vérifications
         audit_history: Historique des vérifications (%{total})
         audits_count: Vérifications

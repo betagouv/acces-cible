@@ -1,7 +1,7 @@
 <%= form_with(model: site) do |f| %>
-  <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: "Saisissez une url valide, commençant par https:// ou http://" %>
+  <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: Site.human(:url_hint) %>
 
-  <%= f.submit "Enregistrer", name: nil, class: "fr-btn", data: { disable_with: "Enregistrement…" } %>
+  <%= f.submit t("shared.save"), name: nil, class: "fr-btn", data: { disable_with: t("shared.saving") } %>
 
-  <%= link_to "Annuler", { action: site.persisted? ? :show : :index }, class: "fr-btn fr-btn--secondary" %>
+  <%= link_to t("shared.cancel"), { action: site.persisted? ? :show : :index }, class: "fr-btn fr-btn--secondary" %>
 <% end %>
