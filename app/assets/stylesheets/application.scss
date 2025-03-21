@@ -46,3 +46,16 @@ form.button_to {
     margin-left: 0;
   }
 }
+
+// Improve file upload group affordance
+.fr-upload-group {
+  .fr-upload {
+    transition: all var(--transition-duration-default, 0.2s) ease;
+  }
+  &.dragover .fr-upload,
+  .fr-upload:focus {
+    outline: var(--border-width-default, 2px) solid #0a76f6;
+    outline-offset: 2px;
+    background-color: var(--background-action-low-blue-france);
+  }
+}

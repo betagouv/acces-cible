@@ -6,8 +6,14 @@ fr:
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
 
   shared:
-    actions: "Actions"
+    actions: Actions
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+    cancel: Annuler
+    send: Envoyer
+    save: Enregistrer
+    saving: Enregistrement…
+    upload: Téléverser
+    uploading: Téléversement en cours…
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
@@ -15,6 +21,7 @@ fr:
     sort_by: "Trier par %{column} %{direction}"
     asc: ascendant
     desc: descendant
+    or: ou
 
   time:
     formats:
@@ -28,6 +35,16 @@ fr:
     attributes:
       url:
         invalid: invalide
+
+  activemodel:
+    errors:
+      models:
+        site_upload:
+          attributes:
+            file:
+              invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
+              invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
+              invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
 
   viewcomponent:
     dsfr:
@@ -134,11 +151,15 @@ fr:
         created_at: Enregistré le
         updated_at: Date de mise à jour
         url: Adresse du site
+        url_hint: Saisissez une url valide, commençant par https:// ou http://
+        file: Fichier CSV
+        file_hint: "Format attendu : fichier CSV avec un colonne intitulée URL. Taille maximale : 5Mo."
         audits: Toutes les vérifications
         audit_history: Historique des vérifications (%{total})
         audits_count: Vérifications
         last_audit_at: Dernière vérification
         detail: Détails
+        import: Importer des sites depuis un fichier
         view: Voir la fiche
         view_name: Voir la fiche de %{name}
         export_to_csv: Télécharger en CSV
@@ -175,6 +196,10 @@ fr:
       title: Ajouter un site
     create:
       notice: Site ajouté
+      uploaded:
+        zero: Aucun site ajouté
+        one: Un site ajouté
+        other: "%{count} sites ajoutés"
     edit:
       title: Modifier le site
     update:
