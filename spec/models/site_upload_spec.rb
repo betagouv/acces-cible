@@ -19,7 +19,6 @@ RSpec.describe SiteUpload do
     )
   end
 
-
   describe "validations" do
     it "is valid with a valid CSV file" do
       expect(site_upload).to be_valid
