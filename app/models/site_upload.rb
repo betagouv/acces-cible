@@ -17,6 +17,7 @@ class SiteUpload
     transaction do
       create!(sites)
     end
+    true
   end
 
   def persisted? = false
@@ -37,7 +38,7 @@ class SiteUpload
   private
 
   def valid_file_size
-    errors.add(:file, :invalid_size) if file.size > MAX_FILE_SIZE
+    errors.add(:file, :invalid_size) if file.size.zero? || file.size > MAX_FILE_SIZE
   end
 
   def valid_file_format
@@ -45,9 +46,11 @@ class SiteUpload
   end
 
   def valid_headers
-    first_line = File.open(file.path, &:gets).strip
-    headers = CSV.parse_line(first_line)
+    first_line = File.open(file.path, &:gets)&.strip || ""
+    headers = CSV.parse_line(first_line) || []
     missing_headers = REQUIRED_HEADERS - headers.collect(&:downcase)
     errors.add(:file, :invalid_headers) unless missing_headers.empty?
+  rescue CSV::MalformedCSVError, StandardError
+    errors.add(:file, :invalid_headers)
   end
 end
