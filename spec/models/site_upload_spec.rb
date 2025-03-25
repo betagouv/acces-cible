@@ -5,8 +5,9 @@ RSpec.describe SiteUpload do
 
   let(:file_path) { Rails.root.join("spec/fixtures/files/sites.csv") }
   let(:csv_content) { "url,name\nhttps://example.com,Example Site\nhttps://test.com,Test Site" }
+  let(:encoding) { Encoding::UTF_8 }
   let(:csv) do
-    Tempfile.new(["sites", ".csv"]).tap do |f|
+    Tempfile.new(["sites", ".csv"], encoding:).tap do |f|
       f.write(csv_content)
       f.rewind
     end
@@ -19,7 +20,6 @@ RSpec.describe SiteUpload do
     )
   end
 
-
   describe "validations" do
     it "is valid with a valid CSV file" do
       expect(site_upload).to be_valid
@@ -29,6 +29,15 @@ RSpec.describe SiteUpload do
       site_upload = described_class.new
       expect(site_upload).not_to be_valid
       expect(site_upload.errors[:file]).not_to be_empty
+    end
+
+    context "when file is empty" do
+      let(:csv_content) { nil }
+
+      it "is invalid" do
+        expect(site_upload).not_to be_valid
+        expect(site_upload.errors.added?(:file, :invalid_size)).to be true
+      end
     end
 
     context "when file size is too large" do
@@ -55,6 +64,16 @@ RSpec.describe SiteUpload do
 
     context "when headers are invalid" do
       let(:csv_content) { "invalid_header,name\nhttps://example.com,Example Site" }
+
+      it "is invalid" do
+        expect(site_upload).not_to be_valid
+        expect(site_upload.errors.added?(:file, :invalid_headers)).to be true
+      end
+    end
+
+    context "when encoding is not UTF-8" do
+      let(:encoding) { Encoding::ISO_8859_1 }
+      let(:csv_content) { "URL,næme\nhttps://example.com,Example Saïte".encode(encoding) }
 
       it "is invalid" do
         expect(site_upload).not_to be_valid
@@ -116,5 +135,15 @@ RSpec.describe SiteUpload do
       end
     end
     # rubocop:enable RSpec/SubjectStub
+
+    context "when file encoding is not UTF-8" do
+      let(:encoding) { Encoding::ISO_8859_1 }
+      let(:csv_content) { "URL,næme\nhttps://exÆmple.com,Example Saïte".encode(encoding) }
+
+      it "returns false" do
+        expect(site_upload.save).to be false
+        expect { site_upload.save }.not_to raise_error
+      end
+    end
   end
 end

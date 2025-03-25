@@ -153,7 +153,7 @@ fr:
         url: Adresse du site
         url_hint: Saisissez une url valide, commençant par https:// ou http://
         file: Fichier CSV
-        file_hint: "Format attendu : fichier CSV avec un colonne intitulée URL. Taille maximale : 5Mo."
+        file_hint: "Format attendu : fichier CSV avec une colonne intitulée URL. Taille maximale : 5Mo."
         audits: Toutes les vérifications
         audit_history: Historique des vérifications (%{total})
         audits_count: Vérifications
