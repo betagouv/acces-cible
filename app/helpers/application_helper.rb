@@ -37,6 +37,16 @@ module ApplicationHelper
     render Dsfr::PaginationComponent.new(pagy: @pagy)
   end
 
+  def icon(*icon, fill: true, **options, &block)
+    icon = Array.wrap(icon).join("-")
+    fill = options[:line] || !fill ? "line" : "fill"
+    tag = options[:tag] || :span
+    options[:class] = class_names(options[:class], "fr-icon-#{icon}-#{fill}")
+    options[:aria] = { hidden: true }.merge(options[:aria] || {})
+    text = options.delete(:text)
+    content_tag(tag, text, **options, &block)
+  end
+
   def sort_link(text, param, **options)
     permitted_params = params.permit(:page)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
