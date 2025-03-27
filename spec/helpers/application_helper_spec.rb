@@ -141,4 +141,61 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(result).to include("custom-class")
     end
   end
+
+  describe "#link_icon" do
+    context "with name and options arguments" do
+      it "generates a link with icon classes" do
+        result = helper.link_icon(:arrow, "Next Page", "/next", side: :right)
+
+        expect(result).to have_selector("a[href='/next']")
+        expect(result).to have_selector("a.fr-link.fr-link--icon-right.fr-icon-arrow-fill")
+        expect(result).to have_content("Next Page")
+      end
+
+      it "supports line style" do
+        result = helper.link_icon(:arrow, "Next", "/next", line: true)
+
+        expect(result).to have_selector("a.fr-icon-arrow-line")
+      end
+
+      it "supports size option" do
+        result = helper.link_icon(:arrow, "Next", "/next", side: :right, size: :sm)
+
+        expect(result).to have_selector("a.fr-link--sm")
+      end
+
+      it "supports button styling" do
+        result = helper.link_icon(:arrow, "Next", "/next", button: true)
+
+        expect(result).to have_selector("a.fr-btn")
+        expect(result).not_to have_selector("a.fr-link")
+      end
+
+      it "merges custom classes" do
+        result = helper.link_icon(:arrow, "Next", "/next", class: "my-custom-class")
+
+        expect(result).to have_selector("a.my-custom-class")
+        expect(result).to have_selector("a.fr-icon-arrow-fill")
+      end
+    end
+
+    context "with block syntax" do
+      it "generates a link with block content" do
+        result = helper.link_icon(:arrow, "/next", side: :right) do
+          helper.content_tag(:span, "Next Page", class: "visually-hidden")
+        end
+
+        expect(result).to have_selector("a[href='/next']")
+        expect(result).to have_selector("a.fr-link.fr-link--icon-right.fr-icon-arrow-fill")
+        expect(result).to have_selector("a span.visually-hidden", text: "Next Page")
+      end
+
+      it "supports all icon options with block syntax" do
+        result = helper.link_icon(:download, "/file", button: true, size: :lg, side: :left) { "Download File" }
+
+        expect(result).to have_selector("a.fr-btn.fr-btn--lg.fr-btn--icon-left.fr-icon-download-fill")
+        expect(result).to have_content("Download File")
+      end
+    end
+  end
 end

@@ -53,6 +53,8 @@ module ApplicationHelper
     side = options[:side].to_s.to_sym.presence_in([:left, :right])
     size = options[:size].to_s.to_sym.presence_in([:sm, :lg])
     btn = (options[:button] || options[:btn])
+    btn_style = btn && btn.to_s.to_sym.presence_in([:primary, :secondary, :tertiary])
+    btn_style = "tertiary-no-outline" if btn_style == :tertiary && options[:outline] == false
     link = !btn && side
     class_names(
       options[:class],
@@ -61,9 +63,17 @@ module ApplicationHelper
       "fr-link--icon-#{side}" => link && side,
       "fr-btn" => btn,
       "fr-btn--#{size}" => btn && size,
+      "fr-btn--#{btn_style}" => btn_style,
       "fr-btn--icon-#{side}" => btn && side,
       "fr-icon-#{icon}-#{fill}" => icon.present?,
     )
+  end
+
+  def link_icon(icon, name = nil, options = {}, html_options = {}, &block)
+    html_options, options, name = options, name, block.call if block_given?
+    icon_options = html_options.extract!(:fill, :line, :side, :size, :button, :btn, :outline, :class)
+    html_options[:class] = icon_class(icon, **icon_options)
+    link_to(name, options, html_options)
   end
 
   def sort_link(text, param, **options)
