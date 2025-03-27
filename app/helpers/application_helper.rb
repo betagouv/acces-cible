@@ -47,6 +47,25 @@ module ApplicationHelper
     content_tag(tag, text, **options, &block)
   end
 
+  def icon_class(*icon, fill: true, **options)
+    icon = Array.wrap(icon).join("-")
+    fill = options[:line] || !fill ? "line" : "fill"
+    side = options[:side].to_s.to_sym.presence_in([:left, :right])
+    size = options[:size].to_s.to_sym.presence_in([:sm, :lg])
+    btn = (options[:button] || options[:btn])
+    link = !btn && side
+    class_names(
+      options[:class],
+      "fr-link" => link,
+      "fr-link--#{size}" => link && size,
+      "fr-link--icon-#{side}" => link && side,
+      "fr-btn" => btn,
+      "fr-btn--#{size}" => btn && size,
+      "fr-btn--icon-#{side}" => btn && side,
+      "fr-icon-#{icon}-#{fill}" => icon.present?,
+    )
+  end
+
   def sort_link(text, param, **options)
     permitted_params = params.permit(:page)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym

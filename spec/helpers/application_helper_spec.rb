@@ -63,4 +63,82 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(result).not_to have_text("Option Text")
     end
   end
+
+  describe "#icon_class" do
+    it "handles any number of icon segments", :aggregate_failures do
+      classes = "fr-icon-user-fill"
+      expect(helper.icon_class("user")).to eq(classes)
+      expect(helper.icon_class(:user)).to eq(classes)
+
+      classes = "fr-icon-arrow-right-s-fill"
+      expect(helper.icon_class("arrow", "right", "s")).to eq(classes)
+      expect(helper.icon_class(["arrow", "right", "s"])).to eq(classes)
+    end
+
+    it "adds fill style unless told otherwise", :aggregate_failures do
+      user_fill = "fr-icon-user-fill"
+      expect(helper.icon_class("user")).to eq(user_fill)
+      expect(helper.icon_class("user", fill: true)).to eq(user_fill)
+
+      user_line = "fr-icon-user-line"
+      expect(helper.icon_class("user", line: true)).to eq(user_line)
+      expect(helper.icon_class("user", fill: false)).to eq(user_line)
+      expect(helper.icon_class("user", line: true, fill: true)).to eq(user_line)
+    end
+
+    context "with side option" do
+      it "adds link classes when side is specified", :aggregate_failures do
+        expect(helper.icon_class(:arrow, side: :right)).to include("fr-link")
+        expect(helper.icon_class(:arrow, side: :right)).to include("fr-link--icon-right")
+        expect(helper.icon_class(:arrow, side: "right")).to include("fr-link--icon-right")
+      end
+
+      it "adds size modifier when provided" do
+        expect(helper.icon_class(:arrow, side: :right, size: :sm)).to include("fr-link--sm")
+      end
+
+      it "ignores invalid side values" do
+        expect(helper.icon_class(:arrow, side: :top)).not_to include("fr-link--icon")
+      end
+
+      it "ignores invalid size values" do
+        expect(helper.icon_class(:arrow, side: :right, size: :xl)).not_to include("fr-link--xl")
+      end
+    end
+
+    context "with button/btn option" do
+      it "adds button classes when button: true is passed" do
+        expect(helper.icon_class(:user, btn: true)).to include("fr-btn")
+        expect(helper.icon_class(:user, button: true)).to include("fr-btn")
+        expect(helper.icon_class(:user, button: true)).not_to include("fr-link")
+      end
+
+      it "adds size modifier when provided" do
+        expect(helper.icon_class(:arrow, button: true, size: :sm)).to include("fr-btn--sm")
+      end
+
+      it "adds side modifier when provided" do
+        expect(helper.icon_class(:arrow, button: true, side: :right)).to include("fr-btn--icon-right")
+      end
+
+      it "ignores invalid side values" do
+        expect(helper.icon_class(:arrow, button: true, side: :top)).not_to include("fr-btn--icon")
+      end
+
+      it "ignores invalid size values" do
+        expect(helper.icon_class(:arrow, button: true, side: :right, size: :xl)).not_to include("fr-btn--xl")
+      end
+
+      it "prioritizes button over link when both options are passed" do
+        result = helper.icon_class(:arrow, button: true, side: :right)
+        expect(result).to include("fr-btn--icon-right")
+        expect(result).not_to include("fr-link")
+      end
+    end
+
+    it "accepts a class option" do
+      result = helper.icon_class(:arrow, class: "custom-class")
+      expect(result).to include("custom-class")
+    end
+  end
 end
