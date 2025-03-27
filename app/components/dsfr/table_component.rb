@@ -24,8 +24,13 @@ module Dsfr
 
     attr_reader :caption, :pagy, :size, :border, :scroll, :html_attributes
 
+    def wrapper_attributes
+      html_attributes.merge(class: table_classes)
+    end
+
     def table_classes
       class_names(
+        html_attributes.delete(:class),
         "fr-table",
         "fr-table--#{size}" => [:sm, :lg].include?(size),
         "fr-table--border" => border,

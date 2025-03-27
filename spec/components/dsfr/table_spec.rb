@@ -42,7 +42,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     let(:params) { { caption:, pagy:, html_attributes: { class: "custom-class", id: "test-table" } } }
 
     it "applies HTML attributes to the table element" do
-      expect(rendered_component).to have_css("table.custom-class#test-table")
+      expect(rendered_component).to have_css("div.fr-table.custom-class#test-table table")
     end
   end
 
