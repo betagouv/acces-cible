@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ApplicationHelper, type: :helper do
+RSpec.describe ApplicationHelper do
   describe "#icon" do
     it "handles any number of icon segments", :aggregate_failures do
       selector = ".fr-icon-user-fill"
@@ -195,6 +195,79 @@ RSpec.describe ApplicationHelper, type: :helper do
 
         expect(result).to have_selector("a.fr-btn.fr-btn--lg.fr-btn--icon-left.fr-icon-download-fill")
         expect(result).to have_content("Download File")
+      end
+    end
+  end
+
+  describe "#sort_link" do
+    subject(:sort_link) { helper.sort_link("Name", column, **options) }
+
+    let(:column) { :name }
+    let(:direction) { :asc }
+    let(:options) { {} }
+    let(:params) { { page: 2 } }
+
+    before do
+      allow(helper).to receive(:params).and_return(ActionController::Parameters.new(**params))
+      allow(helper).to receive(:url_for) { |options| "/?#{options[:params].to_query}" }
+
+      allow(helper).to receive(:t).with("shared.asc").and_return("ascending")
+      allow(helper).to receive(:t).with("shared.desc").and_return("descending")
+      allow(helper).to receive(:t).with("shared.sort_by", any_args).and_return("Sort by #{column.capitalize} #{helper.t("shared.#{direction}")}")
+
+      allow(helper).to receive(:icon_class).with(any_args).and_return("icon-class")
+    end
+
+    context "when no current sort exists", :aggregate_failures do
+      it "generates a link with ascending sort parameter" do
+        expect(sort_link).to have_selector("a[href='/?page=2&sort%5Bname%5D=asc']")
+        expect(sort_link).to have_text("Name")
+        expect(sort_link).not_to include("fr-icon-arrow")
+        expect(sort_link).to have_selector("a[title='Sort by Name ascending']")
+      end
+    end
+
+    context "when column is currently sorted ascending", :aggregate_failures do
+      let(:direction) { :desc }
+      let(:params) { { page: 2, sort: { name: "asc" } } }
+
+      it "generates a link to sort descending" do
+        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=desc']")
+        expect(sort_link).to have_selector("a.icon-class")
+        expect(sort_link).to have_selector("a[title='Sort by Name descending']")
+      end
+    end
+
+    context "when column is currently sorted descending", :aggregate_failures do
+      let(:params) { { page: 2, sort: { name: "desc" } } }
+
+      it "generates a link to sort ascending" do
+        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=asc']")
+        expect(sort_link).to have_selector("a.icon-class")
+        expect(sort_link).to have_selector("a[title='Sort by Name ascending']")
+      end
+    end
+
+    context "with custom options", :aggregate_failures do
+      let(:params) { { sort: { name: "asc" } } }
+      let(:options) { { id: "sort-name", title: "Custom sort title", data: { test: "value" } } }
+
+      it "adds HTML attributes to the link" do
+        expect(sort_link).to have_selector("a#sort-name")
+        expect(sort_link).to have_selector("a[title='Custom sort title']")
+        expect(sort_link).to have_selector("a[data-test='value']")
+      end
+    end
+
+    context "when the page is currently sorted by a column", :aggregate_failures do
+      let(:params) { { sort: { name: "asc", email: "desc" } } }
+
+      it "allows sorting by another column" do
+        sort_link = helper.sort_link("Name", :name)
+        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=desc']")
+
+        sort_link = helper.sort_link("Email", :email)
+        expect(sort_link).to have_selector("a[href*='sort%5Bemail%5D=asc']")
       end
     end
   end
