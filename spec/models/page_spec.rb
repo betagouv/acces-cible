@@ -142,6 +142,12 @@ RSpec.describe Page do
     end
   end
 
+  describe "#heading_levels" do
+    it "returns an array of heading and level arrays" do
+      expect(page.heading_levels).to eq([[1, "Main Heading"], [2, "Sub Heading"]])
+    end
+  end
+
   describe "#headings" do
     it "returns an array of text, one line for each heading" do
       expect(page.headings).to eq(["Main Heading", "Sub Heading"])
