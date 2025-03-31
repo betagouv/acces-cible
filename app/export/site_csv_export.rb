@@ -2,7 +2,7 @@ class SiteCsvExport < ApplicationExport
   EXTENSION = "csv"
 
   def to_csv
-    CSV.generate(headers: true) do |csv|
+    CSV.generate(headers: true, col_sep: ";") do |csv|
       csv << attributes.keys
       records.each do |record|
         csv << serialize(record)
