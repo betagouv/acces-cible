@@ -25,6 +25,7 @@ module Checks
 
     def audit_date = super&.to_date
     def audit_update_date = super&.to_date
+    def human_compliance_rate = helpers.number_to_percentage(compliance_rate, precision: 2, strip_insignificant_zeros: true)
 
     def find_audit_date
       date_matches = page.text.scan(AUDIT_DATE_PATTERN).map do |full_date, day_str, month_str, year_str, day_num, month_num, year_num|
