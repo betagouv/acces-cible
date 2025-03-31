@@ -12,4 +12,8 @@ class ApplicationComponent < ViewComponent::Base
       I18n.translate("viewcomponent.#{component}.#{key}", **options)
     end
   end
+
+  def dom_id(prefix: nil, suffix: nil)
+    [prefix, self.class.name.demodulize, object_id, suffix].compact.join("_").underscore
+  end
 end
