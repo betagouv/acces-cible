@@ -3,6 +3,7 @@ class SiteUpload
   ALLOWED_CONTENT_TYPES = ["text/csv"].freeze
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
+  BOM = /^\xEF\xBB\xBF/
 
   attr_accessor :file
 
@@ -26,7 +27,7 @@ class SiteUpload
     require "csv"
 
     parsed_sites = []
-    CSV.foreach(file.path, headers: true) do |row|
+    CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
       url = row["url"] || row["URL"]
       next if Site.find_by_url(url:)
 
@@ -46,7 +47,7 @@ class SiteUpload
   end
 
   def valid_headers
-    first_line = File.open(file.path, &:gets)&.strip || ""
+    first_line = File.open(file.path, &:gets)&.strip&.sub(BOM, "") || ""
     headers = CSV.parse_line(first_line) || []
     missing_headers = REQUIRED_HEADERS - headers.collect(&:downcase)
     errors.add(:file, :invalid_headers) unless missing_headers.empty?
