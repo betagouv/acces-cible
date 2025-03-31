@@ -103,6 +103,19 @@ fr:
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
+      checks/accessibility_page_heading:
+        type: Titres de la déclaration d'accessibilité
+        table_header: Titres
+        score: Taux de correspondance
+        retained: "Titre retenu :"
+        not_found: Non trouvé
+        pass: Valide
+        fail: Incorrect
+      checks/accessibility_page_heading/statuses:
+        ok: Correct
+        missing: Non trouvé
+        incorrect_order: Ordre incorrect
+        incorrect_level: Niveau de titre incorrect
       checks/analyze_accessibility_page:
         type: Informations sur l'audit
         table_header: Audit

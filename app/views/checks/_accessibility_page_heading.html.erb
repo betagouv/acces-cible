@@ -1,0 +1,22 @@
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge check.to_badge %>
+
+  <% if check.passed? && check.comparison.present? %>
+    <%= dsfr_accordion do |accordion| %>
+      <% check.comparison.each do |expected, status, actual| %>
+        <% accordion_icon = status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v") : icon(:close, :circle, class: "fr-mr-1v") %>
+        <% accordion_status = check.human(status.ok? ? :pass : :fail) %>
+        <% accordion.with_section title: "#{accordion_icon} [#{accordion_status}] #{expected}".html_safe do %>
+          <strong><%= check.human("statuses.#{status}") %></strong>
+          <% if actual && actual != expected %>
+            <p class="fr-mb-0">
+              <%= check.human(:retained) %>
+              <cite><%= actual %></cite>
+            </p>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
