@@ -4,6 +4,7 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
+    params[:sort] ||= { checked_at: :desc }
     sites = Site.includes(:audit).sort_by(params)
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites }
