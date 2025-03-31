@@ -24,7 +24,7 @@ class Audit < ApplicationRecord
 
   def parsed_url = @parsed_url ||= URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
-  def checks = Check.where(audit: self)
+  def checks = Check.where(audit: self).prioritized
   def schedule = RunAuditJob.perform_later(self)
 
   def all_checks
