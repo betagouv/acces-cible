@@ -31,11 +31,11 @@ class Browser
   }.freeze
 
   BLOCKED_EXTENSIONS = [
-    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"].freeze,
-    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"].freeze,
-    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"].freeze,
-    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"].freeze
-  ].flatten.freeze
+    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"],
+    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"],
+    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"],
+    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"]
+  ].flatten.then { |extensions| Regexp.new("(#{Regexp.union(extensions).source})(?:\\?.*|#.*)?$") }
 
   BLOCKED_DOMAINS = [
     "google-analytics.com",
@@ -46,7 +46,7 @@ class Browser
     "linkedin.com",
     "doubleclick.net",
     "adservice.google.com"
-  ].freeze
+  ].then { |domains| Regexp.union(domains) }
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
@@ -85,16 +85,7 @@ class Browser
   def browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
-        browser.network.intercept
-        browser.on(:request) do |request|
-          if request.url.end_with?(*BLOCKED_EXTENSIONS)
-            request.abort
-          elsif BLOCKED_DOMAINS.any? { |domain| request.url.include?(domain) }
-            request.abort
-          else
-            request.continue
-          end
-        end
+        browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
         browser
       end
     end
