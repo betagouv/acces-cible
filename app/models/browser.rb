@@ -92,6 +92,7 @@ class Browser
   end
 
   def reset
+    browser.network.clear(:traffic) if browser.respond_to?(:network)
     browser&.reset
     browser&.quit
     @browser = nil
