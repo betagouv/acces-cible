@@ -3,20 +3,28 @@
   <%= badge check.to_badge %>
 
   <% if check.passed? && check.comparison.present? %>
-    <%= dsfr_accordion do |accordion| %>
-      <% check.comparison.each do |expected, status, actual| %>
-        <% accordion_icon = status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v") : icon(:close, :circle, class: "fr-mr-1v") %>
-        <% accordion_status = check.human(status.ok? ? :pass : :fail) %>
-        <% accordion.with_section title: "#{accordion_icon} [#{accordion_status}] #{expected}".html_safe do %>
-          <strong><%= check.human("statuses.#{status}") %></strong>
-          <% if actual && actual != expected %>
-            <p class="fr-mb-0">
+    <p>
+      <%= check.human(:allowed_level_differences) %>
+      <br><%= check.human_explanation %>
+    </p>
+    <ul class="fr-raw-list fr-mt-2w">
+      <% check.comparison.each do |heading_status| %>
+        <li class="fr-mb-2w">
+          <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v") : icon(:close, :circle, class: "fr-mr-1v") %>
+          <strong>
+            <code>&lt;h<%= heading_status.expected_level %>&gt;</code>
+            <%= heading_status.expected_heading %>
+            <code>&lt;/h<%= heading_status.expected_level %>&gt;</code>
+          </strong>
+          (<%= heading_status.message %>)
+          <% if heading_status.fuzzy_match? %>
+            <p class="fr-ml-4w fr-mb-0">
               <%= check.human(:retained) %>
-              <cite><%= actual %></cite>
+              <cite><%= heading_status.actual_heading %></cite>
             </p>
           <% end %>
-        <% end %>
+        </li>
       <% end %>
-    <% end %>
+    </ul>
   <% end %>
 </div>

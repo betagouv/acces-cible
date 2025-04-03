@@ -18,14 +18,15 @@ module Checks
         [2, "Retour d'information et contact"],
         [2, "Voies de recours"],
     ].freeze
-    COMPARISON_OPTIONS = { partial: false, fuzzy: 0.75, ignore_case: true }.freeze
+    COMPARISON_OPTIONS = { partial: true, fuzzy: 0.65, ignore_case: true }.freeze
 
     store_accessor :data, :page_headings, :comparison
 
-    def comparison = @comparison ||= super&.map { |expected, status, heading| [expected, status.to_s.inquiry, heading] } || {}
-    def discrepancies = comparison.filter { |_expected, status, _actual| !status.ok? }
-    def found_all? = discrepancies.count.zero?
-    def score = comparison.empty? ? 0 : (comparison.count - discrepancies.count) / comparison.count.to_f * 100
+    def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
+    def total = EXPECTED_HEADINGS.count
+    def failures = comparison.filter { it.error? }
+    def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
+    def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
 
     private
 
@@ -56,14 +57,24 @@ module Checks
     end
 
     def compare_headings
-      return EXPECTED_HEADINGS.map { |_, heading| [heading, :missing, nil] } unless page_headings
+      return EXPECTED_HEADINGS.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
 
+      # Two-pass approach: first match all headings, then determine status
+      expected_to_actual = {}
+
+      # First pass: find best matches for each expected heading without order constraints
+      indexed_expected_headings.each do |(expected_index, expected_heading, expected_level)|
+        best_match = find_unconstrained_best_match(expected_heading, expected_to_actual.values)
+        expected_to_actual[expected_index] = best_match if best_match
+      end
+
+      # Second pass: determine status based on matched ordering
       last_matched_index = -1
-
       indexed_expected_headings.map do |(expected_index, expected_heading, expected_level)|
-        if (heading_data = best_matches[expected_index])
-          page_heading, heading_level, original_index = heading_data
+        if match_data = expected_to_actual[expected_index]
+          page_heading, heading_level, original_index = match_data
 
+          # Determine status
           status = if original_index < last_matched_index
             :incorrect_order
           elsif heading_level != expected_level + first_heading_offset
@@ -71,50 +82,43 @@ module Checks
           else
             :ok
           end
+
           last_matched_index = original_index
 
-          [expected_heading, status, page_heading]
+          [expected_heading, expected_level, status, page_heading]
         else
-          [expected_heading, :missing, nil]
+          [expected_heading, expected_level, :missing, nil]
         end
       end
     end
 
-    def best_matches
-      @best_matches ||= begin
-        matches = {}
-        matched_indices = []
-
-        indexed_expected_headings.map do |(expected_index, expected_heading, expected_level)|
-          best_match = best_match_for(expected_heading, matched_indices)
-
-          if best_match
-            matches[expected_index] = best_match
-            matched_indices << best_match[2]
-          end
-        end
-
-        matches
-      end
-    end
-
-    def best_match_for(expected_heading, matched_indices)
+    def find_unconstrained_best_match(expected_heading, already_matched)
       best_match = nil
       best_score = 0
+
+      # Extract just the already matched indices
+      matched_indices = already_matched.map { |match| match && match[2] }.compact
 
       indexed_page_headings.each do |(index, page_heading, level)|
         next if matched_indices.include?(index)
 
-        is_similar = similar?(expected_heading, page_heading)
-        score = ratio(expected_heading, page_heading)
+        score = similarity_ratio(expected_heading, page_heading)
 
-        if is_similar && score > best_score
+        if score >= COMPARISON_OPTIONS[:fuzzy] && score > best_score
           best_score = score
           best_match = [page_heading, level, index]
         end
       end
 
       best_match
+    end
+
+    def find_best_match(expected_heading, candidates)
+      candidates
+        .map { |index, heading, level| [heading, level, index, similarity_ratio(expected_heading, heading)] }
+        .select { |_, _, _, score| score >= COMPARISON_OPTIONS[:fuzzy] }
+        .max_by { |_, _, _, score| score }
+        &.first(3)
     end
 
     def first_heading_offset
@@ -126,7 +130,7 @@ module Checks
 
           indexed_expected_headings.each do |_, expected_heading, expected_level|
             indexed_page_headings.each do |_, page_heading, page_level|
-              score = ratio(expected_heading, page_heading)
+              score = similarity_ratio(expected_heading, page_heading, partial: false)
 
               if score >= COMPARISON_OPTIONS[:fuzzy]
                 matches << [expected_level, page_level, score]
@@ -141,11 +145,11 @@ module Checks
       end
     end
 
-    def ratio(a, b, options = {})
+    def similarity_ratio(a, b, options = {})
       StringComparison.similarity_ratio(a, b, **COMPARISON_OPTIONS.merge(options))
     end
 
-    def similar?(a, b)
+    def similar?(a, b, options = {})
       StringComparison.similar?(a, b, **COMPARISON_OPTIONS)
     end
   end
