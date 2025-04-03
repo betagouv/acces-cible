@@ -3,8 +3,9 @@
 class Browser
   include Singleton
 
-  PAGE_TIMEOUT = 5 # seconds
-  PROCESS_TIMEOUT = 10 # seconds
+  PAGE_TIMEOUT = 5.seconds
+  PROCESS_TIMEOUT = 10.seconds
+  BROWSER_MAX_AGE = 1.hour
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
@@ -31,11 +32,11 @@ class Browser
   }.freeze
 
   BLOCKED_EXTENSIONS = [
-    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"].freeze,
-    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"].freeze,
-    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"].freeze,
-    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"].freeze
-  ].flatten.freeze
+    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"],
+    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"],
+    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"],
+    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"]
+  ].flatten.then { |extensions| Regexp.new("(#{Regexp.union(extensions).source})(?:\\?.*|#.*)?$") }
 
   BLOCKED_DOMAINS = [
     "google-analytics.com",
@@ -46,7 +47,7 @@ class Browser
     "linkedin.com",
     "doubleclick.net",
     "adservice.google.com"
-  ].freeze
+  ].then { |domains| Regexp.union(domains) }
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
@@ -83,24 +84,19 @@ class Browser
   private
 
   def browser
+    reset if @browser_created_at&.before?(BROWSER_MAX_AGE.ago)
     @browser ||= begin
+      @browser_created_at = Time.current
       Ferrum::Browser.new(settings).tap do |browser|
-        browser.network.intercept
-        browser.on(:request) do |request|
-          if request.url.end_with?(*BLOCKED_EXTENSIONS)
-            request.abort
-          elsif BLOCKED_DOMAINS.any? { |domain| request.url.include?(domain) }
-            request.abort
-          else
-            request.continue
-          end
-        end
+        browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
         browser
       end
     end
   end
 
   def reset
+    Rails.logger.info { "Resetting browser" }
+    browser.network.clear(:traffic) if browser.respond_to?(:network)
     browser&.reset
     browser&.quit
     @browser = nil
