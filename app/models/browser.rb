@@ -5,6 +5,7 @@ class Browser
 
   PAGE_TIMEOUT = 5.seconds
   PROCESS_TIMEOUT = 10.seconds
+  BROWSER_MAX_AGE = 1.hour
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
@@ -83,7 +84,9 @@ class Browser
   private
 
   def browser
+    reset if @browser_created_at&.before?(BROWSER_MAX_AGE.ago)
     @browser ||= begin
+      @browser_created_at = Time.current
       Ferrum::Browser.new(settings).tap do |browser|
         browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
         browser
@@ -92,6 +95,7 @@ class Browser
   end
 
   def reset
+    Rails.logger.info { "Resetting browser" }
     browser.network.clear(:traffic) if browser.respond_to?(:network)
     browser&.reset
     browser&.quit
