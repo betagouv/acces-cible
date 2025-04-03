@@ -103,6 +103,24 @@ fr:
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
+      checks/accessibility_page_heading:
+        type: Titres de la déclaration d'accessibilité
+        table_header: Titres
+        score: Taux de correspondance
+        retained: "Titre retenu :"
+        not_found: Non trouvé
+        allowed_level_differences: |
+          Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
+          Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
+        explanation:
+          zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
+          one: "Un seul problème relevé sur %{total} titres atendus (%{error})."
+          other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
+      checks/accessibility_page_heading/statuses:
+        ok: valide
+        missing: non trouvé
+        incorrect_order: ordre incorrect
+        incorrect_level: niveau de titre incorrect
       checks/analyze_accessibility_page:
         type: Informations sur l'audit
         table_header: Audit

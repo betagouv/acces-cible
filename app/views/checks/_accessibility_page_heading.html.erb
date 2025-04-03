@@ -1,0 +1,30 @@
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge check.to_badge %>
+
+  <% if check.passed? && check.comparison.present? %>
+    <p>
+      <%= check.human(:allowed_level_differences) %>
+      <br><%= check.human_explanation %>
+    </p>
+    <ul class="fr-raw-list fr-mt-2w">
+      <% check.comparison.each do |heading_status| %>
+        <li class="fr-mb-2w">
+          <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v") : icon(:close, :circle, class: "fr-mr-1v") %>
+          <strong>
+            <code>&lt;h<%= heading_status.expected_level %>&gt;</code>
+            <%= heading_status.expected_heading %>
+            <code>&lt;/h<%= heading_status.expected_level %>&gt;</code>
+          </strong>
+          (<%= heading_status.message %>)
+          <% if heading_status.fuzzy_match? %>
+            <p class="fr-ml-4w fr-mb-0">
+              <%= check.human(:retained) %>
+              <cite><%= heading_status.actual_heading %></cite>
+            </p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

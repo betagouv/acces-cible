@@ -1,5 +1,6 @@
 class Page
   CACHE_TTL = 10.minutes
+  HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
   SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
 
   class InvalidTypeError < StandardError
@@ -28,7 +29,8 @@ class Page
   def css(selector) = dom.css(selector)
   def title = dom.title&.squish
   def text = dom.text&.squish
-  def headings = dom.css("h1,h2,h3,h4,h5,h6").collect(&:text).collect(&:squish)
+  def heading_levels = dom.css(HEADINGS).map { |hx| [hx.name[1].to_i, hx.text.squish] }
+  def headings = dom.css(HEADINGS).collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"

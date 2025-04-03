@@ -5,6 +5,7 @@ class Check < ApplicationRecord
     :accessibility_mention,
     :find_accessibility_page,
     :analyze_accessibility_page,
+    :accessibility_page_heading,
     :run_axe_on_homepage,
   ].freeze
 
