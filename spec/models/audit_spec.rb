@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Audit do
   subject(:audit) { build(:audit, site: nil) }
 
-  let(:site) { create(:site, audits: [audit]) }
+  let(:site) { build(:site, audits: [audit]) }
 
   it "has a valid factory" do
     audit = build(:audit)
@@ -77,7 +77,7 @@ RSpec.describe Audit do
   end
 
   describe "#derive_status_from_checks" do
-    let(:audit) { create(:audit) }
+    let(:audit) { build(:audit) }
 
     it "sets status to pending when any check is new" do
       audit = build(:audit)
