@@ -16,6 +16,7 @@ module Dsfr
       @size = options.delete(:size)&.to_sym || :md
       @scroll = options.delete(:scroll) { true }
       @border = options.delete(:border)
+      @caption_side = options.delete(:caption_side)
       @html_attributes = html_attributes
 
       raise ArgumentError, "size must be one of: #{SIZES.join(', ')}" unless SIZES.include?(@size)
@@ -23,7 +24,7 @@ module Dsfr
 
     private
 
-    attr_reader :caption, :pagy, :size, :border, :scroll, :html_attributes
+    attr_reader :caption, :caption_side, :pagy, :size, :border, :scroll, :html_attributes
 
     def wrapper_attributes
       html_attributes.merge(class: table_classes)
@@ -35,7 +36,9 @@ module Dsfr
         "fr-table",
         "fr-table--#{size}" => [:sm, :lg].include?(size),
         "fr-table--border" => border,
-        "fr-table--no-scroll" => !scroll
+        "fr-table--no-scroll" => !scroll,
+        "fr-table--no-caption" => caption_side == :hidden,
+        "fr-table--caption-bottom" => caption_side == :bottom,
       )
     end
 
