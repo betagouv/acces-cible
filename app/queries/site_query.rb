@@ -5,17 +5,15 @@ class SiteQuery < SimpleDelegator
     case key
     in :url
       sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
-      subquery = model.joins(:audits)
-        .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")
-        .order("sites.id, sortable_url #{direction}")
+      subquery = model.with_current_audit
+        .select("sites.*, #{sortable_url} as sortable_url")
+        .order(Arel.sql("sortable_url #{direction}"))
       from(subquery, :sites).order(Arel.sql("sortable_url #{direction}"))
     else # default sort
-      joins("LEFT JOIN (
-          SELECT site_id, MAX(checked_at) as latest_check
-          FROM audits
-          GROUP BY site_id
-        ) latest_audits ON sites.id = latest_audits.site_id")
-      .order("latest_audits.latest_check #{direction} NULLS LAST, sites.created_at #{direction}")
+      subquery = model.with_current_audit
+        .select("sites.*, audits.checked_at AS last_checked_at")
+        .order(Arel.sql("last_checked_at #{direction} NULLS LAST"))
+      from(subquery, :sites).order(Arel.sql("last_checked_at #{direction} NULLS LAST, sites.created_at #{direction}"))
     end
   end
 end
