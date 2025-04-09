@@ -4,6 +4,8 @@ class Site < ApplicationRecord
   has_many :audits, dependent: :destroy
   has_one_of_many :audit, -> { checked.sort_by_newest }, dependent: :destroy
 
+  scope :preloaded, -> { includes(:audit) }
+
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
   delegate :url, :url_without_scheme, to: :audit

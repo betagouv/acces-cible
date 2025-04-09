@@ -1,9 +1,9 @@
 class SiteQuery < SimpleDelegator
-  def sort_by(key, direction:, default_scope: nil)
+  def order_by(key, direction:)
     directions = [:asc, :desc]
     direction = direction.to_s.downcase.to_sym.presence_in(directions) || directions.first
     case key
-    when :url
+    in :url
       sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
       subquery = model.joins(:audits)
         .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")

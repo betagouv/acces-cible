@@ -23,17 +23,40 @@
           }
         }
       ],
-      "location": {
-        "type": "template",
-        "template": "sites/show"
-      },
-      "user_input": "Site.friendly.find(params[:site_id]).url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
+          "location": {
+            "type": "template",
+            "template": "sites/show"
+          },
+          "user_input": "Site.friendly.find(params[:site_id]).url",
+          "confidence": "Weak",
+          "cwe_id": [
+            79
+          ],
+          "note": ""
+    },
+    {
+          "warning_type": "SQL Injection",
+          "warning_code": 0,
+          "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
+          "check_name": "SQL",
+          "message": "Possible SQL injection",
+          "file": "app/queries/site_query.rb",
+          "line": 10,
+          "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+          "code": "Arel.sql(\"sortable_url #{direction}\")",
+          "render_path": null,
+          "location": {
+            "type": "method",
+            "class": "SiteQuery",
+            "method": "order_by"
+          },
+          "user_input": "direction",
+          "confidence": "Medium",
+          "cwe_id": [
+            89
+          ],
+          "note": ""
     }
   ],
-  "brakeman_version": "7.0.0"
+          "brakeman_version": "7.0.2"
 }
