@@ -16,7 +16,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "dsfr.nomodule.min", nonce: true %>
+    <%= javascript_include_tag "dsfr.nomodule.min", nonce: true, nomodule: true %>
     <%= yield :head %>
   </head>
 
