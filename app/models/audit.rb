@@ -16,7 +16,7 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(checked_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :past, -> { where.not(status: :pending) }
+  scope :checked, -> { where.not(status: :pending) }
 
   delegate :hostname, :path, to: :parsed_url
 
