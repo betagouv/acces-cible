@@ -45,14 +45,14 @@ module AccesCible
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Don't generate system test files.
+    # Don't generate unneeded files
     config.generators do |generate|
       generate.helper = false
       generate.controller_specs = false
       generate.request_specs = false
       generate.routing_specs = false
       generate.view_specs = false
-      generate.system_tests = false
+      generate.system_tests = nil
     end
   end
 end
