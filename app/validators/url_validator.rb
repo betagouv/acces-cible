@@ -3,9 +3,9 @@ class UrlValidator < ActiveModel::EachValidator
     return if value.blank?
 
     begin
-      uri = URI.parse(value)
+      uri = Addressable::URI.parse(value)
       return if uri.host.present? && uri.scheme.match?(/^https?$/)
-    rescue URI::InvalidURIError
+    rescue Addressable::URI::InvalidURIError
     end
     record.errors.add(attribute, :invalid)
   end

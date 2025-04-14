@@ -5,7 +5,7 @@ class Audit < ApplicationRecord
   end
 
   validates :url, presence: true, url: true
-  normalizes :url, with: ->(url) { URI.parse(url.strip).normalize.to_s }
+  normalizes :url, with: ->(url) { Addressable::URI.parse(url.strip).normalize.to_s }
 
   enum :status, [
     "pending",    # Initial state, no checks started
@@ -20,7 +20,7 @@ class Audit < ApplicationRecord
 
   delegate :hostname, :path, to: :parsed_url
 
-  def parsed_url = @parsed_url ||= URI.parse(url).normalize
+  def parsed_url = @parsed_url ||= Addressable::URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
   def checks = Check.where(audit: self).prioritized
 

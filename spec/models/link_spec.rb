@@ -47,6 +47,18 @@ RSpec.describe Link do
       expect(normalized.to_s).to eq("http://example.com/")
     end
 
+    it "handles accented URLs" do
+      normalized = described_class.normalize("http://www.lucé.fr/./..///")
+      converted = Addressable::URI.parse("http://www.lucé.fr/").normalize.to_s
+      expect(normalized.to_s).to eq(converted)
+    end
+
+    it "handles punycode" do
+      normalized = described_class.normalize("http://www.xn--luc-dma.fr/")
+      converted = "http://www.lucé.fr/"
+      expect(normalized.to_s).to eq(converted)
+    end
+
     it "normalizes redundant slashes" do
       normalized = described_class.normalize("http://example.com//folder///page.html")
       expect(normalized.to_s).to eq("http://example.com/folder/page.html")
@@ -94,6 +106,56 @@ RSpec.describe Link do
         normalized_urls = urls.map { |url| described_class.normalize(url).to_s }
         expect(normalized_urls.uniq.size).to eq(1)
         expect(normalized_urls.first).to eq("http://example.com/folder/page.html")
+      end
+    end
+  end
+
+  describe ".from(source)" do
+    subject(:from) { described_class.from(source) }
+
+    context "when source is a Link" do
+      let(:source) { described_class.new(href: "http://example.com/") }
+
+      it "returns the original object" do
+        expect(from).to be_a described_class
+        expect(from.object_id).to eq source.object_id
+      end
+    end
+
+    context "when source is a String" do
+      let(:source) { "http://example.com/" }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq source
+      end
+    end
+
+    context "when source is a URI" do
+      let(:uri) { "http://example.com/" }
+      let(:source) { URI.parse(uri) }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq uri
+      end
+    end
+
+    context "when source is an Addressable::URI" do
+      let(:uri) { "http://example.com/" }
+      let(:source) { Addressable::URI.parse(uri) }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq uri
+      end
+    end
+
+    context "when source is something else" do
+      let(:source) { Page.new }
+
+      it "raises ArgumentError" do
+        expect { from }.to raise_error(ArgumentError)
       end
     end
   end

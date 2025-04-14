@@ -1,10 +1,10 @@
 require "rails_helper"
 
 RSpec.describe Page do
-  let(:root) { "https://example.com" }
-  let(:url) { "https://example.com/about" }
-  let(:parsed_url) { URI.parse(url) }
-  let(:page) { build(:page, url: url, root: root, html: body) }
+  let(:root) { "https://éxample.com" }
+  let(:url) { "https://éxample.com/about" }
+  let(:parsed_url) { Addressable::URI.parse(url) }
+  let(:page) { build(:page, url:, root:, html: body) }
   let(:headers) { { "Content-Type" => "text/html" } }
   let(:body) do
     <<~HTML
@@ -35,15 +35,21 @@ RSpec.describe Page do
     stub_request(:get, url).to_return(body:, headers:)
   end
 
+  describe "#original_url" do
+    it "preserves the original URL with accents" do
+      expect(page.original_url).to eq(url)
+    end
+  end
+
   describe "#path" do
     it "returns the path portion of the URL" do
-      expect(page.path).to eq("about")
+      expect(page.path).to eq("/about")
     end
 
     context "when URL is the root URL" do
       let(:url) { root }
 
-      it "returns a slash" do
+      it "returns empty string" do
         expect(page.path).to eq("")
       end
     end
@@ -165,9 +171,9 @@ RSpec.describe Page do
   describe "#links" do
     it "returns an array of links" do
       expected_links = [
-        Link.new("https://example.com/contact", "Contact"),
+        Link.new("https://éxample.com/contact", "Contact"),
         Link.new("https://external.com/", "External"),
-        Link.new("https://example.com/relative/path", "Relative"),
+        Link.new("https://éxample.com/relative/path", "Relative"),
       ]
       expect(page.links).to eq(expected_links)
     end
@@ -211,8 +217,8 @@ RSpec.describe Page do
   describe "#internal_links" do
     it "returns only links that start with the root URL" do
       expected_internal_links = [
-        Link.new("https://example.com/contact", "Contact"),
-        Link.new("https://example.com/relative/path", "Relative"),
+        Link.new("https://éxample.com/contact", "Contact"),
+        Link.new("https://éxample.com/relative/path", "Relative"),
       ]
       expect(page.internal_links).to eq(expected_internal_links)
     end
