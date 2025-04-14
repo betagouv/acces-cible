@@ -2,6 +2,7 @@ class Page
   CACHE_TTL = 10.minutes
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
   SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
+  INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
 
   class InvalidTypeError < StandardError
     def initialize(url, content_type)
@@ -39,7 +40,9 @@ class Page
   def refresh = fetch(clear: true)
 
   def dom
-    Nokogiri::HTML(html)
+    Nokogiri::HTML(html).tap do |document|
+      document.css(INVISIBLE_ELEMENTS).each(&:remove)
+    end
   rescue Nokogiri::SyntaxError => e
     raise ParseError.new url, e.message
   end

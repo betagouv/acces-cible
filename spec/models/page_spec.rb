@@ -12,6 +12,8 @@ RSpec.describe Page do
       <html>
         <head>
           <title>Example Page</title>
+          <style>/* CSS comment */</style>
+          <meta name="viewport" content="user-scalable=no">
         </head>
         <body>
           <h1>Main Heading</h1>
@@ -23,6 +25,7 @@ RSpec.describe Page do
           <a href="mailto:test@example.com">Email</a>
           <a href="#section">Section</a>
           <a href="relative/path">Relative</a>
+          <div class="d-none" style="display: none;">display: none;</div>
         </body>
       </html>
     HTML
@@ -114,6 +117,10 @@ RSpec.describe Page do
       expect(page.dom).to be_a(Nokogiri::HTML::Document)
     end
 
+    it "ignores invisible elements" do
+      expect(page.dom.css("style, meta, div.d-none")).to be_empty
+    end
+
     context "when HTML is invalid" do
       let(:nokogiri_document) { instance_double(Nokogiri::HTML::Document) }
 
@@ -139,6 +146,7 @@ RSpec.describe Page do
   describe "#text" do
     it "returns the full text content" do
       expect(page.text).to include("Main Heading", "Sub Heading", "Some content")
+      expect(page.text).not_to include("CSS comment")
     end
   end
 
