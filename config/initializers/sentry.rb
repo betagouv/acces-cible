@@ -3,6 +3,7 @@ Sentry.init do |config|
 
   config.dsn = Rails.application.credentials.sentry.dsn
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
+  config.release = ENV["CONTAINER_VERSION"]
 
   config.before_send = lambda do |event, hint|
     # Remove server_name from the event so it doesn't affect grouping
