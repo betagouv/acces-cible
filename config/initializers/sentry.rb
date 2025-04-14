@@ -1,7 +1,7 @@
 Sentry.init do |config|
   return unless Rails.env.production?
 
-  config.dsn = "https://cb48a87a9a7c2f33bf362a8d91c0a594@sentry.incubateur.net/218"
+  config.dsn = Rails.application.credentials.sentry.dsn
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 
   config.before_send = lambda do |event, hint|
