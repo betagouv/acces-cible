@@ -1,4 +1,9 @@
 <div <%= tag.attributes wrapper_attributes %>>
+  <% if header? -%>
+  <div class="fr-table__header">
+    <%= search %>
+  </div>
+  <% end -%>
   <div class="fr-table__wrapper">
     <div class="fr-table__container">
       <div class="fr-table__content">
