@@ -12,7 +12,7 @@
   <% t.with_body do %>
     <% @sites.each do |site| %>
       <tr>
-        <td class="fr-cell--center"><%= link_icon(:article, site, title: Site.human(:view_name, name: site.name), line: true, side: :left, class: "link--icon-only") { tag.span(class: "fr-sr-only") { Site.human(:view) } } %></td>
+        <td class="fr-cell--center"><%= link_icon(:article, Site.human(:view_name, name: site.name), site, title: Site.human(:view_name, name: site.name), line: true, side: :left, sr_only: true) %></td>
         <td><%= link_to site.url_without_scheme, site.url, target: :_blank %></td>
         <% site.audit.all_checks.each do |check| %>
           <td class="fr-cell--center"><%= check.blocked? || check.pending? ? "-" : badge(check.to_badge, tooltip: check.tooltip?) %></td>

@@ -73,6 +73,10 @@ module ApplicationHelper
     html_options, options, name = options, name, block.call if block_given?
     icon_options = html_options.extract!(:fill, :line, :side, :size, :button, :btn, :outline, :class)
     html_options[:class] = icon_class(icon, **icon_options)
+    if html_options.delete(:sr_only)
+      html_options[:class] += " link--icon-only"
+      name = tag.span(class: "fr-sr-only") { name }
+    end
     link_to(name, options, html_options)
   end
 
