@@ -4,6 +4,8 @@ module Checks
 
     store_accessor :data, :indication
 
+    def tooltip? = false
+
     private
 
     def custom_badge_text = indication || human(:empty)

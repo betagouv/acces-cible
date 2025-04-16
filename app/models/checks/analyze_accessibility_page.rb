@@ -23,6 +23,7 @@ module Checks
 
     store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor
 
+    def tooltip? = false
     def audit_date = super&.to_date
     def audit_update_date = super&.to_date
     def human_compliance_rate = helpers.number_to_percentage(compliance_rate, precision: 2, strip_insignificant_zeros: true)
@@ -108,7 +109,7 @@ module Checks
     def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
     def custom_badge_status = found_required? ? :success : :warning
-    def custom_badge_text = found_all? ? human(:found_all) : human(:missing_data)
+    def custom_badge_text = found_required? ? human_compliance_rate : human(:missing_data)
 
     def analyze!
       {

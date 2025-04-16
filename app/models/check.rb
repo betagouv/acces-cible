@@ -57,6 +57,7 @@ class Check < ApplicationRecord
   def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
   def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false)
   def fail! = update(status: :failed, checked_at: Time.zone.now, scheduled: false)
+  def tooltip? = true
 
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact

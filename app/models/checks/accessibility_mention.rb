@@ -5,6 +5,7 @@ module Checks
 
     store_accessor :data, :mention
 
+    def tooltip? = false
     def mention_text = human("mentions.#{mention || 'none'}")
 
     private
