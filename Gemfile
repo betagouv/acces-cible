@@ -112,6 +112,6 @@ group :test do
 
   # Allow testing accessibility using Axe-core. Only available in JS feature tests
   gem "axe-core-capybara", "~> 4.9"
-  gem "axe-core-rspec", "~> 4.8"
+  gem "axe-core-rspec", "~> 4.10"
   gem "selenium-webdriver", "~> 4.31"
 end
