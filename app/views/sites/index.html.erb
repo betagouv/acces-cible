@@ -2,11 +2,11 @@
   <% t.with_head do %>
     <tr>
       <th scope="col"><%= Site.human(:detail) %></th>
-      <th scope="col"><%= sort_link Site.human(:url), :url %></th>
+      <th scope="col" class="fr-cell--sort"><%= sortable_header Site.human(:url), :url %></th>
       <% Check.classes.each do |klass| %>
         <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
       <% end %>
-      <th scope="col"><%= sort_link Site.human(:last_audit_at), :checked_at %></th>
+      <th scope="col" class="fr-cell--sort"><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
     </tr>
   <% end %>
   <% t.with_body do %>

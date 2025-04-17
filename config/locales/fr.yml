@@ -20,8 +20,8 @@ fr:
     back_to_list: "Revenir à la liste"
     new_window: " (nouvelle fenêtre)"
     sort_by: "Trier par %{column} %{direction}"
-    asc: ascendant
-    desc: descendant
+    asc: croissant
+    desc: décroissant
     or: ou
 
   time:

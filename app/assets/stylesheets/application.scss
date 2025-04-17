@@ -59,3 +59,8 @@ form.button_to {
     background-color: var(--background-action-low-blue-france);
   }
 }
+
+// Ensure sort buttons are separated from cell text
+.fr-cell--sort .fr-btn {
+  margin-left: .5rem;
+}
