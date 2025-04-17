@@ -22,7 +22,7 @@ module Checks
 
     store_accessor :data, :page_headings, :comparison
 
-    def tooltip? = false
+    def tooltip? = failed? || comparison.empty?
     def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
     def total = EXPECTED_HEADINGS.count
     def failures = comparison.filter { it.error? }

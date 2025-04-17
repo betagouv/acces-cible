@@ -23,7 +23,7 @@ module Checks
 
     store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor
 
-    def tooltip? = false
+    def tooltip? = !(passed? && found_required?)
     def audit_date = super&.to_date
     def audit_update_date = super&.to_date
     def human_compliance_rate = helpers.number_to_percentage(compliance_rate, precision: 2, strip_insignificant_zeros: true)

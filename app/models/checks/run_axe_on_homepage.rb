@@ -4,7 +4,7 @@ module Checks
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :issues_total
 
-    def tooltip? = false
+    def tooltip? = failed?
     def applicable_total = passed? ? passes + incomplete + violations : nil
     def checks_total = passed? ? applicable_total + inapplicable : nil
     def success_rate = passed? ? (passes + incomplete) / applicable_total.to_f * 100 : nil
