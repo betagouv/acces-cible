@@ -97,13 +97,15 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#create_checks" do
+  describe "#schedule" do
+    subject(:schedule) { audit.schedule }
+
     let(:audit) { create(:audit) }
 
     it "creates all check types" do
-      expect(audit.create_checks.size).to eq(Check.types.size)
+      expect { schedule }.to change(Check, :count).by(Check.types.size)
 
-      Check.types.keys.each do |name|
+      Check.names.each do |name|
         expect(audit.public_send(name)).to be_persisted
       end
     end
@@ -119,8 +121,8 @@ RSpec.describe Audit do
     end
 
     it "sets status to mixed when checks have different statuses" do
-      audit.all_checks.first.update!(status: :passed)
-      audit.all_checks.last.update!(status: :failed)
+      audit.all_checks.each { |check| check.update(status: :passed) }
+      audit.checks.last.update!(status: :failed)
       audit.derive_status_from_checks
       expect(audit.status).to eq("mixed")
     end
