@@ -62,7 +62,7 @@ class Browser
         body: page.body,
         status: page.network.status || 200,
         headers: page.network.response&.headers || {},
-        current_url: URI.parse(page.current_url)
+        current_url: Addressable::URI.parse(page.current_url)
       }
     end
   end

@@ -15,9 +15,10 @@ class Page
     end
   end
 
-  attr_reader :url, :root, :status, :html, :headers, :actual_url
+  attr_reader :original_url, :url, :root, :status, :html, :headers, :actual_url
 
   def initialize(url:, root: nil, html: nil)
+    @original_url = url
     @url = Link.normalize(url)
     @root = Link.normalize(root || url)
     @status = 200
@@ -34,7 +35,7 @@ class Page
   def headings = dom.css(HEADINGS).collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
-  def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
+  def inspect =  "#<#{self.class.name} @original_url=#{original_url.inspect} @title=#{title}>"
   def success? = status == 200
   def error? = status > 399
   def refresh = fetch(clear: true)
@@ -50,7 +51,7 @@ class Page
   def links
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"]
-      uri = URI.parse(href)
+      uri = Addressable::URI.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
       href = "#{url.origin}/#{href}" if uri.relative?
@@ -67,11 +68,11 @@ class Page
       @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
       if content_type && !content_type.include?("text/html")
-        raise InvalidTypeError.new url, content_type
+        raise InvalidTypeError.new original_url, content_type
       end
       [@actual_url, @status, @headers, @html]
     rescue Ferrum::Error => e
-      Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
+      Rails.logger.error { "Browser error fetching #{original_url}: #{e.message}" }
       raise e
     end
   end
