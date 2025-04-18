@@ -97,13 +97,15 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#create_checks" do
+  describe "#schedule" do
+    subject(:schedule) { audit.schedule }
+
     let(:audit) { create(:audit) }
 
     it "creates all check types" do
-      expect(audit.create_checks.size).to eq(Check.types.size)
+      expect { schedule }.to change(Check, :count).by(Check.types.size)
 
-      Check.types.keys.each do |name|
+      Check.names.each do |name|
         expect(audit.public_send(name)).to be_persisted
       end
     end
@@ -119,8 +121,8 @@ RSpec.describe Audit do
     end
 
     it "sets status to mixed when checks have different statuses" do
-      audit.all_checks.first.update!(status: :passed)
-      audit.all_checks.last.update!(status: :failed)
+      audit.all_checks.each { |check| check.update(status: :passed) }
+      audit.checks.last.update!(status: :failed)
       audit.derive_status_from_checks
       expect(audit.status).to eq("mixed")
     end
@@ -132,8 +134,8 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#checked?(name)" do
-    subject(:checked) { audit.checked?(name) }
+  describe "#check_status(name)" do
+    subject(:check_status) { audit.check_status(name) }
 
     let(:audit) { build(:audit) }
     let(:name) { Check.names.first }
@@ -143,30 +145,30 @@ RSpec.describe Audit do
         allow(audit).to receive(name).and_return(nil)
       end
 
-      it "returns nil" do
-        expect(checked).to be_nil
+      it "returns pending" do
+        expect(check_status.pending?).to be true
       end
     end
 
     context "when check has failed" do
       before do
-        check = instance_double(Check.types[name].name, passed?: false)
+        check = instance_double(Check.types[name].name, status: :failed)
         allow(audit).to receive(name).and_return(check)
       end
 
-      it "returns false" do
-        expect(checked).to be false
+      it "returns failed" do
+        expect(check_status.failed?).to be true
       end
     end
 
     context "when check has passed" do
       before do
-        check = instance_double(Check.types[name].name, passed?: true)
+        check = instance_double(Check.types[name].name, status: :passed)
         allow(audit).to receive(name).and_return(check)
       end
 
       it "returns true" do
-        expect(checked).to be true
+        expect(check_status.passed?).to be true
       end
     end
   end

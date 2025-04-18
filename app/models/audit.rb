@@ -20,20 +20,17 @@ class Audit < ApplicationRecord
 
   delegate :hostname, :path, to: :parsed_url
 
-  after_create_commit :create_checks
-
   def parsed_url = @parsed_url ||= URI.parse(url).normalize
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
   def checks = Check.where(audit: self).prioritized
-  def schedule = RunAuditJob.perform_later(self)
+
+  def schedule
+    all_checks.select(&:new_record?).each(&:save)
+    RunAuditJob.perform_later(self)
+  end
 
   def all_checks
     Check.names.map { |name| send(name) || send(:"build_#{name}") }
-  end
-
-  def create_checks
-    all_checks.select(&:new_record?).each(&:save)
-    all_checks
   end
 
   def check_status(check)
@@ -41,22 +38,18 @@ class Audit < ApplicationRecord
   end
 
   def derive_status_from_checks
-    new_status = if all_checks.any?(&:new_record?)
+    self.status = if all_checks.any?(&:new_record?)
        :pending
-    elsif (check_statuses = all_checks.collect(&:status).uniq).one?
+    elsif (check_statuses = checks.collect(&:status).uniq).one?
        check_statuses.first
     else
        :mixed
     end
-    update(status: new_status)
+    update(status:)
   end
 
   def set_checked_at
     latest_checked_at = checks.collect(&:checked_at).compact.sort.last
     update(checked_at: latest_checked_at)
-  end
-
-  def checked?(name)
-    public_send(name)&.passed?
   end
 end
