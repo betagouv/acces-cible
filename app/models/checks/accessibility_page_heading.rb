@@ -31,7 +31,7 @@ module Checks
 
     private
 
-    def custom_badge_text = helpers.number_to_percentage(score, precision: 2, strip_insignificant_zeros: true)
+    def custom_badge_text = to_percent(score)
     def custom_badge_status
       case score
       when 90..100 then :success

@@ -8,7 +8,7 @@ module Checks
     def applicable_total = passed? ? passes + incomplete + violations : nil
     def checks_total = passed? ? applicable_total + inapplicable : nil
     def success_rate = passed? ? (passes + incomplete) / applicable_total.to_f * 100 : nil
-    def human_success_rate = helpers.number_to_percentage(success_rate, precision: 2, strip_insignificant_zeros: true)
+    def human_success_rate = to_percent(success_rate)
 
     def violation_data
       data["violation_data"]&.map { |data| AxeViolation.new(**data) } || []
