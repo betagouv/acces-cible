@@ -7,13 +7,14 @@ lsof -t -i:3000 | xargs -r kill # Puma
 # Simplifies switching branches and bisecting
 bundle check &> /dev/null || bundle install
 
-# Use Overmind if present
-if command -v overmind &> /dev/null; then
-  # Remove dangling socks from overmind
-  rm -f ".overmind.sock"
-  bundle exec overmind start -f Procfile.dev --no-port "$@"
-else # Fallback to Foreman
-  echo “Installing foreman…”
-  gem install foreman
-  bundle exec foreman start -f Procfile.dev --no-port "$@"
+# Install Overmind if not present
+if ! command -v overmind &> /dev/null; then
+  echo "Installing overmind..."
+  brew install overmind 2>/dev/null || \
+  (echo "Failed to install with brew. Please install Overmind manually:" && \
+   echo "See: https://github.com/DarthSim/overmind#installation")
 fi
+
+# Use Overmind to launch processes
+rm -f ".overmind.sock" # Automatically clean after Overmind crashes
+bundle exec overmind start -f Procfile.dev --no-port "$@"
