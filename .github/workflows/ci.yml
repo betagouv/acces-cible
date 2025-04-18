@@ -3,8 +3,9 @@ name: CI
 on:
   push:
     branches:
-      - '**'  # This will match all branches
-  pull_request:  # Added to also run on PRs
+      - "main"
+      - "staging"
+  pull_request:
 
 jobs:
   scan_ruby:
