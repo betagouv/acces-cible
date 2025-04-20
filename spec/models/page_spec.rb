@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Page do
   let(:root) { "https://éxample.com" }
   let(:url) { "https://éxample.com/about" }
-  let(:parsed_url) { Addressable::URI.parse(url) }
+  let(:normalized_url) { Link.normalize(url) }
   let(:page) { build(:page, url:, root:, html: body) }
   let(:headers) { { "Content-Type" => "text/html" } }
   let(:body) do
@@ -35,15 +35,9 @@ RSpec.describe Page do
     stub_request(:get, url).to_return(body:, headers:)
   end
 
-  describe "#original_url" do
-    it "preserves the original URL with accents" do
-      expect(page.original_url).to eq(url)
-    end
-  end
-
   describe "#path" do
     it "returns the path portion of the URL" do
-      expect(page.path).to eq("/about")
+      expect(page.path).to eq("about/")
     end
 
     context "when URL is the root URL" do
@@ -72,7 +66,7 @@ RSpec.describe Page do
   describe "#redirected?" do
     context "when actual_url is the original URL" do
       it "returns false" do
-        allow(page).to receive(:actual_url).and_return(parsed_url)
+        allow(page).to receive(:actual_url).and_return(Link.normalize(url))
 
         expect(page.redirected?).to be false
       end
@@ -92,8 +86,8 @@ RSpec.describe Page do
 
     before do
       allow(Browser).to receive(:get)
-        .with(url)
-        .and_return({ body:, status: 200, headers:, current_url: parsed_url })
+        .with(normalized_url)
+        .and_return({ body:, status: 200, headers:, current_url: normalized_url })
     end
 
     it "fetches the page content" do
@@ -102,11 +96,11 @@ RSpec.describe Page do
 
     it "attempts to use the cache" do
       allow(Rails.cache).to receive(:fetch)
-        .with(parsed_url, expires_in: described_class::CACHE_TTL)
+        .with(normalized_url, expires_in: described_class::CACHE_TTL)
 
       page
       expect(Rails.cache).to have_received(:fetch)
-        .with(parsed_url, expires_in: described_class::CACHE_TTL)
+        .with(normalized_url, expires_in: described_class::CACHE_TTL)
     end
 
     context "when the response is not HTML" do

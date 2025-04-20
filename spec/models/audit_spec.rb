@@ -76,7 +76,7 @@ RSpec.describe Audit do
 
     it "returns hostname and path for non-root path" do
       audit.url = "https://example.com/path"
-      expect(audit.url_without_scheme).to eq("example.com/path")
+      expect(audit.url_without_scheme).to eq("example.com/path/")
     end
 
     it "memoizes the result" do

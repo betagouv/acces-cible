@@ -49,7 +49,7 @@ RSpec.describe Link do
 
     it "handles accented URLs" do
       normalized = described_class.normalize("http://www.lucé.fr/./..///")
-      converted = Addressable::URI.parse("http://www.lucé.fr/").normalize.to_s
+      converted = "http://www.lucé.fr/"
       expect(normalized.to_s).to eq(converted)
     end
 
