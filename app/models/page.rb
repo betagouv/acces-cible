@@ -51,7 +51,7 @@ class Page
   def links
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"]
-      uri = Addressable::URI.parse(href)
+      uri = Link.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
       href = "#{url.origin}/#{href}" if uri.relative?

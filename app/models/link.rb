@@ -1,6 +1,12 @@
 Link = Data.define(:href, :text) do
   include Comparable
 
+  class InvalidURIError < StandardError
+    def initialize(href)
+      super("Addressable::URI cannot parse '#{href}'")
+    end
+  end
+
   class << self
     def from(source)
       case source
@@ -8,6 +14,12 @@ Link = Data.define(:href, :text) do
       when String, URI, Addressable::URI then Link.new(href: source)
       else raise ArgumentError.new("#{source.class.name} is not allowed in Link.from")
       end
+    end
+
+    def parse(href)
+      Addressable::URI.parse(href)
+    rescue Addressable::InvalidURIError
+      raise InvalidURIError.new(href)
     end
 
     def normalize(href)
