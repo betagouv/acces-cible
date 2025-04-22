@@ -3,4 +3,4 @@ production:
     class: ScheduleChecksJob
     priority: 2
     queue: background
-    schedule: every minute
+    schedule: every hour
