@@ -20,11 +20,17 @@ module Checks
     ].freeze
     COMPARISON_OPTIONS = { partial: true, fuzzy: 0.65, ignore_case: true }.freeze
 
+    delegate :expected_headings, to: :class
+
+    class << self
+      def expected_headings = EXPECTED_HEADINGS
+    end
+
     store_accessor :data, :page_headings, :comparison
 
     def tooltip? = failed? || comparison.empty?
     def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
-    def total = EXPECTED_HEADINGS.count
+    def total = expected_headings.count
     def failures = comparison.filter { it.error? }
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
@@ -50,7 +56,7 @@ module Checks
     end
 
     def indexed_expected_headings
-      @indexed_expected_headings ||= EXPECTED_HEADINGS.each_with_index.map { |(level, heading), index| [index, heading, level] }
+      @indexed_expected_headings ||= expected_headings.each_with_index.map { |(level, heading), index| [index, heading, level] }
     end
 
     def indexed_page_headings
@@ -58,7 +64,7 @@ module Checks
     end
 
     def compare_headings
-      return EXPECTED_HEADINGS.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
+      return expected_headings.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
 
       # Two-pass approach: first match all headings, then determine status
       expected_to_actual = {}

@@ -2,12 +2,17 @@
   <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
   <%= badge check.to_badge %>
 
-  <% if check.passed? && check.comparison.present? %>
-    <p>
-      <%= check.human(:allowed_level_differences) %>
-      <br><%= check.human_explanation %>
-    </p>
-    <ul class="fr-raw-list fr-mt-2w">
+  <p>
+    <%= check.human(:allowed_level_differences) %>
+    <br>
+    <% if check.passed? && check.comparison.present? %>
+    <%= check.human_explanation %>
+    <% else %>
+      <%= check.human(:expectations) %>
+    <% end %>
+  </p>
+  <ul class="fr-raw-list fr-mt-2w">
+    <% if check.passed? && check.comparison.present? %>
       <% check.comparison.each do |heading_status| %>
         <li class="fr-mb-2w">
           <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v") : icon(:close, :circle, class: "fr-mr-1v") %>
@@ -25,6 +30,16 @@
           <% end %>
         </li>
       <% end %>
-    </ul>
-  <% end %>
+    <% else %>
+      <% check.expected_headings.each do |level, heading| %>
+        <li class="fr-mb-2w">
+          <strong>
+            <code>&lt;h<%= level %>&gt;</code>
+            <%= heading %>
+            <code>&lt;/h<%= level %>&gt;</code>
+          </strong>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
 </div>

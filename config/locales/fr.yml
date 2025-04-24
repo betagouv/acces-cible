@@ -112,6 +112,7 @@ fr:
         allowed_level_differences: |
           Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
           Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
+        expectations: "Voici la hiérarchie attendue :"
         explanation:
           zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
           one: "Un seul problème relevé sur %{total} titres atendus (%{error})."
