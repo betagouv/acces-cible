@@ -591,6 +591,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-has_some_of_many
+  addressable (~> 2.8)
   axe-core-capybara (~> 4.9)
   axe-core-rspec (~> 4.8)
   better_errors

@@ -63,7 +63,7 @@ RSpec.describe Audit do
   describe "#parsed_url" do
     it "returns a parsed and normalized URI" do
       audit.url = "https://example.com/path/"
-      expect(audit.parsed_url).to be_a(URI::HTTPS)
+      expect(audit.parsed_url).to be_a(Addressable::URI)
       expect(audit.parsed_url.to_s).to eq(audit.url)
     end
   end
@@ -76,7 +76,7 @@ RSpec.describe Audit do
 
     it "returns hostname and path for non-root path" do
       audit.url = "https://example.com/path"
-      expect(audit.url_without_scheme).to eq("example.com/path")
+      expect(audit.url_without_scheme).to eq("example.com/path/")
     end
 
     it "memoizes the result" do

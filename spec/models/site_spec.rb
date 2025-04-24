@@ -41,6 +41,15 @@ RSpec.describe Site do
         expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
         expect(described_class.find_or_create_by_url(url: new_url)).to eq(existing_site)
       end
+
+      it "finds unicode and punycode versions" do
+        url = "https://éxâmplè.çôm/"
+        existing_site.audit.update(url:)
+        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
+
+        punycode_url = Addressable::URI.parse(url).normalize.to_s
+        expect(described_class.find_or_create_by_url(url: punycode_url)).to eq(existing_site)
+      end
     end
 
     context "when site does not exist" do

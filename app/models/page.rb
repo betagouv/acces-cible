@@ -50,10 +50,10 @@ class Page
   def links
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"]
-      uri = URI.parse(href)
+      uri = Link.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
-      href = "#{url.origin}/#{href}" if uri.relative?
+      href = Link.normalize("#{root}#{href}") unless uri.hostname
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
     end.uniq.compact
