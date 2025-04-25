@@ -199,8 +199,8 @@ RSpec.describe ApplicationHelper do
     end
   end
 
-  describe "#sort_link" do
-    subject(:sort_link) { helper.sort_link("Name", column, **options) }
+  describe "#sortable_header" do
+    subject(:sortable_header) { helper.sortable_header("Name", column, **options) }
 
     let(:column) { :name }
     let(:direction) { :asc }
@@ -220,10 +220,10 @@ RSpec.describe ApplicationHelper do
 
     context "when no current sort exists", :aggregate_failures do
       it "generates a link with ascending sort parameter" do
-        expect(sort_link).to have_selector("a[href='/?page=2&sort%5Bname%5D=asc']")
-        expect(sort_link).to have_text("Name")
-        expect(sort_link).not_to include("fr-icon-arrow")
-        expect(sort_link).to have_selector("a[title='Sort by Name ascending']")
+        expect(sortable_header).to have_selector("a[href='/?page=2&sort%5Bname%5D=asc']")
+        expect(sortable_header).to have_text("Name")
+        expect(sortable_header).not_to include("fr-icon-arrow")
+        expect(sortable_header).to have_selector("a[title='Sort by Name ascending']")
       end
     end
 
@@ -232,9 +232,9 @@ RSpec.describe ApplicationHelper do
       let(:params) { { page: 2, sort: { name: "asc" } } }
 
       it "generates a link to sort descending" do
-        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=desc']")
-        expect(sort_link).to have_selector("a.icon-class")
-        expect(sort_link).to have_selector("a[title='Sort by Name descending']")
+        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=desc']")
+        expect(sortable_header).to have_selector("a.icon-class")
+        expect(sortable_header).to have_selector("a[title='Sort by Name descending']")
       end
     end
 
@@ -242,9 +242,9 @@ RSpec.describe ApplicationHelper do
       let(:params) { { page: 2, sort: { name: "desc" } } }
 
       it "generates a link to sort ascending" do
-        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=asc']")
-        expect(sort_link).to have_selector("a.icon-class")
-        expect(sort_link).to have_selector("a[title='Sort by Name ascending']")
+        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=asc']")
+        expect(sortable_header).to have_selector("a.icon-class")
+        expect(sortable_header).to have_selector("a[title='Sort by Name ascending']")
       end
     end
 
@@ -253,9 +253,9 @@ RSpec.describe ApplicationHelper do
       let(:options) { { id: "sort-name", title: "Custom sort title", data: { test: "value" } } }
 
       it "adds HTML attributes to the link" do
-        expect(sort_link).to have_selector("a#sort-name")
-        expect(sort_link).to have_selector("a[title='Custom sort title']")
-        expect(sort_link).to have_selector("a[data-test='value']")
+        expect(sortable_header).to have_selector("a#sort-name")
+        expect(sortable_header).to have_selector("a[title='Custom sort title']")
+        expect(sortable_header).to have_selector("a[data-test='value']")
       end
     end
 
@@ -263,11 +263,11 @@ RSpec.describe ApplicationHelper do
       let(:params) { { sort: { name: "asc", email: "desc" } } }
 
       it "allows sorting by another column" do
-        sort_link = helper.sort_link("Name", :name)
-        expect(sort_link).to have_selector("a[href*='sort%5Bname%5D=desc']")
+        sortable_header = helper.sortable_header("Name", :name)
+        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=desc']")
 
-        sort_link = helper.sort_link("Email", :email)
-        expect(sort_link).to have_selector("a[href*='sort%5Bemail%5D=asc']")
+        sortable_header = helper.sortable_header("Email", :email)
+        expect(sortable_header).to have_selector("a[href*='sort%5Bemail%5D=asc']")
       end
     end
   end

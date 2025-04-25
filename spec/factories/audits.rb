@@ -1,21 +1,29 @@
 FactoryBot.define do
   factory :audit do
-    site { association :site, url:, strategy: :build }
     url { "https://example.com" }
+    site { association :site, url: }
 
     trait :pending do
       status { "pending" }
     end
 
+    trait :checked do
+      checked_at { 1.day.ago }
+      status { "passed" }
+    end
+
     trait :passed do
+      checked
       status { "passed" }
     end
 
     trait :failed do
+      checked
       status { "failed" }
     end
 
     trait :mixed do
+      checked
       status { "mixed" }
     end
   end

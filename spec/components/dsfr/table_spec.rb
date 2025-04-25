@@ -70,6 +70,24 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
   end
 
+  describe "caption_side option" do
+    context "when :hidden" do
+      let(:params) { { caption:, pagy:, caption_side: :hidden } }
+
+      it "adds the hidden caption class" do
+        expect(rendered_component).to have_css("div.fr-table--no-caption")
+      end
+    end
+
+    context "when :bottom" do
+      let(:params) { { caption:, pagy:, caption_side: :bottom } }
+
+      it "adds the hidden caption class" do
+        expect(rendered_component).to have_css("div.fr-table--caption-bottom")
+      end
+    end
+  end
+
   describe "border option" do
     context "when border is true" do
       let(:params) { { caption:, pagy:, border: true } }
