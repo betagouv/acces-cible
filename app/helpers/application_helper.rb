@@ -95,6 +95,12 @@ module ApplicationHelper
     "#{text} #{link_icon(arrow, text, { params: link_params }, options.merge(btn:, size: :sm, sr_only: true, line: true))}".html_safe
   end
 
+  def aria_sort(param)
+    return unless (current_sort = params.dig(:sort, param)&.downcase&.to_sym)
+
+    "aria-sort=#{current_sort == :asc ? :descending : :ascending}"
+  end
+
   def root? = request.path == "/"
 
   def time_ago(datetime)
