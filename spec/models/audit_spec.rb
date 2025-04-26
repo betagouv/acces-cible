@@ -12,10 +12,7 @@ RSpec.describe Audit do
 
   describe "associations" do
     it { is_expected.to belong_to(:site).touch(true) }
-
-    Check.names.each do |name|
-      it { is_expected.to have_one(name).dependent(:destroy) }
-    end
+    it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 
   describe "validations" do
@@ -88,10 +85,9 @@ RSpec.describe Audit do
   end
 
   describe "#all_checks" do
-    let(:audit) { build(:audit) }
+    subject(:checks) { build(:audit).all_checks }
 
     it "returns all checks, building missing ones" do
-      checks = audit.all_checks
       expect(checks.size).to eq(Check.types.size)
       expect(checks.all?(&:new_record?)).to be true
     end
@@ -104,10 +100,6 @@ RSpec.describe Audit do
 
     it "creates all check types" do
       expect { schedule }.to change(Check, :count).by(Check.types.size)
-
-      Check.names.each do |name|
-        expect(audit.public_send(name)).to be_persisted
-      end
     end
   end
 
@@ -121,7 +113,7 @@ RSpec.describe Audit do
     end
 
     it "sets status to mixed when checks have different statuses" do
-      audit.all_checks.each { |check| check.update(status: :passed) }
+      audit.all_checks.each { |check| check.passed!; check.save }
       audit.checks.last.update!(status: :failed)
       audit.derive_status_from_checks
       expect(audit.status).to eq("mixed")
