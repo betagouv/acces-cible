@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_26_211016) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_26_212105) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,13 +32,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_26_211016) do
     t.string "status", null: false
     t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "checked_at"
-    t.integer "attempts", default: 0, null: false
     t.jsonb "data", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "scheduled", default: false, null: false
     t.integer "priority", default: 100, null: false
-    t.index ["attempts"], name: "index_checks_on_retryable", where: "(((status)::text = 'failed'::text) AND (attempts > 0))"
     t.index ["audit_id"], name: "index_checks_on_audit_id"
     t.index ["status", "run_at"], name: "index_checks_on_status_and_run_at"
   end
