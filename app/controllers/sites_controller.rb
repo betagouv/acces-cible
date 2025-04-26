@@ -28,7 +28,7 @@ class SitesController < ApplicationController
     if params.dig(:site, :file)
       @upload = SiteUpload.new(params.expect(site: [:file]))
       if @upload.save
-        ScheduleChecksJob.perform_later
+        ScheduleAuditsJob.perform_later
         return redirect_to sites_path, notice: t(".uploaded", count: @upload.sites.length)
       end
     else
