@@ -1,8 +1,6 @@
 class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
-  Check.types.each do |name, klass|
-    has_one name, class_name: klass.name, dependent: :destroy
-  end
+  has_many :checks, -> { prioritized }, dependent: :destroy
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -21,9 +19,14 @@ class Audit < ApplicationRecord
 
   delegate :hostname, :path, to: :parsed_url
 
+  Check.types.each do |name, klass|
+    define_method(name) do
+      checks.to_a.find { |check| check.type == klass.name }
+    end
+  end
+
   def parsed_url = @parsed_url ||= Link.parse(url)
   def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
-  def checks = Check.where(audit: self).prioritized
 
   def schedule
     all_checks.select(&:new_record?).each(&:save)
@@ -31,7 +34,7 @@ class Audit < ApplicationRecord
   end
 
   def all_checks
-    Check.names.map { |name| send(name) || send(:"build_#{name}") }
+    Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
   end
 
   def check_status(check)
