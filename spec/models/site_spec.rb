@@ -12,7 +12,6 @@ RSpec.describe Site do
     let!(:audit) { create(:audit, site:, url: "https://example.com") }
 
     it { should delegate_method(:url).to(:audit) }
-    it { should delegate_method(:url_without_scheme).to(:audit) }
 
     it "delegates to the most recent audit" do
       new_audit = create(:audit, site:, url: "https://new-example.com")
@@ -74,17 +73,25 @@ RSpec.describe Site do
     end
   end
 
-  describe "#to_title" do
-    let(:site) { create(:site, url:) }
-    let!(:audit) { create(:audit, site:) }
+  describe "#url_without_scheme" do
+    let(:site) { build(:site) }
 
-    it "returns the URL without scheme from the latest audit" do
-      expect(site.to_title).to eq(audit.url_without_scheme)
+    before do
+      allow(site).to receive(:url).and_return(url)
     end
 
-    it "updates when new audit is created" do
-      new_audit = create(:audit, site:, url: "https://new-example.com")
-      expect(site.reload.to_title).to eq(new_audit.url_without_scheme)
+    context "when path is empty" do
+      it "returns hostname only" do
+        expect(site.url_without_scheme).to eq("example.com")
+      end
+    end
+
+    context "when path is not empty" do
+      let(:url) { "https://example.com/path" }
+
+      it "returns hostname and path" do
+        expect(site.url_without_scheme).to eq("example.com/path")
+      end
     end
   end
 
@@ -94,14 +101,14 @@ RSpec.describe Site do
 
     it "generates slug from url_without_scheme" do
       expect(site.slug).to be_present
-      expect(site.slug).to eq(site.audit.url_without_scheme.parameterize)
+      expect(site.slug).to eq(site.url_without_scheme.parameterize)
     end
 
     it "maintains history of slugs" do
       old_slug = site.slug
       new_url = "https://new-example.com"
 
-      site.audits.create!(url: new_url)
+      site.audits.create!(url: new_url, status: :passed)
       site.save!
 
       expect(site.reload.slug).not_to eq(old_slug)

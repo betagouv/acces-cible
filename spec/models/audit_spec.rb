@@ -57,33 +57,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#parsed_url" do
-    it "returns a parsed and normalized URI" do
-      audit.url = "https://example.com/path/"
-      expect(audit.parsed_url).to be_a(Addressable::URI)
-      expect(audit.parsed_url.to_s).to eq(audit.url)
-    end
-  end
-
-  describe "#url_without_scheme" do
-    it "returns hostname for root path" do
-      audit.url = "https://example.com"
-      expect(audit.url_without_scheme).to eq("example.com")
-    end
-
-    it "returns hostname and path for non-root path" do
-      audit.url = "https://example.com/path"
-      expect(audit.url_without_scheme).to eq("example.com/path/")
-    end
-
-    it "memoizes the result" do
-      audit.url = "https://example.com"
-      first_result = audit.url_without_scheme
-      allow(audit).to receive(:hostname).and_return("different.com") # rubocop:disable RSpec/SubjectStub
-      expect(audit.url_without_scheme).to eq(first_result)
-    end
-  end
-
   describe "#all_checks" do
     subject(:checks) { build(:audit).all_checks }
 

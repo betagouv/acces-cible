@@ -17,16 +17,11 @@ class Audit < ApplicationRecord
   scope :checked, -> { where.not(status: :pending) }
   scope :to_schedule, -> { pending.joins(:checks).merge(Check.to_schedule) }
 
-  delegate :hostname, :path, to: :parsed_url
-
   Check.types.each do |name, klass|
     define_method(name) do
       checks.to_a.find { |check| check.type == klass.name }
     end
   end
-
-  def parsed_url = @parsed_url ||= Link.parse(url)
-  def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
 
   def schedule
     all_checks.select(&:new_record?).each(&:save)
