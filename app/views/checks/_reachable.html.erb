@@ -1,4 +1,8 @@
 <div class="fr-mb-5w" id="<%= dom_id check %>">
   <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
   <%= badge check.to_badge %>
+
+  <% if check.redirected? %>
+    <p><%= check.human(:redirect_message, original: check.original_url, redirected: check.redirect_url).html_safe %></p>
+  <% end %>
 </div>

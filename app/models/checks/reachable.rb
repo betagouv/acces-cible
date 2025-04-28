@@ -11,9 +11,10 @@ module Checks
 
     store_accessor :data, :original_url, :redirect_url
 
+    def redirected? = redirect_url.present? # Ignorer http->https et avec/sans www
+
     private
 
-    def redirected? = redirect_url.present?
     def custom_badge_text = redirected? ? human(:redirected) : human(:reachable)
     def custom_badge_status = redirected? ? :info : :success
 

@@ -148,6 +148,7 @@ fr:
         type: Site joignable
         redirected: Redirection
         reachable: Joignable à l'adresse indiquée
+        redirect_message: "Le site redirige de <b>%{original}</b> vers <b>%{redirected}</b>."
       checks/run_axe_on_homepage:
         type: "Contrôles automatiques : page d'accueil"
         table_header: "🤖 : Accueil"
