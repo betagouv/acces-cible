@@ -2,9 +2,9 @@ require "rails_helper"
 
 RSpec.describe Checks::Reachable do
   let(:check) { described_class.new }
-  let(:url) { "https://example.com" }
+  let(:original_url) { "https://example.com" }
   let(:redirect_url) { "https://example.org" }
-  let(:audit) { instance_double(Audit, url:, update: true) }
+  let(:audit) { instance_double(Audit, url: original_url, update: true) }
   let(:root_page) { instance_double(Page) }
 
   before do
@@ -18,24 +18,16 @@ RSpec.describe Checks::Reachable do
   end
 
   describe "#custom_badge_status" do
-    context "when there is a redirect_url" do
-      before do
-        check.redirect_url = "https://example.org"
-      end
+    subject(:status) { described_class.new(data: { original_url:, redirect_url: }).send(:custom_badge_status) }
 
-      it "returns :info" do
-        expect(check.send(:custom_badge_status)).to eq(:info)
-      end
+    context "when there is a redirect_url" do
+      it { is_expected.to eq(:info) }
     end
 
     context "when there is no redirect_url" do
-      before do
-        check.redirect_url = nil
-      end
+      let(:redirect_url) { nil }
 
-      it "returns :success" do
-        expect(check.send(:custom_badge_status)).to eq(:success)
-      end
+      it { is_expected.to eq(:success) }
     end
   end
 
@@ -57,7 +49,7 @@ RSpec.describe Checks::Reachable do
 
       context "when the page redirects" do
         before do
-          allow(root_page).to receive_messages(redirected?: true, url:, actual_url: redirect_url)
+          allow(root_page).to receive_messages(redirected?: true, url: original_url, actual_url: redirect_url)
         end
 
         it "updates the audit with the new URL" do
@@ -67,10 +59,7 @@ RSpec.describe Checks::Reachable do
 
         it "returns a hash with the original and redirect URLs" do
           result = check.send(:analyze!)
-          expect(result).to eq({
-            original_url: url,
-            redirect_url: redirect_url
-          })
+          expect(result).to eq({ original_url:, redirect_url: })
         end
       end
     end
@@ -83,8 +72,54 @@ RSpec.describe Checks::Reachable do
       it "raises an UnreachableSiteError" do
         expect {
           check.send(:analyze!)
-        }.to raise_error(Checks::Reachable::UnreachableSiteError, "Server response 404 when trying to get #{url}")
+        }.to raise_error(Checks::Reachable::UnreachableSiteError, "Server response 404 when trying to get #{original_url}")
       end
+    end
+  end
+
+  describe "#redirected?" do
+    subject(:redirected) { described_class.new(data: { original_url:, redirect_url: }).redirected? }
+
+    context "when going from https to http" do
+      let(:original_url) { "https://www.example.com/" }
+      let(:redirect_url) { "http://www.example.com/" }
+
+      it { is_expected.to be false }
+    end
+
+    context "when going from http to https" do
+      let(:original_url) { "http://www.example.com/" }
+      let(:redirect_url) { "https://www.example.com/" }
+
+      it { is_expected.to be false }
+    end
+
+    context "when going from naked domain to www" do
+      let(:original_url) { "https://example.com/" }
+      let(:redirect_url) { "https://www.example.com/" }
+
+      it { is_expected.to be false }
+    end
+
+    context "when going from www to naked domain" do
+      let(:original_url) { "https://www.example.com/" }
+      let(:redirect_url) { "https://example.com/" }
+
+      it { is_expected.to be false }
+    end
+
+    context "when going from one domain to another" do
+      let(:original_url) { "https://www.example.com/" }
+      let(:redirect_url) { "https://www.foo.bar/" }
+
+      it { is_expected.to be true }
+    end
+
+    context "when going from root to a folder" do
+      let(:original_url) { "https://www.example.com/" }
+      let(:redirect_url) { "https://www.example.com/foo/" }
+
+      it { is_expected.to be true }
     end
   end
 end

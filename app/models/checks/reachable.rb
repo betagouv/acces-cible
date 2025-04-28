@@ -11,7 +11,7 @@ module Checks
 
     store_accessor :data, :original_url, :redirect_url
 
-    def redirected? = redirect_url.present? # Ignorer http->https et avec/sans www
+    def redirected? = original_url && redirect_url && normalize(original_url) != normalize(redirect_url)
 
     private
 
@@ -27,6 +27,17 @@ module Checks
       else
         {}
       end
+    end
+
+    def normalize(url)
+      parsed = Link.parse(url.downcase)
+      host = parsed.host.start_with?("www.") ? parsed.host[4..-1] : parsed.host
+      {
+        host: host,
+        path: parsed.path,
+        query: parsed.query,
+        fragment: parsed.fragment
+      }
     end
   end
 end
