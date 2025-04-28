@@ -53,9 +53,6 @@ GEM
       activemodel (= 8.0.2)
       activesupport (= 8.0.2)
       timeout (>= 0.4.0)
-    activerecord-has_some_of_many (1.2.0)
-      activerecord (>= 7.0.0.alpha)
-      railties (>= 7.0.0.alpha)
     activestorage (8.0.2)
       actionpack (= 8.0.2)
       activejob (= 8.0.2)
@@ -590,7 +587,6 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  activerecord-has_some_of_many
   addressable (~> 2.8)
   axe-core-capybara (~> 4.9)
   axe-core-rspec (~> 4.8)

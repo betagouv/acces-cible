@@ -2,9 +2,8 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { checked.sort_by_newest }, dependent: :destroy
 
-  scope :preloaded, -> { includes(:audit) }
+  scope :preloaded, -> {}
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
@@ -23,7 +22,7 @@ class Site < ApplicationRecord
   end
 
   def url=(new_url)
-    audit = audits.build(url: new_url)
+    audits.build(url: new_url) unless url == new_url
   end
 
   def parsed_url = Link.parse(url)
@@ -31,7 +30,7 @@ class Site < ApplicationRecord
 
   def name = super.presence || url_without_scheme
   alias to_title name
-  def audit = super || audits.last || audits.build
+  def audit = audits.checked.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 
   def audit!
