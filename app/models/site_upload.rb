@@ -1,5 +1,7 @@
 class SiteUpload
   include ActiveModel::Model
+  include ActiveRecord::Store
+
   ALLOWED_CONTENT_TYPES = ["text/csv"].freeze
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
@@ -12,28 +14,37 @@ class SiteUpload
 
   delegate :create!, :transaction, :human, :model_name, to: :Site
 
+  store_accessor :data, :new_sites, :existing_sites
+
   def save
     return false unless valid?
 
+    parse_sites
+
     transaction do
-      create!(sites)
+      create!(new_sites) if new_sites.any?
+      existing_sites.each(&:audit!)
     end
     true
   end
 
   def persisted? = false
 
-  def sites
+  def parse_sites
     require "csv"
 
-    parsed_sites = []
+    new_sites = []
+    existing_sites = []
+
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
       url = row["url"] || row["URL"]
-      next if Site.find_by_url(url:)
-
-      parsed_sites << { url:, name: row["name"] }
+      if existing_site = Site.find_by_url(url:)
+        existing_sites << existing_site
+      else
+        new_sites << { url:, name: row["name"] }
+      end
     end
-    parsed_sites
+    { new_sites:, existing_sites: }
   end
 
   private

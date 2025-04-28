@@ -82,31 +82,35 @@ RSpec.describe SiteUpload do
     end
   end
 
-  describe "#sites" do
+  describe "#parse_sites" do
+    subject(:parsed_sites) { site_upload.parse_sites }
+
+    let(:new_sites) { parsed_sites[:new_sites] }
+    let(:existing_sites) { parsed_sites[:existing_sites] }
+
     it "parses the CSV file and returns an array of site hashes" do
-      expected_sites = [
+      new_sites_from_csv = [
         { url: "https://example.com", name: "Example Site" },
         { url: "https://test.com", name: "Test Site" }
       ]
-      expect(site_upload.sites).to eq(expected_sites)
+      expect(new_sites).to eq(new_sites_from_csv)
     end
 
     it "handles uppercase URL headers" do
-      csv_content = "URL,name\nhttps://example.com,Example Site"
-      csv.rewind
-      csv.write(csv_content)
+      csv.write("URL,name\nhttps://example.com,Example Site")
       csv.rewind
 
-      expect(site_upload.sites.first[:url]).to eq("https://example.com")
+      expect(new_sites.first[:url]).to eq("https://example.com")
     end
 
     it "skips sites that already exist" do
       existing_site_url = "https://example.com"
-      allow(Site).to receive(:find_by_url).with(url: existing_site_url).and_return(true)
+      allow(Site).to receive(:find_by_url).with(url: existing_site_url).and_return(existing_site_url)
       allow(Site).to receive(:find_by_url).with(url: "https://test.com").and_return(nil)
+      site_upload.parse_sites
 
-      expect(site_upload.sites.length).to eq(1)
-      expect(site_upload.sites.first[:url]).to eq("https://test.com")
+      expect(existing_sites.first).to eq(existing_site_url)
+      expect(new_sites.first[:url]).to eq("https://test.com")
     end
   end
 
@@ -114,7 +118,7 @@ RSpec.describe SiteUpload do
     # rubocop:disable RSpec/SubjectStub
     context "when the upload is valid" do
       before do
-        allow(site_upload).to receive_messages(valid?: true, sites: [{ url: "https://example.com", name: "Example Site" }])
+        allow(site_upload).to receive_messages(valid?: true, new_sites: [{ url: "https://example.com", name: "Example Site" }])
       end
 
       it "creates sites in a transaction" do
