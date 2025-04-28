@@ -3,8 +3,8 @@
 class Browser
   include Singleton
 
-  PAGE_TIMEOUT = 5.seconds
-  PROCESS_TIMEOUT = 10.seconds
+  PAGE_TIMEOUT = 10.seconds
+  PROCESS_TIMEOUT = 20.seconds
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
