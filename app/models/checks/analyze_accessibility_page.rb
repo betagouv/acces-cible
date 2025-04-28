@@ -30,6 +30,8 @@ module Checks
 
     def find_audit_date
       date_matches = page.text.scan(AUDIT_DATE_PATTERN).map do |full_date, day_str, month_str, year_str, day_num, month_num, year_num|
+        next if (year_str&.to_i || year_num&.to_i || 2000) > Date.current.year
+
         begin
           if day_num && month_num && year_num
             day, month, year = day_num.to_i, month_num.to_i, year_num.to_i
@@ -46,7 +48,7 @@ module Checks
           nearby_text = page.text[([position - 100, 0].max)..([position + 100, page.text.length].min)] || ""
           score += AUDIT_DATE_KEYWORDS.count { |kw| nearby_text.match?(/#{kw}/i) }
           [date, score]
-        rescue Date::Error, NoMethodError
+        rescue Date::Error, NoMethodError, TypeError
           nil
         end
       end.compact
@@ -61,6 +63,8 @@ module Checks
       date_matches = []
       UPDATE_AUDIT_PATTERNS.each do |pattern|
         page.text.scan(pattern).each do |day_str, month_str, year_str, day_num, month_num, year_num|
+          next if (year_str&.to_i || year_num&.to_i || 2000) > Date.current.year
+
           begin
             if day_num && month_num && year_num
               day, month, year = day_num.to_i, month_num.to_i, year_num.to_i
@@ -79,7 +83,7 @@ module Checks
             next if score.zero?
 
             date_matches << [date, score]
-          rescue Date::Error, NoMethodError
+          rescue Date::Error, NoMethodError, TypeError
             nil
           end
         end
