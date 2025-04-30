@@ -1,6 +1,10 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
   resources :sites do
+    collection do
+      post :upload
+      get :upload, to: redirect("/sites/new")
+    end
     resources :audits, only: [:create, :show]
   end
 

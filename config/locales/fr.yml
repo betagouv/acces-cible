@@ -217,6 +217,8 @@ fr:
       title: Ajouter un site
     create:
       notice: Site ajouté
+    upload:
+      title: Importer des sites
       uploaded:
         zero: Aucun site ajouté
         one: Un site ajouté

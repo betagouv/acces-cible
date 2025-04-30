@@ -25,20 +25,24 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    if params.dig(:site, :file)
-      @upload = SiteUpload.new(params.expect(site: [:file]))
-      if @upload.save
-        ScheduleAuditsJob.perform_later
-        return redirect_to sites_path, notice: t(".uploaded", count: @upload.sites.length)
-      end
+    @site = Site.find_by_url(site_params) || Site.new(site_params)
+    if @site.persisted? || @site.save
+      @site.audit.schedule if @site.audit.pending?
+      redirect_to @site, notice: t(".notice")
     else
-      @site = Site.find_or_create_by_url(site_params)
-      if @site.persisted?
-        @site.audit.schedule if @site.audit.pending?
-        return redirect_to @site, notice: t(".notice")
-      end
+      render :new, status: :unprocessable_entity
     end
-    render :new, status: :unprocessable_entity
+  end
+
+  # POST /sites/upload
+  def upload
+    @upload = SiteUpload.new(params.expect(site: [:file]))
+    if @upload.save
+      ScheduleAuditsJob.perform_later
+      redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   # PATCH/PUT /sites/1

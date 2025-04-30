@@ -83,34 +83,56 @@ RSpec.describe SiteUpload do
   end
 
   describe "#parse_sites" do
-    subject(:parsed_sites) { site_upload.parse_sites }
+    it "parses the CSV file and populates new_sites" do
+      site_upload.parse_sites
 
-    let(:new_sites) { parsed_sites[:new_sites] }
-    let(:existing_sites) { parsed_sites[:existing_sites] }
-
-    it "parses the CSV file and returns an array of site hashes" do
       new_sites_from_csv = [
         { url: "https://example.com", name: "Example Site" },
         { url: "https://test.com", name: "Test Site" }
       ]
-      expect(new_sites).to eq(new_sites_from_csv)
+      expect(site_upload.new_sites).to eq(new_sites_from_csv)
     end
 
     it "handles uppercase URL headers" do
       csv.write("URL,name\nhttps://example.com,Example Site")
       csv.rewind
 
-      expect(new_sites.first[:url]).to eq("https://example.com")
+      site_upload.parse_sites
+      expect(site_upload.new_sites.first[:url]).to eq("https://example.com")
     end
 
     it "skips sites that already exist" do
       existing_site_url = "https://example.com"
       allow(Site).to receive(:find_by_url).with(url: existing_site_url).and_return(existing_site_url)
       allow(Site).to receive(:find_by_url).with(url: "https://test.com").and_return(nil)
+
       site_upload.parse_sites
 
-      expect(existing_sites.first).to eq(existing_site_url)
-      expect(new_sites.first[:url]).to eq("https://test.com")
+      expect(site_upload.existing_sites.first).to eq(existing_site_url)
+      expect(site_upload.new_sites.first[:url]).to eq("https://test.com")
+    end
+  end
+
+  describe "#count" do
+    it "returns the total number of sites" do
+      site_upload.new_sites = [{ url: "https://example1.com" }, { url: "https://example2.com" }]
+      site_upload.existing_sites = ["https://example3.com"]
+
+      expect(site_upload.count).to eq(3)
+    end
+
+    it "handles nil values" do
+      site_upload.new_sites = nil
+      site_upload.existing_sites = [{ url: "https://example.com" }]
+
+      expect(site_upload.count).to eq(1)
+    end
+
+    it "returns zero when no sites are present" do
+      site_upload.new_sites = []
+      site_upload.existing_sites = []
+
+      expect(site_upload.count).to eq(0)
     end
   end
 

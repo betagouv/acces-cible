@@ -21,7 +21,6 @@ RSpec.describe Site do
   end
 
   describe ".find_by_url" do
-
     context "when url is malformed" do
       it "returns nil" do
         expect(described_class.find_by_url(url: "not a valid url")).to be_nil

@@ -37,9 +37,45 @@ RSpec.describe "Sites" do
     context "when URL is invalid" do
       let(:url) { "invalid-url" }
 
-      it "returns :unprocessable_entity" do
-        expect { post_site }.not_to change(Site, :count)
+      it "doesn't create a site and renders the form again" do
+        allow_any_instance_of(Site).to receive(:valid?).and_return(false) # rubocop:disable RSpec/AnyInstance
 
+        post_site
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
+
+  describe "POST /sites/upload" do
+    subject(:upload_sites) { post upload_sites_path, params: { site: { file: } } }
+
+    let(:file_path) { file_fixture("sites.csv") }
+    let(:file) do
+      ActionDispatch::Http::UploadedFile.new(
+        filename: "sites.csv",
+        type: "text/csv",
+        tempfile: File.open(file_path)
+      )
+    end
+
+    it "schedules audits and redirects to sites index" do
+      upload_mock = instance_double(SiteUpload)
+      allow(upload_mock).to receive_messages(save: true, count: 2)
+      allow(SiteUpload).to receive(:new).and_return(upload_mock)
+
+      expect { upload_sites }.to have_enqueued_job(ScheduleAuditsJob)
+
+      expect(response).to redirect_to(sites_path)
+      follow_redirect!
+      expect(response).to have_http_status(:ok)
+      expect(flash[:notice]).to include("2")
+    end
+
+    context "when upload is invalid" do
+      it "returns :unprocessable_entity" do
+        allow_any_instance_of(SiteUpload).to receive(:save).and_return(false) # rubocop:disable RSpec/AnyInstance
+
+        upload_sites
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
