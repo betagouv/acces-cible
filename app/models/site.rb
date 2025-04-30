@@ -11,10 +11,6 @@ class Site < ApplicationRecord
   delegate :url, :url_without_scheme, to: :audit
 
   class << self
-    def find_or_create_by_url(attributes)
-      find_by_url(attributes) || create(attributes)
-    end
-
     def find_by_url(attributes)
       url = attributes.to_h.fetch(:url).strip
       return if url.empty?

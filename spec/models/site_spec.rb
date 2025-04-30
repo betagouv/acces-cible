@@ -20,46 +20,57 @@ RSpec.describe Site do
     end
   end
 
-  describe ".find_or_create_by_url" do
-    let(:http_url) { "http://example.com" }
+  describe ".find_by_url" do
 
-    context "when site with URL exists" do
-      let!(:existing_site) { described_class.create(url:) }
-
-      it "returns existing site for exact URL match" do
-        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
-      end
-
-      it "returns existing site when only scheme differs" do
-        expect(described_class.find_or_create_by_url(url: http_url)).to eq(existing_site)
-      end
-
-      it "finds site with historical URLs" do
-        new_url = "https://new-example.com"
-        existing_site.audits.create!(url: new_url)
-
-        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
-        expect(described_class.find_or_create_by_url(url: new_url)).to eq(existing_site)
-      end
-
-      it "finds unicode and punycode versions" do
-        url = "https://éxâmplè.çôm/"
-        existing_site.audit.update(url:)
-        expect(described_class.find_or_create_by_url(url:)).to eq(existing_site)
-
-        punycode_url = Addressable::URI.parse(url).normalize.to_s
-        expect(described_class.find_or_create_by_url(url: punycode_url)).to eq(existing_site)
+    context "when url is malformed" do
+      it "returns nil" do
+        expect(described_class.find_by_url(url: "not a valid url")).to be_nil
       end
     end
 
-    context "when site does not exist" do
-      it "creates a new site with audit" do
-        expect {
-          site = described_class.find_or_create_by_url(url:)
-          expect(site).to be_persisted
-          expect(site.audit.url).to eq(url)
-        }.to change(described_class, :count).by(1)
-        .and change(Audit, :count).by(1)
+    context "when nothing exists for that URL" do
+      it "returns nil" do
+        expect(described_class.find_by_url(url: "http://not-an-existing-site.com")).to be_nil
+      end
+    end
+
+    context "when a site exists for that URL" do
+      let!(:existing_site) { described_class.create(url:) }
+
+      it "returns existing site" do
+        expect(described_class.find_by_url(url:)).to eq(existing_site)
+      end
+    end
+
+    context "when a site exists with a different scheme" do
+      let!(:existing_site) { described_class.create(url:) }
+
+      it "returns existing site" do
+        expect(described_class.find_by_url(url: url.sub("https:", "http:"))).to eq(existing_site)
+      end
+    end
+
+    context "when a site had that URL" do
+      let!(:existing_site) { described_class.create(url:) }
+
+      it "finds site with historical URLs" do
+        new_url = "https://new-example.com"
+        existing_site.update(url: new_url)
+        expect(described_class.find_by_url(url: new_url)).to eq(existing_site)
+      end
+    end
+
+    context "when URL contains unicode" do
+      let!(:existing_site) { described_class.create(url:) }
+      let(:url) { "https://éxâmplè.çôm/" }
+
+      it "returns the existing site" do
+        expect(described_class.find_by_url(url:)).to eq(existing_site)
+      end
+
+      it "finds by punycode url" do
+        punycode_url = Addressable::URI.parse(url).normalize.to_s
+        expect(described_class.find_by_url(url: punycode_url)).to eq(existing_site)
       end
     end
   end
