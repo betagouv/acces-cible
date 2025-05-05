@@ -499,7 +499,7 @@ GEM
     sass-embedded (1.87.0-x86_64-linux-musl)
       google-protobuf (~> 4.30)
     securerandom (0.4.1)
-    selenium-webdriver (4.31.0)
+    selenium-webdriver (4.32.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -632,7 +632,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   rubocop-rspec
   rubocop-rspec_rails
-  selenium-webdriver (~> 4.31)
+  selenium-webdriver (~> 4.32)
   sentry-rails
   sentry-ruby
   shoulda-matchers
