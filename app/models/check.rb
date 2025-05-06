@@ -77,6 +77,7 @@ class Check < ApplicationRecord
       self.checked_at = Time.zone.now
       self.data = analyze!
       self.status = :passed
+      self.error = nil
       passed?
     rescue StandardError => exception
       self.status = :failed
@@ -90,10 +91,14 @@ class Check < ApplicationRecord
     error_type.constantize.new(error_message).tap { |err| err.set_backtrace(Array(error_backtrace)) } if error_type && error_message
   end
 
-  def error=(exception)
-    self.error_message = exception.message
-    self.error_type = exception.class.name
-    self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
+  def error=(exception = nil)
+    if exception
+      self.error_message = exception.message
+      self.error_type = exception.class.name
+      self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
+    else
+      self.error_message = self.error_type = self.error_backtrace = nil
+    end
   end
 
   private
