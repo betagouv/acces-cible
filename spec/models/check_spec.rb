@@ -263,13 +263,11 @@ RSpec.describe Check do
         expect(check.status).to eq("failed")
       end
 
-      it "stores error details in data" do
+      it "stores error details in dedicated columns" do
         check.run
-        expect(check.data).to include(
-          "error" => "Test error",
-          "error_type" => "StandardError",
-          "backtrace" => ["backtrace line"]
-        )
+        expect(check.error_type).to eq("StandardError")
+        expect(check.error_message).to eq("Test error")
+        expect(check.error_backtrace).to include("backtrace line")
       end
 
       it "updates checked_at timestamp" do

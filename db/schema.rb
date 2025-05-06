@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_26_212105) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_06_075409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,6 +37,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_26_212105) do
     t.datetime "updated_at", null: false
     t.boolean "scheduled", default: false, null: false
     t.integer "priority", default: 100, null: false
+    t.string "error_type"
+    t.text "error_message"
+    t.string "error_backtrace", default: [], array: true
     t.index ["audit_id"], name: "index_checks_on_audit_id"
     t.index ["status", "run_at"], name: "index_checks_on_status_and_run_at"
   end

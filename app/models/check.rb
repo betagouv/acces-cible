@@ -16,7 +16,6 @@ class Check < ApplicationRecord
   has_one :site, through: :audit
 
   enum :status, ["pending", "passed", "failed", "blocked"].index_by(&:itself), validate: true, default: :pending
-  store_accessor :data, :error, :error_type, :backtrace
 
   delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
@@ -30,7 +29,7 @@ class Check < ApplicationRecord
   scope :to_run, -> { due.scheduled }
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
-  scope :errored, ->(type = nil) { type ? where("data->>'error_type' = ?", type) : where("data ? 'error_type'") }
+  scope :errored, ->(type = nil) { type ? where(error_type: type) : where.not(error_type: nil) }
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
@@ -79,16 +78,22 @@ class Check < ApplicationRecord
       self.data = analyze!
       self.status = :passed
       passed?
-    rescue StandardError => e
+    rescue StandardError => exception
       self.status = :failed
-      self.data = { error: e.message, error_type: e.class.name, backtrace: Rails.backtrace_cleaner.clean(e.backtrace) }
+      self.error = exception
     end
     save
     passed?
   end
 
-  def original_error
-    error_type.constantize.new(error).tap { it.set_backtrace(backtrace) } if error
+  def error
+    error_type.constantize.new(error_message).tap { |err| err.set_backtrace(Array(error_backtrace)) } if error_type && error_message
+  end
+
+  def error=(exception)
+    self.error_message = exception.message
+    self.error_type = exception.class.name
+    self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
   end
 
   private
