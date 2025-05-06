@@ -25,6 +25,10 @@ Rails.application.routes.draw do
     match "/500", action: :internal_server_error
   end
 
+  direct :commit do |hash|
+    "https://github.com/betagouv/acces-cible/commit/#{hash}"
+  end
+
   # Operational URLs
   mount MissionControl::Jobs::Engine, at: "/jobs"
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

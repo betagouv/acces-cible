@@ -129,4 +129,8 @@ module ApplicationHelper
     else dsfr_badge(status:) { text }
     end
   end
+
+  def current_git_commit
+    ENV["CONTAINER_VERSION"] || `git show -s --format=%H`
+  end
 end
