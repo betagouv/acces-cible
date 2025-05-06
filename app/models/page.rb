@@ -29,7 +29,7 @@ class Page
   def path = url.to_s.delete_prefix(root.to_s)
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
-  def title = dom.title&.squish
+  def title = dom.title.to_s.squish
   def text = dom.text&.squish
   def heading_levels = dom.css(HEADINGS).map { |hx| [hx.name[1].to_i, hx.text.squish] }
   def headings = dom.css(HEADINGS).collect(&:text).collect(&:squish)
