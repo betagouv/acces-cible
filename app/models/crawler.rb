@@ -1,6 +1,6 @@
 class Crawler
   include Enumerable
-  MAX_CRAWLED_PAGES = 100
+  MAX_CRAWLED_PAGES = 20
 
   class NoMatchError < StandardError
     def initialize(root, crawled, &block)
