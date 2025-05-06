@@ -1,7 +1,7 @@
 class Page
   CACHE_TTL = 10.minutes
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
-  SKIPPED_EXTENSIONS = /\.(xml|rss|atom|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
+  SKIPPED_EXTENSIONS = /\.(xml|rss|atom|ics|ical|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
 
   class InvalidTypeError < StandardError
