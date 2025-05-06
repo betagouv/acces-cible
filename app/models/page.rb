@@ -25,6 +25,7 @@ class Page
   end
 
   def root? = url == root
+  def parsed_root = @parsed_root ||= Link.parse(root)
   def path = url.to_s.delete_prefix(root.to_s)
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
@@ -53,7 +54,7 @@ class Page
       uri = Link.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
-      href = Link.normalize("#{root}#{href}") unless uri.hostname
+      href = parsed_root.join(href) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
     end.uniq.compact
