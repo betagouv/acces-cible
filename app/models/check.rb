@@ -83,6 +83,7 @@ class Check < ApplicationRecord
       self.status = :failed
       self.error = exception
     end
+    self.scheduled = false
     save
     passed?
   end
