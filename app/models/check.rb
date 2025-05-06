@@ -52,7 +52,7 @@ class Check < ApplicationRecord
   def crawler = Crawler.new(audit.url)
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
-  def blocked? = requirements&.any? { audit.check_status(it).failed? } || false
+  def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
   def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
   def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false)
   def fail! = update(status: :failed, checked_at: Time.zone.now, scheduled: false)
