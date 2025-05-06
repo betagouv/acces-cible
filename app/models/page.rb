@@ -50,13 +50,17 @@ class Page
 
   def links
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
-      href = link["href"]
+      href = link["href"].to_s
+      next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
+
       uri = Link.parse(href)
       next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
 
       href = parsed_root.join(href) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
+    rescue Link::InvalidURIError
+      next
     end.uniq.compact
   end
 

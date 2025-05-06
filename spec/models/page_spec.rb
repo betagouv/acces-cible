@@ -25,6 +25,8 @@ RSpec.describe Page do
           <a href="mailto:test@example.com">Email</a>
           <a href="#section">Section</a>
           <a href="relative/path">Relative</a>
+          <a href="javascript:alert('')">Javascript</a>
+          <a href="void(location.href='')">Void</a>
           <div class="d-none" style="display: none;">display: none;</div>
         </body>
       </html>
