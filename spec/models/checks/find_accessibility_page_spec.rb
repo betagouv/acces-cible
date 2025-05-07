@@ -43,7 +43,7 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#likelihood_of" do
-    let(:basic_link) { build(:link, text: "Accessibilité", href: "/accessibilite") }
+    let(:basic_link) { build(:link, text: "Handicap et accessibilité", href: "/handicap-et-accessibilite") }
     let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
 
@@ -65,7 +65,7 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#sort_queue_by_likelihood(queue)" do
-    let(:basic_link) { build(:link, text: "Accessibilité", href: "/accessibilite") }
+    let(:basic_link) { build(:link, text: "Handicap et accessibilité", href: "/handicap-et-accessibilite") }
     let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
     let(:queue) { LinkList.new(basic_link, declaration_link, unrelated_link) }
@@ -102,6 +102,8 @@ RSpec.describe Checks::FindAccessibilityPage do
   describe "#accessibility_page?" do
     {
       "Déclaration de conformité" => false,
+      "ACCESSIBILITE" => true,
+      "Accessibilité" => true,
       "DECLARATION D'ACCESSIBILITE" => true,
       "Déclaration d’accessibilité" => true,
       "Déclaration d’accessibilité du site internet" => true,

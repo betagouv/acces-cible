@@ -1,7 +1,7 @@
 module Checks
   class FindAccessibilityPage < Check
     PRIORITY = 20
-    DECLARATION = /\AD[ée]claration d('|’)accessibilit[ée]?/i
+    DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
     ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
 
     store_accessor :data, :url, :title
