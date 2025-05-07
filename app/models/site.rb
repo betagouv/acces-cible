@@ -18,7 +18,7 @@ class Site < ApplicationRecord
       attributes.delete(:name) if attributes[:name].blank?
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
-      joins(:audits).find_by(audits: { url: normalized_url })&.tap { it.update(attributes) }
+      joins(:audits).find_by(audits: { url: normalized_url })
     end
   end
 
