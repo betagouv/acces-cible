@@ -5,7 +5,7 @@ class AuditsController < ApplicationController
   def create
     @audit = @site.audit!
     if @audit.persisted?
-      redirect_to @site, notice: t(".notice")
+      redirect_to [@site, @audit], notice: t(".notice")
     else
       render "sites/show", status: :unprocessable_entity
     end
