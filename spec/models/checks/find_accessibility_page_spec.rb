@@ -100,9 +100,19 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#accessibility_page?" do
-    it "returns true when declaration is in title" do
-      page = build(:page, title: "Déclaration d'accessibilité")
-      expect(check.send(:accessibility_page?, page)).to be true
+    {
+      "Déclaration de conformité" => false,
+      "DECLARATION D'ACCESSIBILITE" => true,
+      "Déclaration d’accessibilité" => true,
+      "Déclaration d’accessibilité du site internet" => true,
+    }.each do |title, expectation|
+      context "when page title is '#{title}'" do
+        subject { check.send(:accessibility_page?, page) }
+
+        let(:page) { build(:page, title:) }
+
+        it { is_expected.to eq(expectation) }
+      end
     end
 
     it "returns true when declaration is in headings" do
