@@ -19,8 +19,9 @@
     <% end %>
   </div>
   <div class="fr-col-12 fr-col-md-4">
-    <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: @site.audits_count), right: true) do |sidemenu| %>
-      <% @site.audits.checked.sort_by_newest.each do |audit| %>
+    <% audits = @site.audits.checked.sort_by_newest.load %>
+    <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: audits.count), right: true) do |sidemenu| %>
+      <% audits.each do |audit| %>
         <% sidemenu.with_item text: l(audit.created_at, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
       <% end %>
     <% end %>
