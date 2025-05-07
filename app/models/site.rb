@@ -3,7 +3,7 @@ class Site < ApplicationRecord
 
   has_many :audits, dependent: :destroy
 
-  scope :preloaded, -> {}
+  scope :preloaded, -> { joins(:audits).includes(audits: :checks).merge(Audit.current) }
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
@@ -30,10 +30,22 @@ class Site < ApplicationRecord
 
   def name = super.presence || url_without_scheme
   alias to_title name
-  def audit = audits.checked.last || audits.build
+  def audit = audits.loaded? ? audits.find(&:current?) : audits.current.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 
   def audit!
     audits.create!(url:).tap(&:schedule)
+  end
+
+  def set_current_audit!
+    current = audits.current.last
+    latest = audits.checked.sort_by_newest.last
+    return if current == latest
+
+    transaction do
+      current.update!(current: false)
+      latest.update!(current: true)
+      update!(url: latest.url)
+    end
   end
 end
