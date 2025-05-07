@@ -104,7 +104,8 @@ module Checks
     end
 
     def find_auditor
-      page.text.match(AUDITOR_PATTERN)&.[](1)&.strip
+      match = page.text.match(AUDITOR_PATTERN)&.[](1)&.strip
+      match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
     private

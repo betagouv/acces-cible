@@ -92,7 +92,8 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "par la société ABC," => "ABC",
       "par XYZ (cabinet d'audit assermenté)," => "XYZ (cabinet d'audit assermenté)",
       "par Test Corp révèle" => "Test Corp",
-      "par AXS Consulting sur un échantillon…" => "AXS Consulting"
+      "par AXS Consulting sur un échantillon…" => "AXS Consulting",
+      "par ailleurs vous pouvez toujours compter sur nous" => nil
     }.each do |text, expected_auditor|
       it "extracts '#{expected_auditor}' from '#{text}'" do
         allow(check).to receive(:page).and_return(build(:page, body: text))
