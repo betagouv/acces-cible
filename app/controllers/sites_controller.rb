@@ -5,7 +5,7 @@ class SitesController < ApplicationController
   # GET /sites
   def index
     params[:sort] ||= { checked_at: :desc }
-    sites = Site.preloaded.order_by(params)
+    sites = Site.preloaded.filter_by(params).order_by(params)
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites }
       format.csv  { send_data sites.to_csv, filename: sites.to_csv_filename }
@@ -26,9 +26,10 @@ class SitesController < ApplicationController
   # POST /sites
   def create
     @site = Site.find_by_url(site_params) || Site.new(site_params)
+    notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.persisted? || @site.save
       @site.audit.schedule if @site.audit.pending?
-      redirect_to @site, notice: t(".notice")
+      redirect_to @site, notice:
     else
       render :new, status: :unprocessable_entity
     end

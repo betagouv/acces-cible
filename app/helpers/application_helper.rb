@@ -83,7 +83,7 @@ module ApplicationHelper
   def sortable_header(text, param, **options)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc
-    link_params = params.permit(:page).merge(sort: { param => direction })
+    link_params = params.permit(:page, search: {}).merge(sort: { param => direction })
     options[:title] ||= t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
     if current_sort.present?
       arrow = [:arrow, direction == :asc ? :down : :up]

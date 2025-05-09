@@ -3,7 +3,8 @@ class Site < ApplicationRecord
 
   has_many :audits, dependent: :destroy
 
-  scope :preloaded, -> { joins(:audits).includes(audits: :checks).merge(Audit.current) }
+  scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
+  scope :preloaded, -> { with_current_audit.includes(audits: :checks) }
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
@@ -52,7 +53,6 @@ class Site < ApplicationRecord
     transaction do
       current.update!(current: false)
       latest.update!(current: true)
-      update!(url: latest.url)
     end
   end
 end

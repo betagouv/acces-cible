@@ -7,6 +7,10 @@ FactoryBot.define do
       status { "pending" }
     end
 
+    trait :current do
+      current { true }
+    end
+
     trait :checked do
       checked_at { 1.day.ago }
       status { "passed" }

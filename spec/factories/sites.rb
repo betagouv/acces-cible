@@ -3,7 +3,7 @@ FactoryBot.define do
     sequence(:url) { |n| "https://www.example-#{n}.com/" }
 
     trait :checked do
-      audit { association :audit, :checked, site: instance }
+      audits { [association(:audit, :checked, url:, site: instance, current: true)] }
     end
   end
 end
