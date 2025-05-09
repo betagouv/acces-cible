@@ -8,12 +8,10 @@ RSpec.describe Site do
   end
 
   describe "delegations" do
-    let(:site) { create(:site) }
-    let!(:audit) { create(:audit, site:, url: "https://example.com") }
-
     it { should delegate_method(:url).to(:audit) }
 
     it "delegates to the most recent audit" do
+      site = create(:audit, url: "https://example.com").site
       new_audit = create(:audit, site:, url: "https://new-example.com")
       expect(site.reload.url).to eq(new_audit.url)
     end
@@ -33,7 +31,7 @@ RSpec.describe Site do
     end
 
     context "when a site exists for that URL" do
-      let!(:existing_site) { described_class.create(url:) }
+      let!(:existing_site) { create(:site, url:) }
 
       it "returns existing site" do
         expect(described_class.find_by_url(url:)).to eq(existing_site)
@@ -41,7 +39,7 @@ RSpec.describe Site do
     end
 
     context "when a site exists with a different scheme" do
-      let!(:existing_site) { described_class.create(url:) }
+      let!(:existing_site) { create(:site, url:) }
 
       it "returns existing site" do
         expect(described_class.find_by_url(url: url.sub("https:", "http:"))).to eq(existing_site)

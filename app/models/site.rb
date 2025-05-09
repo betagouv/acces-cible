@@ -22,7 +22,11 @@ class Site < ApplicationRecord
   end
 
   def url=(new_url)
-    audits.build(url: new_url) unless url == new_url
+    if audit.persisted? && url != new_url
+      audits.build(url: new_url)
+    else
+      audit.url = new_url
+    end
   end
 
   def parsed_url = Link.parse(url)
@@ -30,8 +34,11 @@ class Site < ApplicationRecord
 
   def name = super.presence || url_without_scheme
   alias to_title name
-  def audit = audits.loaded? ? audits.find(&:current?) : audits.current.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+
+  def audit
+    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.build
+  end
 
   def audit!
     audits.create!(url:).tap(&:schedule)

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :audit do
     url { "https://example.com" }
-    site { association :site, url: }
+    site { association :site, url:, audits: [instance] }
 
     trait :pending do
       status { "pending" }
