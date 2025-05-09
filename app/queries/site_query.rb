@@ -17,4 +17,17 @@ class SiteQuery < SimpleDelegator
       from(subquery, :sites).order(Arel.sql("last_checked_at #{direction} NULLS LAST, sites.created_at #{direction}"))
     end
   end
+
+  def filter_by(params)
+    return self unless (filters = params[:search]).present?
+
+    scope = self
+    filters.compact_blank.each do |key, value|
+      case key.to_sym
+      when :q
+        scope = scope.joins(:audits).where("sites.name ILIKE :term OR audits.url ILIKE :term", term: "%#{value}%")
+      end
+    end
+    scope
+  end
 end

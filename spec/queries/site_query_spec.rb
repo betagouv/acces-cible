@@ -86,4 +86,37 @@ RSpec.describe SiteQuery do
       end
     end
   end
+
+  describe "#filter_by" do
+    subject(:result) { query.filter_by(params) }
+
+    let(:request) { { search: { q: "bar" } } }
+
+    it "returns only sites matching the query" do
+      no_match = create(:site, :checked, url: "https://foo.com/")
+      domain_match = create(:site, :checked, url: "https://www.bar.com/")
+      path_match = create(:site, :checked, url: "https://baz.com/bar/")
+      name_match = create(:site, :checked, url: "https://foo.com/", name: "Foo Bar Baz")
+
+      expect(result.to_a).to contain_exactly(domain_match, path_match, name_match)
+    end
+  end
+
+  describe "chaining methods" do
+    subject(:result) { query.filter_by(params).order_by(params) }
+
+    let(:request) { { search: { q: "bar" }, sort: { url: :desc } } }
+
+    it "does not raise" do
+      expect { result.includes(:audit).distinct.load }.not_to raise_error
+    end
+
+    it "combines sorting and filtering" do
+      no_match = create(:site, :checked, url: "https://foo.com/")
+      abc_match = create(:site, :checked, url: "https://abc.bar.com/")
+      def_match = create(:site, :checked, url: "https://def.bar.com/")
+
+      expect(result.to_a).to eq([def_match, abc_match])
+    end
+  end
 end

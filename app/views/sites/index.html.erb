@@ -1,4 +1,6 @@
 <%= dsfr_table(caption: "Liste des sites") do |t| %>
+  <% hidden_fields = params.expect(sort: {}).to_h.transform_keys { |key| :"sort[#{key}]" } %>
+  <% t.with_search(url: url_for, name: "search[q]", value: params.dig(:search, :q), hidden_fields:) %>
   <% t.with_head do %>
     <tr>
       <th scope="col"><%= Site.human(:detail) %></th>
