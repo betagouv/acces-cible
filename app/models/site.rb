@@ -52,7 +52,6 @@ class Site < ApplicationRecord
     transaction do
       current.update!(current: false)
       latest.update!(current: true)
-      update!(url: latest.url)
     end
   end
 end
