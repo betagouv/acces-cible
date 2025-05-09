@@ -16,6 +16,7 @@ class Audit < ApplicationRecord
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(status: :pending) }
   scope :to_schedule, -> { pending.joins(:checks).merge(Check.to_schedule) }
+  scope :current, -> { where(current: true) }
 
   Check.types.each do |name, klass|
     define_method(name) do

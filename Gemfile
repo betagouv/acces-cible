@@ -50,9 +50,6 @@ gem "sentry-rails"
 # Allow I18N URLs
 gem "addressable", "~> 2.8"
 
-# Add optimized Active Record association methods
-gem "activerecord-has_some_of_many"
-
 # Pagination
 gem "pagy"
 

@@ -2,9 +2,8 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { checked.sort_by_newest }, dependent: :destroy
 
-  scope :preloaded, -> { includes(:audit) }
+  scope :preloaded, -> { joins(:audits).includes(audits: :checks).merge(Audit.current) }
 
   friendly_id :url_without_scheme, use: [:slugged, :history]
 
@@ -23,7 +22,11 @@ class Site < ApplicationRecord
   end
 
   def url=(new_url)
-    audit = audits.build(url: new_url)
+    if audit.persisted? && url != new_url
+      audits.build(url: new_url)
+    else
+      audit.url = new_url
+    end
   end
 
   def parsed_url = Link.parse(url)
@@ -31,10 +34,25 @@ class Site < ApplicationRecord
 
   def name = super.presence || url_without_scheme
   alias to_title name
-  def audit = super || audits.last || audits.build
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+
+  def audit
+    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.build
+  end
 
   def audit!
     audits.create!(url:).tap(&:schedule)
+  end
+
+  def set_current_audit!
+    current = audits.current.last
+    latest = audits.checked.sort_by_newest.last
+    return if current == latest
+
+    transaction do
+      current.update!(current: false)
+      latest.update!(current: true)
+      update!(url: latest.url)
+    end
   end
 end

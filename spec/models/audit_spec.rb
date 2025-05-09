@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Audit do
   subject(:audit) { build(:audit, site: nil) }
 
-  let(:site) { create(:site) }
+  let(:site) { create(:site, audits: [audit]) }
 
   it "has a valid factory" do
     audit = build(:audit)
