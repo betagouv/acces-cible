@@ -51,8 +51,8 @@ class Site < ApplicationRecord
     return if current == latest
 
     transaction do
-      current.update!(current: false)
-      latest.update!(current: true)
+      current&.update!(current: false)
+      latest&.update!(current: true)
     end
   end
 end
