@@ -1,6 +1,7 @@
 class SiteQuery < SimpleDelegator
-  def order_by(key, direction:)
+  def order_by(params)
     directions = [:asc, :desc]
+    key, direction = params[:sort]&.to_unsafe_h&.first
     direction = direction.to_s.downcase.to_sym.presence_in(directions) || directions.first
     case key
     in :url

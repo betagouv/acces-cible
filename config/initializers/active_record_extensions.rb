@@ -13,7 +13,7 @@ ActiveSupport.on_load(:active_record) do
     def order_by(params)
       key, direction = extract_sort_from(params)
       if query_object_class
-        query_object_class.new(self).order_by(key&.to_sym, direction:) || self
+        query_object_class.new(self).order_by(params) || self
       elsif key = key.presence_in(model.column_names)
         order(key => direction)
       else
