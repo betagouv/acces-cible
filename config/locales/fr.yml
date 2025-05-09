@@ -216,7 +216,8 @@ fr:
     new:
       title: Ajouter un site
     create:
-      notice: Site ajouté
+      created: Site ajouté
+      new_audit: Site existant, nouvel audit programmé
     upload:
       title: Importer des sites
       uploaded:
