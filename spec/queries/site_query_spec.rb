@@ -12,9 +12,9 @@ RSpec.describe SiteQuery do
       let(:request) { { sort: { url: :asc } } }
 
       # Create audits with domains that will sort alphabetically
-      let!(:apple) { create(:audit, :passed, url: "https://apple.com") }
-      let!(:banana) { create(:audit, :passed, url: "https://banana.org") }
-      let!(:carrot) { create(:audit, :passed, url: "https://carrot.io") }
+      let!(:apple)  { create(:audit, :passed, :current, url: "https://apple.com") }
+      let!(:banana) { create(:audit, :passed, :current, url: "https://banana.org") }
+      let!(:carrot) { create(:audit, :passed, :current, url: "https://carrot.bio") }
       let(:expected_ids) { [apple.site_id, banana.site_id, carrot.site_id] }
 
       it "sorts sites by their URLs in ascending order" do
@@ -37,9 +37,9 @@ RSpec.describe SiteQuery do
     context "when sort[url]=desc" do
       let(:request) { { sort: { url: :desc } } }
 
-      let!(:apple) { create(:audit, :passed, url: "https://apple.com") }
-      let!(:banana) { create(:audit, :passed, url: "https://banana.org") }
-      let!(:carrot) { create(:audit, :passed, url: "https://carrot.io") }
+      let!(:apple)  { create(:audit, :passed, :current, url: "https://apple.com") }
+      let!(:banana) { create(:audit, :passed, :current, url: "https://banana.org") }
+      let!(:carrot) { create(:audit, :passed, :current, url: "https://carrot.bio") }
       let(:expected_ids) { [apple.site_id, banana.site_id, carrot.site_id] }
 
       it "sorts sites by their URLs in descending order" do
@@ -49,11 +49,11 @@ RSpec.describe SiteQuery do
 
     context "when sort is empty" do
       let(:request) { {} }
-      let(:expected_ids) { [audit3.site.id, audit2.site.id, audit1.site.id] }
+      let(:expected_ids) { [audit3.site_id, audit2.site_id, audit1.site_id] }
 
-      let!(:audit1) { create(:audit, status: :passed, checked_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, status: :passed, checked_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, status: :passed, checked_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, :passed, :current, checked_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, :passed, :current, checked_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, :passed, :current, checked_at: 3.days.ago) }
 
       it "sorts by latest audit check date in descending order" do
         expect(result.ids).to eq(expected_ids)
@@ -63,9 +63,9 @@ RSpec.describe SiteQuery do
     context "when sort[checked_at]=desc" do
       let(:request) { { sort: { checked_at: :desc } } }
 
-      let!(:audit1) { create(:audit, :passed, checked_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, :passed, checked_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, :passed, checked_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, :passed, :current, checked_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, :passed, :current, checked_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, :passed, :current, checked_at: 3.days.ago) }
 
       it "sorts by latest audit check date in descending order" do
         expect(result.ids).to eq([audit1.site_id, audit2.site_id, audit3.site_id])
@@ -75,11 +75,11 @@ RSpec.describe SiteQuery do
         site1 = audit1.site
         site2 = audit2.site
 
-        create(:audit, :passed, site: site1, checked_at: 5.days.ago)
-        recent1 = create(:audit, :passed, site: site1, checked_at: 6.hours.ago)
+        create(:audit, :passed, site: site1, checked_at: 6.hours.ago)
+        site1.set_current_audit!
 
-        create(:audit, :passed, site: site2, checked_at: 4.days.ago)
-        recent2 = create(:audit, :passed, site: site2, checked_at: 12.hours.ago)
+        create(:audit, :passed, site: site2, checked_at: 12.hours.ago)
+        site2.set_current_audit!
 
         result = query.where(id: [site1.id, site2.id]).order_by(params)
         expect(result.ids).to eq([site1.id, site2.id])
@@ -96,7 +96,7 @@ RSpec.describe SiteQuery do
       no_match = create(:site, :checked, url: "https://foo.com/")
       domain_match = create(:site, :checked, url: "https://www.bar.com/")
       path_match = create(:site, :checked, url: "https://baz.com/bar/")
-      name_match = create(:site, :checked, url: "https://foo.com/", name: "Foo Bar Baz")
+      name_match = create(:site, :checked, url: "https://www.apple.com/", name: "Foo Bar Baz")
 
       expect(result.to_a).to contain_exactly(domain_match, path_match, name_match)
     end
