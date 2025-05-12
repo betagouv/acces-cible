@@ -47,7 +47,7 @@ module Checks
 
       [
         link.text.match?(DECLARATION),
-        link.href.match?("(declaration-)?accessibilite"),
+        link.href.match?("(declaration-)?accessibilit[e|y]"),
         link.text.match?(Checks::AccessibilityMention::MENTION_REGEX)
       ].count(&:itself).then { |n| n.zero? ? 1 : -n + 1 }
     end
