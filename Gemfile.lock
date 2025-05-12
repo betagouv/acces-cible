@@ -349,7 +349,7 @@ GEM
       method_source (~> 1.0)
     pry-rails (0.3.11)
       pry (>= 0.13.0)
-    psych (5.2.4)
+    psych (5.2.5)
       date
       stringio
     public_suffix (6.0.2)
@@ -511,7 +511,7 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (6.5.0)
       activesupport (>= 5.2.0)
-    solid_cable (3.0.7)
+    solid_cable (3.0.8)
       actioncable (>= 7.2)
       activejob (>= 7.2)
       activerecord (>= 7.2)
