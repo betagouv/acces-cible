@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_15_075515) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_16_095805) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -68,6 +68,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_15_075515) do
     t.bigint "audit_id"
     t.index ["audit_id"], name: "index_sites_on_audit_id"
     t.index ["slug"], name: "index_sites_on_slug", unique: true
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.string "email", null: false
+    t.string "given_name", null: false
+    t.string "usual_name", null: false
+    t.string "siret", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
+    t.index ["siret"], name: "index_users_on_siret"
   end
 
   add_foreign_key "audits", "sites"
