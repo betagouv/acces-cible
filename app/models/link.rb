@@ -1,6 +1,9 @@
 Link = Data.define(:href, :text) do
   include Comparable
 
+  SLASH = "/".freeze
+  EMPTY_STRING = "".freeze
+
   class InvalidURIError < StandardError
     def initialize(href)
       super("Addressable::URI cannot parse '#{href}'")
@@ -28,12 +31,12 @@ Link = Data.define(:href, :text) do
       return uri if uri.relative?
 
       path = uri.path
-      unless path == "/"
-        path = File.expand_path(uri.path, "/")
-        path = path[1..-1] if path.start_with?("/")
-        path += "/" if uri.path.end_with?("/") || File.extname(path).empty?
+      unless path == SLASH
+        path = File.expand_path(uri.path, SLASH)
+        path = path[1..-1] if path.start_with?(SLASH)
+        path += SLASH if uri.path.end_with?(SLASH) || File.extname(path).empty?
       end
-      query = uri.query.nil? ? "" : "?#{uri.query}"
+      query = uri.query.nil? ? EMPTY_STRING : "?#{uri.query}"
       Addressable::IDNA.to_unicode Addressable::URI.join(uri.origin, normalized_path, query)
     end
   end
