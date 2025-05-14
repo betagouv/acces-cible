@@ -1,5 +1,5 @@
 class SitesController < ApplicationController
-  before_action :set_site, except: [:index, :create]
+  before_action :set_site, except: [:index, :create, :upload]
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
 
   # GET /sites
