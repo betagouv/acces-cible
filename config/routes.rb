@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   end
 
   direct :commit do |hash|
-    "https://github.com/betagouv/acces-cible/commit/#{hash}"
+    "https://github.com/betagouv/acces-cible/commits/#{hash}"
   end
 
   # Operational URLs
