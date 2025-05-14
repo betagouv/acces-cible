@@ -27,14 +27,13 @@ Link = Data.define(:href, :text) do
       uri.fragment = nil # Fragments shouldn't change the target document
       return uri if uri.relative?
 
-      origin = uri.origin.end_with?("/") ? uri.origin : "#{uri.origin}/"
-      return Addressable::IDNA.to_unicode(origin) unless uri.path.present? || uri.query
-
-      normalized_path = File.expand_path(uri.path, "/")
-      normalized_path = normalized_path[1..-1] if normalized_path.start_with?("/")
-      normalized_path += "/" if uri.path.end_with?("/") || File.extname(normalized_path).empty?
+      path = uri.path
+      unless path == "/"
+        path = File.expand_path(uri.path, "/")
+        path = path[1..-1] if path.start_with?("/")
+        path += "/" if uri.path.end_with?("/") || File.extname(path).empty?
+      end
       query = uri.query.nil? ? "" : "?#{uri.query}"
-
       Addressable::IDNA.to_unicode Addressable::URI.join(uri.origin, normalized_path, query)
     end
   end
