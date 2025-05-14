@@ -15,7 +15,6 @@ class Site < ApplicationRecord
       url = attributes.to_h.fetch(:url).strip
       return if url.empty?
 
-      attributes.delete(:name) if attributes[:name].blank?
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
       joins(:audits).find_by(audits: { url: normalized_url })
