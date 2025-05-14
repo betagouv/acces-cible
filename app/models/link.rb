@@ -37,7 +37,7 @@ Link = Data.define(:href, :text) do
         path += SLASH if uri.path.end_with?(SLASH) || File.extname(path).empty?
       end
       query = uri.query.nil? ? EMPTY_STRING : "?#{uri.query}"
-      Addressable::IDNA.to_unicode Addressable::URI.join(uri.origin, normalized_path, query)
+      Addressable::URI.join(uri.origin, path, query).display_uri
     end
   end
 

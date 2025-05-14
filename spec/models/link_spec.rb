@@ -54,8 +54,8 @@ RSpec.describe Link do
     end
 
     it "handles punycode" do
-      normalized = described_class.normalize("http://www.xn--luc-dma.fr/")
-      converted = "http://www.lucé.fr/"
+      normalized = described_class.normalize("https://xn--mairie-saint-l-epb.fr/")
+      converted = "https://mairie-saint-lô.fr/"
       expect(normalized.to_s).to eq(converted)
     end
 
