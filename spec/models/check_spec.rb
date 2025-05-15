@@ -25,6 +25,10 @@ RSpec.describe Check do
     let!(:scheduled_check) { create(:check, status: :pending, run_at: 1.hour.ago, scheduled: true) }
     let!(:future_check) { create(:check, status: :pending, run_at: 1.hour.from_now, scheduled: false) }
     let!(:passed_check) { create(:check, status: :passed) }
+    let!(:failed_check_retriable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
+    let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago, scheduled: false) }
+    let!(:blocked_check_retriable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago, scheduled: false) }
+    let!(:future_retry_check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.from_now, scheduled: false) }
 
     describe ".due" do
       it "returns pending checks with run_at in the past" do
@@ -42,7 +46,7 @@ RSpec.describe Check do
 
     describe ".unscheduled" do
       it "returns checks not marked as scheduled" do
-        expect(described_class.unscheduled).to include(pending_check, future_check, passed_check)
+        expect(described_class.unscheduled).to include(pending_check, future_check, passed_check, failed_check_retriable)
         expect(described_class.unscheduled).not_to include(scheduled_check)
       end
     end
@@ -58,6 +62,27 @@ RSpec.describe Check do
       it "returns due and scheduled checks" do
         expect(described_class.to_run).to include(scheduled_check)
         expect(described_class.to_run).not_to include(pending_check, future_check, passed_check)
+      end
+    end
+
+    describe ".retriable" do
+      it "returns checks with retry_count < max_retries" do
+        expect(described_class.retriable).to include(failed_check_retriable, blocked_check_retriable, future_retry_check)
+        expect(described_class.retriable).not_to include(failed_check_max_retries)
+      end
+    end
+
+    describe ".retry_due" do
+      it "returns checks with retry_at in the past" do
+        expect(described_class.retry_due).to include(failed_check_retriable, blocked_check_retriable)
+        expect(described_class.retry_due).not_to include(future_retry_check)
+      end
+    end
+
+    describe ".to_retry" do
+      it "returns failed or blocked checks that can be retried and are due" do
+        expect(described_class.to_retry).to include(failed_check_retriable, blocked_check_retriable)
+        expect(described_class.to_retry).not_to include(future_retry_check, failed_check_max_retries, pending_check)
       end
     end
   end
@@ -239,6 +264,18 @@ RSpec.describe Check do
         end
       end
 
+      it "resets retry_count to 0" do
+        check.retry_count = 2
+        check.run
+        expect(check.retry_count).to eq(0)
+      end
+
+      it "resets retry_at to nil" do
+        check.retry_at = 1.hour.from_now
+        check.run
+        expect(check.retry_at).to be_nil
+      end
+
       it "saves the check" do
         expect(check).to receive(:save)
         check.run
@@ -277,6 +314,12 @@ RSpec.describe Check do
         end
       end
 
+      it "increments retry_count" do
+        check.retry_count = 1
+        check.run
+        expect(check.retry_count).to eq(2)
+      end
+
       it "saves the check" do
         expect(check).to receive(:save)
         check.run
@@ -285,6 +328,90 @@ RSpec.describe Check do
       it "returns false" do
         expect(check.run).to be false
       end
+    end
+  end
+
+  describe "#retriable?" do
+    it "returns true when retry_count is less than max_retries" do
+      check = build(:check, retry_count: 2)
+      expect(check).to be_retriable
+    end
+
+    it "returns false when retry_count is equal to max_retries" do
+      check = build(:check, retry_count: 3)
+      expect(check).not_to be_retriable
+    end
+
+    it "returns false when retry_count is greater than max_retries" do
+      check = build(:check, retry_count: 4)
+      expect(check).not_to be_retriable
+    end
+  end
+
+  describe "#calculate_retry_at" do
+    let(:check) { build(:check, retry_count: retry_count) }
+    let(:retry_count) { 1 }
+
+    it "returns nil when not retriable" do
+      check.retry_count = 3
+      expect(check.calculate_retry_at).to be_nil
+    end
+
+    it "calculates exponential backoff based on retry_count" do
+      freeze_time do
+        # For retry_count = 1: 5 * (5^1) = 25 minutes
+        expected_time = Time.current + 25.minutes
+        expect(check.calculate_retry_at).to be_within(1.second).of(expected_time)
+      end
+    end
+
+    context "with different retry counts" do
+      let(:retry_count) { 2 }
+
+      it "applies exponential backoff correctly" do
+        freeze_time do
+          # For retry_count = 2: 5 * (5^2) = 5 * 25 = 125 minutes
+          expected_time = Time.current + 125.minutes
+          expect(check.calculate_retry_at).to be_within(1.second).of(expected_time)
+        end
+      end
+    end
+  end
+
+  describe "#schedule_retry!" do
+    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
+    let(:job_double) { instance_double(ActiveJob::ConfiguredJob) }
+
+    it "returns false if not retriable" do
+      check.retry_count = 3
+      expect(check.schedule_retry!).to be false
+    end
+
+    it "enqueues a RunCheckJob" do
+      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
+      allow(job_double).to receive(:perform_later).with(check)
+
+      check.schedule_retry!
+
+      expect(RunCheckJob).to have_received(:set).with(wait_until: check.retry_at)
+      expect(job_double).to have_received(:perform_later).with(check)
+    end
+
+    it "updates the check status to pending and marks as scheduled" do
+      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
+      allow(job_double).to receive(:perform_later).with(check)
+
+      check.schedule_retry!
+
+      expect(check.reload.status).to eq("pending")
+      expect(check.reload.scheduled).to be true
+    end
+
+    it "returns true on success" do
+      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
+      allow(job_double).to receive(:perform_later).with(check)
+
+      expect(check.schedule_retry!).to be true
     end
   end
 
