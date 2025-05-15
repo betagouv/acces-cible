@@ -9,6 +9,7 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
+  MAX_RETRIES = 3
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
 
@@ -30,6 +31,10 @@ class Check < ApplicationRecord
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
   scope :errored, ->(type = nil) { type ? where(error_type: type) : where.not(error_type: nil) }
+  scope :retryable, -> { where("retry_count < ?", MAX_RETRIES) }
+  scope :retry_due, -> { where("retry_at IS NULL OR retry_at <= now()") }
+  scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due.unscheduled }
+  scope :schedulable, -> { to_schedule.or(to_retry) }
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
@@ -53,20 +58,26 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
-  def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
-  def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false)
-  def fail! = update(status: :failed, checked_at: Time.zone.now, scheduled: false)
+  def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false, retry_at: calculate_retry_at)
+  def retryable? = retry_count < MAX_RETRIES
   def tooltip? = true
 
-  def to_badge
-    [status_to_badge_level, status_to_badge_text, status_link].compact
+  def calculate_retry_at
+    return nil unless retryable?
+
+    (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
   def schedule!
     transaction do
-      RunCheckJob.set(wait_for: 1.minute).perform_later(self)
+      scheduled_time = pending? ? run_at : retry_at
+      RunCheckJob.set(wait_until: scheduled_time).perform_later(self)
       update!(status: :pending, checked_at: nil, scheduled: true)
     end
+  end
+
+  def to_badge
+    [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
   def run
@@ -78,10 +89,13 @@ class Check < ApplicationRecord
       self.data = analyze!
       self.status = :passed
       self.error = nil
+      self.retry_count = 0
+      self.retry_at = nil
       passed?
     rescue StandardError => exception
       self.status = :failed
       self.error = exception
+      self.retry_count += 1
     end
     self.scheduled = false
     save

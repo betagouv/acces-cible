@@ -1,10 +1,7 @@
 class ScheduleChecksJob < ApplicationJob
   def perform
-    Check.to_schedule.prioritized.find_each do |check|
-      Check.transaction do
-        RunCheckJob.set(wait_until: check.run_at).perform_later(check)
-        check.update(scheduled: true)
-      end
+    Check.schedulable.prioritized.find_each do |check|
+      check.schedule!
     end
   end
 end
