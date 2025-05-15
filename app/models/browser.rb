@@ -91,14 +91,6 @@ class Browser
     end
   end
 
-  def reset
-    Rails.logger.info { "Resetting browser" }
-    browser.network.clear(:traffic) if browser.respond_to?(:network)
-    browser&.reset
-    browser&.quit
-    @browser = nil
-  end
-
   def with_page
     begin
       page = create_page
@@ -112,7 +104,7 @@ class Browser
       Rails.logger.error { "Browser error: #{ferrum_error.message}" }
       raise ferrum_error
     ensure
-      reset
+      page&.close
     end
   end
 
