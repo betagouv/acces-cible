@@ -3,9 +3,4 @@ production:
     class: ScheduleChecksJob
     priority: 2
     queue: background
-    schedule: every hour
-  reschedule_checks:
-    class: RescheduleChecksJob
-    priority: 3
-    queue: background
     schedule: every 10 minutes

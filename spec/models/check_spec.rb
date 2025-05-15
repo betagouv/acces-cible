@@ -25,31 +25,10 @@ RSpec.describe Check do
     let!(:scheduled_check) { create(:check, status: :pending, run_at: 1.hour.ago, scheduled: true) }
     let!(:future_check) { create(:check, status: :pending, run_at: 1.hour.from_now, scheduled: false) }
     let!(:passed_check) { create(:check, status: :passed) }
-    let!(:failed_check_retriable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
+    let!(:failed_check_retryable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
     let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago, scheduled: false) }
-    let!(:blocked_check_retriable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago, scheduled: false) }
+    let!(:blocked_check_retryable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago, scheduled: false) }
     let!(:future_retry_check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.from_now, scheduled: false) }
-
-    describe ".due" do
-      it "returns pending checks with run_at in the past" do
-        expect(described_class.due).to include(pending_check, scheduled_check)
-        expect(described_class.due).not_to include(future_check, passed_check)
-      end
-    end
-
-    describe ".scheduled" do
-      it "returns checks marked as scheduled" do
-        expect(described_class.scheduled).to include(scheduled_check)
-        expect(described_class.scheduled).not_to include(pending_check)
-      end
-    end
-
-    describe ".unscheduled" do
-      it "returns checks not marked as scheduled" do
-        expect(described_class.unscheduled).to include(pending_check, future_check, passed_check, failed_check_retriable)
-        expect(described_class.unscheduled).not_to include(scheduled_check)
-      end
-    end
 
     describe ".to_schedule" do
       it "returns due and unscheduled checks" do
@@ -65,24 +44,18 @@ RSpec.describe Check do
       end
     end
 
-    describe ".retriable" do
-      it "returns checks with retry_count < max_retries" do
-        expect(described_class.retriable).to include(failed_check_retriable, blocked_check_retriable, future_retry_check)
-        expect(described_class.retriable).not_to include(failed_check_max_retries)
-      end
-    end
-
-    describe ".retry_due" do
-      it "returns checks with retry_at in the past" do
-        expect(described_class.retry_due).to include(failed_check_retriable, blocked_check_retriable)
-        expect(described_class.retry_due).not_to include(future_retry_check)
-      end
-    end
-
     describe ".to_retry" do
       it "returns failed or blocked checks that can be retried and are due" do
-        expect(described_class.to_retry).to include(failed_check_retriable, blocked_check_retriable)
+        expect(described_class.to_retry).to include(failed_check_retryable, blocked_check_retryable)
         expect(described_class.to_retry).not_to include(future_retry_check, failed_check_max_retries, pending_check)
+      end
+    end
+
+    describe ".schedulable" do
+      it "returns both pending due checks and retryable checks" do
+        expect(described_class.schedulable).to include(pending_check, failed_check_retryable, blocked_check_retryable)
+
+        expect(described_class.schedulable).not_to include(scheduled_check, future_check, future_retry_check, failed_check_max_retries)
       end
     end
   end
@@ -331,20 +304,20 @@ RSpec.describe Check do
     end
   end
 
-  describe "#retriable?" do
+  describe "#retryable?" do
     it "returns true when retry_count is less than max_retries" do
       check = build(:check, retry_count: 2)
-      expect(check).to be_retriable
+      expect(check).to be_retryable
     end
 
     it "returns false when retry_count is equal to max_retries" do
       check = build(:check, retry_count: 3)
-      expect(check).not_to be_retriable
+      expect(check).not_to be_retryable
     end
 
     it "returns false when retry_count is greater than max_retries" do
       check = build(:check, retry_count: 4)
-      expect(check).not_to be_retriable
+      expect(check).not_to be_retryable
     end
   end
 
@@ -352,7 +325,7 @@ RSpec.describe Check do
     let(:check) { build(:check, retry_count: retry_count) }
     let(:retry_count) { 1 }
 
-    it "returns nil when not retriable" do
+    it "returns nil when not retryable" do
       check.retry_count = 3
       expect(check.calculate_retry_at).to be_nil
     end
@@ -378,40 +351,41 @@ RSpec.describe Check do
     end
   end
 
-  describe "#schedule_retry!" do
-    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
+  describe "#schedule!" do
+    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
     let(:job_double) { instance_double(ActiveJob::ConfiguredJob) }
 
-    it "returns false if not retriable" do
-      check.retry_count = 3
-      expect(check.schedule_retry!).to be false
+    before do
+      allow(RunCheckJob).to receive(:set).and_return(job_double)
+      allow(job_double).to receive(:perform_later)
     end
 
-    it "enqueues a RunCheckJob" do
+    it "schedules the check with the appropriate job" do
       allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
-      allow(job_double).to receive(:perform_later).with(check)
+      expect(job_double).to receive(:perform_later).with(check)
 
-      check.schedule_retry!
-
-      expect(RunCheckJob).to have_received(:set).with(wait_until: check.retry_at)
-      expect(job_double).to have_received(:perform_later).with(check)
+      check.schedule!
     end
 
-    it "updates the check status to pending and marks as scheduled" do
-      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
-      allow(job_double).to receive(:perform_later).with(check)
+    it "resets a failed check to pending and marks it as scheduled" do
+      check.schedule!
+      check.reload
 
-      check.schedule_retry!
-
-      expect(check.reload.status).to eq("pending")
-      expect(check.reload.scheduled).to be true
+      expect(check.status).to eq("pending")
+      expect(check.scheduled).to be true
     end
 
-    it "returns true on success" do
-      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
-      allow(job_double).to receive(:perform_later).with(check)
+    it "just marks a pending check as scheduled without changing status" do
+      pending_check = create(:check, status: :pending, run_at: 1.hour.ago, scheduled: false)
+      pending_check.schedule!
+      pending_check.reload
 
-      expect(check.schedule_retry!).to be true
+      expect(pending_check.status).to eq("pending")
+      expect(pending_check.scheduled).to be true
+    end
+
+    it "returns true when successful" do
+      expect(check.schedule!).to be true
     end
   end
 
@@ -544,46 +518,6 @@ RSpec.describe Check do
 
         it "returns false" do
           expect(check.blocked?).to be false
-        end
-      end
-    end
-  end
-
-  describe "#cleared?" do
-    let(:audit) { instance_double(Audit) }
-    let(:check) { build(:check, audit: nil) }
-    let(:check_status) { :passed }
-    let(:inquiry) { check_status.to_s.inquiry }
-
-    before do
-      allow(check).to receive_messages(audit:, requirements:)
-      allow(audit).to receive(:check_status).with(anything).and_return(inquiry)
-    end
-
-    context "when requirements are nil" do
-      let(:requirements) { nil }
-
-      it "returns true" do
-        expect(check.cleared?).to be true
-      end
-    end
-
-    context "when requirements are present" do
-      let(:requirements) { [:reachable] }
-
-      context "when any required check is failed" do
-        let(:check_status) { :failed }
-
-        it "returns false" do
-          expect(check.cleared?).to be false
-        end
-      end
-
-      context "when all required checks passed" do
-        let(:check_status) { :passed }
-
-        it "returns true" do
-          expect(check.cleared?).to be true
         end
       end
     end
