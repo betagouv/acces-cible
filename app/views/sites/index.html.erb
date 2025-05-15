@@ -21,9 +21,10 @@
         <% end %>
         <td>
           <% if checked_at = site.audit.checked_at %>
-            <%= time_tag checked_at, l(checked_at, format: :compact), title: l(checked_at, format: :long) %>
+            <% local_time = checked_at.in_time_zone %>
+            <%= time_tag local_time, l(local_time, format: :compact), title: l(local_time, format: :long) %>
             <br>
-            (<%= time_ago checked_at %>)
+            (<%= time_ago local_time %>)
           <% else %>
             <%= Audit.human("audit/status.pending") %>
           <% end %>

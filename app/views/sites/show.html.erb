@@ -7,8 +7,9 @@
     <% if @audit.checked_at %>
       <p>
         <strong><%= Audit.human :checked_at %> :</strong>
-        <%= time_tag @audit.checked_at, l(@audit.checked_at, format: :long) %>
-        (<%= time_ago @audit.checked_at %>).
+        <% local_time = @audit.checked_at.in_time_zone %>
+        <%= time_tag local_time, l(local_time, format: :long) %>
+        (<%= time_ago local_time %>).
       </p>
       <%= render(partial: @audit.all_checks, as: :check) %>
     <% else %>
@@ -22,7 +23,7 @@
     <% audits = @site.audits.checked.sort_by_newest.load %>
     <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: audits.count), right: true) do |sidemenu| %>
       <% audits.each do |audit| %>
-        <% sidemenu.with_item text: l(audit.created_at, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
+        <% sidemenu.with_item text: l(audit.created_at.in_time_zone, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
       <% end %>
     <% end %>
   </div>

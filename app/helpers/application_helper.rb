@@ -104,6 +104,7 @@ module ApplicationHelper
   def root? = request.path == "/"
 
   def time_ago(datetime)
+    datetime = datetime.in_time_zone if datetime.respond_to?(:in_time_zone)
     time = distance_of_time_in_words_to_now(datetime)
     t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
   end
