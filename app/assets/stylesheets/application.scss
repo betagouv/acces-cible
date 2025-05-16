@@ -64,3 +64,16 @@ form.button_to {
 .fr-cell--sort .fr-btn {
   margin-left: .5rem;
 }
+
+// Improve pagination spacing on mobile
+.fr-pagination {
+  width: 100%;
+}
+.fr-pagination__list {
+  align-content: space-between;
+  & > li {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+}
