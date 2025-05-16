@@ -27,7 +27,7 @@ module Dsfr
         human(:prev),
         page: pagy.prev,
         modifier: :prev,
-        disabled: pagy.page == 1
+        disabled: !pagy.prev
       )
     end
 
@@ -66,8 +66,10 @@ module Dsfr
       options[:class] = class_names(LINK_CLASS, "#{LINK_CLASS}--#{modifier}" => modifier)
       if disabled
         tag.a text, class: options[:class], role: :link, aria: { disabled: true }
-      else
+      elsif page
         link_to text, helpers.pagy_url_for(pagy, page), **options
+      else
+        tag.a text, **options
       end
     end
   end
