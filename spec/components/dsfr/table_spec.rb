@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Dsfr::TableComponent, type: :component do
   subject(:component) { described_class.new(**params) }
 
-  let(:pagy) { instance_double(Pagy, count: 100) }
+  let(:pagy) { instance_double(Pagy, page: 1, last: 1, count: 10, series: []) }
   let(:caption) { "Test table" }
   let(:params) { { caption:, pagy: } }
   let(:rendered_component) { render_inline(component) }
@@ -22,104 +22,93 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
   end
 
-  describe "when caption is not provided" do
-    let(:params) { { pagy: } }
+  describe "initialize" do
+    context "when caption is not provided" do
+      let(:params) { { pagy: } }
 
-    it "raises an ArgumentError" do
-      expect { component }.to raise_error(ArgumentError, /missing keyword: :caption/)
+      it "raises an ArgumentError" do
+        expect { component }.to raise_error(ArgumentError, /missing keyword: :caption/)
+      end
     end
-  end
 
-  describe "when pagy is not provided" do
-    let(:params) { { caption: } }
+    context "when pagy is not provided" do
+      let(:params) { { caption: } }
 
-    it "raises an ArgumentError" do
-      expect { component }.to raise_error(ArgumentError, /missing keyword: :pagy/)
+      it "raises an ArgumentError" do
+        expect { component }.to raise_error(ArgumentError, /missing keyword: :pagy/)
+      end
     end
-  end
 
-  context "when HTML attributes are provided" do
-    let(:params) { { caption:, pagy:, html_attributes: { class: "custom-class", id: "test-table" } } }
+    context "when HTML attributes are provided" do
+      let(:params) { { caption:, pagy:, html_attributes: { class: "custom-class", id: "test-table" } } }
 
-    it "applies HTML attributes to the table element" do
-      expect(rendered_component).to have_css("div.fr-table.custom-class#test-table table")
+      it "applies HTML attributes to the table element" do
+        expect(rendered_component).to have_css("div.fr-table.custom-class#test-table table")
+      end
     end
-  end
 
-  describe "size option" do
-    [:sm, :md, :lg].each do |size|
-      context "when size is :#{size}" do
+    [:sm, :md, :lg, :xl].each do |size|
+      context "when size option is :#{size}" do
         let(:params) { { caption:, pagy:, size: } }
 
-        it "renders with correct size class" do
-          if size == :md
-            expect(rendered_component).not_to have_css("div.fr-table--#{size}")
-          else
-            expect(rendered_component).to have_css("div.fr-table--#{size}")
+        if size == :xl
+          it "raises an ArgumentError" do
+            expect { component }.to raise_error(ArgumentError, /size must be one of: sm, md, lg/)
+          end
+        else
+          it "renders with correct size class" do
+            if size == :md
+              expect(rendered_component).not_to have_css("div.fr-table--#{size}")
+            else
+              expect(rendered_component).to have_css("div.fr-table--#{size}")
+            end
           end
         end
       end
     end
 
-    context "with invalid size" do
-      let(:params) { { caption:, pagy:, size: :xl } }
+    {
+      hidden: "fr-table--no-caption",
+      bottom: "fr-table--caption-bottom"
+    }.each do |caption_side, expected_css|
+      context "when caption_side is :#{}" do
+        let(:params) { { caption:, pagy:, caption_side: } }
 
-      it "raises an ArgumentError" do
-        expect { component }.to raise_error(ArgumentError, /size must be one of: sm, md, lg/)
-      end
-    end
-  end
-
-  describe "caption_side option" do
-    context "when :hidden" do
-      let(:params) { { caption:, pagy:, caption_side: :hidden } }
-
-      it "adds the hidden caption class" do
-        expect(rendered_component).to have_css("div.fr-table--no-caption")
+        it "contains 'div.#{expected_css}" do
+          expect(rendered_component).to have_css("div.#{expected_css}")
+        end
       end
     end
 
-    context "when :bottom" do
-      let(:params) { { caption:, pagy:, caption_side: :bottom } }
+    [true, false].each do |border|
+      context "when border is #{border}" do
+        let(:params) { { caption:, pagy:, border: } }
 
-      it "adds the hidden caption class" do
-        expect(rendered_component).to have_css("div.fr-table--caption-bottom")
-      end
-    end
-  end
-
-  describe "border option" do
-    context "when border is true" do
-      let(:params) { { caption:, pagy:, border: true } }
-
-      it "adds the border class" do
-        expect(rendered_component).to have_css("div.fr-table--border")
-      end
-    end
-
-    context "when border is false" do
-      let(:params) { { caption:, pagy:, border: false } }
-
-      it "does not add the border class" do
-        expect(rendered_component).not_to have_css("div.fr-table--border")
-      end
-    end
-  end
-
-  describe "scroll option" do
-    context "when scroll is false" do
-      let(:params) { { caption:, pagy:, scroll: false } }
-
-      it "adds the no-scroll class" do
-        expect(rendered_component).to have_css("div.fr-table--no-scroll")
+        if border
+          it "has the border class" do
+            expect(rendered_component).to have_css("div.fr-table--border")
+          end
+        else
+          it "doesn't have the border class" do
+            expect(rendered_component).not_to have_css("div.fr-table--border")
+          end
+        end
       end
     end
 
-    context "when scroll is true" do
-      let(:params) { { caption:, pagy:, scroll: true } }
+    [true, false].each do |scroll|
+      context "when scroll is #{scroll}" do
+        let(:params) { { caption:, pagy:, scroll: } }
 
-      it "does not add the no-scroll class" do
-        expect(rendered_component).not_to have_css("div.fr-table--no-scroll")
+        if scroll
+          it "doesn't have the no-scroll class" do
+            expect(rendered_component).not_to have_css("div.fr-table--no-scroll")
+          end
+        else
+          it "has the no-scroll class" do
+            expect(rendered_component).to have_css("div.fr-table--no-scroll")
+          end
+        end
       end
     end
   end
@@ -144,7 +133,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
   describe "total_lines" do
     before do
-      allow(component).to receive(:human).with(:lines, count: 100).and_return("100 lines") # rubocop:disable RSpec/SubjectStub
+      allow(component).to receive(:human).with(:lines, count: 10).and_return("100 lines") # rubocop:disable RSpec/SubjectStub
     end
 
     it "displays the correct number of total lines" do
@@ -152,41 +141,28 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
   end
 
-  describe "pagination" do
+  describe "pagination?" do
     let(:pagination_component) { instance_double(Dsfr::PaginationComponent) }
 
-    before do
-      allow(Dsfr::PaginationComponent).to receive(:new).with(pagy:).and_return(pagination_component)
-      allow(pagination_component).to receive_messages(to_s: '<div class="fr-pagination">Test Pagination</div>'.html_safe, render?: true)
-    end
+    [true, false].each do |value|
+      context "when pagination_component returns #{value}" do
+        before do
+          allow(Dsfr::PaginationComponent).to receive(:new).with(pagy:).and_return(pagination_component)
+          allow(pagination_component).to receive_messages(render?: value)
+        end
 
-    it "creates a pagination component with the pagy object" do
-      render_inline(component) do |c|
-        c.with_pagination
+        it "returns #{value}" do
+          expect(component.send(:pagination?)).to be value
+        end
       end
-
-      expect(Dsfr::PaginationComponent).to have_received(:new).with(pagy:)
-    end
-
-    it "renders the pagination in the middle footer section" do
-      render_inline(component) do |c|
-        c.with_pagination
-      end
-
-      expect(rendered_component).to have_css("div.fr-table__footer--middle div.fr-pagination", text: "Test Pagination")
-    end
-
-    it "does not render the middle footer section when pagination is not used" do
-      expect(rendered_component).not_to have_css("div.fr-table__footer--middle")
     end
   end
 
-  describe "pagination?" do
-    it "returns true when pagination is explicitly set" do
-      component_with_pagination = component
-      component_with_pagination.with_pagination
+  describe "pagination" do
+    let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, series: ["1", 2, 3, :gap, 10], vars: {}, count: 100) }
 
-      expect(component_with_pagination.send(:pagination?)).to be true
+    it "renders the pagination component inside the table footer" do
+      expect(rendered_component).to have_css("div.fr-table__footer--middle nav.fr-pagination")
     end
   end
 

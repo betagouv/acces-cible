@@ -1,5 +1,5 @@
 <div <%= tag.attributes wrapper_attributes %>>
-  <% if header? -%>
+  <% if search? -%>
   <div class="fr-table__header">
     <%= search %>
   </div>
@@ -27,7 +27,7 @@
     </div>
     <% if pagination? -%>
       <div class="fr-table__footer--middle">
-        <%= pagination %>
+        <%= render pagination %>
       </div>
     <%- end %>
     <% if footer_actions? -%>
