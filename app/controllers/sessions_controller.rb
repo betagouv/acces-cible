@@ -1,11 +1,12 @@
 class SessionsController < ApplicationController
-  allow_unauthenticated_access only: [:new, :create]
+  allow_unauthenticated_access only: [:new, :omniauth]
 
   def new
+    flash.now.alert = Session.human(:login_failed) if request.path == auth_failure_path
   end
 
-  def create
-    if user = User.find_by(params.permit(:provider, :uid))
+  def omniauth
+    if user = User.from_omniauth(request.env["omniauth.auth"])
       start_new_session_for user
       redirect_to after_authentication_url
     else

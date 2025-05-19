@@ -12,6 +12,17 @@ class User < ApplicationRecord
 
   before_validation :find_or_create_team, on: :create
 
+  class << self
+    def from_omniauth(auth)
+      find_or_create_by(provider: auth.provider, uid: auth.uid) do |user|
+        user.email = auth.info.email
+        user.siret = auth.info.siret
+        user.given_name = auth.info.given_name
+        user.usual_name = auth.info.usual_name
+      end
+    end
+  end
+
   private
 
   def find_or_create_team

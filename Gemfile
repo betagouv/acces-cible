@@ -63,6 +63,11 @@ gem "dsfr-view-components"
 
 gem "friendly_id"
 
+# Manage external authentication
+gem "omniauth"
+gem "omniauth-proconnect"
+gem "omniauth-rails_csrf_protection"
+
 # Crawl websites using a headless Chrome browser, controlled by Ferrum
 # Use brotli and zstd compression to save bandwidth
 gem "ferrum"

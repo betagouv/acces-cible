@@ -1,5 +1,14 @@
-<%= form_with(url: new_session_path, model: Session.new) do |f| %>
-  <%= f.dsfr_text_field :provider, required: true, name: :provider %>
-  <%= f.dsfr_text_field :uid, required: true, name: :uid %>
-  <%= f.submit t("shared.login"), class: "fr-btn" %>
-<% end %>
+<% use_centered_layout %>
+
+<h2>Se connecter avec FranceConnect</h2>
+
+<div class="fr-connect-group">
+  <%= form_with(url: omniauth_path, model: Session.new, data: { turbo: false }) do |f| %>
+    <%= f.button type: :submit, name: nil, class: "fr-connect" do %>
+      <span class="fr-connect__login">S’identifier avec</span>
+      <span class="fr-connect__brand">FranceConnect</span>
+    <% end %>
+  <% end %>
+  <%= link_to "Qu’est ce que FranceConnect ?", "https://franceconnect.gouv.fr/", class: "fr-link", target: :_blank, rel: :noopener, title: "Qu’est ce que FranceConnect ? - nouvelle fenêtre" %>
+</div>
+
