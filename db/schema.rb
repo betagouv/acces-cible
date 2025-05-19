@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_16_131537) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_19_093533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_16_131537) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "sites", force: :cascade do |t|
     t.string "name"
     t.string "slug", null: false
@@ -95,6 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_16_131537) do
 
   add_foreign_key "audits", "sites"
   add_foreign_key "checks", "audits"
+  add_foreign_key "sessions", "users"
   add_foreign_key "sites", "audits"
   add_foreign_key "users", "teams", column: "siret", primary_key: "siret", name: "fk_users_on_team_siret"
 end

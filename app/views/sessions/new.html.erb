@@ -1,0 +1,5 @@
+<%= form_with(url: new_session_path, model: Session.new) do |f| %>
+  <%= f.dsfr_text_field :provider, required: true, name: :provider %>
+  <%= f.dsfr_text_field :uid, required: true, name: :uid %>
+  <%= f.submit t("shared.login"), class: "fr-btn" %>
+<% end %>

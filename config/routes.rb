@@ -1,5 +1,11 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  scope controller: :sessions do
+    get :login, action: :new, as: :new_session
+    post :login, action: :create
+    delete :logout, action: :destroy
+  end
+
   resources :sites do
     collection do
       post :upload

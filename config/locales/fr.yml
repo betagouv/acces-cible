@@ -23,6 +23,8 @@ fr:
     asc: croissant
     desc: décroissant
     or: ou
+    login: Se connecter
+    logout: Se déconnecter
     page_unavailable: Cette page n'est pas disponible.
 
   time:
@@ -169,6 +171,8 @@ fr:
         serious: Important
         critical: Critique
 
+      session:
+        login_failed: Nous n'avons pas réussi à vous identifier.
       site:
         empty_collection: Il n'y a aucun site à afficher. Ajoutez un ou plusieurs sites à évaluer.
         created_at: Enregistré le
@@ -212,6 +216,9 @@ fr:
       title: Mentions légales
     plan:
       title: Plan du site
+  sessions:
+    new:
+      title: Connexion à Accès Cible
   sites:
     index:
       title: Tous les sites
