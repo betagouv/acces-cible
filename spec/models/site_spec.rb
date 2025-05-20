@@ -113,4 +113,92 @@ RSpec.describe Site do
       expect(described_class.friendly.find(old_slug)).to eq(site)
     end
   end
+
+  describe "#actual_current_audit" do
+    subject(:site) { create(:site) }
+
+    context "with a freshly created site" do
+      it "returns the initial audit" do
+        expect(site.actual_current_audit).to eq(site.audits.first)
+      end
+    end
+
+    context "when there are checked audits" do
+      let!(:old_audit) { create(:audit, :checked, site:, checked_at: 2.days.ago) }
+      let!(:newest_audit) { create(:audit, :checked, site:, checked_at: 1.day.ago) }
+
+      it "returns the newest checked audit" do
+        expect(site.reload.actual_current_audit).to eq(newest_audit)
+      end
+    end
+
+    context "when initial audit is unchecked but other audits are checked" do
+      let!(:checked_audit) { create(:audit, :checked, site:, checked_at: 1.day.ago) }
+
+      it "returns the checked audit" do
+        expect(site.actual_current_audit).to eq(checked_audit)
+      end
+    end
+
+    context "when no audits are checked" do
+      let!(:newer_audit) { create(:audit, site:, checked_at: nil, created_at: 1.day.from_now) }
+
+      it "returns the newest audit by creation date" do
+        expect(site.actual_current_audit).to eq(newer_audit)
+      end
+    end
+  end
+
+  describe "#set_current_audit!" do
+    subject(:site) { create(:site) }
+
+    let(:initial_audit) { site.audits.first }
+
+    context "with a freshly created site" do
+      it "marks the initial audit as current" do
+        expect { site.set_current_audit! }.to change { initial_audit.reload.current }.from(false).to(true)
+      end
+    end
+
+    context "when there are multiple audits" do
+      subject(:site) { create(:site) }
+
+      let!(:old_audit) { create(:audit, :checked, site:, checked_at: 2.days.ago, current: true) }
+      let!(:newest_audit) { create(:audit, :checked, site:, checked_at: 1.day.ago) }
+
+      it "marks the newest checked audit as current" do
+        expect { site.set_current_audit! }.to change { newest_audit.reload.current }.from(false).to(true)
+          .and change { old_audit.reload.current }.from(true).to(false)
+      end
+    end
+
+    context "when the actual current audit is already marked as current" do
+      it "does not change anything" do
+        initial_audit.update(current: true)
+        expect { site.set_current_audit! }.not_to change { initial_audit.reload.current }
+      end
+    end
+
+    context "when there are unchecked audits only" do
+      let!(:old_audit) { create(:audit, site:, current: true, checked_at: nil, created_at: 2.days.ago) }
+      let!(:newest_audit) { create(:audit, site:, current: false, checked_at: nil, created_at: 1.day.from_now) }
+
+      it "marks the newest audit as current" do
+        expect { site.set_current_audit! }.to change { newest_audit.reload.current }.from(false).to(true)
+          .and change { old_audit.reload.current }.from(true).to(false)
+      end
+    end
+
+    context "when there are both checked and unchecked audits" do
+      let!(:old_checked_audit) { create(:audit, site:, current: true, checked_at: 3.days.ago) }
+      let!(:newest_checked_audit) { create(:audit, :checked, site:, checked_at: 2.days.ago) }
+      let!(:newest_unchecked_audit) { create(:audit, site:, checked_at: nil, created_at: 1.day.from_now) }
+
+      it "marks the newest checked audit as current" do
+        expect { site.set_current_audit! }.to change { newest_checked_audit.reload.current }.from(false).to(true)
+          .and change { old_checked_audit.reload.current }.from(true).to(false)
+        expect(newest_unchecked_audit.reload.current).to be false
+      end
+    end
+  end
 end

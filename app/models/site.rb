@@ -37,21 +37,24 @@ class Site < ApplicationRecord
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 
   def audit
-    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.build
+    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.last || audits.build
   end
 
   def audit!
-    audits.create!(url:).tap(&:schedule)
+    audits.create!(url:, current: audits.none? || audits.current.none?).tap(&:schedule)
+  end
+
+  def actual_current_audit
+    audits.checked.sort_by_newest.first || audits.sort_by_newest.first
   end
 
   def set_current_audit!
-    current = audits.current.last
-    latest = audits.checked.sort_by_newest.last
-    return if current == latest
+    current_audit = audits.current.last
+    return if actual_current_audit && current_audit == actual_current_audit
 
     transaction do
-      current&.update!(current: false)
-      latest&.update!(current: true)
+      current_audit&.update!(current: false)
+      actual_current_audit&.update!(current: true)
     end
   end
 end
