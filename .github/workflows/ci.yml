@@ -110,19 +110,30 @@ jobs:
       - name: Run tests
         run: bundle exec rspec
 
-  deploy:
-    name: Déploiement sur Scalingo
+  deploy_staging:
+    name: Déploiement sur Scalingo Staging
     runs-on: ubuntu-latest
-
     needs: [test, lint]
-
-    if: ${{ (github.ref == 'refs/heads/staging') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
-
+    if: ${{ github.ref == 'refs/heads/staging' && !contains(github.event.head_commit.message, '[skip-deploy]') }}
+  
     steps:
       - name: Install Scalingo CLI
         run: curl -O https://cli-dl.scalingo.com/install && bash install
-
+  
       - run: scalingo login --api-token ${{ secrets.SCALINGO_TOKEN }}
       - name: Déploiement sur staging
-        if: ${{ github.ref == 'refs/heads/staging' }}
         run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
+  
+  deploy_production:
+    name: Déploiement sur Scalingo Production
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: ${{ github.ref == 'refs/heads/production' && !contains(github.event.head_commit.message, '[skip-deploy]') }}
+  
+    steps:
+      - name: Install Scalingo CLI
+        run: curl -O https://cli-dl.scalingo.com/install && bash install
+  
+      - run: scalingo login --api-token ${{ secrets.SCALINGO_TOKEN }}
+      - name: Déploiement sur production
+        run: scalingo --app acces-cible-production --region osc-secnum-fr1 integration-link-manual-deploy production
