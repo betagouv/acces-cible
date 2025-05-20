@@ -11,17 +11,15 @@ RSpec.describe "Sites" do
        .and change(Audit, :count).by(1)
        .and change(Check, :count).by(Check.names.count)
 
-      expect(response).to redirect_to(site_path(Site.last))
-
-      follow_redirect!
-      expect(response).to have_http_status(:ok)
-
       site = Site.last
       audit = site.audit
       expect(audit).to be_present
       expect(audit.status).to eq("pending")
-
       expect(RunAuditJob).to have_been_enqueued.with(audit)
+
+      expect(response).to redirect_to(site_path(site))
+      follow_redirect!
+      expect(response).to have_http_status(:ok)
     end
 
     context "when URL already exists" do
@@ -49,18 +47,10 @@ RSpec.describe "Sites" do
   describe "POST /sites/upload" do
     subject(:upload_sites) { post upload_sites_path, params: { site: { file: } } }
 
-    let(:file_path) { file_fixture("sites.csv") }
-    let(:file) do
-      ActionDispatch::Http::UploadedFile.new(
-        filename: "sites.csv",
-        type: "text/csv",
-        tempfile: File.open(file_path)
-      )
-    end
+    let(:file) { fixture_file_upload("sites.csv", "text/csv") }
 
     it "schedules audits and redirects to sites index" do
-      upload_mock = instance_double(SiteUpload)
-      allow(upload_mock).to receive_messages(save: true, count: 2)
+      upload_mock = instance_double(SiteUpload, save: true, count: 2)
       allow(SiteUpload).to receive(:new).and_return(upload_mock)
 
       expect { upload_sites }.to have_enqueued_job(ScheduleAuditsJob)
