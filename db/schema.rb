@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_19_093533) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_21_131246) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,8 +73,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_19_093533) do
     t.datetime "updated_at", null: false
     t.integer "audits_count", default: 0, null: false
     t.bigint "audit_id"
+    t.bigint "team_id", null: false
     t.index ["audit_id"], name: "index_sites_on_audit_id"
     t.index ["slug"], name: "index_sites_on_slug", unique: true
+    t.index ["team_id"], name: "index_sites_on_team_id"
   end
 
   create_table "teams", force: :cascade do |t|
@@ -104,5 +106,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_19_093533) do
   add_foreign_key "checks", "audits"
   add_foreign_key "sessions", "users"
   add_foreign_key "sites", "audits"
+  add_foreign_key "sites", "teams"
   add_foreign_key "users", "teams", column: "siret", primary_key: "siret", name: "fk_users_on_team_siret"
 end

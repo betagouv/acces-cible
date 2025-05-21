@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users
+  has_many :sites, through: :team
   has_many :sessions, dependent: :destroy
 
   validates :provider, :uid, :email, :given_name, :usual_name, :siret, presence: true

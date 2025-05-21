@@ -5,7 +5,7 @@ class SitesController < ApplicationController
   # GET /sites
   def index
     params[:sort] ||= { checked_at: :desc }
-    sites = Site.preloaded.filter_by(params).order_by(params)
+    sites = current_user.sites.preloaded.filter_by(params).order_by(params)
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites }
       format.csv  { send_data sites.to_csv, filename: sites.to_csv_filename }
@@ -25,7 +25,7 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    @site = Site.find_by_url(site_params) || Site.new(site_params)
+    @site = current_user.sites.find_by_url(site_params) || current_user.sites.build(site_params)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.persisted? || @site.save
       @site.audit.schedule if @site.audit.pending?
@@ -37,7 +37,7 @@ class SitesController < ApplicationController
 
   # POST /sites/upload
   def upload
-    @upload = SiteUpload.new(params.expect(site: [:file]))
+    @upload = SiteUpload.new(params.expect(site: [:file]).merge(team: current_user.team))
     if @upload.save
       ScheduleAuditsJob.perform_later
       redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
@@ -64,7 +64,7 @@ class SitesController < ApplicationController
   private
 
   def set_site
-    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new
+    @site = params[:id].present? ? current_user.sites.friendly.find(params.expect(:id)) : Site.new
   end
 
   def redirect_old_slugs

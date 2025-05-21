@@ -6,9 +6,9 @@ class SiteUpload
   REQUIRED_HEADERS = ["url"].freeze
   BOM = /^\xEF\xBB\xBF/
 
-  attr_accessor :file, :new_sites, :existing_sites
+  attr_accessor :file, :team, :new_sites, :existing_sites
 
-  validates :file, presence: true
+  validates :file, :team, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
 
   delegate :create!, :transaction, :human, :model_name, to: :Site
@@ -42,10 +42,10 @@ class SiteUpload
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
       url = row["url"] || row["URL"]
-      if existing_site = Site.find_by_url(url:)
+      if existing_site = team.sites.find_by_url(url:)
         self.existing_sites << existing_site
       else
-        self.new_sites << { url:, name: row["name"] }
+        self.new_sites << { url:, name: row["name"], team: }
       end
     end
   end

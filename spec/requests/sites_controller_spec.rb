@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "Sites" do
+  let!(:user) { create(:user) }
+  let(:team) { user.team }
+
+  before { login_as(user) }
+
   describe "POST /sites" do
     subject(:post_site) { post sites_path, params: { site: { url: } } }
 
@@ -24,7 +29,7 @@ RSpec.describe "Sites" do
 
     context "when URL already exists" do
       it "doesn't create a duplicate site" do
-        existing_site = Site.create(url:)
+        existing_site = create(:site, url:, team:)
 
         expect { post_site }.not_to change(Site, :count)
 

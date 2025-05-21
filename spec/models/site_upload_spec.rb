@@ -1,8 +1,9 @@
 require "rails_helper"
 
 RSpec.describe SiteUpload do
-  subject(:site_upload) { described_class.new(file:) }
+  subject(:site_upload) { described_class.new(file:, team:) }
 
+  let(:team) { build(:team) }
   let(:file_path) { Rails.root.join("spec/fixtures/files/sites.csv") }
   let(:csv_content) { "url,name\nhttps://example.com,Example Site\nhttps://test.com,Test Site" }
   let(:encoding) { Encoding::UTF_8 }
@@ -25,10 +26,11 @@ RSpec.describe SiteUpload do
       expect(site_upload).to be_valid
     end
 
-    it "requires a file" do
+    it "requires a file and a team" do
       site_upload = described_class.new
       expect(site_upload).not_to be_valid
       expect(site_upload.errors[:file]).not_to be_empty
+      expect(site_upload.errors[:team]).not_to be_empty
     end
 
     context "when file is empty" do
@@ -87,8 +89,8 @@ RSpec.describe SiteUpload do
       site_upload.parse_sites
 
       new_sites_from_csv = [
-        { url: "https://example.com", name: "Example Site" },
-        { url: "https://test.com", name: "Test Site" }
+        { url: "https://example.com", name: "Example Site", team: },
+        { url: "https://test.com", name: "Test Site", team: }
       ]
       expect(site_upload.new_sites).to eq(new_sites_from_csv)
     end

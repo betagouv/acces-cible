@@ -4,6 +4,9 @@ RSpec.describe Site do
   let(:url) { "https://example.com/" }
 
   describe "associations" do
+    subject { build(:site) }
+
+    it { should belong_to(:team).touch(true) }
     it { should have_many(:audits).dependent(:destroy) }
   end
 
@@ -47,7 +50,7 @@ RSpec.describe Site do
     end
 
     context "when a site had that URL" do
-      let!(:existing_site) { described_class.create(url:) }
+      let!(:existing_site) { create(:site, url:) }
 
       it "finds site with historical URLs" do
         new_url = "https://new-example.com"
@@ -57,7 +60,7 @@ RSpec.describe Site do
     end
 
     context "when URL contains unicode" do
-      let!(:existing_site) { described_class.create(url:) }
+      let!(:existing_site) { create(:site, url:) }
       let(:url) { "https://éxâmplè.çôm/" }
 
       it "returns the existing site" do

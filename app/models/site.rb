@@ -1,6 +1,7 @@
 class Site < ApplicationRecord
   extend FriendlyId
 
+  belongs_to :team, touch: true
   has_many :audits, dependent: :destroy
 
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
