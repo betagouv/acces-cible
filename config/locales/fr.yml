@@ -170,6 +170,7 @@ fr:
         critical: Critique
 
       site:
+        empty_collection: Il n'y a aucun site à afficher. Ajoutez un ou plusieurs sites à évaluer.
         created_at: Enregistré le
         updated_at: Date de mise à jour
         url: Adresse du site
