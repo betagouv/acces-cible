@@ -23,6 +23,7 @@ fr:
     asc: croissant
     desc: décroissant
     or: ou
+    page_unavailable: Cette page n'est pas disponible.
 
   time:
     formats:

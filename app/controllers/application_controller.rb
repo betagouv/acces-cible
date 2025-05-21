@@ -20,6 +20,10 @@ class ApplicationController < ActionController::Base
       format.html { render "errors/internal_server_error", status: :internal_server_error }
     end
   end
+  rescue_from Pagy::OverflowError do |exception|
+    path_without_page = [request.path, request.query_string.sub(/&?page=\d*/, "")].compact_blank.join("?")
+    redirect_to path_without_page, alert: t("shared.page_unavailable")
+  end
 
   private
 
