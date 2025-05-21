@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     end
     resources :audits, only: [:create, :show]
   end
+  get "/sites", to: "sites#index", as: :authenticated_root
 
   # Static pages
   scope controller: :pages do
