@@ -53,7 +53,7 @@ module Dsfr
       pagy.series.map do |page|
         case page
         when :gap
-          tag.span "…", class: LINK_CLASS
+          tag.span "…", class: LINK_CLASS, aria: { hidden: true }
         when String # current page
           page_link(page, title: human(:page, page:), aria: { current: :page })
         else # regular page link
