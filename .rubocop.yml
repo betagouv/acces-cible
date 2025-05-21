@@ -42,7 +42,7 @@ Naming/VariableNumber:
 RSpec/ExampleLength:
   Enabled: false
 RSpec/ImplicitExpect:
-  Enabled: false
+  EnforcedStyle: should
 RSpec/ImplicitSubject:
   Enabled: false
 RSpec/IndexedLet:

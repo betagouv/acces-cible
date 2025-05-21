@@ -11,13 +11,13 @@ RSpec.describe Audit do
   end
 
   describe "associations" do
-    it { is_expected.to belong_to(:site).touch(true) }
-    it { is_expected.to have_many(:checks).dependent(:destroy) }
+    it { should belong_to(:site).touch(true) }
+    it { should have_many(:checks).dependent(:destroy) }
   end
 
   describe "validations" do
-    it { is_expected.to allow_value("https://example.com").for(:url) }
-    it { is_expected.not_to allow_value("not-a-url").for(:url) }
+    it { should allow_value("https://example.com").for(:url) }
+    it { should_not allow_value("not-a-url").for(:url) }
   end
 
   describe "normalization" do

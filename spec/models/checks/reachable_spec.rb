@@ -21,13 +21,13 @@ RSpec.describe Checks::Reachable do
     subject(:status) { described_class.new(data: { original_url:, redirect_url: }).send(:custom_badge_status) }
 
     context "when there is a redirect_url" do
-      it { is_expected.to eq(:info) }
+      it { should eq(:info) }
     end
 
     context "when there is no redirect_url" do
       let(:redirect_url) { nil }
 
-      it { is_expected.to eq(:success) }
+      it { should eq(:success) }
     end
   end
 
@@ -84,42 +84,42 @@ RSpec.describe Checks::Reachable do
       let(:original_url) { "https://www.example.com/" }
       let(:redirect_url) { "http://www.example.com/" }
 
-      it { is_expected.to be false }
+      it { should be false }
     end
 
     context "when going from http to https" do
       let(:original_url) { "http://www.example.com/" }
       let(:redirect_url) { "https://www.example.com/" }
 
-      it { is_expected.to be false }
+      it { should be false }
     end
 
     context "when going from naked domain to www" do
       let(:original_url) { "https://example.com/" }
       let(:redirect_url) { "https://www.example.com/" }
 
-      it { is_expected.to be false }
+      it { should be false }
     end
 
     context "when going from www to naked domain" do
       let(:original_url) { "https://www.example.com/" }
       let(:redirect_url) { "https://example.com/" }
 
-      it { is_expected.to be false }
+      it { should be false }
     end
 
     context "when going from one domain to another" do
       let(:original_url) { "https://www.example.com/" }
       let(:redirect_url) { "https://www.foo.bar/" }
 
-      it { is_expected.to be true }
+      it { should be true }
     end
 
     context "when going from root to a folder" do
       let(:original_url) { "https://www.example.com/" }
       let(:redirect_url) { "https://www.example.com/foo/" }
 
-      it { is_expected.to be true }
+      it { should be true }
     end
   end
 end

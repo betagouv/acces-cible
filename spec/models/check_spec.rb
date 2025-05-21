@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Check do
   describe "associations" do
-    it { is_expected.to belong_to(:audit) }
+    it { should belong_to(:audit) }
   end
 
   describe "enums" do
@@ -16,8 +16,8 @@ RSpec.describe Check do
   end
 
   describe "delegations" do
-    it { is_expected.to delegate_method(:parsed_url).to(:audit) }
-    it { is_expected.to delegate_method(:human_type).to(:class) }
+    it { should delegate_method(:parsed_url).to(:audit) }
+    it { should delegate_method(:human_type).to(:class) }
   end
 
   describe "scopes" do
@@ -179,13 +179,13 @@ RSpec.describe Check do
     context "when check is pending" do
       let(:check) { build(:check, status: :pending) }
 
-      it { is_expected.to eq([:info, check.human_status]) }
+      it { should eq([:info, check.human_status]) }
     end
 
     context "when check is failed" do
       let(:check) { build(:check, status: :failed) }
 
-      it { is_expected.to eq([:error, check.human_status]) }
+      it { should eq([:error, check.human_status]) }
     end
   end
 

@@ -113,7 +113,7 @@ RSpec.describe Checks::FindAccessibilityPage do
 
         let(:page) { build(:page, title:) }
 
-        it { is_expected.to eq(expectation) }
+        it { should eq(expectation) }
       end
     end
 
