@@ -1,4 +1,6 @@
 class ErrorsController < ApplicationController
+  allow_unauthenticated_access
+
   def not_found
     render status: 404
   end
