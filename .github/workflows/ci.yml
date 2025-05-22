@@ -5,6 +5,7 @@ on:
     branches:
       - "main"
       - "staging"
+      - "production"
   pull_request:
 
 jobs:
@@ -116,7 +117,7 @@ jobs:
 
     needs: [test, lint, scan_ruby]
 
-    if: ${{ (github.ref == 'refs/heads/staging') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
+    if: ${{ (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
 
     steps:
       - name: Install Scalingo CLI
@@ -126,3 +127,7 @@ jobs:
       - name: Déploiement sur staging
         if: ${{ github.ref == 'refs/heads/staging' }}
         run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
+
+      - name: Déploiement en production
+        if: ${{ github.ref == 'refs/heads/production' }}
+        run: scalingo --app acces-cible-prod --region osc-secnum-fr1 integration-link-manual-deploy main
