@@ -1,6 +1,6 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
   if Rails.env.local?
-    provider :developer, fields: [:uid, :given_name], uid_field: :uid
+    provider :developer, fields: [:uid], uid_field: :uid
   else
     proconnect = Rails.application.credentials.proconnect[Rails.application.staging? ? :staging : Rails.env]
     provider(
