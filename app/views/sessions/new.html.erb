@@ -11,3 +11,8 @@
   <% end %>
   <%= link_to "Qu’est ce que ProConnect ?", "https://www.proconnect.gouv.fr/", class: "fr-link", target: :_blank, rel: :noopener, title: "Qu’est ce que FranceConnect ? - nouvelle fenêtre" %>
 </div>
+
+<% if Rails.env.development? %>
+  <%= or_separator %>
+  <%= button_to "Se connecter en mode développeur", omniauth_path(provider: :developer), method: :post, remote: false, data: { turbo: false }, class: "fr-btn fr-btn--lg fr-mb-3w", form_class: "fr-btns-group" %>
+<% end %>
