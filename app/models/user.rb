@@ -20,7 +20,7 @@ class User < ApplicationRecord
         user.siret = auth.info.siret
         user.given_name = auth.info.given_name
         user.usual_name = auth.info.usual_name
-      end
+      end.then { |user| user.persisted? ? user : nil }
     end
   end
 
