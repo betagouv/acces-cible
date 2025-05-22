@@ -4,7 +4,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   else
     proconnect = Rails.application.credentials.proconnect[Rails.application.staging? ? :staging : Rails.env]
     provider(
-      :proconnect,
+      Omniauth::Proconnect, # Until https://github.com/betagouv/omniauth-proconnect/issues/2 is fixed
       {
         client_id: proconnect.client_id,
         client_secret: proconnect.client_secret,
