@@ -3,7 +3,7 @@
 <h2>Se connecter avec ProConnect</h2>
 
 <div class="fr-connect-group">
-  <%= form_with(url: "/auth/proconnect", data: { turbo: false }) do |f| %>
+  <%= form_with(url: omniauth_path(provider: :proconnect), data: { turbo: false }) do |f| %>
     <%= f.button type: :submit, name: nil, class: "fr-connect" do %>
       <span class="fr-connect__login">S’identifier avec</span>
       <span class="fr-connect__brand">FranceConnect</span>
