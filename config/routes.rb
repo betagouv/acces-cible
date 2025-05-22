@@ -2,8 +2,10 @@
 Rails.application.routes.draw do
   scope controller: :sessions do
     get :login, action: :new, as: :new_session
-    get "auth/:provider", action: :new, as: :omniauth, defaults: { provider: Rails.env.local? ? :developer : Rails.env }
-    get "auth/:provider/callback", action: :omniauth
+
+    get "auth/:provider/callback", to: "sessions#create"
+    get "auth/:provider/logout", to: "sessions#destroy"
+
     get "auth/failure", action: :new
     delete :logout, action: :destroy
   end
