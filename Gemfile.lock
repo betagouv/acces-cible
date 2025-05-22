@@ -355,7 +355,7 @@ GEM
       hashie (>= 3.4.6)
       rack (>= 2.2.3)
       rack-protection
-    omniauth-proconnect (0.2.0)
+    omniauth-proconnect (0.3.0)
       faraday (~> 2)
       json-jwt (~> 1)
       omniauth

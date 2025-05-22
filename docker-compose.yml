@@ -1,5 +1,5 @@
 services:
-  web:
+  web: &server
     build:
       dockerfile: Dockerfile.dev
     image: acces_cible
@@ -10,6 +10,10 @@ services:
     volumes:
       - "./:/app"
       - "/app/node_modules"
+  css-watcher:
+    <<: *server
+    command: ["bin/rails", "dartsass:watch"]
+    ports: []
   db:
     image: postgres
     environment:

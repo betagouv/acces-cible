@@ -1,11 +1,11 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
   scope controller: :sessions do
-    get :login, action: :new, as: :new_session
-    get "auth/:provider", action: :new, as: :omniauth, defaults: { provider: Rails.env.local? ? :developer : Rails.env }
-    get "auth/:provider/callback", action: :omniauth
+    get :login, action: :new, as: :login
     get "auth/failure", action: :new
-    delete :logout, action: :destroy
+    get "auth/:provider", action: :new, as: :omniauth
+    get "auth/:provider/callback", action: :omniauth
+    post "auth/:provider/logout", action: :destroy, as: :logout
   end
 
   resources :sites do

@@ -1,10 +1,10 @@
-FROM ruby:3.4.2-slim
+FROM ruby:3.4.4-slim
 
 ENV WITHIN_DOCKER=1
 
 EXPOSE 3000
 
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y build-essential libpq-dev libyaml-dev chromium
+RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y build-essential libpq-dev libyaml-dev chromium git
 
 # do the bundle install in another directory with the strict essential
 # (Gemfile and Gemfile.lock) to allow further steps to be cached

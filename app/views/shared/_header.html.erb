@@ -1,11 +1,11 @@
 <%= dsfr_header logo_text: t("global.sponsor_html"), title: t("global.service_name"), tagline: t("global.service_description") do |header| %>
   <%= header.with_direct_link_simple title: "Accueil", path: root_path, active: current_page?(root_path) %>
   <% if authenticated? %>
-    <%= header.with_tool_link title: t("shared.logout"), path: logout_path, html_attributes: { class: [icon_class("logout-box-r", btn: :secondary)], "data-turbo-method": :delete } %>
+    <%= header.with_tool_link title: t("shared.logout"), path: logout_path(provider: Current.user.provider), html_attributes: { class: [icon_class("logout-box-r", btn: :secondary)], "data-turbo-method": :post } %>
 
     <%= header.with_direct_link_simple title: "Tous les sites", path: sites_path, active: current_page?(controller: :sites, action: :index) %>
     <%= header.with_direct_link_simple title: "Ajouter un site", path: new_site_path, active: current_page?(controller: :sites, action: :new) %>
   <% else %>
-    <%= header.with_tool_link title: t("shared.login"), path: new_session_path, html_attributes: { class: [icon_class(:account, :circle, btn: :secondary)] } %>
+    <%= header.with_tool_link title: t("shared.login"), path: login_path, html_attributes: { class: [icon_class(:account, :circle, btn: :secondary)] } %>
   <% end %>
 <% end %>
