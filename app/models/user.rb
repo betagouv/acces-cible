@@ -17,9 +17,9 @@ class User < ApplicationRecord
     def from_omniauth(auth)
       find_or_create_by(provider: auth.provider, uid: auth.uid) do |user|
         user.email = auth.info.email
-        user.siret = auth.info.siret
-        user.given_name = auth.info.given_name
-        user.usual_name = auth.info.usual_name
+        user.siret = auth.extra.raw_info.siret
+        user.given_name = auth.extra.raw_info.given_name
+        user.usual_name = auth.extra.raw_info.usual_name
       end.then { |user| user.persisted? ? user : nil }
     end
   end
