@@ -45,7 +45,7 @@ class SiteUpload
       if existing_site = team.sites.find_by_url(url:)
         self.existing_sites << existing_site
       else
-        self.new_sites << { url:, name: row["name"], team: }
+        self.new_sites << { url:, team:, name: row["name"] }
       end
     end
   end
