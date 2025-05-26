@@ -4,7 +4,10 @@ FactoryBot.define do
     team { association :team }
 
     trait :checked do
-      audits { [association(:audit, :checked, url:, site: instance, current: true)] }
+      after(:create) do |site|
+        audit = site.audits.current.first || create(:audit, :current, site:, url: site.url)
+        audit.update!(checked_at: 1.day.ago, status: :passed)
+      end
     end
   end
 end

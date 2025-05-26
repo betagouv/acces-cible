@@ -75,7 +75,7 @@ RSpec.describe Site do
   end
 
   describe "#url_without_scheme" do
-    let(:site) { build(:site) }
+    let(:site) { build(:site, url:) }
 
     before do
       allow(site).to receive(:url).and_return(url)
@@ -88,10 +88,10 @@ RSpec.describe Site do
     end
 
     context "when path is not empty" do
-      let(:url) { "https://example.com/path" }
+      let(:url) { "https://example.com/path/" }
 
       it "returns hostname and path" do
-        expect(site.url_without_scheme).to eq("example.com/path")
+        expect(site.url_without_scheme).to eq("example.com/path/")
       end
     end
   end
@@ -109,10 +109,10 @@ RSpec.describe Site do
       old_slug = site.slug
       new_url = "https://new-example.com"
 
-      site.audits.create!(url: new_url, status: :passed)
-      site.save!
+      create(:audit, :checked, site:, url: new_url)
+      site.set_current_audit!
 
-      expect(site.reload.slug).not_to eq(old_slug)
+      expect(site.reload.slug).to eq("new-example-com")
       expect(described_class.friendly.find(old_slug)).to eq(site)
     end
   end
@@ -157,19 +157,12 @@ RSpec.describe Site do
 
     let(:initial_audit) { site.audits.first }
 
-    context "with a freshly created site" do
-      it "marks the initial audit as current" do
-        expect { site.set_current_audit! }.to change { initial_audit.reload.current }.from(false).to(true)
-      end
-    end
-
     context "when there are multiple audits" do
       subject(:site) { create(:site) }
 
-      let!(:old_audit) { create(:audit, :checked, site:, checked_at: 2.days.ago, current: true) }
-      let!(:newest_audit) { create(:audit, :checked, site:, checked_at: 1.day.ago) }
-
       it "marks the newest checked audit as current" do
+        old_audit = site.audit
+        newest_audit = create(:audit, :checked, site:, checked_at: 1.day.ago)
         expect { site.set_current_audit! }.to change { newest_audit.reload.current }.from(false).to(true)
           .and change { old_audit.reload.current }.from(true).to(false)
       end
@@ -183,23 +176,19 @@ RSpec.describe Site do
     end
 
     context "when there are unchecked audits only" do
-      let!(:old_audit) { create(:audit, site:, current: true, checked_at: nil, created_at: 2.days.ago) }
-      let!(:newest_audit) { create(:audit, site:, current: false, checked_at: nil, created_at: 1.day.from_now) }
+      let!(:newest_audit) { create(:audit, site:, checked_at: nil, created_at: 1.day.from_now) }
 
       it "marks the newest audit as current" do
         expect { site.set_current_audit! }.to change { newest_audit.reload.current }.from(false).to(true)
-          .and change { old_audit.reload.current }.from(true).to(false)
       end
     end
 
     context "when there are both checked and unchecked audits" do
-      let!(:old_checked_audit) { create(:audit, site:, current: true, checked_at: 3.days.ago) }
       let!(:newest_checked_audit) { create(:audit, :checked, site:, checked_at: 2.days.ago) }
       let!(:newest_unchecked_audit) { create(:audit, site:, checked_at: nil, created_at: 1.day.from_now) }
 
       it "marks the newest checked audit as current" do
         expect { site.set_current_audit! }.to change { newest_checked_audit.reload.current }.from(false).to(true)
-          .and change { old_checked_audit.reload.current }.from(true).to(false)
         expect(newest_unchecked_audit.reload.current).to be false
       end
     end

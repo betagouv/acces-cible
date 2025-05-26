@@ -12,7 +12,7 @@ class Audit < ApplicationRecord
     "failed",     # All checks failed
   ].index_by(&:itself), validate: true, default: :pending
 
-  scope :sort_by_newest, -> { order(checked_at: :desc, created_at: :desc) }
+  scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(status: :pending) }
   scope :to_schedule, -> { pending.joins(:checks).merge(Check.to_schedule) }

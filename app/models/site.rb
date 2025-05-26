@@ -2,7 +2,7 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   belongs_to :team, touch: true
-  has_many :audits, dependent: :destroy
+  has_many :audits, -> { sort_by_newest }, dependent: :destroy
 
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
   scope :preloaded, -> { with_current_audit.includes(audits: :checks) }
@@ -30,19 +30,23 @@ class Site < ApplicationRecord
     end
   end
 
-  def parsed_url = Link.parse(url)
-  def url_without_scheme = [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
+  def url_without_scheme(url: audit.url)
+    parsed_url = Link.parse(url)
+    [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
+  end
 
-  def name = super.presence || url_without_scheme
+  def name = super.presence || url_without_scheme(url:)
   alias to_title name
-  def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+
+  def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
+  def update_slug! = tap { self.slug = nil; friendly_id }.save!
 
   def audit
-    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.last || audits.build(current: true)
+    audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
   end
 
   def audit!
-    audits.create!(url:, current: audits.none? || audits.current.none?).tap(&:schedule)
+    audits.create!(url:, current: audits.current.none? || audits.none?).tap(&:schedule)
   end
 
   def actual_current_audit
@@ -50,12 +54,12 @@ class Site < ApplicationRecord
   end
 
   def set_current_audit!
-    current_audit = audits.current.last
-    return if actual_current_audit && current_audit == actual_current_audit
+    return if actual_current_audit && audit == actual_current_audit
 
     transaction do
-      current_audit&.update!(current: false)
+      audit&.update!(current: false)
       actual_current_audit&.update!(current: true)
+      update_slug!
     end
   end
 end
