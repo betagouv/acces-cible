@@ -38,7 +38,7 @@ class Site < ApplicationRecord
   def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
 
   def audit
-    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.last || audits.build
+    audits.find(&:current?) || audits.current.last || audits.sort_by(&:checked_at).last || audits.last || audits.build(current: true)
   end
 
   def audit!
