@@ -1,15 +1,15 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "cb8384ab051ae32f84795a297fae3519a66a98325b1b7aa214dd5657e4df9e47",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "b1d272ced65d1548159466f184341516087cb5ff7013e7eab89de1f2ab8db1d4",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
       "file": "app/views/sites/show.html.erb",
-      "line": 5,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Site.friendly.find(params[:site_id]).url, Site.friendly.find(params[:site_id]).url, :target => :_blank)",
+      "line": 14,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:id)).audit!.all_checks, { :as => :check })",
       "render_path": [
         {
           "type": "controller",
@@ -23,40 +23,63 @@
           }
         }
       ],
-          "location": {
-            "type": "template",
-            "template": "sites/show"
-          },
-          "user_input": "Site.friendly.find(params[:site_id]).url",
-          "confidence": "Weak",
-          "cwe_id": [
-            79
-          ],
-          "note": ""
+      "location": {
+        "type": "template",
+        "template": "sites/show"
+      },
+      "user_input": "params.expect(:id)",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": ""
     },
     {
-          "warning_type": "SQL Injection",
-          "warning_code": 0,
-          "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
-          "check_name": "SQL",
-          "message": "Possible SQL injection",
-          "file": "app/queries/site_query.rb",
-          "line": 10,
-          "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-          "code": "Arel.sql(\"sortable_url #{direction}\")",
-          "render_path": null,
-          "location": {
-            "type": "method",
-            "class": "SiteQuery",
-            "method": "order_by"
-          },
-          "user_input": "direction",
-          "confidence": "Medium",
-          "cwe_id": [
-            89
-          ],
-          "note": ""
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/queries/site_query.rb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"sortable_url #{direction}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SiteQuery",
+        "method": "order_by"
+      },
+      "user_input": "direction",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/queries/site_query.rb",
+      "line": 12,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"sortable_url #{direction}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SiteQuery",
+        "method": "order_by"
+      },
+      "user_input": "direction",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
     }
   ],
-          "brakeman_version": "7.0.2"
+  "brakeman_version": "7.0.2"
 }
