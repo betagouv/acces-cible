@@ -25,7 +25,7 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    @site = current_user.sites.find_by_url(site_params) || current_user.sites.build(site_params)
+    @site = current_user.team.sites.find_by_url(site_params) || current_user.team.sites.build(site_params)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.persisted? || @site.save
       @site.audit.schedule if @site.audit.pending?
@@ -64,7 +64,7 @@ class SitesController < ApplicationController
   private
 
   def set_site
-    @site = params[:id].present? ? current_user.sites.friendly.find(params.expect(:id)) : Site.new
+    @site = params[:id].present? ? current_user.team.sites.friendly.find(params.expect(:id)) : Site.new
   end
 
   def redirect_old_slugs
