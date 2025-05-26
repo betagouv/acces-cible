@@ -1,4 +1,6 @@
 name: CI
+permissions:
+  contents: read
 
 on:
   push:
@@ -46,6 +48,9 @@ jobs:
   lint:
     name: Rubocop
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write # To annotate PRs
 
     steps:
       - name: Checkout code
