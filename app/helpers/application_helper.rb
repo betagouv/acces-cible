@@ -53,7 +53,7 @@ module ApplicationHelper
     side = options[:side].to_s.to_sym.presence_in([:left, :right])
     size = options[:size].to_s.to_sym.presence_in([:sm, :lg])
     btn = (options[:button] || options[:btn])
-    btn_style = btn && btn.to_s.to_sym.presence_in([:primary, :secondary, :tertiary])
+    btn_style = btn && btn.to_s.to_sym.presence_in([:primary, :secondary, :tertiary, :sort])
     btn_style = "tertiary-no-outline" if btn_style == :tertiary && options[:outline] == false
     link = !btn && side
     class_names(
@@ -87,12 +87,10 @@ module ApplicationHelper
     options[:title] ||= t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
     if current_sort.present?
       arrow = [:arrow, direction == :asc ? :down : :up]
-      btn = :secondary
     else
       arrow = [:arrow, :up, :down]
-      btn = :tertiary
     end
-    "#{text} #{link_icon(arrow, text, { params: link_params }, options.merge(btn:, size: :sm, sr_only: true, line: true))}".html_safe
+    "#{text} #{link_icon(arrow, text, { params: link_params }, options.merge(btn: :sort, size: :sm, sr_only: true, line: true))}".html_safe
   end
 
   def aria_sort(param)
