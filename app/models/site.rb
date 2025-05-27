@@ -31,6 +31,8 @@ class Site < ApplicationRecord
   end
 
   def url_without_scheme(url: audit.url)
+    return "" unless url
+
     parsed_url = Link.parse(url)
     [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
   end
