@@ -6,9 +6,10 @@ RSpec.describe Checks::Reachable do
   let(:redirect_url) { "https://example.org" }
   let(:audit) { instance_double(Audit, url: original_url, update: true) }
   let(:root_page) { instance_double(Page) }
+  let(:site) { instance_double(Site) }
 
   before do
-    allow(check).to receive_messages(audit:, root_page:)
+    allow(check).to receive_messages(audit:, root_page:, site:)
   end
 
   describe "constants" do
@@ -32,15 +33,34 @@ RSpec.describe Checks::Reachable do
   end
 
   describe "#analyze!" do
+    let(:reachable) { true }
+    let(:redirects) { false }
+
+    before do
+      allow(root_page).to receive_messages(success?: reachable, redirected?: redirects, title: "Page title")
+      allow(site).to receive_messages(name: nil, update: true)
+    end
+
     context "when the site is reachable" do
-      before do
-        allow(root_page).to receive(:success?).and_return(true)
+      context "when the site has a blank name" do
+        it "updates the site name" do
+          expect(site).to receive(:update).with(name: root_page.title)
+
+          check.send(:analyze!)
+        end
+      end
+
+      context "when the site already has a name" do
+        it "doesn't update site name" do
+          allow(site).to receive(:name).and_return("Site name already set")
+          expect(site).not_to receive(:update)
+
+          check.send(:analyze!)
+        end
       end
 
       context "when the page does not redirect" do
-        before do
-          allow(root_page).to receive(:redirected?).and_return(false)
-        end
+        let(:redirects) { false }
 
         it "returns an empty hash" do
           expect(check.send(:analyze!)).to eq({})

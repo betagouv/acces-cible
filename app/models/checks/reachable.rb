@@ -21,6 +21,7 @@ module Checks
     def analyze!
       raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
 
+      site.update(name: root_page.title) if site && site.name.blank?
       if root_page.redirected?
         audit.update(url: root_page.actual_url)
         { original_url: root_page.url, redirect_url: root_page.actual_url }
