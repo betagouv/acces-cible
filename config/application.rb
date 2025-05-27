@@ -45,6 +45,10 @@ module AccesCible
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    # Setup time zone
+    config.time_zone = "Paris"
+    config.active_record.default_timezone = :utc
+
     # Don't generate unneeded files
     config.generators do |generate|
       generate.helper = false

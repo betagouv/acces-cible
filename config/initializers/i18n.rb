@@ -3,7 +3,6 @@
 Rails.application.configure do
   config.i18n.available_locales = [:fr]
   config.i18n.default_locale = :fr
-  config.time_zone = "Europe/Paris"
   config.i18n.raise_on_missing_translations = Rails.env.local?
 
   # Workaround until there's a fix for https://github.com/faker-ruby/faker/issues/2987
