@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_26_082606) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_27_120328) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_26_082606) do
     t.datetime "updated_at", null: false
     t.datetime "checked_at"
     t.boolean "current", default: false, null: false
+    t.boolean "scheduled", default: false
     t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
     t.index ["site_id", "current"], name: "index_audits_on_site_id_and_current", unique: true, where: "(current = true)"
     t.index ["site_id"], name: "index_audits_on_site_id"
