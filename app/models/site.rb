@@ -37,7 +37,7 @@ class Site < ApplicationRecord
     [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
   end
 
-  def name = super.presence || url_without_scheme(url:)
+  def name = super.presence || url_without_scheme
   alias to_title name
 
   def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
