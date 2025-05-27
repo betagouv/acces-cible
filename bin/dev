@@ -10,7 +10,7 @@ bundle check &> /dev/null || bundle install
 # Install Overmind if not present
 if ! command -v overmind &> /dev/null; then
   echo "Installing overmind..."
-  brew install overmind 2>/dev/null || \
+  brew install tmux overmind 2>/dev/null || \
   (echo "Failed to install with brew. Please install Overmind manually:" && \
    echo "See: https://github.com/DarthSim/overmind#installation")
 fi
