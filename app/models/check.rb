@@ -31,7 +31,7 @@ class Check < ApplicationRecord
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
   scope :errored, ->(type = nil) { type ? where(error_type: type) : where.not(error_type: nil) }
-  scope :retryable, -> { where("retry_count < ?", MAX_RETRIES) }
+  scope :retryable, -> { where("retry_count < ? AND (error_type IS NULL OR error_type LIKE 'Ferrum%')", MAX_RETRIES) }
   scope :retry_due, -> { where("retry_at IS NULL OR retry_at <= now()") }
   scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due.unscheduled }
   scope :schedulable, -> { to_schedule.or(to_retry) }
@@ -59,7 +59,7 @@ class Check < ApplicationRecord
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
   def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false, retry_at: calculate_retry_at)
-  def retryable? = retry_count < MAX_RETRIES
+  def retryable? = retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
   def tooltip? = true
 
   def calculate_retry_at
