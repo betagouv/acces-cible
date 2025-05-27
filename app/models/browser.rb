@@ -3,8 +3,8 @@
 class Browser
   include Singleton
 
-  PAGE_TIMEOUT = 10.seconds
-  PROCESS_TIMEOUT = 20.seconds
+  PAGE_TIMEOUT = 30.seconds
+  PROCESS_TIMEOUT = 1.minute
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
@@ -127,7 +127,17 @@ class Browser
         browser_options: {
           "disable-blink-features": "AutomationControlled",
           "disable-popup-blocking": true,
-          "disable-notifications": true
+          "disable-notifications": true,
+          "no-sandbox" => nil,
+          "disable-gpu" => nil,
+          "disable-dev-shm-usage" => nil,
+          "disable-background-timer-throttling" => nil,
+          "disable-backgrounding-occluded-windows" => nil,
+          "disable-renderer-backgrounding" => nil,
+          "disable-features" => "TranslateUI,VizDisplayCompositor",
+          "disable-extensions" => nil,
+          "disable-plugins" => nil,
+          "disable-default-apps" => nil
         }
       }.tap do |options|
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
