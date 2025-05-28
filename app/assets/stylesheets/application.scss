@@ -14,6 +14,11 @@ form.button_to {
   display: contents;
 }
 
+// Empêche l'affichage des boutons [hidden], que la classe .fr-btn affiche par défaut
+.fr-btn[hidden] {
+  display: none !important;
+}
+
 .fr-badge {
   // Ajoute un outline quand il contient un lien caché qui a le focus
   &:has(a:focus) {
