@@ -7,6 +7,8 @@ class Site < ApplicationRecord
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
   scope :preloaded, -> { with_current_audit.includes(audits: :checks) }
 
+  after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
+
   friendly_id :url_without_scheme, use: [:slugged, :history, :scoped], scope: :team_id
 
   delegate :url, to: :audit, allow_nil: true
@@ -23,10 +25,13 @@ class Site < ApplicationRecord
   end
 
   def url=(new_url)
-    if audit.persisted? && url != new_url
-      audits.build(url: new_url)
-    else
+    return if url == new_url
+
+    if audit.pending?
       audit.url = new_url
+      audit.save if audit.persisted?
+    else
+      audits.build(url: new_url)
     end
   end
 
