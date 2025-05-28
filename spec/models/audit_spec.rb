@@ -1,14 +1,11 @@
 require "rails_helper"
 
 RSpec.describe Audit do
-  subject(:audit) { build(:audit, site: nil) }
+  subject(:audit) { build(:audit) }
 
-  let(:site) { build(:site, audits: [audit]) }
+  let(:site) { audit.site }
 
-  it "has a valid factory" do
-    audit = build(:audit)
-    expect(audit).to be_valid
-  end
+  it { should be_valid }
 
   describe "associations" do
     it { should belong_to(:site).touch(true) }

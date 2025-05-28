@@ -1,11 +1,13 @@
 require "rails_helper"
 
 RSpec.describe Site do
+  subject { build(:site, url:) }
+
   let(:url) { "https://example.com/" }
 
-  describe "associations" do
-    subject { build(:site) }
+  it { should be_valid }
 
+  describe "associations" do
     it { should belong_to(:team).touch(true) }
     it { should have_many(:audits).dependent(:destroy) }
   end

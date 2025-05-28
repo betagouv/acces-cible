@@ -3,9 +3,7 @@ require 'rails_helper'
 RSpec.describe Team do
   subject(:team) { build(:team) }
 
-  it "has a valid factory" do
-    expect(team).to be_valid
-  end
+  it { should be_valid }
 
   describe "associations" do
     it { should have_many(:users) }

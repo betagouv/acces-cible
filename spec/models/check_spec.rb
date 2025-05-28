@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe Check do
+  subject(:check) { build(:check) }
+
+  it { should be_valid }
+
   describe "associations" do
     it { should belong_to(:audit) }
   end
