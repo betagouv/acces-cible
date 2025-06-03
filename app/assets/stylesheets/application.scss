@@ -83,3 +83,26 @@ form.button_to {
     justify-content: center;
   }
 }
+
+// Allow placing input and buttons side-by-side
+.fr-input-group--inline {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 1rem;
+
+  .fr-input-group,
+  .fr-input {
+    flex: 1;
+    margin-bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  .fr-btn {
+    align-self: flex-end;
+    margin-bottom: 0;
+    border-top-right-radius: .25rem;
+    height: 100%;
+  }
+}
