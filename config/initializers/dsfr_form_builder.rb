@@ -2,7 +2,7 @@ module DsfrFormBuilderExtension
   # Override to use `value`, otherwise checkbox labels have an invalid `for`
   def dsfr_label_with_hint(attribute, opts = {})
     opts[:class] = "fr-label #{opts[:class]}".strip
-    label(attribute, **opts.except(:name, :checked, :required, :label)) do
+    label(attribute, **opts.except(:name, :checked, :required, :label, :id).merge(for: opts[:id])) do
       @template.safe_join([
         label_value(attribute, opts),
         (required_tag if opts[:required] && display_required_tags),
