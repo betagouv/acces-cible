@@ -26,9 +26,8 @@ class SitesController < ApplicationController
   # POST /sites
   def create
     url = site_params[:url]
-    @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build do |site|
-      site.assign_attributes(site_params)
-    end
+    @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
+    @site.assign_attributes(site_params)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.save
       @site.audit.schedule if @site.audit.pending?
