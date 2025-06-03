@@ -19,6 +19,7 @@ form.button_to {
   display: none !important;
 }
 
+// Ajuste les badges pour permettre de n'afficher que l'icône
 .fr-badge {
   // Ajoute un outline quand il contient un lien caché qui a le focus
   &:has(a:focus) {
