@@ -19,6 +19,11 @@ form.button_to {
   display: none !important;
 }
 
+// Supprime la bordure en double sur mobile quand il n'y a qu'un seul lien
+.fr-nav__item:first-child::before {
+  box-shadow: none;
+}
+
 // Ajuste les badges pour permettre de n'afficher que l'icône
 .fr-badge {
   // Ajoute un outline quand il contient un lien caché qui a le focus
