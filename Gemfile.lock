@@ -468,7 +468,7 @@ GEM
       rspec-expectations (~> 3.13)
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
-    rspec-support (3.13.3)
+    rspec-support (3.13.4)
     rspec-watcher (0.3.3)
       listen (~> 3.0)
       rspec-core (~> 3.0)
