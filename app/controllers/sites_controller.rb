@@ -74,6 +74,6 @@ class SitesController < ApplicationController
   end
 
   def site_params
-    params.expect(site: [:url, :name])
+    params.expect(site: [:url, :name, tag_ids: [], tags_attributes: [:name]])
   end
 end
