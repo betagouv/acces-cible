@@ -26,6 +26,7 @@ fr:
     login: Se connecter
     logout: Se déconnecter
     page_unavailable: Cette page n'est pas disponible.
+    x_more: Et %{x} de plus…
 
   time:
     formats:
@@ -200,6 +201,15 @@ fr:
           zero: Aucun site
           one: Un site
           other: "%{count} sites"
+      tag:
+        all: Étiquettes
+        name: Libellé
+        new: Nouvelle étiquette
+        add: Créer une nouvelle étiquette
+        count:
+          zero: Aucune étiquette
+          one: Une étiquette
+          other: "%{count} étiquettes"
 
   errors:
     not_found:
