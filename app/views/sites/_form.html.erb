@@ -1,4 +1,5 @@
-<%= form_with(model: site || Site.new) do |f| %>
+<%# locals: (site:) %>
+<%= form_with(model: site) do |f| %>
   <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: Site.human(:url_hint) %>
   <%= f.dsfr_text_field :name, autofocus: site.persisted?, hint: Site.human(:name_hint) %>
 
