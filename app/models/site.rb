@@ -3,9 +3,12 @@ class Site < ApplicationRecord
 
   belongs_to :team, touch: true
   has_many :audits, -> { sort_by_newest }, dependent: :destroy
+  has_many :site_tags, dependent: :destroy
+  has_many :tags, -> { in_alphabetical_order }, through: :site_tags
+  accepts_nested_attributes_for :tags, reject_if: :all_blank
 
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
-  scope :preloaded, -> { with_current_audit.includes(audits: :checks) }
+  scope :preloaded, -> { with_current_audit.includes(:tags, audits: :checks) }
 
   after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
 
