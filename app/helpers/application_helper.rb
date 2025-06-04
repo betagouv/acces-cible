@@ -103,6 +103,10 @@ module ApplicationHelper
     "aria-sort=#{current_sort == :asc ? :descending : :ascending}"
   end
 
+  def set_focus(selector)
+    tag.div(hidden: true, data: { controller: :focus, "focus-selector-value": "##{selector}" })
+  end
+
   def root? = request.path == "/"
 
   def time_ago(datetime)
