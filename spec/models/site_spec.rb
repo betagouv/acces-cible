@@ -10,6 +10,9 @@ RSpec.describe Site do
   describe "associations" do
     it { should belong_to(:team).touch(true) }
     it { should have_many(:audits).dependent(:destroy) }
+
+    it { should have_many(:site_tags).dependent(:destroy) }
+    it { should have_many(:tags).through(:site_tags) }
   end
 
   describe "delegations" do

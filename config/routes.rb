@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     delete :logout, action: :destroy, as: :logout
   end
 
+  resources :tags, only: :create
   resources :sites do
     collection do
       post :upload

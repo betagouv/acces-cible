@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_27_120328) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_27_124402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -67,6 +67,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_120328) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "site_tags", force: :cascade do |t|
+    t.bigint "site_id", null: false
+    t.bigint "tag_id", null: false
+    t.index ["site_id", "tag_id"], name: "index_site_tags_on_site_id_and_tag_id", unique: true
+    t.index ["site_id"], name: "index_site_tags_on_site_id"
+    t.index ["tag_id"], name: "index_site_tags_on_tag_id"
+  end
+
   create_table "sites", force: :cascade do |t|
     t.string "name"
     t.string "slug", null: false
@@ -78,6 +86,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_120328) do
     t.index ["audit_id"], name: "index_sites_on_audit_id"
     t.index ["slug", "team_id"], name: "index_sites_on_slug_and_team_id", unique: true
     t.index ["team_id"], name: "index_sites_on_team_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.bigint "team_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name", "team_id"], name: "index_tags_on_name_and_team_id", unique: true
+    t.index ["slug", "team_id"], name: "index_tags_on_slug_and_team_id", unique: true
+    t.index ["team_id"], name: "index_tags_on_team_id"
   end
 
   create_table "teams", force: :cascade do |t|
@@ -106,7 +125,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_120328) do
   add_foreign_key "audits", "sites"
   add_foreign_key "checks", "audits"
   add_foreign_key "sessions", "users"
+  add_foreign_key "site_tags", "sites"
+  add_foreign_key "site_tags", "tags"
   add_foreign_key "sites", "audits"
   add_foreign_key "sites", "teams"
+  add_foreign_key "tags", "teams"
   add_foreign_key "users", "teams", column: "siret", primary_key: "siret", name: "fk_users_on_team_siret"
 end

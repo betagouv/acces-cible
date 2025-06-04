@@ -83,3 +83,41 @@ form.button_to {
     justify-content: center;
   }
 }
+
+// Allow visually hiding a legend, when it duplicates a heading
+.fr-legend--hidden .fr-fieldset__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap; /* added line */
+  border: 0;
+  display: block;
+  height: 0;
+}
+
+// Allow placing input and buttons side-by-side
+.fr-input-group--inline {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 1rem;
+
+  .fr-input-group,
+  .fr-input {
+    flex: 1;
+    margin-bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  .fr-btn {
+    align-self: flex-end;
+    margin-bottom: 0;
+    border-top-right-radius: .25rem;
+    height: 100%;
+  }
+}

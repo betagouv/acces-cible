@@ -9,6 +9,7 @@
         <% Check.classes.each do |klass| %>
           <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
         <% end %>
+        <th scope="col"><%= Tag.human(:all) %></th>
         <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
       </tr>
     <% end %>
@@ -20,6 +21,15 @@
           <% site.audit.all_checks.each do |check| %>
             <td class="fr-cell--center"><%= badge(check.to_badge, tooltip: check.tooltip?) %></td>
           <% end %>
+          <td class="fr-cell--multiline">
+            <% tags = site.tags.collect(&:name) %>
+            <% if tags.any? %>
+              <%= safe_join site.tags.take(3).collect(&:name).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
+              <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: site.tags[3..].collect(&:name).to_sentence) if tags.size > 3 %>
+            <% else %>
+              N/A
+            <% end %>
+          </td>
           <td>
             <% if checked_at = site.audit.checked_at %>
               <% local_time = checked_at.in_time_zone %>

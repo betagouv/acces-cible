@@ -4,6 +4,14 @@
       <strong><%= Site.human :url %> :</strong>
       <%= link_to @site.url, @site.url, target: :_blank %>
     </p>
+    <p>
+      <strong><%= Tag.human(:all) %> :</strong>
+      <% if @site.tags.load.any? %>
+        <%= safe_join @site.tags.collect(&:name).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
+      <% else %>
+        <%= Tag.human_count(count: 0) %>
+      <% end %>
+    </p>
     <% if @audit.checked_at %>
       <p>
         <strong><%= Audit.human :checked_at %> :</strong>

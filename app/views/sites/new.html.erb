@@ -1,6 +1,6 @@
 <% use_centered_layout %>
 
-<%= render "form", site: @site || Site.new %>
+<%= render "form", site: @site || current_user.team.sites.build %>
 
 <%= or_separator %>
 
