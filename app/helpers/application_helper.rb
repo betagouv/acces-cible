@@ -37,6 +37,10 @@ module ApplicationHelper
     render Dsfr::PaginationComponent.new(pagy: @pagy)
   end
 
+  def dsfr_tooltip(text, title:, type: :button)
+    render Dsfr::TooltipComponent.new(text, title:, type:)
+  end
+
   def icon(*icon, fill: true, **options, &block)
     icon = Array.wrap(icon).join("-")
     fill = options[:line] || !fill ? "line" : "fill"
