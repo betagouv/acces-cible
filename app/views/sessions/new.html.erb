@@ -2,15 +2,7 @@
 
 <h2>Se connecter avec ProConnect</h2>
 
-<div class="fr-connect-group">
-  <%= form_with(url: omniauth_path(provider: :proconnect), data: { turbo: false }) do |f| %>
-    <%= f.button type: :submit, name: nil, class: "fr-connect" do %>
-      <span class="fr-connect__login">S’identifier avec</span>
-      <span class="fr-connect__brand">ProConnect</span>
-    <% end %>
-  <% end %>
-  <%= link_to "Qu’est ce que ProConnect ?", "https://www.proconnect.gouv.fr/", class: "fr-link", target: :_blank, rel: :noopener, title: "Qu’est ce que FranceConnect ? - nouvelle fenêtre" %>
-</div>
+<%= dsfr_proconnect_button(target: omniauth_path(provider: :proconnect)) %>
 
 <% if Rails.env.development? %>
   <%= or_separator %>
