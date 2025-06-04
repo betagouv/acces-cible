@@ -7,4 +7,4 @@ production:
   remove_orphan_tags:
     class: RemoveOrphanTagsJob
     queue: background
-    schedule: every night at 2am
+    schedule: every day at 2am
