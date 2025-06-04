@@ -1,0 +1,16 @@
+<%# locals: (site:, focus: false) %>
+<%= turbo_frame_tag :site_tags, data: { controller: :frame, "frame-action-value": tags_path } do %>
+  <%= dsfr_accordion_section(title: Tag.human(:all), expanded: focus, starting_header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
+    <%= fields_for(site, index: Time.current.to_i) do |f| %>
+      <%= f.dsfr_collection_check_boxes(:tag_ids, site.team.tags, :id, :name, { legend: Tag.human(:all) }, class: "fr-legend--hidden") %>
+      <div class="fr-input-group--inline fr-mb-0">
+        <%= f.fields_for :tags_attributes, site.team.tags.build do |ff| %>
+          <%= ff.dsfr_text_field :name, label: Tag.human(:new), id: dom_id(site, :tag_name) %>
+        <% end %>
+        <%= f.button t("shared.add"), class: icon_class("add-circle", btn: :secondary, line: true), hidden: true,
+                    data: { action: "frame#submit:prevent", "frame-target": :button }, title: Tag.human(:add) %>
+      </div>
+    <% end %>
+    <%= set_focus(dom_id(site, :tag_name)) if focus %>
+  <% end %>
+<% end %>

@@ -48,6 +48,12 @@ class Site < ApplicationRecord
   def name = super.presence || url_without_scheme
   alias to_title name
 
+  def tags_attributes=(attributes)
+    return if (name = attributes[:name]).blank?
+
+    tags << team.tags.find_or_create_by(name:)
+  end
+
   def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
   def update_slug! = tap { self.slug = nil; friendly_id }.save!
 
