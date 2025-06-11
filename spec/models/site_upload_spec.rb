@@ -89,8 +89,8 @@ RSpec.describe SiteUpload do
       site_upload.parse_sites
 
       new_sites_from_csv = [
-        { url: "https://example.com", name: "Example Site", team: },
-        { url: "https://test.com", name: "Test Site", team: }
+        { url: "https://example.com", name: "Example Site", tag_ids: [], team: },
+        { url: "https://test.com", name: "Test Site", tag_ids: [], team: }
       ]
       expect(site_upload.new_sites).to eq(new_sites_from_csv)
     end
@@ -104,13 +104,12 @@ RSpec.describe SiteUpload do
     end
 
     it "skips sites that already exist" do
-      existing_site_url = "https://example.com"
-      allow(Site).to receive(:find_by_url).with(url: existing_site_url).and_return(existing_site_url)
-      allow(Site).to receive(:find_by_url).with(url: "https://test.com").and_return(nil)
+      existing_site = build(:site, url: "https://example.com")
+      allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com" }
 
       site_upload.parse_sites
 
-      expect(site_upload.existing_sites.first).to eq(existing_site_url)
+      expect(site_upload.existing_sites.first).to eq(existing_site)
       expect(site_upload.new_sites.first[:url]).to eq("https://test.com")
     end
   end
@@ -135,6 +134,76 @@ RSpec.describe SiteUpload do
       site_upload.existing_sites = []
 
       expect(site_upload.count).to eq(0)
+    end
+  end
+
+  describe "#tags_attributes=" do
+    before { team.save }
+
+    it "creates a new tag and adds its ID to tag_ids" do
+      name = "Accessibility"
+      site_upload.tags_attributes = { name: }
+
+      expect(site_upload.tag_ids).to include(team.tags.find_by(name:).id)
+    end
+
+    it "finds existing tag and adds its ID to tag_ids" do
+      existing_tag = create(:tag, name: "Existing Tag", team:)
+      site_upload.tags_attributes = { name: "Existing Tag" }
+
+      expect(site_upload.tag_ids).to include(existing_tag.id)
+    end
+
+    it "does nothing when name is blank" do
+      original_tag_ids = site_upload.tag_ids.dup
+      site_upload.tags_attributes = { name: "" }
+
+      expect(site_upload.tag_ids).to eq(original_tag_ids)
+    end
+
+    it "does nothing when name is nil" do
+      original_tag_ids = site_upload.tag_ids.dup
+      site_upload.tags_attributes = { name: nil }
+
+      expect(site_upload.tag_ids).to eq(original_tag_ids)
+    end
+
+    it "does nothing when name is only whitespace" do
+      original_tag_ids = site_upload.tag_ids.dup
+      site_upload.tags_attributes = { name: "   " }
+
+      expect(site_upload.tag_ids).to eq(original_tag_ids)
+    end
+  end
+
+  describe "#parse_sites with tag_ids" do
+    let(:team) { create(:team) }
+    let(:tag1) { create(:tag, name: "Tag 1", team:) }
+    let(:tag2) { create(:tag, name: "Tag 2", team:) }
+
+    before do
+      site_upload.tag_ids = [tag1.id, tag2.id]
+    end
+
+    it "adds tag_ids to new sites" do
+      site_upload.parse_sites
+
+      expect(site_upload.new_sites).to all(include(tag_ids: [tag1.id, tag2.id]))
+    end
+
+    it "assigns tag_ids to existing sites" do
+      existing_site = create(:site, url: "https://example.com", team:)
+      site_upload.parse_sites
+
+      expect(site_upload.existing_sites.first.tag_ids).to contain_exactly(tag1.id, tag2.id)
+    end
+
+    it "preserves existing tag_ids on existing sites" do
+      tag3 = create(:tag, name: "Tag 3", team:)
+      existing_site = create(:site, url: "https://example.com", team:, tag_ids: [tag3.id])
+      site_upload.parse_sites
+
+      expect(site_upload.existing_sites.first.tag_ids).to contain_exactly(tag1.id, tag2.id, tag3.id)
     end
   end
 

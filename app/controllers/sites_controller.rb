@@ -39,7 +39,7 @@ class SitesController < ApplicationController
 
   # POST /sites/upload
   def upload
-    @upload = SiteUpload.new(params.expect(site: [:file]).merge(team: current_user.team))
+    @upload = SiteUpload.new(site_upload_params)
     if @upload.save
       ScheduleAuditsJob.perform_later
       redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
@@ -75,5 +75,9 @@ class SitesController < ApplicationController
 
   def site_params
     params.expect(site: [:url, :name, tag_ids: [], tags_attributes: [:name]])
+  end
+
+  def site_upload_params
+    params.expect(site_upload: [:file, [tag_ids: [], tags_attributes: [:name]]]).merge(team: current_user.team)
   end
 end
