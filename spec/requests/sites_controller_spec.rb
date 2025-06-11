@@ -50,7 +50,7 @@ RSpec.describe "Sites" do
   end
 
   describe "POST /sites/upload" do
-    subject(:upload_sites) { post upload_sites_path, params: { site: { file: } } }
+    subject(:upload_sites) { post upload_sites_path, params: { site_upload: { file: } } }
 
     let(:file) { fixture_file_upload("sites.csv", "text/csv") }
 
