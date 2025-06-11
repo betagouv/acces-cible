@@ -6,15 +6,16 @@ class SiteUpload
   REQUIRED_HEADERS = ["url"].freeze
   BOM = /^\xEF\xBB\xBF/
 
-  attr_accessor :file, :team, :new_sites, :existing_sites
+  attr_accessor :file, :team, :tag_ids, :tags, :new_sites, :existing_sites
 
   validates :file, :team, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
 
-  delegate :create!, :transaction, :human, :model_name, to: :Site
+  delegate :create!, :transaction, :human, to: :Site
 
   def initialize(attributes = {})
     super
+    @tag_ids ||= []
     @new_sites = []
     @existing_sites = []
   end
@@ -26,12 +27,23 @@ class SiteUpload
 
     transaction do
       create!(new_sites) if new_sites.any?
-      existing_sites.each(&:audit!)
+      existing_sites.each { |site| site.save && site.audit! }
     end
     true
   end
 
   def persisted? = false
+
+  def tags_attributes=(attributes)
+    return if (name = attributes[:name]).blank?
+
+    tag_ids << team.tags.find_or_create_by(name:).id
+  end
+
+  def assign_attributes(attributes)
+    # Assign team before other attributes because tags is scoped by team
+    super(attributes.slice(:team).merge(attributes))
+  end
 
   def count
     (new_sites&.length || 0) + (existing_sites&.length || 0)
@@ -43,9 +55,10 @@ class SiteUpload
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
       url = row["url"] || row["URL"]
       if existing_site = team.sites.find_by_url(url:)
+        existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
         self.existing_sites << existing_site
       else
-        self.new_sites << { url:, team:, name: row["name"] }
+        self.new_sites << { url:, team:, name: row["name"], tag_ids: }
       end
     end
   end

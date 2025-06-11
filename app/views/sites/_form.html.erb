@@ -3,6 +3,7 @@
   <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: Site.human(:url_hint) %>
   <%= f.dsfr_text_field :name, hint: Site.human(:name_hint) %>
 
-  <%= render "tags_form", site: %>
+  <%= render "tags_form", object: f.object %>
+
   <%= f.submit t("shared.#{site.persisted? ? :save : :add}"), name: nil, class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
 <% end %>
