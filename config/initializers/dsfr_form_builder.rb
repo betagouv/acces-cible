@@ -24,12 +24,12 @@ module DsfrFormBuilderExtension
   end
 
   # New method, to be merged back into dsfr-form-builder
-  def dsfr_collection_check_boxes(method, collection, value_method, text_method, options = {}, html_options = {})
+  def dsfr_collection_check_boxes(attribute, collection, value_method, text_method, options = {}, html_options = {})
     legend = @template.safe_join([
-      options.delete(:legend) || @object.class.human_attribute_name(method),
+      options.delete(:legend) || @object.class.human_attribute_name(attribute),
       hint_tag(options.delete(:hint))
     ])
-    name = options.delete(:name) || "#{@object_name}[#{method}][]"
+    name = options.delete(:name) || "#{@object_name}[#{attribute}][]"
     html_options[:class] = ["fr-fieldset", html_options[:class]].compact.join(" ")
     @template.content_tag(:fieldset, **html_options) do
       @template.safe_join([
@@ -40,13 +40,13 @@ module DsfrFormBuilderExtension
           checkbox_options = {
             name: name,
             value: value,
-            id: field_id(method, value),
+            id: field_id(attribute, value),
             label: item.send(text_method),
             inline: options[:inline],
-            checked: selected?(method, value),
+            checked: selected?(attribute, value),
             include_hidden: false
           }
-          dsfr_check_box(method, checkbox_options, value, "")
+          dsfr_check_box(attribute, checkbox_options, value, "")
         end
       ])
     end
