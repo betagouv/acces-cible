@@ -33,8 +33,7 @@ module Checks
 
     def accessibility_page?(current_page)
       current_page.title.match?(DECLARATION) ||
-        current_page.headings.any?(DECLARATION) ||
-        current_page.text.match?(ARTICLE)
+        current_page.headings.any?(DECLARATION) && current_page.text.match?(ARTICLE)
     end
 
     def sort_queue_by_likelihood(queue)
