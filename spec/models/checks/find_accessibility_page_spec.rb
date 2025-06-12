@@ -120,7 +120,8 @@ RSpec.describe Checks::FindAccessibilityPage do
     it "returns true when declaration is in headings" do
       page = build(:page,
         title: "Other Page",
-        headings: ["Déclaration d'accessibilité RGAA"]
+        headings: ["Déclaration d'accessibilité RGAA"],
+        body: "article 47 loi n°2005-102 du 11 février 2005"
       )
       expect(check.send(:accessibility_page?, page)).to be true
     end
@@ -128,6 +129,7 @@ RSpec.describe Checks::FindAccessibilityPage do
     it "returns true when article text is present" do
       page = build(:page,
         title: "Other Page",
+        headings: ["Accessibilité RGAA"],
         body: "article 47 loi n°2005-102 du 11 février 2005"
       )
       expect(check.send(:accessibility_page?, page)).to be true
