@@ -19,6 +19,7 @@ RSpec.describe Page do
           <h1>Main Heading</h1>
           <h2>Sub Heading</h2>
           <p>Some content</p>
+          <p>Text<strong>without</strong>spaces<em>between</em><code>tags</code></p>
           <a href="/contact">Contact</a>
           <a href="https://external.com">External</a>
           <a href="tel:123456">Phone</a>
@@ -135,7 +136,7 @@ RSpec.describe Page do
 
   describe "#css" do
     it "forwards CSS selector queries to the DOM" do
-      expect(page.css("h1").first.text).to eq("Main Heading")
+      expect(page.css("h1").first.text.squish).to eq("Main Heading")
     end
   end
 
@@ -148,6 +149,7 @@ RSpec.describe Page do
   describe "#text" do
     it "returns the full text content" do
       expect(page.text).to include("Main Heading", "Sub Heading", "Some content")
+      expect(page.text).to include("Text without spaces between tags")
       expect(page.text).not_to include("CSS comment")
     end
   end
