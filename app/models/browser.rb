@@ -4,7 +4,7 @@ class Browser
   include Singleton
 
   PAGE_TIMEOUT = 30.seconds
-  PROCESS_TIMEOUT = 1.minute
+  PROCESS_TIMEOUT = 3.minutes
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
@@ -112,7 +112,7 @@ class Browser
     browser.create_page.tap do |page|
       page.headers.set(HEADERS)
       page.headers.add(random_user_agent)
-      page.network.wait_for_idle(timeout: 2)
+      page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
   end
 
