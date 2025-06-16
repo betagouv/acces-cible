@@ -1,7 +1,18 @@
 class SiteUpload
   include ActiveModel::Model
 
-  ALLOWED_CONTENT_TYPES = ["text/csv"].freeze
+  ALLOWED_CONTENT_TYPES = [
+    "text/csv",
+    "text/comma-separated-values",
+    "text/x-csv",
+    "text/plain",
+    "application/csv",
+    "application/vnd.ms-excel",
+    "application/excel",
+    "application/x-excel",
+    "application/x-msexcel",
+    "application/octet-stream"
+  ].freeze
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
   BOM = /^\xEF\xBB\xBF/
@@ -70,6 +81,7 @@ class SiteUpload
   end
 
   def valid_file_format
+    errors.add(:file, :invalid_format) unless file.original_filename&.ends_with?(".csv")
     errors.add(:file, :invalid_format) unless ALLOWED_CONTENT_TYPES.include?(file.content_type)
   end
 
