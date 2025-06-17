@@ -159,6 +159,16 @@ fr:
         compliance_rate: Taux de conformité
         standard: Référentiel
         auditor: Audit réalisé par
+      checks/analyze_schema:
+        type: Schéma pluriannuel d'accessibilité
+        table_header: Schéma
+        years: Années de validité du schéma
+        year_not_found: non détectées
+        link_text: Intitulé du lien
+        link_url: Adresse du lien
+        link_not_found: Lien non trouvé
+        all_passed: Lien trouvé et valide
+        invalid_years: Années invalides
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
         table_header: Déclaration

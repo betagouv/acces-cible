@@ -25,6 +25,13 @@ RSpec.describe SiteCsvExport do
         audit_date: Date.new(2023, 6, 15),
         audit_update_date: Date.new(2025, 8, 20)
       })
+      analyze_schema = create(:check, :analyze_schema, audit:, data: {
+        link_url: "https://example.com/schema.pdf",
+        link_text: "Schéma pluriannuel d'accessibilité",
+        years: [2024, 2025, 2026],
+        reachable: true,
+        valid_years: true
+      })
       run_axe_on_homepage = create(:check, :run_axe_on_homepage, :completed, audit:, data: {
         passes: 50,
         incomplete: 5,
@@ -57,6 +64,7 @@ RSpec.describe SiteCsvExport do
         Checks::AnalyzeAccessibilityPage.human(:compliance_rate) => analyze_accessibility_page.human_compliance_rate,
         Checks::AnalyzeAccessibilityPage.human(:audit_date) => analyze_accessibility_page.audit_date.to_s,
         Checks::AnalyzeAccessibilityPage.human(:audit_update_date) => analyze_accessibility_page.audit_update_date.to_s,
+        Checks::AnalyzeSchema.human(:type) => analyze_schema.link_url,
         Checks::AccessibilityPageHeading.human(:type) => accessibility_page_heading.human_success_rate,
         Checks::RunAxeOnHomepage.human(:success_rate) => run_axe_on_homepage.human_success_rate
       }
