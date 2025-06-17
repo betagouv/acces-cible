@@ -7,7 +7,8 @@ class Tag < ApplicationRecord
 
   friendly_id :name, use: [:slugged, :scoped], scope: :team_id
 
-  validates :name, presence: true, uniqueness: { scope: :team_id }, if: :name_changed?
+  validates :name, presence: true
+  validates :name, uniqueness: { scope: :team_id }, if: :name_changed?
 
   scope :in_alphabetical_order, -> { order(:name) }
   scope :orphaned, -> { where.missing(:site_tags) }
