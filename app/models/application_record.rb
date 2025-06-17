@@ -2,7 +2,7 @@ class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
   delegate :l, to: :I18n
-  delegate :human, :human_count, :to_percent, :helpers, to: :class
+  delegate :human, :to_percent, :helpers, to: :class
 
   class << self
     delegate :helpers, to: ApplicationController
@@ -13,4 +13,5 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def to_title = respond_to?(:name) ? name : to_s
+  def human_count(attr, count: nil) = human(attr, count: count || send(attr))
 end
