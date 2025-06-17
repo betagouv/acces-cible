@@ -1,0 +1,26 @@
+<% if @sites.load.any? %>
+  <%= dsfr_table(caption: Site.human(:all)) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col" aria-sort="ascending"><%= Site.human(:name) %></th>
+        <th scope="col" class="fr-cell--right"><%= Tag.human(:all) %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <% @sites.each do |site| %>
+        <tr>
+          <td><%= link_to site.name, site %></td>
+          <td class="fr-cell--right"><%= Tag.human_count(count: site.tags_count) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= dsfr_alert(type: :info, title: Site.human_count(count: @tag.sites_count), html_attributes: { class: "fr-mb-4w" }) %>
+<% end %>
+
+<div class="fr-btns-group fr-btns-group--inline-md fr-mb-2w">
+  <%= link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
+  <%= button_to Tag.human(:delete), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+</div>

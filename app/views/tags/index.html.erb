@@ -1,0 +1,20 @@
+<% if @tags.load.any? %>
+  <%= dsfr_table(caption: Tag.human(:all)) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col" aria-sort="ascending"><%= Tag.human(:name) %></th>
+        <th scope="col" class="fr-cell--right"><%= Tag.human(:sites) %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <% @tags.each do |tag| %>
+        <tr>
+          <td><%= link_to tag.name, tag %></td>
+          <td class="fr-cell--right"><%= Site.human_count(count: tag.sites_count) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= dsfr_alert(type: :info, title: Tag.human_count) %>
+<% end %>
