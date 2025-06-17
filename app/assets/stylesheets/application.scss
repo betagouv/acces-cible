@@ -58,6 +58,11 @@ form.button_to {
   }
 }
 
+// Increase button spacing for clarity (particularly useful to place primary/secondary apart)
+.fr-btns-group--space-between {
+  justify-content: space-between;
+}
+
 // Improve file upload group affordance
 .fr-upload-group {
   .fr-upload {
