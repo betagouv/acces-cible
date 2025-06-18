@@ -1,0 +1,9 @@
+<%# locals: (tag:) %>
+<%= form_with(model: tag) do |f| %>
+  <%= f.dsfr_text_field :name, required: true, autofocus: true %>
+
+  <div class="fr-btns-group fr-btns-group--inline-md fr-btns-group--space-between fr-mb-2w">
+    <%= f.submit t("shared.save"), name: nil, class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
+    <%= link_to t("shared.cancel"), tag, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  </div>
+<% end %>

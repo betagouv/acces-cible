@@ -206,6 +206,9 @@ fr:
         name: Libellé
         new: Nouvelle étiquette
         add: Créer une nouvelle étiquette
+        sites: Sites
+        delete: Supprimer cette étiquette
+        edit: Modifier cette étiquette
         count:
           zero: Aucune étiquette
           one: Une étiquette
@@ -260,6 +263,15 @@ fr:
       notice: Site modifié
     destroy:
       notice: Site supprimé
+  tags:
+    index:
+      title: Étiquettes
+    edit:
+      title: Modifier l'étiquette
+    update:
+      notice: Étiquette modifiée
+    destroy:
+      notice: Étiquette supprimée
   audits:
     create:
       notice: Vérification créée
