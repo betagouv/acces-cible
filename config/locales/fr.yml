@@ -210,6 +210,12 @@ fr:
           zero: Aucune étiquette
           one: Une étiquette
           other: "%{count} étiquettes"
+      team:
+        all: Équipes
+        count:
+          zero: Aucune équipe
+          one: Une équipe
+          other: "%{count} équipes"
 
   errors:
     not_found:
