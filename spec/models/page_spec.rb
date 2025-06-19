@@ -28,6 +28,13 @@ RSpec.describe Page do
           <a href="relative/path">Relative</a>
           <a href="javascript:alert('')">Javascript</a>
           <a href="void(location.href='')">Void</a>
+          <a href="document.pdf">PDF</a>
+          <a href="file.zip">ZIP</a>
+          <a href="report.docx">DOCX</a>
+          <a href="image.jpg">JPG</a>
+          <a href="webcal.ical">ICAL</a>
+          <a href="rss.atom">ATOM</a>
+          <a href="holidays.mov">MOV</a>
           <div class="d-none" style="display: none;">display: none;</div>
         </body>
       </html>
@@ -194,20 +201,6 @@ RSpec.describe Page do
       expect(page.links.collect(&:text)).not_to include("Section")
     end
 
-    context "with links to non-HTML files" do
-      let(:body) do
-        <<~HTML
-          <a href="document.pdf">PDF</a>
-          <a href="file.zip">ZIP</a>
-          <a href="image.jpg">JPG</a>
-        HTML
-      end
-
-      it "excludes links to non-HTML files" do
-        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
-      end
-    end
-
     context "with fragment URLs" do
       let(:body) do
         <<~HTML
@@ -218,6 +211,22 @@ RSpec.describe Page do
 
       it "strips fragments from URLs" do
         expect(page.links.collect(&:href)).to contain_exactly("https://external.com/")
+      end
+    end
+
+    context "with skip_files: true (default)" do
+      it "excludes links to non-HTML files" do
+        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+      end
+    end
+
+    context "with skip_files: false" do
+      it "excludes ical, atom, movies, etc" do
+        expect(page.links(skip_files: false).collect(&:text)).not_to include("ICAL", "ATOM", "MOV")
+      end
+
+      it "includes file links" do
+        expect(page.links(skip_files: false).collect(&:text)).to include("PDF", "ZIP", "DOCX")
       end
     end
   end
