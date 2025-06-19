@@ -1,7 +1,8 @@
 class Page
   CACHE_TTL = 30.minutes
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
-  SKIPPED_EXTENSIONS = /\.(xml|rss|atom|ics|ical|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
+  DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
+  FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
 
   class InvalidTypeError < StandardError
@@ -48,13 +49,14 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def links
+  def links(skip_files: true)
     dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
       uri = Link.parse(href)
-      next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
+      next if uri.path && File.extname(uri.path).match?(FILES_EXTENSIONS)
+      next if skip_files && uri.path && File.extname(uri.path).match?(DOCUMENT_EXTENSIONS)
 
       href = parsed_root.join(href) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
