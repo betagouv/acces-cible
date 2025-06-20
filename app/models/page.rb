@@ -20,7 +20,6 @@ class Page
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
     @root = Link.normalize(root || url)
-    @status = 200
     @html = html || fetch&.last
   end
 
@@ -36,7 +35,7 @@ class Page
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
-  def success? = status == 200
+  def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   def error? = status > 399
   def refresh = fetch(clear: true)
 
