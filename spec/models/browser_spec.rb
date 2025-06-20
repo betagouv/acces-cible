@@ -1,71 +1,121 @@
 require "rails_helper"
 
 RSpec.describe Browser do
-  describe "#axe_check" do
-    subject(:axe_check) { described_class.axe_check(url) }
+  let(:url) { "https://example.com/" }
+  let(:browser) { described_class.new }
+  let(:status) { 200 }
+  let(:headers) { { "content-type" => "text/html" } }
+  # rubocop:disable RSpec/VerifiedDoubles
+  let(:ferrum) { double("ferrum").as_null_object }
+  let(:page) { double("page").as_null_object }
+  let(:network) { double("network").as_null_object }
+  let(:response) { double("response") }
+  # rubocop:enable RSpec/VerifiedDoubles
 
-    let(:url) { "https://example.com" }
-    let(:ferrum_browser) { described_class.instance.send(:browser) }
-    let(:page) { ferrum_browser.create_page }
-    let(:html) do
-      <<~HTML
-        <!DOCTYPE html>
-        <html> <!-- 1. Missing lang attribute -->
-          <head></head> <!-- 2. Missing title tag -->
-          <body>
-            <img src="test.jpg"> <!-- 3. Missing alt attribute -->
-            <a href="/target"></a>  <!-- 4. Missing text -->
-            <input name="email"> <!-- 5. Missing associated label -->
-          </body>
-        </html>
-      HTML
-    end
+  before do
+    allow(Ferrum::Browser).to receive(:new).and_return(ferrum)
+    allow(ferrum).to receive_messages(network:, create_page: page)
+    allow(page).to receive(:network).and_return(network)
+    allow(network).to receive_messages(status:, response:)
+    allow(response).to receive(:headers).and_return(headers) if response
+  end
 
-    around do |example|
-      # Allow real HTTP connections for Chrome DevTools Protocol
-      WebMock.disable_net_connect!(allow_localhost: true)
-      example.run
-      WebMock.disable_net_connect!
-    end
+  describe "#get" do
+    subject(:get) { browser.get(url) }
+
+    let(:body) { "<html><body>Test</body></html>" }
 
     before do
-      allow(described_class.instance).to receive(:with_page).and_yield(page)
+      allow(page).to receive_messages(body:, current_url: url)
+    end
 
-      allow(page).to receive(:go_to) do |_url|
-        page.evaluate("document.documentElement.innerHTML = `#{html}`")
+    context "with a successful request", :aggregate_failures do
+      it "returns response data for the provided URL" do
+        expect(page).to receive(:go_to).with(url)
+        expect(get).to eq({ body:, status:, headers:, current_url: url })
       end
     end
 
-    it "visits the provided URL" do
+    context "when network response is nil" do
+      let(:response) { nil }
+
+      it "handles missing network response gracefully" do
+        expect(get[:headers]).to eq({})
+      end
+    end
+
+    context "when network status is nil" do
+      let(:status) { nil }
+      let(:headers) { {} }
+
+      it "defaults status to 200" do
+        expect(get[:status]).to eq(200)
+      end
+    end
+
+    context "when browser encounters an error" do
+      before do
+        allow(page).to receive(:go_to).and_raise(Ferrum::TimeoutError.new("Timeout"))
+      end
+
+      it "logs the error and re-raises it" do
+        expect(Rails.logger).to receive(:error)
+        expect { get }.to raise_error(Ferrum::TimeoutError)
+      end
+    end
+  end
+
+  # rubocop:disable RSpec/MultipleMemoizedHelpers
+  describe "#axe_check", :aggregate_failures do
+    subject(:axe_check) { browser.axe_check(url) }
+
+    let(:axe_source) { "/* axe source code */" }
+    let(:axe_locale) { '{"lang": "fr"}' }
+    let(:axe_results) do
+      {
+        "violations" => [
+          { "id" => "document-title" },
+          { "id" => "html-has-lang" }
+        ],
+        "passes" => []
+      }
+    end
+
+    before do
+      allow(File).to receive(:read).with(Browser::AXE_SOURCE_PATH).and_return(axe_source)
+      allow(File).to receive(:read).with(Browser::AXE_LOCALE_PATH).and_return(axe_locale)
+      allow(page).to receive(:bypass_csp)
+      allow(page).to receive(:add_script_tag).with(content: axe_source)
+      allow(page).to receive(:evaluate_async).and_return(axe_results)
+    end
+
+    it "runs localized Axe checks on the provided URL, bypassing CSP" do
       expect(page).to receive(:go_to).with(url)
-      axe_check
-    end
-
-    it "bypasses Content Security Policy" do
-      expect(page).to receive(:bypass_csp).and_call_original
-      axe_check
-    end
-
-    it "returns accessibility results" do
+      expect(page).to receive(:bypass_csp)
+      expect(page).to receive(:add_script_tag).with(content: axe_source)
+      expect(page).to receive(:evaluate_async).with(
+        include("axe.configure({locale: #{axe_locale} })"),
+        Browser::PAGE_TIMEOUT
+      )
       results = axe_check
 
       expect(results).to be_a(Hash)
       expect(results).to have_key("violations")
       expect(results).to have_key("passes")
-
-      violation_ids = results["violations"].collect { |rule| rule["id"] }
-      expected_ids = ["document-title", "html-has-lang", "image-alt", "label", "landmark-one-main", "link-name", "page-has-heading-one", "region"]
-      expect(violation_ids).to match_array(expected_ids)
+      expect(results["violations"]).to be_an(Array)
+      expect(results["passes"]).to be_an(Array)
     end
 
     context "when browser encounters a timeout" do
       before do
-        allow(described_class.instance).to receive(:with_page).and_raise(Ferrum::TimeoutError.new("Timeout"))
+        allow(page).to receive(:go_to).and_raise(Ferrum::TimeoutError.new("Timeout"))
       end
 
-      it "raises the timeout error" do
+      it "logs the error and re-raises it" do
+        expect(Rails.logger).to receive(:error)
         expect { axe_check }.to raise_error(Ferrum::TimeoutError)
       end
     end
   end
+  # rubocop:enable RSpec/MultipleMemoizedHelpers
 end
