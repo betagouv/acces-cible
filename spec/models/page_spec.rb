@@ -36,6 +36,16 @@ RSpec.describe Page do
 
   before do
     stub_request(:get, url).to_return(body:, headers:)
+
+    # Mock Browser to prevent real Ferrum::Browser instantiation
+    ferrum_browser = instance_double(Ferrum::Browser)
+    network = instance_double(Ferrum::Network)
+    allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
+    allow(ferrum_browser).to receive(:network).and_return(network)
+    allow(network).to receive(:blocklist=)
+    allow(ferrum_browser).to receive(:reset)
+    allow(ferrum_browser).to receive(:close)
+    allow(ferrum_browser).to receive(:quit)
   end
 
   describe "#path" do

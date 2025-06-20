@@ -1,8 +1,6 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
 class Browser
-  include Singleton
-
   PAGE_TIMEOUT = 30.seconds
   PROCESS_TIMEOUT = 3.minutes
   WINDOW_SIZES = [
@@ -52,7 +50,15 @@ class Browser
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
 
   class << self
-    delegate_missing_to :instance
+    delegate_missing_to :new
+  end
+
+  attr_reader :browser
+
+  def initialize
+    @browser = Ferrum::Browser.new(settings).tap do |browser|
+      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
+    end
   end
 
   def get(url)
@@ -81,29 +87,17 @@ class Browser
   end
 
   def restart!
-    browser.reset
-    browser.close
-    browser.quit
+    cleanup_browser
     @browser = nil
-    browser
-  end
-
-  def browser
-    @browser ||= begin
-      Ferrum::Browser.new(settings).tap do |browser|
-        browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-        browser
-      end
-    end
   end
 
   private
 
   def with_page
+    page = nil
     begin
       page = create_page
-      result = yield(page)
-      result
+      yield(page)
     rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError, Ferrum::DeadBrowserError => error
       Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
       restart!
@@ -113,6 +107,7 @@ class Browser
       raise error
     ensure
       page&.close
+      cleanup_browser
     end
   end
 
@@ -146,7 +141,8 @@ class Browser
           "disable-features" => "TranslateUI,VizDisplayCompositor",
           "disable-extensions" => nil,
           "disable-plugins" => nil,
-          "disable-default-apps" => nil
+          "disable-default-apps" => nil,
+          "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}")
         }
       }.tap do |options|
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
@@ -154,6 +150,22 @@ class Browser
         options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
       end.freeze
     end
+  end
+
+  def cleanup_browser
+    if browser
+      browser.reset
+      browser.close
+      browser.quit
+    end
+  rescue => error
+    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
+  ensure
+    cleanup_user_data_dir
+  end
+
+  def cleanup_user_data_dir
+    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
   end
 
   def random_user_agent
