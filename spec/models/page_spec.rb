@@ -36,6 +36,7 @@ RSpec.describe Page do
 
   before do
     stub_request(:get, url).to_return(body:, headers:)
+    mock_browser
   end
 
   describe "#path" do
@@ -88,9 +89,7 @@ RSpec.describe Page do
     let(:body) { nil }
 
     before do
-      allow(Browser).to receive(:get)
-        .with(normalized_url)
-        .and_return({ body:, status: 200, headers:, current_url: normalized_url })
+      mock_browser(body:, headers:)
     end
 
     it "fetches the page content" do
@@ -100,8 +99,9 @@ RSpec.describe Page do
     it "attempts to use the cache" do
       allow(Rails.cache).to receive(:fetch)
         .with(normalized_url, expires_in: described_class::CACHE_TTL)
+        .and_return([normalized_url, 200, headers, body])
 
-      page
+      described_class.new(url:, root:)
       expect(Rails.cache).to have_received(:fetch)
         .with(normalized_url, expires_in: described_class::CACHE_TTL)
     end
@@ -110,6 +110,7 @@ RSpec.describe Page do
       let(:headers) { { "Content-Type" => "application/pdf" } }
 
       it "raises InvalidTypeError" do
+        mock_browser(headers:)
         expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
