@@ -61,7 +61,8 @@ class Browser
     end
   end
 
-  def initialize
+  def initialize(auto_quit: true)
+    @auto_quit = auto_quit
     @browser = Ferrum::Browser.new(settings).tap do |browser|
       browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
@@ -94,7 +95,7 @@ class Browser
 
   private
 
-  attr_reader :browser
+  attr_reader :browser, :auto_quit
 
   def with_page
     begin
@@ -105,7 +106,7 @@ class Browser
       raise ferrum_error
     ensure
       page&.close
-      quit
+      quit if auto_quit
     end
   end
 
