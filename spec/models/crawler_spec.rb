@@ -8,6 +8,7 @@ RSpec.describe Crawler do
   before do
     allow(Page).to receive(:new).and_return(page)
     allow(Rails.logger).to receive(:info)
+    mock_browser
   end
 
   describe "#initialize" do
@@ -31,7 +32,7 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(url: link1.href, root: root_url)
+          .with(url: link1.href, root: root_url, browser: anything)
           .and_return(target_page)
       end
 
@@ -55,7 +56,7 @@ RSpec.describe Crawler do
     context "when no matching page exists" do
       before do
         allow(Page).to receive(:new)
-          .with(url: anything, root: root_url)
+          .with(url: anything, root: root_url, browser: anything)
           .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
@@ -67,6 +68,7 @@ RSpec.describe Crawler do
       it "crawls unique pages only" do
         expect(Page).to receive(:new)
           .exactly(3).times # root + 2 unique links
+          .with(hash_including(browser: anything))
           .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
 
         expect { crawler.find { |page, _queue| page.title == "Target" } }
@@ -82,10 +84,10 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(url: root_url, root: root_url)
+          .with(url: root_url, root: root_url, browser: anything)
           .and_return(root_page)
         allow(Page).to receive(:new)
-          .with(url: anything, root: root_url)
+          .with(url: anything, root: root_url, browser: anything)
           .and_return(crawled_page)
       end
 
