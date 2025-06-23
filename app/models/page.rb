@@ -17,10 +17,11 @@ class Page
 
   attr_reader :url, :root, :status, :html, :headers, :actual_url
 
-  def initialize(url:, root: nil, html: nil)
+  def initialize(url:, root: nil, html: nil, browser: nil)
     @url = Link.normalize(url)
     @root = Link.normalize(root || url)
     @html = html || fetch&.last
+    @browser = browser
   end
 
   def root? = url == root
@@ -69,7 +70,7 @@ class Page
   def fetch(clear: false)
     Rails.cache.clear(url) if clear
     Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-      @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
+      @actual_url, @status, @headers, @html = browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
       content_type = headers["Content-Type"]
       if content_type && !content_type.include?("text/html")
         raise InvalidTypeError.new url, content_type
@@ -79,5 +80,9 @@ class Page
       Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
       raise e
     end
+  end
+
+  def browser
+    @browser || Browser.new
   end
 end
