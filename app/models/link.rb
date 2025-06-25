@@ -21,7 +21,7 @@ Link = Data.define(:href, :text) do
 
     def parse(href)
       Addressable::URI.parse(href.to_s.strip)
-    rescue Addressable::InvalidURIError
+    rescue Addressable::URI::InvalidURIError
       raise InvalidURIError.new(href)
     end
 
