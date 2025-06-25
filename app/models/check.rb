@@ -93,6 +93,13 @@ class Check < ApplicationRecord
       self.retry_at = nil
       passed?
     rescue StandardError => exception
+      Sentry.with_scope do |scope|
+        next unless scope # scope is nil when Sentry is disabled (in dev & test environments typically)
+
+        scope.set_context("check", { id:, type:, retry_count: })
+        scope.set_context("audit", { id: audit_id, url: audit.url })
+        Sentry.capture_exception(exception)
+      end
       self.status = :failed
       self.error = exception
       self.retry_count += 1
