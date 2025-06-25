@@ -60,7 +60,7 @@ class Page
       href = parsed_root.join(href) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
-    rescue Link::InvalidURIError
+    rescue Link::InvalidUriError
       next
     end.uniq.compact
   end

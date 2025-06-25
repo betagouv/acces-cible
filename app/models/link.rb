@@ -4,12 +4,6 @@ Link = Data.define(:href, :text) do
   SLASH = "/".freeze
   EMPTY_STRING = "".freeze
 
-  class InvalidURIError < StandardError
-    def initialize(href)
-      super("Addressable::URI cannot parse '#{href}'")
-    end
-  end
-
   class << self
     def from(source)
       case source
@@ -22,7 +16,7 @@ Link = Data.define(:href, :text) do
     def parse(href)
       Addressable::URI.parse(href.to_s.strip)
     rescue Addressable::URI::InvalidURIError
-      raise InvalidURIError.new(href)
+      raise Link::InvalidUriError.new(href)
     end
 
     def normalize(href)
