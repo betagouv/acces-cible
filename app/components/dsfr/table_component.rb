@@ -9,7 +9,7 @@ module Dsfr
 
     SIZES = [:sm, :md, :lg].freeze
 
-    def initialize(caption:, pagy:, html_attributes: {}, **options)
+    def initialize(caption:, pagy: nil, html_attributes: {}, **options)
       @caption = caption
       @pagy = pagy
       @size = options.delete(:size)&.to_sym || :md
@@ -41,8 +41,9 @@ module Dsfr
       )
     end
 
-    def pagination? = pagination.render?
-    def pagination = PaginationComponent.new(pagy:)
+    def paginated? = pagy.present?
+    def multipage? = pagination&.render?
+    def pagination = (PaginationComponent.new(pagy:) if pagy)
     def total_lines = human(:lines, count: pagy.count)
   end
 end

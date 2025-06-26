@@ -29,14 +29,6 @@ RSpec.describe Dsfr::TableComponent, type: :component do
       end
     end
 
-    context "when pagy is not provided" do
-      let(:params) { { caption: } }
-
-      it "raises an ArgumentError" do
-        expect { component }.to raise_error(ArgumentError, /missing keyword: :pagy/)
-      end
-    end
-
     context "when HTML attributes are provided" do
       let(:params) { { caption:, pagy:, html_attributes: { class: "custom-class", id: "test-table" } } }
 
@@ -139,7 +131,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
   end
 
-  describe "pagination?" do
+  describe "multipage?" do
     let(:pagination_component) { instance_double(Dsfr::PaginationComponent) }
 
     [true, false].each do |value|
@@ -150,7 +142,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
         end
 
         it "returns #{value}" do
-          expect(component.send(:pagination?)).to be value
+          expect(component.send(:multipage?)).to be value
         end
       end
     end
