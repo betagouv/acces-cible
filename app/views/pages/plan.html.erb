@@ -1,3 +1,4 @@
+<h2>Pages publiques</h2>
 <ul>
   <li>
     <%= link_to "Page d'accueil", root_path %>
@@ -16,5 +17,21 @@
   </li>
   <li>
     <%= link_to "Gestion des cookies", cookies_path %>
+  </li>
+  <li>
+    <%= link_to t("shared.login"), login_path %>
+  </li>
+</ul>
+
+<h2>Pages nécessitant de se connecter</h2>
+<ul>
+  <li>
+    <%= link_to Site.human(:all), sites_path %>
+  </li>
+  <li>
+    <%= link_to Site.human(:add), new_site_path %>
+  </li>
+  <li>
+    <%= link_to Tag.human(:all), tags_path %>
   </li>
 </ul>
