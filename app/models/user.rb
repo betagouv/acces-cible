@@ -20,6 +20,9 @@ class User < ApplicationRecord
         user.siret = auth.extra.raw_info.siret
         user.given_name = auth.extra.raw_info.given_name
         user.usual_name = auth.extra.raw_info.usual_name
+        user.team = find_or_create_team(siret: user.siret) do |team|
+          team.organizational_unit = auth.extra.raw_info.organizational_unit
+        end
       end.then { |user| user.persisted? ? user : nil }
     end
   end
