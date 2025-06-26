@@ -22,10 +22,12 @@
     </div>
   </div>
   <div class="fr-table__footer">
-    <div class="fr-table__footer--start">
-      <p class="fr-table__detail"><%= total_lines %></p>
-    </div>
-    <% if pagination? -%>
+    <% if paginated? -%>
+      <div class="fr-table__footer--start">
+        <p class="fr-table__detail"><%= total_lines %></p>
+      </div>
+    <%- end %>
+    <% if multipage? -%>
       <div class="fr-table__footer--middle">
         <%= render pagination %>
       </div>
