@@ -8,3 +8,7 @@ production:
     class: RemoveOrphanTagsJob
     queue: background
     schedule: every day at 2am
+  remove_inactive_users:
+    class: RemoveInactiveUsersJob
+    queue: background
+    schedule: "@monthly at 05:00"
