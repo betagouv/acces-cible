@@ -12,3 +12,7 @@ production:
     class: RemoveInactiveUsersJob
     queue: background
     schedule: "@monthly at 05:00"
+  remove_inactive_teams:
+    class: RemoveInactiveTeamsJob
+    queue: background
+    schedule: "@monthly at 06:00"
