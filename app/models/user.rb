@@ -15,15 +15,20 @@ class User < ApplicationRecord
 
   class << self
     def from_omniauth(auth)
-      find_or_create_by(provider: auth.provider, uid: auth.uid) do |user|
-        user.email = auth.info.email
-        user.siret = auth.extra.raw_info.siret
-        user.given_name = auth.extra.raw_info.given_name
-        user.usual_name = auth.extra.raw_info.usual_name
-        user.team = find_or_create_team(siret: user.siret) do |team|
-          team.organizational_unit = auth.extra.raw_info.organizational_unit
-        end
-      end.then { |user| user.persisted? ? user : nil }
+      siret = auth.extra.raw_info.siret
+      user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+      user.assign_attributes(
+        siret:,
+        email: auth.info.email,
+        given_name: auth.extra.raw_info.given_name,
+        usual_name: auth.extra.raw_info.usual_name
+      )
+      user.team ||= Team.find_or_initialize_by(siret:)
+      user.team.save if user.valid?
+      return unless user.save
+
+      user.team.update(organizational_unit: auth.extra.raw_info.organizational_unit)
+      user
     end
   end
 
