@@ -33,6 +33,7 @@ module AccesCible
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: ["assets", "tasks"])
+    config.autoload_paths << "#{config.root}/app/components/concerns"
 
     # Display custom error pages
     config.exceptions_app = routes
