@@ -18,25 +18,18 @@ class Crawler
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
     @queue = LinkList.new(root)
     @crawled = LinkList.new
-    @browser = nil
   end
 
   def find(&block)
     found = nil
-    begin
-      detect { |page, queue| found = page if block.call(page, queue) }
-      found or raise NoMatchError.new(root, crawled, &block)
-    ensure
-      browser.quit
-    end
+    detect { |page, queue| found = page if block.call(page, queue) }
+    found or raise NoMatchError.new(root, crawled, &block)
   end
 
   private
 
   attr_accessor :queue
   attr_reader :root, :crawled, :crawl_up_to
-
-  def browser = @browser ||= Browser.new(auto_quit: false)
 
   def each
     while queue.any?
@@ -53,7 +46,7 @@ class Crawler
   def get_page
     crawled << link = queue.shift
     Rails.logger.info { "#{crawled.size}: Crawling #{link.href}" }
-    Page.new(url: link.href, root: root.href, browser:)
+    Page.new(url: link.href, root: root.href)
   rescue StandardError => e
     case e
     when Page::InvalidTypeError
