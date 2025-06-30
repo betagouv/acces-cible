@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+# Available options:
+# --fail-fast    # Stop when a test fails
+# --only-failure # Only run tests that didn't pass
+# --next-failure # Equivalent to --fail-fast + --only-failure
+# bin/test spec/models/ spec/features/ # Runs model an feature tests only
+# bin/test spec/models/user_spec.rb:8:12 # Only run tests from lines 8 and 12 in user_spec.rb
+bundle exec rspec "$@"
