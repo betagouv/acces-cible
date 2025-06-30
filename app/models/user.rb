@@ -9,7 +9,7 @@ class User < ApplicationRecord
   validates :email, email: true
 
   normalizes :email, with: ->(value) { value.strip.downcase }
-  normalizes :siret, with: ->(value) { value.to_s.gsub(/[^a-zA-Z0-9]/, "") }
+  normalizes :siret, with: ->(value) { value.to_s.gsub(/\D/, "") }
 
   before_validation :find_or_create_team, on: :create
 

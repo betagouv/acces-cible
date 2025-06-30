@@ -4,4 +4,6 @@ class Team < ApplicationRecord
   has_many :tags, -> { in_alphabetical_order }, dependent: :destroy
 
   validates :siret, presence: true, uniqueness: true
+
+  normalizes :siret, with: ->(value) { value.to_s.gsub(/\D/, "") }
 end
