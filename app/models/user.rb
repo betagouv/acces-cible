@@ -5,7 +5,7 @@ class User < ApplicationRecord
 
   validates :provider, :uid, :email, :given_name, :usual_name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }
-  validates :email, uniqueness: true, if: :email_changed?
+  validates :email, uniqueness: { scope: :provider, if: :email_changed? }
   validates :email, email: true
 
   normalizes :email, with: ->(value) { value.strip.downcase }
