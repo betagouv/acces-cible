@@ -1,6 +1,8 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
 class Browser
+  include Singleton
+
   PAGE_TIMEOUT = 30.seconds
   PROCESS_TIMEOUT = 3.minutes
   WINDOW_SIZES = [
@@ -49,23 +51,8 @@ class Browser
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
 
-  delegate :quit, to: :browser, allow_nil: true
-
   class << self
-    def get(url)
-      new.get(url)
-    end
-
-    def axe_check(url)
-      new.axe_check(url)
-    end
-  end
-
-  def initialize(auto_quit: true)
-    @auto_quit = auto_quit
-    @browser = Ferrum::Browser.new(settings).tap do |browser|
-      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-    end
+    delegate_missing_to :instance
   end
 
   def get(url)
@@ -95,18 +82,29 @@ class Browser
 
   private
 
-  attr_reader :browser, :auto_quit
+  def browser
+    @browser ||= begin
+      Ferrum::Browser.new(settings).tap do |browser|
+        browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
+        browser
+      end
+    end
+  end
 
   def with_page
     begin
       page = create_page
-      yield(page)
+      result = yield(page)
+      result
+    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
+      Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
+      raise e unless defined?(page) && page
+      yield(page) # Try again to get what we can from the page
     rescue Ferrum::Error => ferrum_error
       Rails.logger.error { "Browser error: #{ferrum_error.message}" }
       raise ferrum_error
     ensure
       page&.close
-      quit if auto_quit
     end
   end
 
