@@ -1,1 +1,0 @@
-Faker::Config.locale = :fr
