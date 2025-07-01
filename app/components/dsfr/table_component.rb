@@ -27,7 +27,7 @@ module Dsfr
     store_accessor :options, :size, :border, :scroll, :caption_side
 
     def wrapper_attributes
-      html_attributes.merge(class: table_classes)
+      html_attributes.merge(class: table_classes, data: { controller: :table, table_hidden_class: "fr-hidden" })
     end
 
     def table_classes

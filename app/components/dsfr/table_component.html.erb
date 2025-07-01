@@ -3,11 +3,16 @@
   <div class="fr-table__header">
     <%= search if search? %>
     <% if header_actions? %>
-    <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
-      <% header_actions.each do |header_action| %>
-        <li><%= header_action %></li>
-      <% end %>
-    </ul>
+      <div class="fr-table__detail fr-hidden" data-table-target="detail">
+        <span data-table-target="counter"></span>
+        <span data-table-target="counterOne"><%= t("shared.selected_lines", count: 1) %></span>
+        <span data-table-target="counterMany"><%= t("shared.selected_lines", count: 2) %></span>
+      </div>
+      <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
+        <% header_actions.each do |header_action| %>
+          <li><%= header_action %></li>
+        <% end %>
+      </ul>
     <% end %>
   </div>
   <% end -%>
