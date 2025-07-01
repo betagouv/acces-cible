@@ -27,6 +27,12 @@ fr:
     logout: Se déconnecter
     page_unavailable: Cette page n'est pas disponible.
     x_more: Et %{x} de plus…
+    select_name: "Sélectionner %{name}"
+    all_lines: "toutes les lignes"
+    selected_lines:
+      one: ligne sélectionnée
+      other: lignes sélectionnées
+    destroy_all: "Supprimer la sélection"
 
   time:
     formats:
@@ -263,6 +269,11 @@ fr:
       notice: Site modifié
     destroy:
       notice: Site supprimé
+    destroy_all:
+      notice:
+        zero: Aucun site supprimé
+        one: Un site supprimé
+        other: "%{count} sites supprimés"
   tags:
     index:
       title: Étiquettes

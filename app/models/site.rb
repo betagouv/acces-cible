@@ -47,6 +47,7 @@ class Site < ApplicationRecord
 
   def name = super.presence || url_without_scheme
   alias to_title name
+  alias to_s name
 
   def tags_attributes=(attributes)
     return if (name = attributes[:name]).blank?
