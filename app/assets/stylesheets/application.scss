@@ -126,3 +126,12 @@ form.button_to {
     height: 100%;
   }
 }
+
+// Style indeterminate checkboxes
+.fr-checkbox-group input[type="checkbox"]:indeterminate + label::before {
+  background-color: var(--border-action-high-blue-france) !important;
+  background-image: linear-gradient(to right, var(--background-default-grey) 0%, var(--background-default-grey) 100%) !important;
+  background-size: 0.7rem 0.095rem !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
