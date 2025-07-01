@@ -1,7 +1,14 @@
 <div <%= tag.attributes wrapper_attributes %>>
-  <% if search? -%>
+  <% if header? -%>
   <div class="fr-table__header">
-    <%= search %>
+    <%= search if search? %>
+    <% if header_actions? %>
+    <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
+      <% header_actions.each do |header_action| %>
+        <li><%= header_action %></li>
+      <% end %>
+    </ul>
+    <% end %>
   </div>
   <% end -%>
   <div class="fr-table__wrapper">
