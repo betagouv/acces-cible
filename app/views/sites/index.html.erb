@@ -1,9 +1,15 @@
 <% if @sites.load.any? %>
+  <% form_id = :table_form %>
+  <%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
   <%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
     <% hidden_fields = params.expect(sort: {}).to_h.transform_keys { |key| :"sort[#{key}]" } %>
     <% t.with_search(url: url_for, name: "search[q]", value: params.dig(:search, :q), hidden_fields:) %>
+    <% t.with_header_action do %>
+      <%= button_tag t("shared.destroy_all"), form: form_id, data: { table_target: :button, turbo_confirm: t("shared.confirm") }, class: icon_class(:delete, line: true, btn: :secondary, class: "fr-hidden") %>
+    <% end %>
     <% t.with_head do %>
       <tr>
+        <%= dsfr_row_check_all %>
         <th scope="col"><%= Site.human(:detail) %></th>
         <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header Site.human(:url), :url %></th>
         <% Check.classes.each do |klass| %>
@@ -16,6 +22,7 @@
     <% t.with_body do %>
       <% @sites.each do |site| %>
         <tr>
+          <%= dsfr_row_check(site) %>
           <td class="fr-cell--center"><%= link_icon(:article, Site.human(:view_name, name: site.name), site, title: Site.human(:view_name, name: site.name), line: true, side: :left, sr_only: true) %></td>
           <td><%= link_to site.url_without_scheme.truncate(35, separator: /\W/), site.url, target: :_blank, title: site.url_without_scheme.length > 35 ? site.url_without_scheme : nil %></td>
           <% site.audit.all_checks.each do |check| %>

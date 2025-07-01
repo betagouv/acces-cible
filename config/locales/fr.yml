@@ -273,7 +273,7 @@ fr:
       notice:
         zero: Aucun site supprimé
         one: Un site supprimé
-        zero: "%{count} sites supprimés"
+        other: "%{count} sites supprimés"
   tags:
     index:
       title: Étiquettes

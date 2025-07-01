@@ -1,5 +1,6 @@
 class SitesController < ApplicationController
   before_action :set_site, only: [:show, :edit, :update, :destroy]
+  before_action :set_sites, only: :destroy_all
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
 
   # GET /sites
@@ -63,10 +64,22 @@ class SitesController < ApplicationController
     redirect_to sites_path, notice: t(".notice"), status: :see_other
   end
 
+  # DELETE /sites
+  def destroy_all
+    count = @sites.count
+    @sites.destroy_all
+    redirect_to sites_path, notice: t(".notice", count:), status: :see_other
+  end
+
   private
 
   def set_site
     @site = params[:id].present? ? current_user.team.sites.friendly.find(params.expect(:id)) : current_user.team.sites.build
+  end
+
+  def set_sites
+    site_ids = params.expect(id: [])
+    @sites = current_user.team.sites.where(id: site_ids)
   end
 
   def redirect_old_slugs
