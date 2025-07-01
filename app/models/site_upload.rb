@@ -64,7 +64,7 @@ class SiteUpload
     require "csv"
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
-      url = row["url"] || row["URL"]
+      url = Link.normalize(row["url"] || row["URL"])
       if existing_site = team.sites.find_by_url(url:)
         existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
         self.existing_sites << existing_site
@@ -72,6 +72,7 @@ class SiteUpload
         self.new_sites << { url:, team:, name: row["name"], tag_ids: }
       end
     end
+    self.new_sites.uniq!
   end
 
   private
