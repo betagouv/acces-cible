@@ -135,3 +135,22 @@ form.button_to {
   background-position: center !important;
   background-repeat: no-repeat !important;
 }
+
+// Allow enlarging clickable inputs (radio, checkboxes)
+.fr-enlarge-input {
+  position: relative;
+  .fr-radio-group .fr-label::after,
+  .fr-checkbox-group .fr-label::after {
+    content: "";
+    inset: 0;
+    position: absolute;
+    pointer-events: auto;
+    z-index: 1;
+  }
+  &.fr-cell--fixed {
+    .fr-radio-group .fr-label::after,
+    .fr-checkbox-group .fr-label::after {
+      margin: -.5rem -1rem -.5rem -2.5rem;
+    }
+  }
+}
