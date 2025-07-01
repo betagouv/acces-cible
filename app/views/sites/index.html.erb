@@ -1,5 +1,5 @@
 <% if @sites.load.any? %>
-  <%= dsfr_table(caption: Site.human(:all)) do |t| %>
+  <%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
     <% hidden_fields = params.expect(sort: {}).to_h.transform_keys { |key| :"sort[#{key}]" } %>
     <% t.with_search(url: url_for, name: "search[q]", value: params.dig(:search, :q), hidden_fields:) %>
     <% t.with_head do %>
