@@ -12,18 +12,18 @@ module Dsfr
     def initialize(caption:, pagy: nil, html_attributes: {}, **options)
       @caption = caption
       @pagy = pagy
-      @size = options.delete(:size)&.to_sym || :md
-      @scroll = options.delete(:scroll) { true }
-      @border = options.delete(:border)
-      @caption_side = options.delete(:caption_side)
+      options[:scroll] = options.fetch(:scroll, true)
+      options[:size] = options[:size]&.to_sym || :md
+      @options = options
       @html_attributes = html_attributes
 
-      raise ArgumentError, "size must be one of: #{SIZES.join(', ')}" unless SIZES.include?(@size)
+      raise ArgumentError, "size must be one of: #{SIZES.join(', ')}" unless SIZES.include?(size)
     end
 
     private
 
-    attr_reader :caption, :caption_side, :pagy, :size, :border, :scroll, :html_attributes
+    attr_reader :caption, :pagy, :html_attributes
+    store_accessor :options, :size, :border, :scroll, :caption_side
 
     def wrapper_attributes
       html_attributes.merge(class: table_classes)
