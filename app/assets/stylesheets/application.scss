@@ -154,3 +154,25 @@ form.button_to {
     }
   }
 }
+
+// Fix vertical alignment of table actions
+.fr-table__header .fr-btns-group li:last-child .fr-btn {
+  margin-bottom: 0;
+}
+
+// Fix vertical alignment of search and counter on narrow screens
+@media (max-width: 47.999em) {
+  .fr-search-bar + .fr-table__detail {
+    margin-top: .5rem;
+  }
+}
+
+// Fix spacing between table header elements on larger screens
+@media (min-width: 48em) {
+  .fr-table__header .fr-table__detail {
+    margin-bottom: 0;
+  }
+  .fr-search-bar + .fr-table__detail {
+    margin-left: .5rem;
+  }
+}
