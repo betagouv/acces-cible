@@ -5,6 +5,7 @@ module Dsfr
     renders_one :head
     renders_one :body
     renders_one :search, DsfrComponent::SearchComponent
+    renders_many :header_actions
     renders_many :footer_actions
 
     SIZES = [:sm, :md, :lg].freeze
@@ -45,5 +46,7 @@ module Dsfr
     def multipage? = pagination&.render?
     def pagination = (PaginationComponent.new(pagy:) if pagy)
     def total_lines = human(:lines, count: pagy.count)
+    def header_actions? = header_actions.any?
+    def header? = search? || header_actions?
   end
 end
