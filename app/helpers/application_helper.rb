@@ -41,6 +41,32 @@ module ApplicationHelper
     render Dsfr::TooltipComponent.new(text, title:, type:)
   end
 
+  def dsfr_row_check(record)
+    input_id = "row_check_#{record.id}"
+    text = t("shared.select_name", name: record.to_s)
+    <<-HTML.html_safe
+    <th class="fr-cell--fixed fr-enlarge-input" scope="row">
+      <div class="fr-checkbox-group fr-checkbox-group--sm" title="#{text}">
+        <input type="checkbox" name="id[]" value="#{record.id}" id="#{input_id}" form="table_form" data-fr-row-select="true" data-action="table#toggle" data-table-target="checkbox">
+        <label for="#{input_id}" class="fr-label">#{text}</label>
+      </div>
+    </th>
+    HTML
+  end
+
+  def dsfr_row_check_all
+    input_id = "row_check_all"
+    text = t("shared.select_name", name: t("shared.all_lines"))
+    <<-HTML.html_safe
+    <th class="fr-cell--fixed fr-enlarge-input" role="columnheader">
+      <div class="fr-checkbox-group fr-checkbox-group--sm" title="#{text}">
+        <input type="checkbox" id="#{input_id}" data-action="table#toggleAll" data-table-target="toggleAll">
+        <label for="#{input_id}" class="fr-label">#{text}</label>
+      </div>
+    </th>
+    HTML
+  end
+
   def icon(*icon, fill: true, **options, &block)
     icon = Array.wrap(icon).join("-")
     fill = options[:line] || !fill ? "line" : "fill"
