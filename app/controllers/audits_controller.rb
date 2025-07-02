@@ -21,6 +21,6 @@ class AuditsController < ApplicationController
   private
 
   def set_site
-    @site = current_user.team.sites.friendly.find(params.expect(:id))
+    @site = current_user.team.sites.friendly.find(params.expect(:site_id))
   end
 end
