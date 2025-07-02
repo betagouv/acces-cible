@@ -123,6 +123,7 @@ class Browser
         timeout: PAGE_TIMEOUT,
         window_size: WINDOW_SIZES.sample,
         process_timeout: PROCESS_TIMEOUT,
+        pending_connection_errors: false,
         extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
         browser_options: {
           "disable-blink-features": "AutomationControlled",
