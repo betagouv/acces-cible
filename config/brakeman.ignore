@@ -1,6 +1,40 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "2a04a647ede1a3b6eb10a742d32955f6e8881d5e5649e42d78d52a2af8252a50",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/sites/show.html.erb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:site_id)).audit!.all_checks, { :as => :check })",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "AuditsController",
+          "method": "create",
+          "line": 10,
+          "file": "app/controllers/audits_controller.rb",
+          "rendered": {
+            "name": "sites/show",
+            "file": "app/views/sites/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sites/show"
+      },
+      "user_input": "params.expect(:site_id)",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "5becd9d8bacf1ad1f5396e95adf45d4e7d9c6e1682d5c43cd3a61027fdafe432",
@@ -20,40 +54,6 @@
       "confidence": "Medium",
       "cwe_id": [
         89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "b1d272ced65d1548159466f184341516087cb5ff7013e7eab89de1f2ab8db1d4",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/views/sites/show.html.erb",
-      "line": 22,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:id)).audit!.all_checks, { :as => :check })",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "AuditsController",
-          "method": "create",
-          "line": 10,
-          "file": "app/controllers/audits_controller.rb",
-          "rendered": {
-            "name": "sites/show",
-            "file": "app/views/sites/show.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "sites/show"
-      },
-      "user_input": "params.expect(:id)",
-      "confidence": "Weak",
-      "cwe_id": [
-        22
       ],
       "note": ""
     },
