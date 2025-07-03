@@ -141,7 +141,7 @@ RSpec.describe User do
 
     context "with invalid data" do
       before do
-        auth.info.stub(:email).and_return("invalid-email")
+        allow(auth.info).to receive(:email).and_return("invalid-email")
       end
 
       it "returns nil" do
