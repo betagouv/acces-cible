@@ -56,6 +56,9 @@ gem "pagy"
 # ViewComponents
 gem "view_component"
 
+# Markdown in views
+gem "markdown_views"
+
 # DSFR utilities
 gem "dsfr-assets"
 gem "dsfr-form_builder"
