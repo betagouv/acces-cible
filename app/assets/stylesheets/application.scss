@@ -176,3 +176,9 @@ form.button_to {
     margin-left: .5rem;
   }
 }
+
+@media print {
+  .fr-btns-group {
+    display: none !important;
+  }
+}
