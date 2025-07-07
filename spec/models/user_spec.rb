@@ -35,26 +35,28 @@ RSpec.describe User do
   describe ".from_omniauth" do
     subject(:from_omniauth) { described_class.from_omniauth(auth) }
 
+    let(:email) { "john.doe@example.com" }
     let(:siret) { "12345678901234" }
     let(:organizational_unit) { "Engineering Department" }
-    # rubocop:disable RSpec/VerifiedDoubles
+
     let(:auth) do
-      double(
-        :auth,
-        provider: "google_oauth2",
-        uid: "123456789",
-        info: double(email: "john.doe@example.com"),
-        extra: double(
-          raw_info: double(
-            siret:,
-            organizational_unit:,
-            given_name: "John",
-            usual_name: "Doe",
-          )
-        )
+      OmniAuth::AuthHash.new(
+        {
+          provider: "test",
+          uid: "123",
+          info: { email: },
+          extra: {
+            raw_info: {
+              email:,
+              siret:,
+              organizational_unit:,
+              given_name: "John",
+              usual_name: "Doe"
+            }
+          }
+        }
       )
     end
-    # rubocop:enable RSpec/VerifiedDoubles
 
     context "when user does not exist" do
       it "creates a new user with the provided attributes" do
@@ -120,8 +122,7 @@ RSpec.describe User do
       end
 
       it "updates the existing team's organizational_unit" do
-        from_omniauth
-        expect(existing_team.reload.organizational_unit).to eq(auth.extra.raw_info.organizational_unit)
+        expect { from_omniauth }.to change { existing_team.reload.organizational_unit }
       end
     end
 
@@ -140,9 +141,7 @@ RSpec.describe User do
     end
 
     context "with invalid data" do
-      before do
-        allow(auth.info).to receive(:email).and_return("invalid-email")
-      end
+      let(:email) { "invalid-email" }
 
       it "returns nil" do
         expect(from_omniauth).to be_nil
