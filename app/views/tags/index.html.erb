@@ -16,5 +16,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= dsfr_alert(type: :info, title: Tag.human_count) %>
+  <%= dsfr_alert(type: :info, title: Tag.human_count(count: 0)) %>
 <% end %>
