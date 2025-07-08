@@ -10,7 +10,7 @@
       <% @tags.each do |tag| %>
         <tr>
           <td><%= link_to tag.name, tag %></td>
-          <td class="fr-cell--right"><%= Site.human_count(count: tag.sites_count) %></td>
+          <td class="fr-cell--right"><%= tag.sites_count %></td>
         </tr>
       <% end %>
     <% end %>
