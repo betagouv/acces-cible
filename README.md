@@ -5,7 +5,7 @@ Application permettant de contrôler l'accessibilité des sites Internet, et les
 ## 🚀 Installation et démarrage
 
 - Demandez la `master.key` à l'un des membres de votre équipe
-- Placez la dans `config/`
+- Placez-la dans `config/`
 
 Pour démarrer le serveur, vous pouvez utiliser l'une des commandes suivantes :
 
