@@ -4,10 +4,15 @@ Application permettant de contrôler l'accessibilité des sites Internet, et les
 
 ## 🚀 Installation et démarrage
 
+- Demandez la `master.key` à l'un des membres de votre équipe
+- Placez la dans `config/`
+
 Pour démarrer le serveur, vous pouvez utiliser l'une des commandes suivantes :
 
 ```bash
-docker compose up
+docker compose build
+docker compose up -d
+docker compose exec web bin/rails db:setup
 ```
 
 ou, si ruby est installé sur votre poste (overmind est préconisé) :
@@ -51,7 +56,10 @@ bin/dev
 
 ## 🧪 Tests
 
+:information_source: Docker: Préfixer `docker compose exec web` pour chaque commande
+
 ### Exécuter tous les tests
+
 ```bash
 bundle exec rspec
 ```
