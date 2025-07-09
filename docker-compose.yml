@@ -5,6 +5,10 @@ services:
     image: acces_cible
     environment:
       DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
+      RUBY_DEBUG_HOST: 0.0.0.0
+      RUBY_DEBUG_NO_RELINE: true
+      RUBY_DEBUG_PORT: 12345
+      WEB_CONCURRENCY: 0
     ports:
       - "3000:3000"
     volumes:
