@@ -38,7 +38,7 @@
       <div class="fr-table__footer--start">
         <p class="fr-table__detail"><%= total_lines %></p>
         <% if lines.positive? -%>
-          <%= form_with(url: url_for, method: :get) do |f| %>
+          <%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
             <%= f.hidden_field :sort, name: "sort[#{params[:sort].keys.first}]", value: params[:sort].values.first if params[:sort] %>
             <%= f.hidden_field :filter, value: params[:filter] if params[:filter] %>
             <div class="fr-select-group">
