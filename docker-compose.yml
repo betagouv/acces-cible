@@ -18,6 +18,7 @@ services:
     <<: *server
     command: ["bin/rails", "dartsass:watch"]
     ports: []
+    entrypoint: ''
   db:
     image: postgres
     environment:
