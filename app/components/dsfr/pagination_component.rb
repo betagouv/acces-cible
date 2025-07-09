@@ -1,6 +1,12 @@
 module Dsfr
   class PaginationComponent < ApplicationComponent
     LINK_CLASS = "fr-pagination__link".freeze
+    PER_PAGE = [10, 20, 50, 100]
+
+    class << self
+      def per_page_label = human(:per_page_label)
+      def per_page_options = PER_PAGE.index_with { |count| human(:per_page, count:) }.invert
+    end
 
     def initialize(pagy:)
       @pagy = pagy
