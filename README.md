@@ -81,3 +81,26 @@ bundle exec rubocop
 ```bash
 bundle exec rubocop -a
 ```
+
+## 🔬 Debug
+
+Dans l'environnement Docker, vous pouvez utiliser `debug` pour
+arrêter et explorer votre code à un endroit précis :
+
+1. rajoutez un breakpoint avec l'appel `debugger` :
+
+```diff
+def some_method
++  debugger
+  a = "foobar"
+end
+```
+
+2. une fois le code arrêté :
+
+```
+web-1          | DEBUGGER: wait for debugger connection...
+```
+
+ouvrez un terminal et lancez `make debug` qui se connecte
+automatiquement au debugger.

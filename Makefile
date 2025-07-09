@@ -23,4 +23,4 @@ guard:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) guard
 
 debug:
-	$(DOCKER-RUN) web $(BUNDLE-EXEC) rdbg -A web 12345
+	$(DOCKER-RUN) web $(BUNDLE-EXEC) rdbg -nA web 12345
