@@ -2,6 +2,10 @@
 
 Application permettant de contrôler l'accessibilité des sites Internet, et les obligations légales liés à celle-ci.
 
+Production: https://acces-cible.beta.gouv.fr/
+
+Staging: https://acces-cible.incubateur.net/
+
 ## 🚀 Installation et démarrage
 
 - Demandez la `master.key` à l'un des membres de votre équipe
@@ -9,10 +13,11 @@ Application permettant de contrôler l'accessibilité des sites Internet, et les
 
 Pour démarrer le serveur, vous pouvez utiliser l'une des commandes suivantes :
 
+Docker: 
 ```bash
-docker compose build
-docker compose up -d
-docker compose exec web bin/rails db:setup
+make up # docker compose up
+make cl # rails c
+make sh # bash
 ```
 
 ou, si ruby est installé sur votre poste (overmind est préconisé) :
@@ -20,6 +25,30 @@ ou, si ruby est installé sur votre poste (overmind est préconisé) :
 ```bash
 bin/dev
 ```
+
+### Jobs & Mission control job
+
+Afin d'accéder à l'interface utilisateur des jobs, vous devrez aller sur `http://localhost:3000/jobs` et entrer les informations authentication présentes dans les `credentials`.
+
+
+### Seeds et connexion en local
+
+- Pour lancer les seeds (`db/seeds/development.rb`)
+
+```bash
+# Docker
+make sh
+./bin/rails db:seed
+
+# Local
+bundle exec rails db:seed
+```
+
+- Dirigez-vous sur `http://localhost:3000`
+- Connectez-vous avec ProConnect et renseignez vos identifiants habituels
+- OU
+- Cliquez sur `Se connecter en tant que développeur`
+- Renseignez l'`uid` `123456789`
 
 ## 🧰 Outils et technologies
 
@@ -56,7 +85,15 @@ bin/dev
 
 ## 🧪 Tests
 
-:information_source: Docker: Préfixer `docker compose exec web` pour chaque commande
+### Docker setup
+```
+# bash
+make sh 
+./bin/rails db:setup RAILS_ENV=test
+
+# Tous les tests
+make rspec 
+```
 
 ### Exécuter tous les tests
 
