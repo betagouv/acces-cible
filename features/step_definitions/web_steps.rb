@@ -134,6 +134,10 @@ Quand("je choisis {string} pour {string}") do |option, fieldset|
   end
 end
 
+Quand("j'attache le fichier {string} pour le champ {string}") do |path, field|
+  attach_file(field, path)
+end
+
 Alors("je peux voir dans le tableau {string}") do |caption, table|
   expect(page).to have_table(caption, with_rows: table.rows)
 end

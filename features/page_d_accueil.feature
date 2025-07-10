@@ -10,5 +10,6 @@ Fonctionnalité: Accueil
 
   Scénario: Un agent se connecte pour la première fois
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
-    Et que je me pro-connecte
+    Quand je me pro-connecte
+    # Alors la page affiche "Connexion réussie pour marie.curie@gouv.fr"
     Alors la page contient "Ajouter un site"
