@@ -107,6 +107,7 @@ end
 group :test do
   gem "capybara"
   gem "cucumber-rails", require: false
+  gem "betagouv-cucumber-steps", require: false
   gem "database_cleaner"
   gem "guard"
   gem "guard-cucumber"
