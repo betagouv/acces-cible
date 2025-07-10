@@ -16,6 +16,8 @@ Pour démarrer le serveur, vous pouvez utiliser l'une des commandes suivantes :
 Docker: 
 ```bash
 make up # docker compose up
+
+# Autres commandes présentes dans le Makefile:
 make cl # rails c
 make sh # bash
 ```
@@ -47,8 +49,16 @@ bundle exec rails db:seed
 - Dirigez-vous sur `http://localhost:3000`
 - Connectez-vous avec ProConnect et renseignez vos identifiants habituels
 - OU
-- Cliquez sur `Se connecter en tant que développeur`
-- Renseignez l'`uid` `123456789`
+- Cliquez sur `Se connecter en mode développeur`
+- Renseignez:
+```
+Uid: user@example.com
+Email: user@example.com
+Given name: Test
+Usual name: User
+Siret: 12345678901234
+Organizational unit: Engineering
+```
 
 ## 🧰 Outils et technologies
 
@@ -86,9 +96,8 @@ bundle exec rails db:seed
 ## 🧪 Tests
 
 ### Docker setup
-```
-# bash
-make sh 
+```shell
+make sh # bash
 ./bin/rails db:setup RAILS_ENV=test
 ```
 

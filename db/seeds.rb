@@ -8,4 +8,4 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-load(Rails.root.join( 'db', 'seeds', "#{Rails.env.downcase}.rb"))
+load(Rails.root.join('db', 'seeds', "#{Rails.env.downcase}.rb"))

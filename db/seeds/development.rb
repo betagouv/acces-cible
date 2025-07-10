@@ -9,7 +9,7 @@
 #   end
 
 # Create a team
-team = FactoryBot.create(:team, siret: '12345678901234')
+team = FactoryBot.create(:team, siret: '12345678901234', organizational_unit: 'Engineering')
 
 # Create tags
 
@@ -20,7 +20,7 @@ tag3 = FactoryBot.create(:tag, name: "Public", team:)
 # Create a user associated with the team
 user = FactoryBot.create(:user,
                          provider: 'developer',
-                         uid: '123456789',
+                         uid: 'user@example.com',
                          email: 'user@example.com',
                          given_name: 'Test',
                          usual_name: 'User',
@@ -33,5 +33,6 @@ sites = [
   FactoryBot.create(:site, team:, url: 'https://www.example.com', tags: [tag2]),
   FactoryBot.create(:site, team:, url: 'https://www.example-2.com')
 ]
+
 
 puts "Created user #{user.email} with team (uid: #{user.uid} siret: #{team.siret}) and #{sites.count} sites"
