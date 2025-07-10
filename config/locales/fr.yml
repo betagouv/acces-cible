@@ -186,6 +186,7 @@ fr:
 
       session:
         login_failed: Nous n'avons pas réussi à vous identifier.
+        login_success: Vous êtes maintenant connecté.
       site:
         all: Tous les sites
         empty_collection: Il n'y a aucun site à afficher. Ajoutez un ou plusieurs sites à évaluer.

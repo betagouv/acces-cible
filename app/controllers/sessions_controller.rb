@@ -9,6 +9,7 @@ class SessionsController < ApplicationController
   def omniauth
     if user = User.from_omniauth(request.env["omniauth.auth"])
       start_new_session_for user
+      flash[:notice] = Session.human(:login_success)
       redirect_to after_authentication_url
     else
       redirect_to auth_failure_path
