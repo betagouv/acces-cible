@@ -2,6 +2,8 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
+  after_create :create_checks
+
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
@@ -28,7 +30,6 @@ class Audit < ApplicationRecord
     return if scheduled?
 
     transaction do
-      all_checks.select(&:new_record?).each(&:save)
       RunAuditJob.perform_later(self)
       update!(scheduled: true)
     end
@@ -56,5 +57,9 @@ class Audit < ApplicationRecord
   def set_checked_at
     latest_checked_at = checks.collect(&:checked_at).compact.sort.last
     update(checked_at: latest_checked_at)
+  end
+
+  def create_checks
+    all_checks.select(&:new_record?).each(&:save)
   end
 end

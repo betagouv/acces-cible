@@ -68,8 +68,25 @@ RSpec.describe Audit do
 
     let(:audit) { create(:audit) }
 
-    it "creates all check types" do
-      expect { schedule }.to change(Check, :count).by(Check.types.size)
+    context "when audit is not scheduled" do
+      before { audit.update!(scheduled: false) }
+
+      it "marks audit as scheduled and enqueues RunAuditJob" do
+        expect { schedule }.to change(audit, :scheduled).from(false).to(true)
+                               .and have_enqueued_job(RunAuditJob).with(audit)
+      end
+    end
+
+    context "when audit is already scheduled" do
+      before { audit.update!(scheduled: true) }
+
+      it "does not mark audit as scheduled" do
+        expect { schedule }.not_to change(audit, :scheduled)
+      end
+
+      it "does not enqueue RunAuditJob" do
+        expect { schedule }.not_to have_enqueued_job(RunAuditJob)
+      end
     end
   end
 
@@ -93,6 +110,30 @@ RSpec.describe Audit do
       audit.all_checks.each { |check| check.update(status: :passed) }
       audit.derive_status_from_checks
       expect(audit.status).to eq("passed")
+    end
+  end
+
+  describe "#create_checks" do
+    subject(:create_checks) { audit.create_checks }
+
+    let(:audit) { build(:audit) }
+
+    it "creates all check types" do
+      expect { create_checks }.to change(Check, :count).by(Check.types.size)
+    end
+
+    it "does not create duplicate checks" do
+      audit.create_checks
+      expect { create_checks }.not_to change(Check, :count)
+    end
+  end
+
+  describe "after_create callback" do
+    let(:audit) { build(:audit) }
+
+    it "calls create_checks when audit is created" do
+      expect(audit).to receive(:create_checks).and_call_original
+      expect { audit.save! }.to change(Check, :count).by(Check.types.size)
     end
   end
 
