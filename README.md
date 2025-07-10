@@ -90,9 +90,6 @@ bundle exec rails db:seed
 # bash
 make sh 
 ./bin/rails db:setup RAILS_ENV=test
-
-# Tous les tests
-make rspec 
 ```
 
 ### Exécuter tous les tests
