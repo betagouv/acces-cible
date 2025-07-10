@@ -67,7 +67,8 @@ gem "dsfr-view-components"
 gem "friendly_id"
 
 # Manage external authentication
-gem "omniauth"
+# FIXME: until https://github.com/omniauth/omniauth/pull/1146
+gem "omniauth", github: "freesteph/omniauth", branch: "fix/dont-call-setup-phase-in-test-mode"
 gem "omniauth-proconnect"
 gem "omniauth-rails_csrf_protection"
 
