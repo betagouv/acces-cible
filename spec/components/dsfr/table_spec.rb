@@ -3,10 +3,14 @@ require "rails_helper"
 RSpec.describe Dsfr::TableComponent, type: :component do
   subject(:component) { described_class.new(**params) }
 
-  let(:pagy) { instance_double(Pagy, page: 1, last: 1, count: 10, series: []) }
+  let(:pagy) { instance_double(Pagy, page: 1, last: 1, count: 10, limit: 20, series: []) }
   let(:caption) { "Test table" }
   let(:params) { { caption:, pagy: } }
   let(:rendered_component) { render_inline(component) }
+
+  before do
+    allow_any_instance_of(described_class).to receive(:url_for).and_return("/things") # rubocop:disable RSpec/AnyInstance
+  end
 
   it "renders the DSFR table structure" do
     expect(rendered_component).to have_css("div.fr-table") do |table_wrapper|
@@ -149,7 +153,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
   end
 
   describe "pagination" do
-    let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, series: ["1", 2, 3, :gap, 10], vars: {}, count: 100) }
+    let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, limit: 20, series: ["1", 2, 3, :gap, 10], vars: {}, count: 100) }
 
     it "renders the pagination component inside the table footer" do
       expect(rendered_component).to have_css("div.fr-table__footer--middle nav.fr-pagination")

@@ -41,4 +41,5 @@ class ApplicationController < ActionController::Base
   end
 
   def get_request? = request.request_method_symbol == :get
+  def pagy_limit = Integer(params[:limit], 10, exception: false).then { it&.nonzero? }
 end

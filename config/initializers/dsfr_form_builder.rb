@@ -10,6 +10,29 @@ module DsfrFormBuilderExtension
     end
   end
 
+  unless respond_to?(:dsfr_button)
+    def dsfr_button(value = nil, options = {}, &block)
+      if block_given?
+        options = value || {}
+        value = @template.capture { yield(value) }
+      end
+      options[:type] ||= :button
+      options[:class] = @template.class_names("fr-btn", options[:class])
+      button(value, options)
+    end
+  end
+
+  unless respond_to?(:dsfr_submit)
+    def dsfr_submit(value = nil, options = {}, &block)
+      if block_given?
+        options = value || {}
+        value = @template.capture { yield(value) }
+      end
+      options[:type] = :submit
+      dsfr_button(value, options)
+    end
+  end
+
   # Override to add support for `inline` option, and prevent DSFR-specific options from ending up as check_box attributes
   def dsfr_check_box(attribute, opts = {}, checked_value = "1", unchecked_value = "0")
     @template.content_tag(:div, class: "fr-fieldset__element #{'fr-fieldset__element--inline' if opts.delete(:inline)}") do

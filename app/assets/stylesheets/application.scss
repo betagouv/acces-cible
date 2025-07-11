@@ -89,6 +89,11 @@ form.button_to {
   }
 }
 
+// Fix bottom margin for pagination limit selector
+.fr-table__footer .fr-select-group {
+  margin-bottom: 0;
+}
+
 // Allow visually hiding a legend, when it duplicates a heading
 .fr-legend--hidden .fr-fieldset__legend {
   position: absolute;

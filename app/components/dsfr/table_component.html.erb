@@ -37,6 +37,17 @@
     <% if paginated? -%>
       <div class="fr-table__footer--start">
         <p class="fr-table__detail"><%= total_lines %></p>
+        <% if lines.positive? -%>
+          <%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
+            <%= f.hidden_field :sort, name: "sort[#{params[:sort].keys.first}]", value: params[:sort].values.first if params[:sort] %>
+            <%= f.hidden_field :filter, value: params[:filter] if params[:filter] %>
+            <div class="fr-select-group">
+              <%= f.dsfr_label_with_hint :limit, label: per_page_label, class: "fr-sr-only" %>
+              <%= f.dsfr_select_tag :limit, per_page_options, required: true, include_blank: per_page_label, selected: per_page %>
+            </div>
+            <%= f.dsfr_submit t("shared.apply"), name: nil, class: helpers.icon_class(:refresh, fill: true, class: "fr-sr-only"), title: t("shared.apply"), data: { turbo_submit_with: t("shared.applying") } %>
+          <% end %>
+        <%- end %>
       </div>
     <%- end %>
     <% if multipage? -%>
