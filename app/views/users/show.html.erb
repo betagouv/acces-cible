@@ -1,0 +1,19 @@
+<% use_centered_layout %>
+<div>
+  <p>
+    <strong><%= Site.human :email %> :</strong>
+    <%= @user.email %>
+  </p>
+  <p>
+    <strong><%= Site.human :team %> :</strong>
+    <%= @user.team.organizational_unit %>
+  </p>
+  <p>
+    <strong><%= Site.human :siret %> :</strong>
+    <%= @user.siret %>
+  </p>
+</div>
+
+<div class="fr-btns-group fr-btns-group--inline-md fr-mb-2w">
+  <%= link_to t("shared.back_to_home"), root_path, class: "fr-btn fr-btn--tertiary-no-outline" %>
+</div>

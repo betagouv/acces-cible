@@ -20,6 +20,8 @@ Rails.application.routes.draw do
   end
   get "/sites", to: "sites#index", as: :authenticated_root
 
+  resource :user, only: [:show]
+
   # Static pages
   scope controller: :pages do
     root action: :accueil
