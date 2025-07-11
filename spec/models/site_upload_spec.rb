@@ -73,6 +73,14 @@ RSpec.describe SiteUpload do
       end
     end
 
+    context "when headers are uppercase" do
+      let(:csv_content) { "URL,NAME\nhttps://example.com/,Example Site" }
+
+      it "is ignores case" do
+        expect(site_upload).to be_valid
+      end
+    end
+
     context "when encoding is not UTF-8" do
       let(:encoding) { Encoding::ISO_8859_1 }
       let(:csv_content) { "URL,næme\nhttps://example.com/,Example Saïte".encode(encoding) }
@@ -95,12 +103,13 @@ RSpec.describe SiteUpload do
       expect(site_upload.new_sites).to eq(new_sites_from_csv)
     end
 
-    it "handles uppercase URL headers" do
-      csv.write("URL,name\nhttps://example.com/,Example Site")
+    it "handles mixed case headers" do
+      csv.write("Url,Name\nhttps://example.com/,Example Site")
       csv.rewind
 
       site_upload.parse_sites
       expect(site_upload.new_sites.first[:url]).to eq("https://example.com/")
+      expect(site_upload.new_sites.first[:name]).to eq("Example Site")
     end
 
     it "skips sites that already exist" do
