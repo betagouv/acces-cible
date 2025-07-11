@@ -163,6 +163,13 @@ module ApplicationHelper
     end
   end
 
+  def page_actions(**html_attributes, &block)
+    default_class = "fr-btns-group fr-btns-group--inline-md fr-mb-2w"
+    html_attributes[:class] = class_names(default_class, html_attributes[:class])
+
+    tag.div(**html_attributes, &block)
+  end
+
   def current_git_commit
     ENV["CONTAINER_VERSION"] || `git show -s --format=%H`
   end
