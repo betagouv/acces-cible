@@ -8,4 +8,5 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-load(Rails.root.join('db', 'seeds', "#{Rails.env.downcase}.rb"))
+path = "db/seeds/#{Rails.env}.rb"
+load(path) if Rails.root.join(path).exist?
