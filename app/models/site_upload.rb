@@ -27,8 +27,8 @@ class SiteUpload
   def initialize(attributes = {})
     super
     @tag_ids ||= []
-    @new_sites = []
-    @existing_sites = []
+    @new_sites = {}
+    @existing_sites = {}
   end
 
   def save
@@ -37,8 +37,8 @@ class SiteUpload
     parse_sites
 
     transaction do
-      create!(new_sites) if new_sites.any?
-      existing_sites.each { |site| site.save && site.audit! }
+      create!(new_sites.values) if new_sites.any?
+      existing_sites.values.each { |site| site.save && site.audit! }
     end
     true
   end
@@ -64,15 +64,18 @@ class SiteUpload
     require "csv"
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
-      url = Link.normalize(row["url"] || row["URL"])
+      row = row.to_h.transform_keys(&:downcase) # Case-insensitive headers
+
+      url = Link.normalize(row["url"])
+      name = row["nom"] || row["name"]
       if existing_site = team.sites.find_by_url(url:)
         existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
-        self.existing_sites << existing_site
+        existing_site.assign_attributes(name:) unless existing_site.name
+        self.existing_sites[url] = existing_site
       else
-        self.new_sites << { url:, team:, name: row["name"], tag_ids: }
+        self.new_sites[url] = { url:, team:, name:, tag_ids: }
       end
     end
-    self.new_sites.uniq!
   end
 
   private
