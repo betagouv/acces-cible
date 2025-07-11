@@ -64,10 +64,10 @@ class SiteUpload
     require "csv"
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
-      normalized = row.to_h.transform_keys(&:downcase) # Case-insensitive headers
+      row = row.to_h.transform_keys(&:downcase) # Case-insensitive headers
 
-      url = Link.normalize(normalized["url"])
-      name = normalized["nom"] || normalized["name"]
+      url = Link.normalize(row["url"])
+      name = row["nom"] || row["name"]
       if existing_site = team.sites.find_by_url(url:)
         existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
         existing_site.assign_attributes(name:) unless existing_site.name
