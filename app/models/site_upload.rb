@@ -67,7 +67,7 @@ class SiteUpload
       normalized = row.to_h.transform_keys(&:downcase) # Case-insensitive headers
 
       url = Link.normalize(normalized["url"])
-      name = normalized["name"]
+      name = normalized["nom"] || normalized["name"]
       if existing_site = team.sites.find_by_url(url:)
         existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
         existing_site.assign_attributes(name:) unless existing_site.name

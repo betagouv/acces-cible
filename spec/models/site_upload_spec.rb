@@ -112,6 +112,14 @@ RSpec.describe SiteUpload do
       expect(site_upload.new_sites.first[:name]).to eq("Example Site")
     end
 
+    it "prefers 'nom' over 'name' when both are present" do
+      csv.write("url,nom,name\nhttps://example.com/,Nom,Name")
+      csv.rewind
+
+      site_upload.parse_sites
+      expect(site_upload.new_sites.first[:name]).to eq("Nom")
+    end
+
     it "skips sites that already exist" do
       existing_site = build(:site, url: "https://example.com/")
       allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
