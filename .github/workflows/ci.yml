@@ -112,6 +112,9 @@ jobs:
       - name: Run tests
         run: bundle exec rspec
 
+      - name: Run feature tests
+        run: bundle exec cucumber
+
   deploy:
     name: Déploiement sur Scalingo
     runs-on: ubuntu-latest
