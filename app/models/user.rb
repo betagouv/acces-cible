@@ -49,7 +49,7 @@ class User < ApplicationRecord
   end
 
   def to_title
-    full_name
+    full_name.truncate(30)
   end
 
   private
