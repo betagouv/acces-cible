@@ -38,7 +38,9 @@ class SiteUpload
 
     transaction do
       create!(new_sites.values) if new_sites.any?
-      existing_sites.values.each { |site| site.save && site.audit! }
+      existing_sites.values.each_with_index do |site, index|
+        site.save && site.audit!(wait: index.minutes)
+      end
     end
     true
   end
