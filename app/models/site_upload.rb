@@ -70,6 +70,7 @@ class SiteUpload
       name = normalized["name"]
       if existing_site = team.sites.find_by_url(url:)
         existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
+        existing_site.assign_attributes(name:) unless existing_site.name
         self.existing_sites << existing_site
       else
         self.new_sites << { url:, team:, name:, tag_ids: }
