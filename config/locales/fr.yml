@@ -20,6 +20,7 @@ fr:
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
+    back_to_home: "Revenir à la page d'accueil"
     new_window: " (nouvelle fenêtre)"
     sort_by: "Trier par %{column} %{direction}"
     asc: croissant
