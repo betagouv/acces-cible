@@ -44,6 +44,11 @@ class User < ApplicationRecord
     end
   end
 
+  def full_name
+    "#{given_name} #{usual_name}"
+  end
+  alias to_title full_name
+
   private
 
   def find_or_create_team

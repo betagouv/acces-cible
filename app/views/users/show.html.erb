@@ -1,0 +1,22 @@
+<% use_centered_layout boxed: false %>
+
+<%= dsfr_table(caption: User.human(:profile), border: true) do |t| %>
+  <% t.with_head do %>
+    <tr>
+      <th><%= User.human :email %></th>
+      <th><%= User.human :team %></th>
+      <th><%= User.human :siret %></th>
+    </tr>
+  <% end %>
+  <% t.with_body do %>
+    <tr>
+      <td><%= @user.email %></td>
+      <td><%= @user.team.organizational_unit %></td>
+      <td><%= @user.siret %></td>
+    </tr>
+  <% end %>
+<% end %>
+
+<%= page_actions do %>
+  <%= link_to t("shared.back_to_home"), root_path, class: "fr-btn fr-btn--tertiary" %>
+<% end %>

@@ -1,6 +1,8 @@
 module ApplicationHelper
   include Pagy::Frontend
 
+  TRUNCATE_LENGTH = 50
+
   # Automagically fetch title from @title, content_for(:title), resource.to_title, or controller/action/title I18n lookup
   def page_title
     return @title unless @title.blank?
@@ -19,7 +21,7 @@ module ApplicationHelper
     if root?
       [t("global.service_name"), t("global.service_description")].compact_blank.join(" : ")
     else
-      [page_title, t("global.service_name")].compact_blank.join(" - ")
+      [page_title.truncate(TRUNCATE_LENGTH), t("global.service_name")].compact_blank.join(" - ")
     end
   end
 
@@ -159,7 +161,8 @@ module ApplicationHelper
     when tooltip
       dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
     when link then dsfr_badge(status:) { link_to text, link }
-    else dsfr_badge(status:) { text }
+    else
+      dsfr_badge(status:) { text }
     end
   end
 

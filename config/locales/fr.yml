@@ -20,6 +20,7 @@ fr:
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
+    back_to_home: "Revenir à la page d'accueil"
     new_window: " (nouvelle fenêtre)"
     sort_by: "Trier par %{column} %{direction}"
     asc: croissant
@@ -231,6 +232,11 @@ fr:
           zero: Aucune équipe
           one: Une équipe
           other: "%{count} équipes"
+      user:
+        profile: Profil utilisateur
+        siret: SIRET
+        team: Équipe
+        email: Adresse électronique
 
   errors:
     not_found:
@@ -255,6 +261,8 @@ fr:
   sessions:
     new:
       title: Connexion à Accès Cible
+    omniauth:
+      success: Vous êtes maintenant connecté•e.
   sites:
     index:
       title: Tous les sites
