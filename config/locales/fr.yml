@@ -232,6 +232,10 @@ fr:
           zero: Aucune équipe
           one: Une équipe
           other: "%{count} équipes"
+      user:
+        siret: SIRET
+        team: Équipe
+        email: Adresse mail
 
   errors:
     not_found:

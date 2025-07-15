@@ -1,15 +1,15 @@
 <% use_centered_layout %>
 <div>
   <p>
-    <strong><%= Site.human :email %> :</strong>
+    <strong><%= User.human :email %> :</strong>
     <%= @user.email %>
   </p>
   <p>
-    <strong><%= Site.human :team %> :</strong>
+    <strong><%= User.human :team %> :</strong>
     <%= @user.team.organizational_unit %>
   </p>
   <p>
-    <strong><%= Site.human :siret %> :</strong>
+    <strong><%= User.human :siret %> :</strong>
     <%= @user.siret %>
   </p>
 </div>
