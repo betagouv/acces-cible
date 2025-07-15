@@ -48,7 +48,7 @@ module Dsfr
     def multipage? = pagination&.render?
     def pagination = (PaginationComponent.new(pagy:) if pagy)
     def lines = pagy.count
-    def per_page = pagy.limit
+    def per_page = pagy.limit.to_s
     def total_lines = human(:lines, count: lines)
     def header_actions? = header_actions.any?
     def header? = search? || header_actions?
