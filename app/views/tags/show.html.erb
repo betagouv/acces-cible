@@ -19,8 +19,8 @@
   <%= dsfr_alert(type: :info, title: Site.human_count(count: @tag.sites_count), html_attributes: { class: "fr-mb-4w" }) %>
 <% end %>
 
-<div class="fr-btns-group fr-btns-group--inline-md fr-mb-2w">
+<%= page_actions do %>
   <%= link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
   <%= button_to Tag.human(:delete), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
   <%= link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
-</div>
+<% end %>
