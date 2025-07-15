@@ -10,10 +10,10 @@ module ApplicationHelper
     return resource.to_title if action_name == "show"
 
     action = case action_name.to_sym
-             when :create then :new
-             when :update then :edit
-             else action_name
-             end
+    when :create then :new
+    when :update then :edit
+    else action_name
+    end
     t("#{controller_name}.#{action}.title")
   end
 
