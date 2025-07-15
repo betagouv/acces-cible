@@ -47,7 +47,6 @@ class User < ApplicationRecord
   def full_name
     "#{given_name} #{usual_name}"
   end
-
   alias to_title full_name
 
   private
