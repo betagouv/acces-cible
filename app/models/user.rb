@@ -45,12 +45,10 @@ class User < ApplicationRecord
   end
 
   def full_name
-    "#{usual_name} #{given_name}"
+    "#{given_name} #{usual_name}"
   end
 
-  def to_title
-    full_name.truncate(30)
-  end
+  alias to_title full_name
 
   private
 

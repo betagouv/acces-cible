@@ -1,18 +1,26 @@
 module ApplicationHelper
   include Pagy::Frontend
 
+  TRUNCATE_LENGTH = 50
+
   # Automagically fetch title from @title, content_for(:title), resource.to_title, or controller/action/title I18n lookup
   def page_title
-    return @title unless @title.blank?
-    return content_for(:title) if content_for?(:title)
-    return resource.to_title if action_name == "show"
-
-    action = case action_name.to_sym
-    when :create then :new
-    when :update then :edit
-    else action_name
+    title = if @title.present?
+              @title
+    elsif content_for?(:title)
+              content_for(:title)
+    elsif action_name == "show" && resource.respond_to?(:to_title)
+              resource.to_title
+    else
+              action = case action_name.to_sym
+              when :create then :new
+              when :update then :edit
+              else action_name
+              end
+              t("#{controller_name}.#{action}.title")
     end
-    t("#{controller_name}.#{action}.title")
+
+    title.truncate(TRUNCATE_LENGTH)
   end
 
   def head_title
@@ -159,7 +167,8 @@ module ApplicationHelper
     when tooltip
       dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
     when link then dsfr_badge(status:) { link_to text, link }
-    else dsfr_badge(status:) { text }
+    else
+      dsfr_badge(status:) { text }
     end
   end
 

@@ -233,9 +233,10 @@ fr:
           one: Une équipe
           other: "%{count} équipes"
       user:
+        profile: Profil utilisateur
         siret: SIRET
         team: Équipe
-        email: Adresse mail
+        email: Adresse électronique
 
   errors:
     not_found:
