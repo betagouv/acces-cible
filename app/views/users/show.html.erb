@@ -1,5 +1,6 @@
-<% use_centered_layout %>
-<div>
+<% use_centered_layout boxed: false %>
+
+<div class="fr-mt-2w fr-mb-6w">
   <p>
     <strong><%= User.human :email %> :</strong>
     <%= @user.email %>
@@ -14,6 +15,6 @@
   </p>
 </div>
 
-<div class="fr-btns-group fr-btns-group--inline-md fr-mb-2w">
-  <%= link_to t("shared.back_to_home"), root_path, class: "fr-btn fr-btn--tertiary-no-outline" %>
-</div>
+<%= page_actions do %>
+  <%= link_to t("shared.back_to_home"), root_path, class: "fr-btn fr-btn--tertiary" %>
+<% end %>
