@@ -13,7 +13,13 @@ class ApplicationComponent < ViewComponent::Base
     end
   end
 
-  def dom_id(prefix: nil, suffix: nil)
-    [prefix, self.class.name.demodulize, object_id, suffix].compact.join("_").underscore
+  def dom_id(object = nil, prefix: nil, suffix: nil)
+    object ||= self # Default to the current component
+    klass, id = if object.is_a?(ApplicationRecord)
+      [object.model_name.param_key, object.to_param]
+    else
+      [object.class.name.gsub("::", "_"), object.object_id]
+    end
+    [prefix, klass, id, suffix].compact.join("_").underscore.gsub(/[^a-z0-9_]/i, "")
   end
 end
