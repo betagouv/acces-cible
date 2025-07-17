@@ -26,11 +26,11 @@ class Audit < ApplicationRecord
     end
   end
 
-  def schedule
+  def schedule(wait: 0)
     return if scheduled?
 
     transaction do
-      RunAuditJob.perform_later(self)
+      RunAuditJob.set(wait:).perform_later(self)
       update!(scheduled: true)
     end
   end

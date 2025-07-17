@@ -62,8 +62,8 @@ class Site < ApplicationRecord
     audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
   end
 
-  def audit!
-    audits.create!(url:, current: audits.current.none? || audits.none?).tap(&:schedule)
+  def audit!(wait: 0)
+    audits.create!(url:, current: audits.current.none? || audits.none?).tap { |audit| audit.schedule(wait:) }
   end
 
   def actual_current_audit
