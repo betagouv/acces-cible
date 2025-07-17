@@ -1,6 +1,12 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
 class Browser
+  class PutsLogger < SimpleDelegator
+    def puts(message = "")
+      tagged("Ferrum") { info(message) }
+    end
+  end
+
   PAGE_TIMEOUT = 30.seconds
   PROCESS_TIMEOUT = 3.minutes
   WINDOW_SIZES = [
@@ -126,6 +132,7 @@ class Browser
         window_size: WINDOW_SIZES.sample,
         process_timeout: PROCESS_TIMEOUT,
         pending_connection_errors: false,
+        logger: PutsLogger.new(Rails.logger),
         extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
         browser_options: {
           "disable-blink-features": "AutomationControlled",
