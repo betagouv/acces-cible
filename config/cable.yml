@@ -8,7 +8,7 @@ development:
     database:
       writing: cable
   polling_interval: 0.1.seconds
-  message_retention: 1.day
+  message_retention: 1.hour
 
 test:
   adapter: test

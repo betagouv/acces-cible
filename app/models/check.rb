@@ -41,6 +41,8 @@ class Check < ApplicationRecord
   scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due }
   scope :to_run, -> { due.or(to_retry) }
 
+  broadcasts_refreshes_to ->(check) { "sites" }
+
   class << self
     def human_type = human("checks.#{model_name.element}.type")
     def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
@@ -77,7 +79,7 @@ class Check < ApplicationRecord
       block!
       return false
     elsif retry_at && retry_at > Time.current
-      return false  # Not ready to retry yet
+      return false # Not ready to retry yet
     end
     run!
   end
