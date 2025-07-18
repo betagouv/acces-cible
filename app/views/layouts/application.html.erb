@@ -18,7 +18,7 @@
 
   <%= javascript_importmap_tags %>
   <%= javascript_include_tag "dsfr.nomodule.min", nonce: true, nomodule: true %>
-  <%#= turbo_refreshes_with method: :morph, scroll: :preserve %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
   <%= yield :head %>
 </head>
 
