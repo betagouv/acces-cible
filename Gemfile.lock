@@ -1,10 +1,11 @@
 GIT
   remote: https://github.com/freesteph/omniauth.git
-  revision: c11b4da0465ac2e80f30a39c5e36085fde0a9838
+  revision: 6ecc52c674e02c84adba3e9b23e1b12c8b435a6d
   branch: fix/dont-call-setup-phase-in-test-mode
   specs:
-    omniauth (2.1.2)
+    omniauth (2.1.3)
       hashie (>= 3.4.6)
+      logger
       rack (>= 2.2.3)
       rack-protection
 
