@@ -1,4 +1,6 @@
 class Check < ApplicationRecord
+  include ActionView::RecordIdentifier
+
   TYPES = [
     :reachable,
     :language_indication,
@@ -22,6 +24,14 @@ class Check < ApplicationRecord
   delegate :human_type, to: :class
 
   after_initialize :set_priority
+
+  # The broadcasts_refreshes_to method fires on every update with no conditional options
+  # broadcasts_refreshes_to ->(check) { [check.site.team, :sites] }
+  # broadcasts_refreshes_to ->(check) { check.site }
+
+  # Only broadcast when status changes to avoid unnecessary updates
+  after_update_commit :broadcast_to_sites, if: :should_broadcast_to_view?
+  after_update_commit :broadcast_to_site, if: :should_broadcast_to_view?
 
   scope :due, -> { pending.where("run_at <= now()") }
   scope :past, -> { where.not(status: [:pending, :blocked]) }
@@ -130,6 +140,18 @@ class Check < ApplicationRecord
     else
       self.error_message = self.error_type = self.error_backtrace = nil
     end
+  end
+
+  def should_broadcast_to_view?
+    saved_change_to_status? && !(pending? || blocked?)
+  end
+
+  def broadcast_to_sites
+    Turbo::StreamsChannel.broadcast_refresh_to([site.team, :sites])
+  end
+
+  def broadcast_to_site
+    Turbo::StreamsChannel.broadcast_refresh_to(site)
   end
 
   def status_to_badge_level
