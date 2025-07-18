@@ -16,6 +16,8 @@ class Site < ApplicationRecord
 
   delegate :url, to: :audit, allow_nil: true
 
+  broadcasts_refreshes
+
   class << self
     def find_by_url(attributes)
       url = attributes.to_h.fetch(:url).strip
