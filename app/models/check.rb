@@ -93,13 +93,6 @@ class Check < ApplicationRecord
       self.retry_at = nil
       passed?
     rescue StandardError => exception
-      Sentry.with_scope do |scope|
-        next unless scope # scope is nil when Sentry is disabled (in dev & test environments typically)
-
-        scope.set_context("check", { id:, type:, retry_count: })
-        scope.set_context("audit", { id: audit_id, url: audit.url })
-        Sentry.capture_exception(exception)
-      end
       self.status = :failed
       self.error = exception
       self.retry_count += 1
@@ -118,6 +111,7 @@ class Check < ApplicationRecord
       self.error_message = exception.message
       self.error_type = exception.class.name
       self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
+      report exception
     else
       self.error_message = self.error_type = self.error_backtrace = nil
     end
@@ -140,4 +134,14 @@ class Check < ApplicationRecord
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
   def set_priority = self.priority = self.class.priority
+
+  def report(exception)
+    return unless Sentry.initialized?
+
+    Sentry.with_scope do |scope|
+      scope.set_context("check", { id:, type:, retry_count: })
+      scope.set_context("audit", { id: audit_id, url: audit.url })
+      Sentry.capture_exception(exception)
+    end
+  end
 end
