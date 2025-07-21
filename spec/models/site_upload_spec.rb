@@ -152,6 +152,17 @@ RSpec.describe SiteUpload do
       expect(site_upload.existing_sites.size).to eq(1)
       expect(site_upload.existing_sites.values.first).to eq(existing_site)
     end
+
+    context "when CSV has nil headers" do
+      it "handles nil headers gracefully" do
+        csv.write("url,name,\nhttps://example.com/,Example Site,extra_data")
+        csv.rewind
+
+        expect { site_upload.parse_sites }.not_to raise_error
+        expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
+        expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
+      end
+    end
   end
 
   describe "#count" do

@@ -64,7 +64,7 @@ class SiteUpload
     require "csv"
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
-      row = row.to_h.transform_keys(&:downcase) # Case-insensitive headers
+      row = row.to_h.transform_keys { |header| header.to_s.downcase } # Case-insensitive headers
 
       url = Link.normalize(row["url"])
       name = row["nom"] || row["name"]
