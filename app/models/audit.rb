@@ -43,6 +43,10 @@ class Audit < ApplicationRecord
     (send(check)&.status || :pending).to_s.inquiry
   end
 
+  def create_checks
+    all_checks.select(&:new_record?).each(&:save)
+  end
+
   def derive_status_from_checks
     self.status = if all_checks.any?(&:new_record?)
        :pending
@@ -54,12 +58,12 @@ class Audit < ApplicationRecord
     update(status:)
   end
 
-  def set_checked_at
-    latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-    update(checked_at: latest_checked_at)
-  end
-
-  def create_checks
-    all_checks.select(&:new_record?).each(&:save)
+  def finalize!
+    transaction do
+      derive_status_from_checks
+      latest_checked_at = checks.collect(&:checked_at).compact.sort.last
+      update(checked_at: latest_checked_at)
+      site.set_current_audit!
+    end
   end
 end
