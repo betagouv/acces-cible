@@ -35,22 +35,22 @@ class Audit < ApplicationRecord
     end
   end
 
-  def all_checks
-    Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
-  end
-
   def check_status(check)
     (send(check)&.status || :pending).to_s.inquiry
   end
 
   def create_checks
-    all_checks.select(&:new_record?).each(&:save)
+    Check.types.each do |name, klass|
+      next if send(name) # Skip if check already exists
+
+      checks.build(type: klass.name).save!
+    end
   end
 
   def derive_status_from_checks
-    self.status = if all_checks.any?(&:new_record?)
-       :pending
-    elsif (check_statuses = checks.collect(&:status).uniq).one?
+    check_statuses = checks.collect(&:status).uniq
+
+    self.status = if check_statuses.one?
        check_statuses.first
     else
        :mixed
