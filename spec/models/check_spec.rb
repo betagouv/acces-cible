@@ -25,26 +25,18 @@ RSpec.describe Check do
   end
 
   describe "scopes" do
-    let!(:pending_check) { create(:check, status: :pending, run_at: 1.hour.ago, scheduled: false) }
-    let!(:scheduled_check) { create(:check, status: :pending, run_at: 1.hour.ago, scheduled: true) }
-    let!(:future_check) { create(:check, status: :pending, run_at: 1.hour.from_now, scheduled: false) }
+    let!(:pending_check) { create(:check, status: :pending, run_at: 1.hour.ago) }
+    let!(:future_check) { create(:check, status: :pending, run_at: 1.hour.from_now) }
     let!(:passed_check) { create(:check, status: :passed) }
-    let!(:failed_check_retryable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
-    let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago, scheduled: false) }
-    let!(:blocked_check_retryable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago, scheduled: false) }
-    let!(:future_retry_check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.from_now, scheduled: false) }
-
-    describe ".to_schedule" do
-      it "returns due and unscheduled checks" do
-        expect(described_class.to_schedule).to include(pending_check)
-        expect(described_class.to_schedule).not_to include(scheduled_check)
-      end
-    end
+    let!(:failed_check_retryable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
+    let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago) }
+    let!(:blocked_check_retryable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago) }
+    let!(:future_retry_check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.from_now) }
 
     describe ".to_run" do
-      it "returns due and scheduled checks" do
-        expect(described_class.to_run).to include(scheduled_check)
-        expect(described_class.to_run).not_to include(pending_check, future_check, passed_check)
+      it "returns due and retryable checks" do
+        expect(described_class.to_run).to include(pending_check)
+        expect(described_class.to_run).not_to include(future_check, passed_check)
       end
     end
 
@@ -52,14 +44,6 @@ RSpec.describe Check do
       it "returns failed or blocked checks that can be retried and are due" do
         expect(described_class.to_retry).to include(failed_check_retryable, blocked_check_retryable)
         expect(described_class.to_retry).not_to include(future_retry_check, failed_check_max_retries, pending_check)
-      end
-    end
-
-    describe ".schedulable" do
-      it "returns both pending due checks and retryable checks" do
-        expect(described_class.schedulable).to include(pending_check, failed_check_retryable, blocked_check_retryable)
-
-        expect(described_class.schedulable).not_to include(scheduled_check, future_check, future_retry_check, failed_check_max_retries)
       end
     end
   end
@@ -356,7 +340,7 @@ RSpec.describe Check do
   end
 
   describe "#schedule!" do
-    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, scheduled: false) }
+    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
     let(:job_double) { instance_double(ActiveJob::ConfiguredJob) }
 
     before do
@@ -376,16 +360,14 @@ RSpec.describe Check do
       check.reload
 
       expect(check.status).to eq("pending")
-      expect(check.scheduled).to be true
     end
 
-    it "just marks a pending check as scheduled without changing status" do
-      pending_check = create(:check, status: :pending, run_at: 1.hour.ago, scheduled: false)
+    it "just marks a pending check as pending without changing status" do
+      pending_check = create(:check, status: :pending, run_at: 1.hour.ago)
       pending_check.schedule!
       pending_check.reload
 
       expect(pending_check.status).to eq("pending")
-      expect(pending_check.scheduled).to be true
     end
 
     it "returns true when successful" do
