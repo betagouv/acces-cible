@@ -3,6 +3,7 @@ class Audit < ApplicationRecord
   has_many :checks, -> { prioritized }, dependent: :destroy
 
   after_create_commit :create_checks
+  after_create_commit :schedule
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -29,10 +30,8 @@ class Audit < ApplicationRecord
   def schedule
     return if scheduled?
 
-    transaction do
-      RunAuditJob.perform_later(self)
-      update!(scheduled: true)
-    end
+    update!(scheduled: true)
+    ProcessAuditJob.perform_later(self)
   end
 
   def check_status(check)

@@ -63,21 +63,19 @@ class Check < ApplicationRecord
     (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
-  def schedule!
-    transaction do
-      scheduled_time = pending? ? run_at : retry_at
-      RunCheckJob.set(wait_until: scheduled_time).perform_later(self)
-      update!(status: :pending, checked_at: nil)
-    end
-  end
-
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
   def run
-    return schedule! if waiting?
-    return block! if blocked?
+    if waiting?
+      return false
+    elsif blocked?
+      block!
+      return false
+    elsif retry_at && retry_at > Time.current
+      return false  # Not ready to retry yet
+    end
 
     begin
       self.data = analyze!

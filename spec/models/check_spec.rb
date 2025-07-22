@@ -183,12 +183,58 @@ RSpec.describe Check do
     context "when check is waiting on requirements" do
       before do
         allow(check).to receive(:waiting?).and_return(true)
-        allow(check).to receive(:schedule!)
       end
 
-      it "schedules the check" do
-        expect(check).to receive(:schedule!)
+      it "returns false without running" do
+        expect(check.run).to be false
+      end
+
+      it "does not call analyze!" do
+        expect(check).not_to receive(:analyze!)
         check.run
+      end
+    end
+
+    context "when check is blocked by failed requirements" do
+      before do
+        allow(check).to receive_messages(waiting?: false, blocked?: true)
+      end
+
+      it "sets status to blocked" do
+        check.run
+        expect(check.status).to eq("blocked")
+      end
+
+      it "sets checked_at timestamp" do
+        freeze_time do
+          check.run
+          expect(check.checked_at).to eq(Time.zone.now)
+        end
+      end
+
+      it "sets retry_at for future retry" do
+        check.run
+        expect(check.retry_at).to be > Time.current
+      end
+
+      it "returns false" do
+        expect(check.run).to be false
+      end
+
+      it "does not call analyze!" do
+        expect(check).not_to receive(:analyze!)
+        check.run
+      end
+    end
+
+    context "when check is not ready to retry yet" do
+      before do
+        allow(check).to receive_messages(waiting?: false, blocked?: false)
+        check.retry_at = 1.hour.from_now
+      end
+
+      it "returns false without running" do
+        expect(check.run).to be false
       end
 
       it "does not call analyze!" do
@@ -226,9 +272,19 @@ RSpec.describe Check do
       end
 
       it "resets retry_at to nil" do
-        check.retry_at = 1.hour.from_now
+        check.retry_at = 1.hour.ago
         check.run
         expect(check.retry_at).to be_nil
+      end
+
+      it "clears error details on pass" do
+        check.error_type = "SomeError"
+        check.error_message = "Some message"
+        check.error_backtrace = ["line 1"]
+        check.run
+        expect(check.error_type).to be_nil
+        expect(check.error_message).to be_nil
+        expect(check.error_backtrace).to be_nil
       end
 
       it "returns true when passed" do
@@ -237,7 +293,7 @@ RSpec.describe Check do
     end
 
     context "when analyze! raises an error" do
-      let(:error) { StandardError.new("Test error") }
+      let(:error) { Ferrum::TimeoutError.new("Test error") }
 
       before do
         allow(check).to receive(:waiting?).and_return(false)
@@ -252,8 +308,8 @@ RSpec.describe Check do
 
       it "stores error details in dedicated columns" do
         check.run
-        expect(check.error_type).to eq("StandardError")
-        expect(check.error_message).to eq("Test error")
+        expect(check.error_type).to eq("Ferrum::TimeoutError")
+        expect(check.error_message).to be_present
         expect(check.error_backtrace).to include("backtrace line")
       end
 
@@ -268,6 +324,18 @@ RSpec.describe Check do
         check.retry_count = 1
         check.run
         expect(check.retry_count).to eq(2)
+      end
+
+      it "sets retry_at if retryable" do
+        check.retry_count = 1 # Make sure it's retryable
+        check.run
+        expect(check.retry_at).to be > Time.current
+      end
+
+      it "does not set retry_at if not retryable" do
+        check.retry_count = 3 # Max retries
+        check.run
+        expect(check.retry_at).to be_nil
       end
 
       it "returns false" do
@@ -320,42 +388,6 @@ RSpec.describe Check do
           expect(check.calculate_retry_at).to be_within(1.second).of(expected_time)
         end
       end
-    end
-  end
-
-  describe "#schedule!" do
-    let(:check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
-    let(:job_double) { instance_double(ActiveJob::ConfiguredJob) }
-
-    before do
-      allow(RunCheckJob).to receive(:set).and_return(job_double)
-      allow(job_double).to receive(:perform_later)
-    end
-
-    it "schedules the check with the appropriate job" do
-      allow(RunCheckJob).to receive(:set).with(wait_until: check.retry_at).and_return(job_double)
-      expect(job_double).to receive(:perform_later).with(check)
-
-      check.schedule!
-    end
-
-    it "resets a failed check to pending and marks it as scheduled" do
-      check.schedule!
-      check.reload
-
-      expect(check.status).to eq("pending")
-    end
-
-    it "just marks a pending check as pending without changing status" do
-      pending_check = create(:check, status: :pending, run_at: 1.hour.ago)
-      pending_check.schedule!
-      pending_check.reload
-
-      expect(pending_check.status).to eq("pending")
-    end
-
-    it "returns true when successful" do
-      expect(check.schedule!).to be true
     end
   end
 

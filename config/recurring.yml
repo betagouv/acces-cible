@@ -1,9 +1,4 @@
 production:
-  schedule_checks:
-    class: ScheduleChecksJob
-    priority: 2
-    queue: background
-    schedule: every 10 minutes
   remove_orphan_tags:
     class: RemoveOrphanTagsJob
     queue: background
