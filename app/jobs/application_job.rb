@@ -1,4 +1,6 @@
 class ApplicationJob < ActiveJob::Base
+  self.enqueue_after_transaction_commit = true # Ensure jobs enqueued during a transaction don't run if it rolls back
+
   queue_as :background
 
   retry_on ActiveRecord::Deadlocked
