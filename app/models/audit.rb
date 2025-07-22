@@ -31,7 +31,7 @@ class Audit < ApplicationRecord
     return if scheduled?
 
     update!(scheduled: true)
-    ProcessAuditJob.perform_later(self)
+    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
   end
 
   def check_status(check)

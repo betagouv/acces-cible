@@ -32,6 +32,6 @@ class ProcessAuditJob < ApplicationJob
     next_run_at = checks.pending.minimum(:run_at)
 
     wait_until = [next_retry_at, next_run_at].compact.min || 5.minutes.from_now
-    self.class.set(wait_until:).perform_later(audit)
+    self.class.set(wait_until:, group: "audit_#{audit.id}").perform_later(audit)
   end
 end

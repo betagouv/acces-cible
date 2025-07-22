@@ -14,7 +14,7 @@ RSpec.describe ProcessAuditJob do
         allow(check).to receive(:run).and_return(true)
 
         job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time)).and_return(job_class_double)
+        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
         allow(job_class_double).to receive(:perform_later)
 
         job.perform(audit)
@@ -27,7 +27,7 @@ RSpec.describe ProcessAuditJob do
         allow(check).to receive(:run).and_return(false)
 
         job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time)).and_return(job_class_double)
+        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
         allow(job_class_double).to receive(:perform_later)
 
         job.perform(audit)
@@ -91,11 +91,11 @@ RSpec.describe ProcessAuditJob do
         audit.checks.first.update!(status: :failed, retry_at: retry_time)
 
         job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: retry_time).and_return(job_class_double)
+        allow(described_class).to receive(:set).with(wait_until: retry_time, group: "audit_#{audit.id}").and_return(job_class_double)
         allow(job_class_double).to receive(:perform_later)
 
         job.send(:reschedule)
-        expect(described_class).to have_received(:set).with(wait_until: retry_time)
+        expect(described_class).to have_received(:set).with(wait_until: retry_time, group: "audit_#{audit.id}")
         expect(job_class_double).to have_received(:perform_later).with(audit)
       end
     end
@@ -105,11 +105,11 @@ RSpec.describe ProcessAuditJob do
         audit.checks.update_all(status: :passed)
 
         job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time)).and_return(job_class_double)
+        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
         allow(job_class_double).to receive(:perform_later)
 
         job.send(:reschedule)
-        expect(described_class).to have_received(:set).with(wait_until: kind_of(Time))
+        expect(described_class).to have_received(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}")
         expect(job_class_double).to have_received(:perform_later).with(audit)
       end
     end
