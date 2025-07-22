@@ -225,21 +225,10 @@ RSpec.describe Check do
         end
       end
 
-      it "resets retry_count to 0" do
-        check.retry_count = 2
-        check.run
-        expect(check.retry_count).to eq(0)
-      end
-
       it "resets retry_at to nil" do
         check.retry_at = 1.hour.from_now
         check.run
         expect(check.retry_at).to be_nil
-      end
-
-      it "saves the check" do
-        expect(check).to receive(:save)
-        check.run
       end
 
       it "returns true when passed" do
@@ -279,11 +268,6 @@ RSpec.describe Check do
         check.retry_count = 1
         check.run
         expect(check.retry_count).to eq(2)
-      end
-
-      it "saves the check" do
-        expect(check).to receive(:save)
-        check.run
       end
 
       it "returns false" do

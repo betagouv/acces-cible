@@ -54,7 +54,6 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
-  def blocked! = update(status: :blocked, checked_at: Time.zone.now, retry_at: calculate_retry_at)
   def retryable? = retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
   def tooltip? = true
 
@@ -78,22 +77,14 @@ class Check < ApplicationRecord
 
   def run
     return schedule! if waiting?
-    return blocked! if blocked?
+    return block! if blocked?
 
     begin
-      self.checked_at = Time.zone.now
       self.data = analyze!
-      self.status = :passed
-      self.error = nil
-      self.retry_count = 0
-      self.retry_at = nil
-      passed?
+      pass!
     rescue StandardError => exception
-      self.status = :failed
-      self.error = exception
-      self.retry_count += 1
+      fail!(exception)
     end
-    save
     passed?
   end
 
@@ -101,20 +92,47 @@ class Check < ApplicationRecord
     error_type.constantize.new(error_message).tap { |err| err.set_backtrace(Array(error_backtrace)) } if error_type && error_message
   end
 
+  private
+
+  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+
+  def pass!
+    self.error = nil
+    update!(
+      status: :passed,
+      checked_at: Time.zone.now,
+      retry_at: nil
+    )
+  end
+
+  def fail!(exception)
+    self.error = exception
+    update!(
+      status: :failed,
+      checked_at: Time.zone.now,
+      retry_count: retry_count + 1,
+      retry_at: retryable? ? calculate_retry_at : nil
+    )
+    report(exception)
+  end
+
+  def block!
+    update!(
+      status: :blocked,
+      checked_at: Time.zone.now,
+      retry_at: calculate_retry_at
+    )
+  end
+
   def error=(exception = nil)
     if exception
       self.error_message = exception.message
       self.error_type = exception.class.name
       self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
-      report exception
     else
       self.error_message = self.error_type = self.error_backtrace = nil
     end
   end
-
-  private
-
-  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
 
   def status_to_badge_level
     case
