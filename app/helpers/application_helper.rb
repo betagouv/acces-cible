@@ -25,6 +25,11 @@ module ApplicationHelper
     end
   end
 
+  # Remove all leading whitespace to prevent markdown code block interpretation (strip_heredoc preserves relative indentation)
+  def safe_unindent(string)
+    string.gsub(/^\s+/, "").html_safe
+  end
+
   def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, **html_attributes, &block)
     render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, html_attributes:), &block
   end

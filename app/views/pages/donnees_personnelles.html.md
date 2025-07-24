@@ -4,7 +4,7 @@ Le responsable du traitement des données est la <abbr>DINUM</abbr>, représent�
 
 ## Pourquoi et comment vos données personnelles sont traitées ?
 
-<%= dsfr_table(caption: "Données personnelles utilisées par la plateforme") do |t| %>
+<%= safe_unindent dsfr_table(caption: "Données personnelles utilisées par la plateforme") do |t| %>
   <%= t.with_head do %>
     <tr>
       <th>Données</th>
@@ -29,11 +29,12 @@ Le responsable du traitement des données est la <abbr>DINUM</abbr>, représent�
   <% end %>
 <% end %>
 
+
 ## Qui nous aide à traiter vos données personnelles ?
 
 Afin d’héberger vos données personnelles, nous faisons appel à un sous-traitant. Avant de lui transmettre vos données, nous nous sommes assurés de la mise en œuvre par ses sous-traitants de garanties adéquates et du respect de conditions strictes de confidentialité, d’usage et de protection des données.
 
-<%= dsfr_table(caption: "Données personnelles utilisées par la plateforme") do |t| %>
+<%= safe_unindent dsfr_table(caption: "Données personnelles utilisées par la plateforme") do |t| %>
   <%= t.with_head do %>
     <tr>
       <th>Partenaire</th>
@@ -51,6 +52,7 @@ Afin d’héberger vos données personnelles, nous faisons appel à un sous-trai
     </tr>
   <% end %>
 <% end %>
+
 
 ## Quels sont vos droits ?
 
