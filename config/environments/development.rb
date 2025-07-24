@@ -1,5 +1,5 @@
 require "active_support/core_ext/integer/time"
-require "debug/open_nonstop"
+require "debug/open_nonstop" if File.exist?("/.dockerenv")
 
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
