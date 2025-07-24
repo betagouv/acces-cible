@@ -24,17 +24,13 @@ class Check < ApplicationRecord
   after_initialize :set_priority
 
   scope :due, -> { pending.where("run_at <= now()") }
-  scope :scheduled, -> { where(scheduled: true) }
-  scope :unscheduled, -> { where(scheduled: false) }
-  scope :to_schedule, -> { due.unscheduled }
-  scope :to_run, -> { due.scheduled }
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
   scope :errored, ->(type = nil) { type ? where(error_type: type) : where.not(error_type: nil) }
   scope :retryable, -> { where("retry_count < ? AND (error_type IS NULL OR error_type LIKE 'Ferrum%')", MAX_RETRIES) }
   scope :retry_due, -> { where("retry_at IS NULL OR retry_at <= now()") }
-  scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due.unscheduled }
-  scope :schedulable, -> { to_schedule.or(to_retry) }
+  scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due }
+  scope :to_run, -> { due.or(to_retry) }
 
   class << self
     def human_type = human("checks.#{model_name.element}.type")
@@ -58,7 +54,6 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
-  def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false, retry_at: calculate_retry_at)
   def retryable? = retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
   def tooltip? = true
 
@@ -68,49 +63,63 @@ class Check < ApplicationRecord
     (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
-  def schedule!
-    transaction do
-      scheduled_time = pending? ? run_at : retry_at
-      RunCheckJob.set(wait_until: scheduled_time).perform_later(self)
-      update!(status: :pending, checked_at: nil, scheduled: true)
-    end
-  end
-
   def to_badge
     [status_to_badge_level, status_to_badge_text, status_link].compact
   end
 
   def run
-    return schedule! if waiting?
-    return blocked! if blocked?
+    if waiting?
+      return false
+    elsif blocked?
+      block!
+      return false
+    elsif retry_at && retry_at > Time.current
+      return false  # Not ready to retry yet
+    end
 
     begin
-      self.checked_at = Time.zone.now
       self.data = analyze!
-      self.status = :passed
-      self.error = nil
-      self.retry_count = 0
-      self.retry_at = nil
-      passed?
+      pass!
     rescue StandardError => exception
-      Sentry.with_scope do |scope|
-        next unless scope # scope is nil when Sentry is disabled (in dev & test environments typically)
-
-        scope.set_context("check", { id:, type:, retry_count: })
-        scope.set_context("audit", { id: audit_id, url: audit.url })
-        Sentry.capture_exception(exception)
-      end
-      self.status = :failed
-      self.error = exception
-      self.retry_count += 1
+      fail!(exception)
     end
-    self.scheduled = false
-    save
     passed?
   end
 
   def error
     error_type.constantize.new(error_message).tap { |err| err.set_backtrace(Array(error_backtrace)) } if error_type && error_message
+  end
+
+  private
+
+  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+
+  def pass!
+    self.error = nil
+    update!(
+      status: :passed,
+      checked_at: Time.zone.now,
+      retry_at: nil
+    )
+  end
+
+  def fail!(exception)
+    self.error = exception
+    update!(
+      status: :failed,
+      checked_at: Time.zone.now,
+      retry_count: retry_count + 1,
+      retry_at: retryable? ? calculate_retry_at : nil
+    )
+    report(exception)
+  end
+
+  def block!
+    update!(
+      status: :blocked,
+      checked_at: Time.zone.now,
+      retry_at: calculate_retry_at
+    )
   end
 
   def error=(exception = nil)
@@ -122,10 +131,6 @@ class Check < ApplicationRecord
       self.error_message = self.error_type = self.error_backtrace = nil
     end
   end
-
-  private
-
-  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
 
   def status_to_badge_level
     case
@@ -140,4 +145,14 @@ class Check < ApplicationRecord
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
   def set_priority = self.priority = self.class.priority
+
+  def report(exception)
+    return unless Sentry.initialized?
+
+    Sentry.with_scope do |scope|
+      scope.set_context("check", { id:, type:, retry_count: })
+      scope.set_context("audit", { id: audit_id, url: audit.url })
+      Sentry.capture_exception(exception)
+    end
+  end
 end

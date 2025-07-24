@@ -2,7 +2,8 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
-  after_create :create_checks
+  after_create_commit :create_checks
+  after_create_commit :schedule
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -17,7 +18,7 @@ class Audit < ApplicationRecord
   scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(status: :pending) }
-  scope :to_schedule, -> { pending.where(scheduled: false).joins(:checks).merge(Check.to_schedule) }
+  scope :to_schedule, -> { pending.where(scheduled: false) }
   scope :current, -> { where(current: true) }
 
   Check.types.each do |name, klass|
@@ -29,24 +30,26 @@ class Audit < ApplicationRecord
   def schedule
     return if scheduled?
 
-    transaction do
-      RunAuditJob.perform_later(self)
-      update!(scheduled: true)
-    end
-  end
-
-  def all_checks
-    Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
+    update!(scheduled: true)
+    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
   end
 
   def check_status(check)
     (send(check)&.status || :pending).to_s.inquiry
   end
 
+  def create_checks
+    Check.types.each do |name, klass|
+      next if send(name) # Skip if check already exists
+
+      checks.build(type: klass.name).save!
+    end
+  end
+
   def derive_status_from_checks
-    self.status = if all_checks.any?(&:new_record?)
-       :pending
-    elsif (check_statuses = checks.collect(&:status).uniq).one?
+    check_statuses = checks.collect(&:status).uniq
+
+    self.status = if check_statuses.one?
        check_statuses.first
     else
        :mixed
@@ -54,12 +57,12 @@ class Audit < ApplicationRecord
     update(status:)
   end
 
-  def set_checked_at
-    latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-    update(checked_at: latest_checked_at)
-  end
-
-  def create_checks
-    all_checks.select(&:new_record?).each(&:save)
+  def finalize!
+    transaction do
+      derive_status_from_checks
+      latest_checked_at = checks.collect(&:checked_at).compact.sort.last
+      update(checked_at: latest_checked_at)
+      site.set_current_audit!
+    end
   end
 end
