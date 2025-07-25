@@ -23,7 +23,7 @@ default: &default
 development:
   primary: &primary_dev
     <<: *default
-    url: <%= ENV.fetch("DATABASE_URL") %>
+    url: <%= ENV["DATABASE_URL"] %>
     database: acces_cible_development
   cable:
     <<: *primary_dev
