@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+
+def help_message
+  puts <<~HELP
+    Usage: bin/scalingo [ENVIRONMENT] [OPTIONS]
+
+    ENVIRONMENT:
+      staging    Connect to staging environment (default)
+      prod       Connect to production environment
+
+    OPTIONS:
+      -s, --sandbox  Start Rails console in sandbox mode (changes are rolled back)
+      -h, --help     Show this help message
+
+    Examples:
+      bin/scalingo                    # Connect to staging console
+      bin/scalingo staging            # Connect to staging console
+      bin/scalingo prod               # Connect to production console
+      bin/scalingo staging -s         # Connect to staging console in sandbox mode
+      bin/scalingo prod --sandbox     # Connect to production console in sandbox mode
+
+    Note: This script requires the Scalingo CLI to be installed and configured.
+    If you haven't set it up yet, visit: https://doc.scalingo.com/platform/cli/start
+  HELP
+end
+
+def check_scalingo_cli
+  unless system("which scalingo > /dev/null 2>&1")
+    puts "Error: Scalingo CLI not found."
+    puts "Please install and configure the Scalingo CLI first."
+    puts "Documentation: https://doc.scalingo.com/platform/cli/start"
+    exit 1
+  end
+end
+
+# Parse command line arguments
+environment = "staging"
+sandbox = false
+
+OptionParser.new do |opts|
+  opts.on("-s", "--sandbox", "Start console in sandbox mode") do
+    sandbox = true
+  end
+
+  opts.on("-h", "--help", "Show help message") do
+    help_message
+    exit 0
+  end
+end.parse!
+
+# Handle positional argument for environment
+if ARGV.length > 0
+  case ARGV[0].downcase
+  when "staging", "stage"
+    environment = "staging"
+  when "prod", "production"
+    environment = "prod"
+  else
+    puts "Error: Invalid environment '#{ARGV[0]}'. Use 'staging' or 'prod'."
+    puts "Use --help for usage information."
+    exit 1
+  end
+end
+
+# Check if Scalingo CLI is available
+check_scalingo_cli
+
+# Build the command based on environment
+case environment
+when "staging"
+  app_config = "--region osc-fr1 --app acces-cible-staging"
+when "prod"
+  app_config = "--region osc-secnum-fr1 -a acces-cible-prod"
+end
+
+# Build the Rails console command
+console_cmd = sandbox ? "rails console --sandbox" : "rails console"
+scalingo_cmd = "scalingo #{app_config} run #{console_cmd}"
+
+puts "Connecting to #{environment} environment#{sandbox ? ' (sandbox mode)' : ''}..."
+puts "Running: #{scalingo_cmd}"
+puts
+
+# Execute the command
+exec(scalingo_cmd)
