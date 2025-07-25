@@ -1,38 +1,15 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "5becd9d8bacf1ad1f5396e95adf45d4e7d9c6e1682d5c43cd3a61027fdafe432",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/application_record.rb",
-      "line": 33,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "update_all(\"#{\"#{association}_count\"} = (SELECT count(*) FROM #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)} WHERE #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)}.#{(reflect_on_association(association).through_reflection.foreign_key or reflect_on_association(association).through_reflection.association_foreign_key)} = #{table_name}.#{primary_key})\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ApplicationRecord",
-        "method": "s(:self).bulk_reset_counter"
-      },
-      "user_input": "association",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
-      "fingerprint": "733978b31b9a71fe389309b247196f95a33acc9313505c220531d45e7ffa7ef1",
+      "fingerprint": "2a04a647ede1a3b6eb10a742d32955f6e8881d5e5649e42d78d52a2af8252a50",
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/sites/show.html.erb",
-      "line": 28,
+      "line": 22,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:site_id)).audit!.checks, { :as => :check })",
+      "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:site_id)).audit!.all_checks, { :as => :check })",
       "render_path": [
         {
           "type": "controller",
@@ -54,6 +31,29 @@
       "confidence": "Weak",
       "cwe_id": [
         22
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5becd9d8bacf1ad1f5396e95adf45d4e7d9c6e1682d5c43cd3a61027fdafe432",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/application_record.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "update_all(\"#{\"#{association}_count\"} = (SELECT count(*) FROM #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)} WHERE #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)}.#{(reflect_on_association(association).through_reflection.foreign_key or reflect_on_association(association).through_reflection.association_foreign_key)} = #{table_name}.#{primary_key})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ApplicationRecord",
+        "method": "s(:self).bulk_reset_counter"
+      },
+      "user_input": "association",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -104,5 +104,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "7.1.0"
+  "brakeman_version": "7.0.2"
 }

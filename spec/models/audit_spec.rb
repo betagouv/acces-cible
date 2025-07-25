@@ -54,6 +54,14 @@ RSpec.describe Audit do
     end
   end
 
+  describe "#all_checks" do
+    subject(:checks) { build(:audit).all_checks }
+
+    it "returns all checks, building missing ones" do
+      expect(checks.size).to eq(Check.types.size)
+      expect(checks.all?(&:new_record?)).to be true
+    end
+  end
 
   describe "#schedule" do
     subject(:schedule) { audit.schedule }
@@ -83,20 +91,23 @@ RSpec.describe Audit do
   end
 
   describe "#derive_status_from_checks" do
-    let(:audit) { create(:audit) }
+    let(:audit) { build(:audit) }
 
+    it "sets status to pending when any check is new" do
+      audit = build(:audit)
+      audit.derive_status_from_checks
+      expect(audit.status).to eq("pending")
+    end
 
     it "sets status to mixed when checks have different statuses" do
-      audit.save!
-      audit.checks.each { |check| check.update!(status: :passed) }
+      audit.all_checks.each { |check| check.passed!; check.save }
       audit.checks.last.update!(status: :failed)
       audit.derive_status_from_checks
       expect(audit.status).to eq("mixed")
     end
 
     it "sets status to match checks when all have same status" do
-      audit.save!
-      audit.checks.each { |check| check.update!(status: :passed) }
+      audit.all_checks.each { |check| check.update(status: :passed) }
       audit.derive_status_from_checks
       expect(audit.status).to eq("passed")
     end
@@ -105,7 +116,7 @@ RSpec.describe Audit do
   describe "#create_checks" do
     subject(:create_checks) { audit.create_checks }
 
-    let(:audit) { create(:audit) }
+    let(:audit) { build(:audit) }
 
     it "creates all check types" do
       expect { create_checks }.to change(Check, :count).by(Check.types.size)
