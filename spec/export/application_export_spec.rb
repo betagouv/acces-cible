@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ApplicationExport, type: :model do
+RSpec.describe ApplicationExport do
   let(:relation) { Site.all }
   let(:concrete_export_class) do
     Class.new(ApplicationExport) do
@@ -15,14 +15,7 @@ RSpec.describe ApplicationExport, type: :model do
       end
     end
   end
-  let(:concrete_export) { concrete_export_class.new(relation) }
-  let(:export) { concrete_export }
-
-  describe "#initialize" do
-    it "sets the relation" do
-      expect(export.instance_variable_get(:@relation)).to eq(relation)
-    end
-  end
+  let(:export) { concrete_export_class.new(relation) }
 
   describe "#extension" do
     it "returns the class EXTENSION constant" do
@@ -56,29 +49,21 @@ RSpec.describe ApplicationExport, type: :model do
   end
 
   describe "#serialize" do
-    let(:site) { build(:site, url: "https://test.com") }
-    let(:audit) { build(:audit, checked_at: Time.zone.parse("2024-01-01 12:00:00")) }
+    subject(:result) { export.serialize(site) }
 
-    before do
-      allow(site).to receive(:audit).and_return(audit)
+    let(:site) { build(:site, name: "Test Site", audits: [audit]) }
+    let(:audit) { build(:audit, checked_at:, url: "https://test.com/") }
+    let(:checked_at) { Time.zone.parse("2024-01-01 12:00:00") }
+
+    it "serializes simple and nested attributes" do
+      expect(result).to eq(["Test Site", "https://test.com/", checked_at])
     end
 
-    it "serializes simple attributes" do
-      allow(site).to receive_messages(name: "Test Site", url: "https://test.com")
-      result = export.serialize(site)
-      expect(result[0]).to eq("Test Site")
-      expect(result[1]).to eq("https://test.com")
-    end
-
-    it "serializes nested attributes" do
-      result = export.serialize(site)
-      expect(result[2]).to eq(Time.zone.parse("2024-01-01 12:00:00"))
-    end
-
-    it "handles nil values in chain" do
-      allow(site).to receive_messages(name: "Test Site", url: "https://test.com", audit: nil)
-      result = export.serialize(site)
-      expect(result[2]).to be_nil
+    context "when a chained method returns nil" do
+      it "returns nil" do
+        allow(site).to receive(:audit).and_return(nil)
+        expect(result[2]).to be_nil
+      end
     end
   end
 end
