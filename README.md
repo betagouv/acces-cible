@@ -111,6 +111,30 @@ Organizational unit: Engineering
   utilisent [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary)
   Exemples de préfixes : `fix:`, `feat:`, `chore:`, `ci:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, etc.
 
+## Particularités
+
+### Helpers et raccourcis
+
+Pour améliorer l'expérience développeur, des raccourcis et des outils ont été mis en place
+
+- `human` : raccourci pour `human_attribute_name`. `User.human(:full_name)` : renvoie la traduction de la clé `full_name` pour la classe `User`. Accepte des options supplémentaires, comme la méthode originale. Il est également disponible au niveau des instances (`some_user.human(:foo)`).
+- `human_count` : raccourci pour compter des objets. Par défaut, compte le nombre d'éléments de la classe : `User.human_count` renvoie le nombre total d'utilisateurs. Il est possible d'indiquer un attribut et/ou un nombre : `User.human_count(:inactive, count: User.inactive.count)`.
+- `bulk_reset_counter(association, counter: nil)` fait ce qu'on attend de `reset_counters` : prendre un nom d'association, le nom du compteur s'il diffère du nom par défaut, et met à jour toute la table en une seule requête SQL. TODO : proposer de l'upstreamer dans Rails.
+- `page_title` : récupère ou génère le titre de page. Cherche successivement dans `@title`, `content_for(:title)`, la méthode `to_title` de la ressource courante si on est dans une action de type `:show`, ou dans la configuration I18n du contrôleur courant.
+- `head_title` : concatène le titre de page et le nom du site, et l'insère dans le layout principal.
+- `time_ago` : affiche "il y a X minutes/heures/jours…" ou "dans X minutes/heures/jours…". Bien plus court à taper que `distance_of_time_in_words_to_now`.
+- `page_actions` permet de regrouper les boutons et actions, avec les même styles d'une page à l'autre.
+
+### Extensions ActiveRecord
+
+- `order_by` et `filter_by`. Ces méthodes sont injectées dans `ActiveRecord`, et gérées dans `app/queries/[model]_query.rb`. Grâce à cela, il est possible d'appeler `User.preloaded.filter_by(params[:filter]).order_by(params[:sort])` pour filtrer et trier les résultats.
+- `to_csv` et `to_csv_filename` sont injectées dans `ActiveRecord`, pour permettre d'exporter une requête en CSV avec un minimum de configuration.
+
+### Composants
+
+Les composants DSFR qui ne sont pas encore implémentés dans dsfr-view-components sont implémentés dans le dossier
+`app/components/dsfr/`. Des helpers sont également inclus pour les appeler avec une syntaxe concise et des valeurs par défaut logiques.
+
 ## 🧪 Tests
 
 ### Docker setup

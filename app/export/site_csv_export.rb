@@ -1,15 +1,4 @@
-class SiteCsvExport < ApplicationExport
-  EXTENSION = "csv"
-
-  def to_csv
-    CSV.generate(headers: true, col_sep: ";") do |csv|
-      csv << attributes.keys
-      records.each do |record|
-        csv << serialize(record)
-      end
-    end
-  end
-
+class SiteCsvExport < CsvExport
   def attributes
     {
       human(:url) => :url,
@@ -23,14 +12,5 @@ class SiteCsvExport < ApplicationExport
       Checks::AnalyzeAccessibilityPage.human(:audit_update_date) => [:audit, :analyze_accessibility_page, :audit_update_date],
       Checks::RunAxeOnHomepage.human(:success_rate) => [:audit, :run_axe_on_homepage, :human_success_rate],
     }
-  end
-
-  def headers = attributes.keys
-
-  def serialize(record)
-    attributes.values.map do |methods|
-      # Turns [:a, :b, :c] into record.a&.b&.c
-      Array.wrap(methods).reduce(record) { |obj, method| obj&.public_send(method) }
-    end
   end
 end
