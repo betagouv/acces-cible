@@ -22,9 +22,7 @@
       </tr>
     <% end %>
     <% t.with_body do %>
-      <% @sites.each do |site| %>
-        <%= render "site", site: %>
-      <% end %>
+      <%= render partial: "site", collection: @sites %>
     <% end %>
     <% t.with_footer_action do %>
       <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } %>
