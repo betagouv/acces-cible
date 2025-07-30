@@ -196,4 +196,24 @@ RSpec.describe IconHelper do
       end
     end
   end
+
+  describe "#aria_sort" do
+    it 'returns nil when no sort param exists' do
+      allow(helper).to receive(:params).and_return({})
+
+      expect(helper.aria_sort(:name)).to be_nil
+    end
+
+    it 'returns descending when current sort is asc' do
+      allow(helper).to receive(:params).and_return({ sort: { name: 'asc' } })
+
+      expect(helper.aria_sort(:name)).to eq('aria-sort=descending')
+    end
+
+    it 'returns ascending when current sort is descending' do
+      allow(helper).to receive(:params).and_return({ sort: { name: 'desc' } })
+
+      expect(helper.aria_sort(:name)).to eq('aria-sort=ascending')
+    end
+  end
 end
