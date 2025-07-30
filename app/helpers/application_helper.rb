@@ -32,6 +32,7 @@ module ApplicationHelper
       dsfr_badge(status:) { text }
     end
   end
+
   def sortable_header(text, param, **options)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc

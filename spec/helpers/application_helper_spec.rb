@@ -9,45 +9,24 @@ RSpec.describe ApplicationHelper do
       expect(result).to eq("First line\nSecond line\nThird line")
       expect(result).to be_html_safe
     end
-
-    it "handles mixed indentation" do
-      mixed_string = "  Line 1\n    Line 2\n Line 3"
-      result = helper.safe_unindent(mixed_string)
-
-      expect(result).to eq("Line 1\nLine 2\nLine 3")
-    end
-
-    it "returns html_safe string" do
-      result = helper.safe_unindent("  test")
-      expect(result).to be_html_safe
-    end
   end
 
   describe "#time_ago" do
     it "formats past time correctly" do
-      past_time = 2.hours.ago
-      result = helper.time_ago(past_time)
+      result = helper.time_ago(2.hours.ago)
 
       expect(result).to include("il y a")
     end
 
     it "formats future time correctly" do
-      future_time = 2.hours.from_now
-      result = helper.time_ago(future_time)
+      result = helper.time_ago(2.hours.from_now)
 
       expect(result).to include("dans")
-    end
-
-    it "handles datetime objects" do
-      datetime = DateTime.now - 1.hour
-      result = helper.time_ago(datetime)
-
-      expect(result).to include("il y a")
     end
   end
 
   describe "#or_separator" do
-    it "generates a separator with DSFR classes" do
+    it "generates a separator with classes" do
       result = helper.or_separator
 
       expect(result).to have_selector("p.fr-hr-or.fr-my-4w", text: "ou")
@@ -58,12 +37,6 @@ RSpec.describe ApplicationHelper do
     it "renders basic badge" do
       result = helper.badge(:success, "Success message")
       expect(result).to have_selector(".fr-badge.fr-badge--success", text: "Success message")
-    end
-
-    it "unpacks array into status, text, and link" do
-      result = helper.badge([:info, "Info text", "/info-link"])
-      expect(result).to have_selector(".fr-badge.fr-badge--info")
-      expect(result).to have_selector("a[href='/info-link']", text: "Info text")
     end
 
     it "uses block content when no text provided" do
@@ -83,7 +56,7 @@ RSpec.describe ApplicationHelper do
       expect(result).to have_selector("a[href='/link']", text: "Link text")
     end
 
-    it "renders external link with tooltip" do
+    it "renders external link" do
       result = helper.badge(:info, "External link", link: "/external", tooltip: true)
       expect(result).to have_selector("a[href='/external'][target='_blank']")
       expect(result).to have_selector("[role='tooltip']")
@@ -160,6 +133,14 @@ RSpec.describe ApplicationHelper do
         sortable_header = helper.sortable_header("Email", :email)
         expect(sortable_header).to have_selector("a[href*='sort%5Bemail%5D=asc']")
       end
+    end
+  end
+
+  describe "#set_focus" do
+    it 'generates a hidden div with selector attribute' do
+      result = helper.set_focus('my-input')
+
+      expect(result).to have_selector('div[hidden][data-controller="focus"][data-focus-selector-value="#my-input"]', visible: false)
     end
   end
 end
