@@ -1,6 +1,35 @@
 require "rails_helper"
 
 RSpec.describe PageHelper do
+  describe "#head_title" do
+    it "returns service info for root page" do
+      allow(helper).to receive(:root?).and_return(true)
+
+      result = helper.head_title
+      expect(result).to eq("Accès cible : Contrôle l'accessibilité et la conformité des sites internet")
+    end
+
+    it "returns page title with service name for other pages" do
+      allow(helper).to receive_messages(
+                         root?: false,
+                         page_title: "Test Page"
+                       )
+
+      result = helper.head_title
+      expect(result).to eq("Test Page - Accès cible")
+    end
+
+    it "returns a truncated page title with service name for other pages" do
+      allow(helper).to receive_messages(
+                         root?: false,
+                         page_title: "Test Page" * 10
+                       )
+
+      result = helper.head_title
+      expect(result).to eq("Test PageTest PageTest PageTest PageTest PageTe... - Accès cible")
+    end
+  end
+
   describe "#page_actions" do
     it "generates a div with default DSFR button group classes" do
       result = helper.page_actions { "Some content" }
