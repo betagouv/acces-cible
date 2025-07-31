@@ -12,7 +12,8 @@ class User < ApplicationRecord
     ]).from("inactive_users")
   end
 
-  validates :provider, :uid, :email, :given_name, :usual_name, :siret, presence: true
+  validates :provider, :uid, :email, :siret, presence: true
+  validate :name_presence_validation
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }
   validates :email, uniqueness: { scope: :provider, if: :email_changed? }
   validates :email, email: true
@@ -45,11 +46,15 @@ class User < ApplicationRecord
   end
 
   def full_name
-    "#{given_name} #{usual_name}"
+    [given_name, usual_name].compact.join(" ")
   end
   alias to_title full_name
 
   private
+
+  def name_presence_validation
+    errors.add(:base, "Either given_name or usual_name must be present") if given_name.blank? && usual_name.blank?
+  end
 
   def find_or_create_team
     self.team ||= Team.find_or_create_by(siret:)

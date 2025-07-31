@@ -16,14 +16,36 @@ RSpec.describe User do
       it { should_not allow_value("not an email, even though there's an @ somewhere").for(:email) }
     end
 
-    context "for given_name" do
-      it { should allow_value("Given Name").for(:given_name) }
-      it { should_not allow_value("").for(:given_name) }
-    end
+    context "for names" do
+      it { should allow_value("Yan").for(:given_name) }
+      it { should allow_value("Zhu").for(:usual_name) }
+      it { should allow_value(nil).for(:given_name) }
+      it { should allow_value(nil).for(:usual_name) }
 
-    context "for usual_name" do
-      it { should allow_value("Usual Name").for(:usual_name) }
-      it { should_not allow_value("").for(:usual_name) }
+      it "requires at least one name to be present" do
+        user.given_name = nil
+        user.usual_name = nil
+        expect(user).not_to be_valid
+        expect(user.errors[:base]).to include("Either given_name or usual_name must be present")
+      end
+
+      it "is valid with only given_name" do
+        user.given_name = "Yan"
+        user.usual_name = nil
+        expect(user).to be_valid
+      end
+
+      it "is valid with only usual_name" do
+        user.given_name = nil
+        user.usual_name = "Zhu"
+        expect(user).to be_valid
+      end
+
+      it "is valid with both names" do
+        user.given_name = "Yan"
+        user.usual_name = "Zhu"
+        expect(user).to be_valid
+      end
     end
 
     context "for siret" do
@@ -35,7 +57,7 @@ RSpec.describe User do
   describe ".from_omniauth" do
     subject(:from_omniauth) { described_class.from_omniauth(auth) }
 
-    let(:email) { "john.doe@example.com" }
+    let(:email) { "yan.zhu@example.com" }
     let(:siret) { "12345678901234" }
     let(:organizational_unit) { "Engineering Department" }
 
@@ -50,8 +72,8 @@ RSpec.describe User do
               email:,
               siret:,
               organizational_unit:,
-              given_name: "John",
-              usual_name: "Doe"
+              given_name: "Yan",
+              usual_name: "Zhu"
             }
           }
         }
@@ -64,13 +86,13 @@ RSpec.describe User do
 
         user = described_class.last
         expect(user).to have_attributes(
-          siret:,
-          provider: auth.provider,
-          uid: auth.uid,
-          email: auth.info.email,
-          given_name: auth.extra.raw_info.given_name,
-          usual_name: auth.extra.raw_info.usual_name,
-        )
+                          siret:,
+                          provider: auth.provider,
+                          uid: auth.uid,
+                          email: auth.info.email,
+                          given_name: auth.extra.raw_info.given_name,
+                          usual_name: auth.extra.raw_info.usual_name,
+                        )
       end
 
       it "creates a new team if it doesn't exist" do
@@ -102,11 +124,11 @@ RSpec.describe User do
 
         expect(user).to eq(existing_user.reload)
         expect(user).to have_attributes(
-          email: auth.info.email,
-          given_name: auth.extra.raw_info.given_name,
-          usual_name: auth.extra.raw_info.usual_name,
-          siret:
-        )
+                          email: auth.info.email,
+                          given_name: auth.extra.raw_info.given_name,
+                          usual_name: auth.extra.raw_info.usual_name,
+                          siret:
+                        )
       end
 
       it "associates the user with the correct team" do
@@ -146,6 +168,26 @@ RSpec.describe User do
       it "returns nil" do
         expect(from_omniauth).to be_nil
       end
+    end
+  end
+
+  describe "#full_name" do
+    it "returns both names when both are present" do
+      user.given_name = "Yan"
+      user.usual_name = "Zhu"
+      expect(user.full_name).to eq("Yan Zhu")
+    end
+
+    it "returns only given_name when usual_name is nil" do
+      user.given_name = "Yan"
+      user.usual_name = nil
+      expect(user.full_name).to eq("Yan")
+    end
+
+    it "returns only usual_name when given_name is nil" do
+      user.given_name = nil
+      user.usual_name = "Zhu"
+      expect(user.full_name).to eq("Zhu")
     end
   end
 end
