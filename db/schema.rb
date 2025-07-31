@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_22_125903) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_30_150831) do
   create_schema "acces_cible_development_cable"
   create_schema "acces_cible_development_cache"
   create_schema "acces_cible_development_queue"
@@ -117,8 +117,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_125903) do
     t.string "provider", null: false
     t.string "uid", null: false
     t.string "email", null: false
-    t.string "given_name", null: false
-    t.string "usual_name", null: false
+    t.string "given_name"
+    t.string "usual_name"
     t.string "siret", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
