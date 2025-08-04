@@ -50,6 +50,12 @@ module ApplicationHelper
     tag.div(hidden: true, data: { controller: :focus, "focus-selector-value": "##{selector}" })
   end
 
+  def aria_sort(param)
+    return unless (current_sort = params.dig(:sort, param)&.downcase&.to_sym)
+
+    "aria-sort=#{current_sort == :asc ? :descending : :ascending}"
+  end
+
   def root? = request.path == "/"
 
   def current_git_commit

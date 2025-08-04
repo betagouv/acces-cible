@@ -41,10 +41,4 @@ module IconHelper
     end
     link_to(name, options, html_options)
   end
-
-  def aria_sort(param)
-    return unless (current_sort = params.dig(:sort, param)&.downcase&.to_sym)
-
-    "aria-sort=#{current_sort == :asc ? :descending : :ascending}"
-  end
 end
