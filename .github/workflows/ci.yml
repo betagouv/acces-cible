@@ -134,4 +134,4 @@ jobs:
 
       - name: Déploiement en production
         if: ${{ github.ref == 'refs/heads/production' }}
-        run: scalingo --app acces-cible-prod --region osc-secnum-fr1 integration-link-manual-deploy main
+        run: scalingo --app acces-cible-prod --region osc-secnum-fr1 integration-link-manual-deploy production
