@@ -18,7 +18,6 @@ class Audit < ApplicationRecord
   scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(status: :pending) }
-  scope :to_schedule, -> { pending.where(scheduled: false) }
   scope :current, -> { where(current: true) }
 
   Check.types.each do |name, klass|
@@ -27,12 +26,7 @@ class Audit < ApplicationRecord
     end
   end
 
-  def schedule
-    return if scheduled?
-
-    update!(scheduled: true)
-    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
-  end
+  def schedule = ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
 
   def all_checks
     Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
