@@ -34,7 +34,7 @@ class SitesController < ApplicationController
       @site.audit.schedule if @site.audit.pending?
       redirect_to @site, notice:
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -45,7 +45,7 @@ class SitesController < ApplicationController
       ScheduleAuditsJob.perform_later
       redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -54,7 +54,7 @@ class SitesController < ApplicationController
     if @site.update(site_params)
       redirect_to @site, notice: t(".notice"), status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

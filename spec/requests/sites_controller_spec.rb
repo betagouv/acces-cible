@@ -43,7 +43,7 @@ RSpec.describe "Sites" do
         allow_any_instance_of(Site).to receive(:valid?).and_return(false) # rubocop:disable RSpec/AnyInstance
 
         post_site
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -66,11 +66,11 @@ RSpec.describe "Sites" do
     end
 
     context "when upload is invalid" do
-      it "returns :unprocessable_entity" do
+      it "returns :unprocessable_content" do
         allow_any_instance_of(SiteUpload).to receive(:save).and_return(false) # rubocop:disable RSpec/AnyInstance
 
         upload_sites
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

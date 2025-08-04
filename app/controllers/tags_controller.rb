@@ -16,7 +16,7 @@ class TagsController < ApplicationController
       object = template_object_klass.new(tag_ids:, team: current_user.team)
       render turbo_stream: turbo_stream.replace(:site_tags, partial: "sites/tags_form", locals: { object:, focus: true })
     else
-      head :unprocessable_entity
+      head :unprocessable_content
     end
   end
 
@@ -34,7 +34,7 @@ class TagsController < ApplicationController
     if @tag.update(tag_params)
       redirect_to @tag, notice: t(".notice"), status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
