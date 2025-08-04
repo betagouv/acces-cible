@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_22_125903) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_04_083656) do
   create_schema "acces_cible_development_cable"
   create_schema "acces_cible_development_cache"
   create_schema "acces_cible_development_queue"

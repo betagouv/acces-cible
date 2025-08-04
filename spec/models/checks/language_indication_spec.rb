@@ -3,6 +3,33 @@ require "rails_helper"
 RSpec.describe Checks::LanguageIndication do
   let(:check) { described_class.new }
 
+  describe "#find_language_indication" do
+    subject(:indication) { check.send(:find_language_indication) }
+
+    before do
+      # rubocop:disable RSpec/MessageChain
+      allow(check).to receive_message_chain("root_page.dom.root.attributes").and_return(attributes)
+      # rubocop:enable RSpec/MessageChain
+    end
+
+    {
+      "fr" => "fr",
+      "fr-FR" => "fr-FR",
+      "  fr-CA  " => "fr-CA",
+      "" => "",
+      "   " => "",
+      nil => nil
+    }.each do |value, expected_result|
+      context "when lang attribute #{value.inspect}" do
+        let(:attributes) { { "lang" => double(value:) } } # rubocop:disable RSpec/VerifiedDoubles
+
+        it "returns #{expected_result.inspect}" do
+          expect(indication).to eq(expected_result)
+        end
+      end
+    end
+  end
+
   describe "#custom_badge_status" do
     subject(:badge_status) { check.send(:custom_badge_status) }
 
