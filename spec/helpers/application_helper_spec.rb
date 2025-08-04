@@ -1,199 +1,65 @@
 require "rails_helper"
 
 RSpec.describe ApplicationHelper do
-  describe "#icon" do
-    it "handles any number of icon segments", :aggregate_failures do
-      selector = ".fr-icon-user-fill"
-      expect(helper.icon("user")).to have_selector(selector)
-      expect(helper.icon(:user)).to have_selector(selector)
+  describe "#safe_unindent" do
+    it "removes leading whitespace from all lines" do
+      indented_string = "    First line\n    Second line\n    Third line"
+      result = helper.safe_unindent(indented_string)
 
-      selector = ".fr-icon-arrow-right-s-fill"
-      expect(helper.icon("arrow", "right", "s")).to have_selector(selector)
-      expect(helper.icon(["arrow", "right", "s"])).to have_selector(selector)
-    end
-
-    it "adds fill style unless told otherwise", :aggregate_failures do
-      user_fill = ".fr-icon-user-fill"
-      expect(helper.icon("user")).to have_selector(user_fill)
-      expect(helper.icon("user", fill: true)).to have_selector(user_fill)
-
-      user_line = ".fr-icon-user-line"
-      expect(helper.icon("user", line: true)).to have_selector(user_line)
-      expect(helper.icon("user", fill: false)).to have_selector(user_line)
-      expect(helper.icon("user", line: true, fill: true)).to have_selector(user_line)
-    end
-
-    it "allows changing the tag", :aggregate_failures do
-      expect(helper.icon("user")).to have_selector("span")
-      expect(helper.icon("user", tag: :i)).to have_selector("i")
-      expect(helper.icon("user", tag: "div")).to have_selector("div")
-    end
-
-    it "accepts additional HTML options", :aggregate_failures do
-      expect(helper.icon("user", class: "custom-class")).to have_selector(".fr-icon-user-fill.custom-class")
-
-      result = helper.icon("user", id: "icon-id", data: { test: "value" })
-      expect(result).to have_selector("#icon-id[data-test='value']")
-    end
-
-    it "has aria-hidden: true, but allows overrides and additions", :aggregate_failures do
-      expect(helper.icon("user")).to have_selector("[aria-hidden='true']")
-
-      result = helper.icon("user", aria: { hidden: false })
-      expect(result).to have_selector("span[aria-hidden='false']")
-
-      result = helper.icon("user", aria: { label: "User icon" })
-      expect(result).to have_selector("span[aria-hidden='true'][aria-label='User icon']")
-    end
-
-    it "accepts text as an option or a block", :aggregate_failures do
-      result = helper.icon("user", text: "User Account")
-      expect(result).to have_selector("span", text: "User Account")
-
-      result = helper.icon("user", text: "<strong>User</strong>".html_safe)
-      expect(result).to have_selector("span strong", text: "User")
-
-      result = helper.icon("user") { "<strong>User</strong>".html_safe }
-      expect(result).to have_selector("span strong", text: "User")
-
-      result = helper.icon("user", text: "Option Text") { "Block Text" }
-      expect(result).to have_text("Block Text")
-      expect(result).not_to have_text("Option Text")
+      expect(result).to eq("First line\nSecond line\nThird line")
+      expect(result).to be_html_safe
     end
   end
 
-  describe "#icon_class" do
-    it "handles any number of icon segments", :aggregate_failures do
-      classes = "fr-icon-user-fill"
-      expect(helper.icon_class("user")).to eq(classes)
-      expect(helper.icon_class(:user)).to eq(classes)
+  describe "#time_ago" do
+    it "formats past time correctly" do
+      result = helper.time_ago(2.hours.ago)
 
-      classes = "fr-icon-arrow-right-s-fill"
-      expect(helper.icon_class("arrow", "right", "s")).to eq(classes)
-      expect(helper.icon_class(["arrow", "right", "s"])).to eq(classes)
+      expect(result).to include("il y a")
     end
 
-    it "adds fill style unless told otherwise", :aggregate_failures do
-      user_fill = "fr-icon-user-fill"
-      expect(helper.icon_class("user")).to eq(user_fill)
-      expect(helper.icon_class("user", fill: true)).to eq(user_fill)
+    it "formats future time correctly" do
+      result = helper.time_ago(2.hours.from_now)
 
-      user_line = "fr-icon-user-line"
-      expect(helper.icon_class("user", line: true)).to eq(user_line)
-      expect(helper.icon_class("user", fill: false)).to eq(user_line)
-      expect(helper.icon_class("user", line: true, fill: true)).to eq(user_line)
-    end
-
-    context "with side option" do
-      it "adds link classes when side is specified", :aggregate_failures do
-        expect(helper.icon_class(:arrow, side: :right)).to include("fr-link")
-        expect(helper.icon_class(:arrow, side: :right)).to include("fr-link--icon-right")
-        expect(helper.icon_class(:arrow, side: "right")).to include("fr-link--icon-right")
-      end
-
-      it "adds size modifier when provided" do
-        expect(helper.icon_class(:arrow, side: :right, size: :sm)).to include("fr-link--sm")
-      end
-
-      it "ignores invalid side values" do
-        expect(helper.icon_class(:arrow, side: :top)).not_to include("fr-link--icon")
-      end
-
-      it "ignores invalid size values" do
-        expect(helper.icon_class(:arrow, side: :right, size: :xl)).not_to include("fr-link--xl")
-      end
-    end
-
-    context "with button/btn option" do
-      it "adds button classes when button: true is passed" do
-        expect(helper.icon_class(:user, btn: true)).to include("fr-btn")
-        expect(helper.icon_class(:user, button: true)).to include("fr-btn")
-        expect(helper.icon_class(:user, button: true)).not_to include("fr-link")
-      end
-
-      it "adds size modifier when provided" do
-        expect(helper.icon_class(:arrow, button: true, size: :sm)).to include("fr-btn--sm")
-      end
-
-      it "adds side modifier when provided" do
-        expect(helper.icon_class(:arrow, button: true, side: :right)).to include("fr-btn--icon-right")
-      end
-
-      it "ignores invalid side values" do
-        expect(helper.icon_class(:arrow, button: true, side: :top)).not_to include("fr-btn--icon")
-      end
-
-      it "ignores invalid size values" do
-        expect(helper.icon_class(:arrow, button: true, side: :right, size: :xl)).not_to include("fr-btn--xl")
-      end
-
-      it "prioritizes button over link when both options are passed" do
-        result = helper.icon_class(:arrow, button: true, side: :right)
-        expect(result).to include("fr-btn--icon-right")
-        expect(result).not_to include("fr-link")
-      end
-    end
-
-    it "accepts a class option" do
-      result = helper.icon_class(:arrow, class: "custom-class")
-      expect(result).to include("custom-class")
+      expect(result).to include("dans")
     end
   end
 
-  describe "#link_icon" do
-    context "with name and options arguments" do
-      it "generates a link with icon classes" do
-        result = helper.link_icon(:arrow, "Next Page", "/next", side: :right)
+  describe "#or_separator" do
+    it "generates a separator with classes" do
+      result = helper.or_separator
 
-        expect(result).to have_selector("a[href='/next']")
-        expect(result).to have_selector("a.fr-link.fr-link--icon-right.fr-icon-arrow-fill")
-        expect(result).to have_content("Next Page")
-      end
+      expect(result).to have_selector("p.fr-hr-or.fr-my-4w", text: "ou")
+    end
+  end
 
-      it "supports line style" do
-        result = helper.link_icon(:arrow, "Next", "/next", line: true)
-
-        expect(result).to have_selector("a.fr-icon-arrow-line")
-      end
-
-      it "supports size option" do
-        result = helper.link_icon(:arrow, "Next", "/next", side: :right, size: :sm)
-
-        expect(result).to have_selector("a.fr-link--sm")
-      end
-
-      it "supports button styling" do
-        result = helper.link_icon(:arrow, "Next", "/next", button: true)
-
-        expect(result).to have_selector("a.fr-btn")
-        expect(result).not_to have_selector("a.fr-link")
-      end
-
-      it "merges custom classes" do
-        result = helper.link_icon(:arrow, "Next", "/next", class: "my-custom-class")
-
-        expect(result).to have_selector("a.my-custom-class")
-        expect(result).to have_selector("a.fr-icon-arrow-fill")
-      end
+  describe "#badge" do
+    it "renders basic badge" do
+      result = helper.badge(:success, "Success message")
+      expect(result).to have_selector(".fr-badge.fr-badge--success", text: "Success message")
     end
 
-    context "with block syntax" do
-      it "generates a link with block content" do
-        result = helper.link_icon(:arrow, "/next", side: :right) do
-          helper.content_tag(:span, "Next Page", class: "visually-hidden")
-        end
+    it "uses block content when no text provided" do
+      result = helper.badge(:warning) { "Block content" }
+      expect(result).to have_selector(".fr-badge.fr-badge--warning", text: "Block content")
+    end
 
-        expect(result).to have_selector("a[href='/next']")
-        expect(result).to have_selector("a.fr-link.fr-link--icon-right.fr-icon-arrow-fill")
-        expect(result).to have_selector("a span.visually-hidden", text: "Next Page")
-      end
+    it "renders tooltip badge when tooltip: true" do
+      result = helper.badge(:info, "Tooltip text", tooltip: true)
+      expect(result).to have_selector(".fr-badge.fr-badge--info[role='tooltip']")
+      expect(result).to have_selector("[title='Tooltip text']")
+    end
 
-      it "supports all icon options with block syntax" do
-        result = helper.link_icon(:download, "/file", button: true, size: :lg, side: :left) { "Download File" }
+    it "renders badge with link when link provided" do
+      result = helper.badge(:success, "Link text", link: "/link")
+      expect(result).to have_selector(".fr-badge.fr-badge--success")
+      expect(result).to have_selector("a[href='/link']", text: "Link text")
+    end
 
-        expect(result).to have_selector("a.fr-btn.fr-btn--lg.fr-btn--icon-left.fr-icon-download-fill")
-        expect(result).to have_content("Download File")
-      end
+    it "renders external link" do
+      result = helper.badge(:info, "External link", link: "/external", tooltip: true)
+      expect(result).to have_selector("a[href='/external'][target='_blank']")
+      expect(result).to have_selector("[role='tooltip']")
     end
   end
 
@@ -270,30 +136,31 @@ RSpec.describe ApplicationHelper do
     end
   end
 
-  describe "#page_actions" do
-    it "generates a div with default DSFR button group classes" do
-      result = helper.page_actions { "Some content" }
+  describe "#set_focus" do
+    it 'generates a hidden div with selector attribute' do
+      result = helper.set_focus('my-input')
 
-      expect(result).to have_selector("div.fr-btns-group.fr-btns-group--inline-md.fr-mb-2w")
-      expect(result).to have_content("Some content")
+      expect(result).to have_selector('div[hidden][data-controller="focus"][data-focus-selector-value="#my-input"]', visible: false)
+    end
+  end
+
+  describe "#aria_sort" do
+    it 'returns nil when no sort param exists' do
+      allow(helper).to receive(:params).and_return({})
+
+      expect(helper.aria_sort(:name)).to be_nil
     end
 
-    it "accepts additional HTML attributes and merges custom classes with defaults", :aggregate_failures do
-      result = helper.page_actions(id: "page-actions", data: { test: "value" }, class: "custom-class") { "Content" }
+    it 'returns descending when current sort is asc' do
+      allow(helper).to receive(:params).and_return({ sort: { name: 'asc' } })
 
-      expect(result).to have_selector("div#page-actions[data-test='value']")
-      expect(result).to have_selector("div.fr-btns-group.fr-btns-group--inline-md.fr-mb-2w.custom-class")
+      expect(helper.aria_sort(:name)).to eq('aria-sort=descending')
     end
 
-    it "allows yielding complex content" do
-      result = helper.page_actions do
-        helper.tag.a("Edit", href: "/edit", class: "fr-btn") +
-        helper.tag.a("Delete", href: "/delete", class: "fr-btn fr-btn--secondary")
-      end
+    it 'returns ascending when current sort is descending' do
+      allow(helper).to receive(:params).and_return({ sort: { name: 'desc' } })
 
-      expect(result).to have_selector("div.fr-btns-group")
-      expect(result).to have_selector("a[href='/edit'].fr-btn", text: "Edit")
-      expect(result).to have_selector("a[href='/delete'].fr-btn.fr-btn--secondary", text: "Delete")
+      expect(helper.aria_sort(:name)).to eq('aria-sort=ascending')
     end
   end
 end
