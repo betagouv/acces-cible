@@ -48,12 +48,13 @@ class User < ApplicationRecord
   def full_name
     [given_name, usual_name].compact.join(" ")
   end
+
   alias to_title full_name
 
   private
 
   def name_presence_validation
-    errors.add(:base, "Either given_name or usual_name must be present") if given_name.blank? && usual_name.blank?
+    errors.add(:given_name, :blank) if given_name.blank? && usual_name.blank?
   end
 
   def find_or_create_team

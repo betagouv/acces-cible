@@ -45,11 +45,6 @@ fr:
     formats:
       compact: "%Y/%m/%d"
 
-  errors:
-    attributes:
-      url:
-        invalid: invalide
-
   activemodel:
     errors:
       models:
@@ -241,10 +236,21 @@ fr:
         email: Adresse électronique
 
   errors:
+    attributes:
+      url:
+        invalid: invalide
+      given_name:
+        blank: Veuillez indiquer au moins un prénom ou un nom.
     not_found:
       title: "Page non trouvée (erreur 404)"
     internal_server_error:
       title: "Problème technique (erreur 500)"
+  #    models:
+  #      user:
+  #        attributes:
+  #          given_name:
+  #            blank: Veuillez indiquer au moins un prénom ou un nom.
+
   pages:
     accessibilite:
       title: Déclaration d’accessibilité

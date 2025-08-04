@@ -26,7 +26,7 @@ RSpec.describe User do
         user.given_name = nil
         user.usual_name = nil
         expect(user).not_to be_valid
-        expect(user.errors[:base]).to include("Either given_name or usual_name must be present")
+        expect(user.errors[:given_name]).to include("Veuillez indiquer au moins un prénom ou un nom.")
       end
 
       it "is valid with only given_name" do
