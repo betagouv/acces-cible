@@ -1,4 +1,4 @@
-<%= dsfr_header logo_text: t("global.sponsor_html"), title: t("global.service_name"), tagline: t("global.service_description") do |header| %>
+<%= dsfr_header logo_text: t("global.sponsor_html"), title: t("global.service_name"), tagline: t("global.service_description"), html_attributes: { id: :nav } do |header| %>
   <%= header.with_direct_link_simple title: t("pages.accueil.title"), path: root_path, active: current_page?(root_path) %>
 
   <% if authenticated? %>
