@@ -87,21 +87,22 @@ RSpec.describe ProcessAuditJob do
 
     context 'when there are failed retryable checks' do
       it 'schedules job to run at earliest retry time' do
-        retry_time = 5.minutes.from_now.round
-        audit.checks.first.update!(status: :failed, retry_at: retry_time)
+        audit.checks.first.update!(status: :failed, retry_at: 1.minute.from_now)
+        audit.checks.where.not(id: audit.checks.first.id).update_all(status: :passed)
+        retry_at = audit.checks.first.reload.retry_at
 
         job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: retry_time, group: "audit_#{audit.id}").and_return(job_class_double)
+        allow(described_class).to receive(:set).with(wait_until: retry_at, group: "audit_#{audit.id}").and_return(job_class_double)
         allow(job_class_double).to receive(:perform_later)
 
         job.send(:reschedule)
-        expect(described_class).to have_received(:set).with(wait_until: retry_time, group: "audit_#{audit.id}")
+        expect(described_class).to have_received(:set).with(wait_until: retry_at, group: "audit_#{audit.id}")
         expect(job_class_double).to have_received(:perform_later).with(audit)
       end
     end
 
     context 'when there are no failed retryable checks' do
-      it 'schedules job to run in 5 minutes' do
+      it 'schedules job to run in 1 minute' do
         audit.checks.update_all(status: :passed)
 
         job_class_double = class_double(described_class)

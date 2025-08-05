@@ -68,25 +68,8 @@ RSpec.describe Audit do
 
     let(:audit) { create(:audit) }
 
-    context "when audit is not scheduled" do
-      before { audit.update!(scheduled: false) }
-
-      it "marks audit as scheduled and enqueues ProcessAuditJob" do
-        expect { schedule }.to change(audit, :scheduled).from(false).to(true)
-                               .and have_enqueued_job(ProcessAuditJob).with(audit)
-      end
-    end
-
-    context "when audit is already scheduled" do
-      before { audit.update!(scheduled: true) }
-
-      it "does not mark audit as scheduled" do
-        expect { schedule }.not_to change(audit, :scheduled)
-      end
-
-      it "does not enqueue ProcessAuditJob" do
-        expect { schedule }.not_to have_enqueued_job(ProcessAuditJob)
-      end
+    it "enqueues a ProcessAuditJob" do
+      expect { schedule }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
   end
 
