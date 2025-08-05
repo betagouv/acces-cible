@@ -54,7 +54,7 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
-  def retryable? = retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
+  def retryable? = failed? && retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
   def tooltip? = true
 
   def calculate_retry_at
