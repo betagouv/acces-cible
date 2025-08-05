@@ -55,6 +55,8 @@ class Browser
     delegate_missing_to :instance
   end
 
+  delegate :reset, :restart, to: :browser
+
   def get(url)
     with_page do |page|
       page.go_to(url)
@@ -80,8 +82,6 @@ class Browser
     end
   end
 
-  private
-
   def browser
     @browser ||= begin
       Ferrum::Browser.new(settings).tap do |browser|
@@ -91,11 +91,18 @@ class Browser
     end
   end
 
+  private
+
   def with_page
     begin
       page = create_page
       result = yield(page)
       result
+    rescue Ferrum::DeadBrowserError => e
+      Rails.logger.warn { "Dead browser detected: #{e.message}, restarting browser" }
+      reset
+      restart
+      retry
     rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
       Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
       raise e unless defined?(page) && page
