@@ -9,9 +9,9 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
-  MAX_RETRIES = 3
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
+  MAX_RETRIES = 3
 
   belongs_to :audit
   has_one :site, through: :audit
