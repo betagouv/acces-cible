@@ -111,7 +111,10 @@ class Check < ApplicationRecord
       retry_count: retry_count + 1,
       retry_at: retryable? ? calculate_retry_at : nil
     )
-    report(exception)
+    report(exception:) do |scope|
+      scope.set_context("check", { id:, type:, retry_count: })
+      scope.set_context("audit", { id: audit_id, url: audit.url })
+    end
   end
 
   def block!
@@ -145,14 +148,4 @@ class Check < ApplicationRecord
   def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
   def set_priority = self.priority = self.class.priority
-
-  def report(exception)
-    return unless Sentry.initialized?
-
-    Sentry.with_scope do |scope|
-      scope.set_context("check", { id:, type:, retry_count: })
-      scope.set_context("audit", { id: audit_id, url: audit.url })
-      Sentry.capture_exception(exception)
-    end
-  end
 end

@@ -3,6 +3,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   delegate :l, to: :I18n
   delegate :human, :to_percent, :helpers, to: :class
+  delegate :report, to: ErrorHelper
 
   class << self
     delegate :helpers, to: ApplicationController

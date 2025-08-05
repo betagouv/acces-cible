@@ -3,7 +3,10 @@ class SessionsController < ApplicationController
   redirect_if_authenticated only: [:new, :omniauth]
 
   def new
-    flash.now.alert = Session.human(:login_failed) if request.path == auth_failure_path
+    if request.path == auth_failure_path
+      flash.now.alert = Session.human(:login_failed)
+      report(message: params[:message] || "Omniauth error")
+    end
   end
 
   def omniauth
