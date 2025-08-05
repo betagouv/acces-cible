@@ -7,7 +7,7 @@
         <%= f.fields_for :tags_attributes, Tag.new do |ff| %>
           <%= ff.dsfr_text_field :name, label: Tag.human(:new) %>
         <% end %>
-        <%= f.button t("shared.add"), class: icon_class("add-circle", btn: :secondary, line: true), hidden: true,
+        <%= f.button t("shared.add"), type: :button, class: icon_class("add-circle", btn: :secondary, line: true), hidden: true,
                     data: { action: "frame#submit:prevent", "frame-target": :button }, title: Tag.human(:add) %>
       </div>
     <% end %>
