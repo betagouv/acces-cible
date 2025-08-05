@@ -23,6 +23,9 @@ class Check < ApplicationRecord
 
   after_initialize :set_priority
 
+  after_update_commit :broadcast_to_sites, if: :should_broadcast_to_view?
+  after_update_commit :broadcast_to_site, if: :should_broadcast_to_view?
+
   scope :due, -> { pending.where("run_at <= now()") }
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
@@ -74,7 +77,7 @@ class Check < ApplicationRecord
       block!
       return false
     elsif retry_at && retry_at > Time.current
-      return false  # Not ready to retry yet
+      return false # Not ready to retry yet
     end
 
     begin
@@ -130,6 +133,18 @@ class Check < ApplicationRecord
     else
       self.error_message = self.error_type = self.error_backtrace = nil
     end
+  end
+
+  def should_broadcast_to_view?
+    saved_change_to_status? && !(pending? || blocked?)
+  end
+
+  def broadcast_to_sites
+    Turbo::StreamsChannel.broadcast_refresh_later_to([site.team, :sites])
+  end
+
+  def broadcast_to_site
+    Turbo::StreamsChannel.broadcast_refresh_later_to(site)
   end
 
   def status_to_badge_level

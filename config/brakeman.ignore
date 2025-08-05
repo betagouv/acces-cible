@@ -7,7 +7,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/sites/show.html.erb",
-      "line": 22,
+      "line": 24,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:site_id)).audit!.all_checks, { :as => :check })",
       "render_path": [
@@ -54,6 +54,39 @@
       "confidence": "Medium",
       "cwe_id": [
         89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "c2c45c9376fab69f25eab4c111bc888477b15e78fef3df9ba4251f468bd4332f",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/sites/_site.html.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to((Unresolved Model).new.url_without_scheme.truncate(35, :separator => /\\W/), (Unresolved Model).new.url, :target => :_blank, :title => (if ((Unresolved Model).new.url_without_scheme.length > 35) then\n  (Unresolved Model).new.url_without_scheme\nelse\n  nil\nend))",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "sites/index",
+          "line": 26,
+          "file": "app/views/sites/index.html.erb",
+          "rendered": {
+            "name": "sites/_site",
+            "file": "app/views/sites/_site.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sites/_site"
+      },
+      "user_input": "(Unresolved Model).new.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
       ],
       "note": ""
     },
