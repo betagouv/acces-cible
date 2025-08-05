@@ -35,6 +35,9 @@ module Authentication
 
   def find_session_by_cookie
     Session.find(cookies.signed[:session_id]) if cookies.signed[:session_id]
+  rescue ActiveRecord::RecordNotFound
+    cookies.delete(:session_id)
+    nil
   end
 
   def request_authentication
