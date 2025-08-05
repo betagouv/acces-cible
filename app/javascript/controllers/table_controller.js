@@ -46,7 +46,8 @@ export default class extends Controller {
   updateToggleAll() {
     const count = this.checkedCount
     const total = this.checkboxCount
-    this.toggleAllTarget.checked = count == total
+    this.toggleAllTarget.disabled = total == 0
+    this.toggleAllTarget.checked = count > 0 && count == total
     this.toggleAllTarget.indeterminate = count > 0 && count < total
   }
 
