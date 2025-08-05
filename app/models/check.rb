@@ -66,8 +66,6 @@ class Check < ApplicationRecord
   def tooltip? = true
 
   def calculate_retry_at
-    return nil unless retryable?
-
     (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
@@ -120,7 +118,7 @@ class Check < ApplicationRecord
       status: :failed,
       checked_at: Time.zone.now,
       retry_count: retry_count + 1,
-      retry_at: retryable? ? calculate_retry_at : nil
+      retry_at: calculate_retry_at
     )
     report(exception:) do |scope|
       scope.set_context("check", { id:, type:, retry_count: })

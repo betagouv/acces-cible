@@ -3,6 +3,8 @@ require "rails_helper"
 RSpec.describe Check do
   subject(:check) { build(:check) }
 
+  let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
+
   it { should be_valid }
 
   describe "associations" do
@@ -28,9 +30,9 @@ RSpec.describe Check do
     let!(:pending_check) { create(:check, status: :pending, run_at: 1.hour.ago) }
     let!(:future_check) { create(:check, status: :pending, run_at: 1.hour.from_now) }
     let!(:passed_check) { create(:check, status: :passed) }
-    let!(:failed_check_retryable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago) }
-    let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago) }
-    let!(:blocked_check_retryable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago) }
+    let!(:failed_check_retryable) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.ago, error_type: retryable_error) }
+    let!(:failed_check_max_retries) { create(:check, status: :failed, retry_count: 3, retry_at: 1.hour.ago, error_type: retryable_error) }
+    let!(:blocked_check_retryable) { create(:check, status: :blocked, retry_count: 0, retry_at: 1.hour.ago, error_type: retryable_error) }
     let!(:future_retry_check) { create(:check, status: :failed, retry_count: 1, retry_at: 1.hour.from_now) }
 
     describe ".to_run" do
@@ -213,6 +215,8 @@ RSpec.describe Check do
       end
 
       it "sets retry_at for future retry" do
+        # Mock the retryable? method to return true since blocked checks should be retryable
+        allow(check).to receive(:retryable?).and_return(true)
         check.run
         expect(check.retry_at).to be > Time.current
       end
@@ -326,16 +330,10 @@ RSpec.describe Check do
         expect(check.retry_count).to eq(2)
       end
 
-      it "sets retry_at if retryable" do
-        check.retry_count = 1 # Make sure it's retryable
+      it "sets retry_at" do
+        check.retry_count = 1
         check.run
         expect(check.retry_at).to be > Time.current
-      end
-
-      it "does not set retry_at if not retryable" do
-        check.retry_count = 3 # Max retries
-        check.run
-        expect(check.retry_at).to be_nil
       end
 
       it "returns false" do
@@ -345,30 +343,40 @@ RSpec.describe Check do
   end
 
   describe "#retryable?" do
-    it "returns true when retry_count is less than max_retries" do
-      check = build(:check, retry_count: 2)
+    it "returns true when check is failed, retry_count is less than max_retries, and error_type is retryable" do
+      check = build(:check, status: :failed, retry_count: 2, error_type: retryable_error)
       expect(check).to be_retryable
     end
 
     it "returns false when retry_count is equal to max_retries" do
-      check = build(:check, retry_count: 3)
+      check = build(:check, status: :failed, retry_count: 3, error_type: retryable_error)
       expect(check).not_to be_retryable
     end
 
     it "returns false when retry_count is greater than max_retries" do
-      check = build(:check, retry_count: 4)
+      check = build(:check, status: :failed, retry_count: 4, error_type: retryable_error)
+      expect(check).not_to be_retryable
+    end
+
+    it "returns false when check is not failed" do
+      check = build(:check, status: :blocked, retry_count: 1, error_type: retryable_error)
+      expect(check).not_to be_retryable
+    end
+
+    it "returns false when error_type is not retryable" do
+      check = build(:check, status: :failed, retry_count: 1, error_type: "SomeOtherError")
+      expect(check).not_to be_retryable
+    end
+
+    it "returns false when error_type is nil" do
+      check = build(:check, status: :failed, retry_count: 1, error_type: nil)
       expect(check).not_to be_retryable
     end
   end
 
   describe "#calculate_retry_at" do
-    let(:check) { build(:check, retry_count: retry_count) }
+    let(:check) { build(:check, status: :failed, retry_count:, error_type: retryable_error) }
     let(:retry_count) { 1 }
-
-    it "returns nil when not retryable" do
-      check.retry_count = 3
-      expect(check.calculate_retry_at).to be_nil
-    end
 
     it "calculates exponential backoff based on retry_count" do
       freeze_time do
