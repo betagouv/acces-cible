@@ -13,10 +13,12 @@ class Check < ApplicationRecord
   REQUIREMENTS = [:reachable]
   MAX_RETRIES = 3
   RETRYABLE_ERRORS = [
+    "Errno::ECONNREFUSED",
     "Ferrum::PendingConnectionsError",
     "Ferrum::ProcessTimeoutError",
     "Ferrum::StatusError",
     "Ferrum::TimeoutError",
+    "ThreadError",
   ].freeze
 
   belongs_to :audit
