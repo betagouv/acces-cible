@@ -75,8 +75,8 @@ fr:
           other: "%{count} lignes par page"
       table:
         lines:
-          zero: Aucune ligne
-          one: Une ligne
+          zero: 0 lignes
+          one: 1 ligne
           other: "%{count} lignes"
 
   activerecord:
@@ -190,6 +190,8 @@ fr:
       site:
         all: Tous les sites
         empty_collection: Il n'y a aucun site à afficher. Ajoutez un ou plusieurs sites à évaluer.
+        no_results: Aucun site à afficher.
+        no_search_results: Aucun site ne correspond à votre recherche.
         created_at: Enregistré le
         updated_at: Date de mise à jour
         url: Adresse du site

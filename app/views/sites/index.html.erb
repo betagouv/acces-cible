@@ -1,25 +1,25 @@
-<% if @sites.load.any? %>
-  <% form_id = :table_form %>
-  <%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
-  <%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
-    <% hidden_fields = params.expect(sort: {}).to_h.transform_keys { |key| :"sort[#{key}]" } %>
-    <% t.with_search(url: url_for, name: "search[q]", value: params.dig(:search, :q), hidden_fields:) %>
-    <% t.with_header_action do %>
-      <%= button_tag t("shared.destroy_all"), form: form_id, data: { table_target: :button, turbo_confirm: t("shared.confirm") }, class: icon_class(:delete, line: true, btn: :secondary, class: "fr-hidden") %>
-    <% end %>
-    <% t.with_head do %>
-      <tr>
-        <%= dsfr_row_check_all %>
-        <th scope="col"><%= Site.human(:detail) %></th>
-        <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header Site.human(:url), :url %></th>
-        <% Check.classes.each do |klass| %>
-          <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
-        <% end %>
-        <th scope="col"><%= Tag.human(:all) %></th>
-        <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
-      </tr>
-    <% end %>
-    <% t.with_body do %>
+<% form_id = :table_form %>
+<%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
+<%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
+  <% hidden_fields = params.expect(sort: {}).to_h.transform_keys { |key| :"sort[#{key}]" } %>
+  <% t.with_search(url: url_for, name: "search[q]", value: params.dig(:search, :q), hidden_fields:) %>
+  <% t.with_header_action do %>
+    <%= button_tag t("shared.destroy_all"), form: form_id, data: { table_target: :button, turbo_confirm: t("shared.confirm") }, class: icon_class(:delete, line: true, btn: :secondary, class: "fr-hidden") %>
+  <% end %>
+  <% t.with_head do %>
+    <tr>
+      <%= dsfr_row_check_all %>
+      <th scope="col"><%= Site.human(:detail) %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header Site.human(:url), :url %></th>
+      <% Check.classes.each do |klass| %>
+        <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
+      <% end %>
+      <th scope="col"><%= Tag.human(:all) %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
+    </tr>
+  <% end %>
+  <% t.with_body do %>
+    <% if @sites.load.any? %>
       <% @sites.each do |site| %>
         <tr>
           <%= dsfr_row_check(site) %>
@@ -49,11 +49,15 @@
           </td>
         </tr>
       <% end %>
-    <% end %>
-    <% t.with_footer_action do %>
-      <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } %>
+    <% else %>
+      <tr>
+        <td colspan="<%= 5 + Check.classes.size %>">
+          <%= Site.human(params.dig(:search, :q)&.empty? ? :no_results : :no_search_results) %>
+        </td>
+      </tr>
     <% end %>
   <% end %>
-<% else %>
-  <%= dsfr_alert(type: :info, title: Site.human(:empty_collection)) %>
+  <% t.with_footer_action do %>
+    <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } unless @sites.empty? %>
+  <% end %>
 <% end %>
