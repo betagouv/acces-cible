@@ -50,6 +50,6 @@
     <% end %>
   <% end %>
   <% t.with_footer_action do %>
-    <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } %>
+    <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } unless @sites.empty? %>
   <% end %>
 <% end %>
