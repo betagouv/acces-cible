@@ -1,5 +1,5 @@
 <%# locals: (object:, focus: false, team: current_user.team) %>
-<%= turbo_frame_tag dom_id(object, :tags), data: { controller: :frame, "frame-action-value": tags_path } do %>
+<%= turbo_frame_tag dom_class(object, :tags), data: { controller: :frame, "frame-action-value": tags_path } do %>
   <%= dsfr_accordion_section(title: Tag.human(:all), expanded: focus, starting_header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
     <%= fields_for(object) do |f| %>
       <%= f.dsfr_collection_check_boxes(:tag_ids, team.tags, :id, :name, { legend: Tag.human(:all) }, class: "fr-legend--hidden") %>

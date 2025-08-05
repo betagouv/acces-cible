@@ -14,7 +14,8 @@ class TagsController < ApplicationController
     if new_tag.persisted?
       tag_ids = (create_params[:tag_ids] || []).push(new_tag.id).compact
       object = template_object_klass.new(tag_ids:, team: current_user.team)
-      render turbo_stream: turbo_stream.replace(:site_tags, partial: "sites/tags_form", locals: { object:, focus: true })
+      frame_id = dom_class(upload? ? :site_upload : :site, :tags)
+      render turbo_stream: turbo_stream.replace(frame_id, partial: "sites/tags_form", locals: { object:, focus: true })
     else
       head :unprocessable_content
     end
