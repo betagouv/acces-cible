@@ -75,8 +75,8 @@ fr:
           other: "%{count} lignes par page"
       table:
         lines:
-          zero: Aucune ligne
-          one: Une ligne
+          zero: 0 lignes
+          one: 1 ligne
           other: "%{count} lignes"
 
   activerecord:
