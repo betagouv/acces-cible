@@ -1,4 +1,27 @@
 class Check < ApplicationRecord
+  # FIXME: begin state machine glue
+  has_many :check_transitions, autosave: false, dependent: :destroy
+
+  include Statesman::Adapters::ActiveRecordQueries[
+            transition_class: CheckTransition,
+            initial_state: :pending
+          ]
+
+  def state_machine
+    @state_machine || CheckStateMachine.new(
+      self,
+      transition_class: CheckTransition,
+      association_name: :check_transitions,
+      initial_transition: true
+    )
+  end
+
+  delegate :current_state,
+           :transition_to!,
+           :in_state?,
+           to: :state_machine
+  # FIXME: end state machine glue
+
   TYPES = [
     :reachable,
     :language_indication,
@@ -8,6 +31,9 @@ class Check < ApplicationRecord
     :accessibility_page_heading,
     :run_axe_on_homepage,
   ].freeze
+
+  # used to signal a check's `run` method has failed
+  class RuntimeError < StandardError; end
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
@@ -73,25 +99,17 @@ class Check < ApplicationRecord
   end
 
   def run
-    if waiting?
-      return false
-    elsif blocked?
-      block!
-      return false
-    elsif retry_at && retry_at > Time.current
-      return false # Not ready to retry yet
-    end
-    run!
+    self.data = analyze!
+  rescue StandardError => exception
+    raise Check::RuntimeError.new(exception)
   end
 
-  def run!
-    begin
-      self.data = analyze!
-      pass!
-    rescue StandardError => exception
-      fail!(exception)
-    end
-    passed?
+  def all_requirements_met?
+    requirements.all? { |requirement| audit.check_complete?(requirement) }
+  end
+
+  def complete?
+    in_state?(:complete)
   end
 
   def error
@@ -101,47 +119,6 @@ class Check < ApplicationRecord
   private
 
   def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
-
-  def pass!
-    self.error = nil
-    update!(
-      status: :passed,
-      checked_at: Time.zone.now,
-      retry_at: nil
-    )
-  end
-
-  def fail!(exception)
-    self.error = exception
-    update!(
-      status: :failed,
-      checked_at: Time.zone.now,
-      retry_count: retry_count + 1,
-      retry_at: calculate_retry_at
-    )
-    report(exception:) do |scope|
-      scope.set_context("check", { id:, type:, retry_count: })
-      scope.set_context("audit", { id: audit_id, url: audit.url })
-    end
-  end
-
-  def block!
-    update!(
-      status: :blocked,
-      checked_at: Time.zone.now,
-      retry_at: calculate_retry_at
-    )
-  end
-
-  def error=(exception = nil)
-    if exception
-      self.error_message = exception.message
-      self.error_type = exception.class.name
-      self.error_backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
-    else
-      self.error_message = self.error_type = self.error_backtrace = nil
-    end
-  end
 
   def set_priority = self.priority = self.class.priority
 end
