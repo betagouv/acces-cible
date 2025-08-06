@@ -64,6 +64,22 @@ Siret: 12345678901234
 Organizational unit: Engineering
 ```
 
+### Connexion au serveur
+
+Pour faciliter la connexion aux serveurs, utiliser le script `bin/scalingo`.
+
+Par défaut, il se connecte au staging, mais on peut préciser `prod` pour accéder à la production.
+L'option `-s` ou `--sandbox`  permet d'activer le mode [sandbox](https://guides.rubyonrails.org/command_line.html#bin-rails-console).
+
+```
+# Connexion au staging
+bin/scalingo
+bin/scalingo -s
+# Connexion à la production
+bin/scalingo prod
+bin/scalingo prod --sandbox
+```
+
 ## 🧰 Outils et technologies
 
 - Framework : Ruby on Rails, ViewComponents, SolidQueue
