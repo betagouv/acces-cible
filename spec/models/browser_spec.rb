@@ -196,26 +196,18 @@ RSpec.describe Browser do
 
     context "when Ferrum::DeadBrowserError is raised" do
       before do
-        call_count = 0
-        allow(instance).to receive(:create_page) do
-          call_count += 1
-          if call_count == 1
-            raise Ferrum::DeadBrowserError.new("Browser is dead")
-          else
-            page
-          end
-        end
+        allow(instance).to receive(:create_page).and_invoke(
+          -> { raise Ferrum::DeadBrowserError.new("Browser is dead") },
+          -> { page }
+        )
 
         allow(instance).to receive(:restart!)
       end
 
-      it "logs a warning message" do
+      it "logs a warning message and calls restart" do
         instance.send(:with_page) { |p| "result" }
-        expect(Rails.logger).to have_received(:warn)
-      end
 
-      it "calls restart" do
-        instance.send(:with_page) { |p| "result" }
+        expect(Rails.logger).to have_received(:warn)
         expect(instance).to have_received(:restart!)
       end
 
