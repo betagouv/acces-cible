@@ -112,6 +112,62 @@ RSpec.describe User do
       it "associates the user with the correct team" do
         expect(from_omniauth.team.siret).to eq(siret)
       end
+
+      context "when reconnecting with a different siret" do
+        let(:old_siret) { "98765432109876" }
+        let(:new_siret) { "11111111111111" }
+        let!(:old_team) { create(:team, siret: old_siret) }
+        let!(:existing_user) do
+          create(:user,
+            provider: auth.provider,
+            uid: auth.uid,
+            email: "old@example.com",
+            siret: old_siret,
+            team: old_team
+          )
+        end
+
+        let(:auth) do
+          OmniAuth::AuthHash.new(
+            {
+              provider: "test",
+              uid: "123",
+              info: { email: },
+              extra: {
+                raw_info: {
+                  email:,
+                  siret: new_siret,
+                  organizational_unit:,
+                  given_name: "John",
+                  usual_name: "Doe"
+                }
+              }
+            }
+          )
+        end
+
+        it "updates the user and changes team association" do
+          expect { from_omniauth }.not_to change(described_class, :count)
+
+          user = from_omniauth
+          expect(user).to eq(existing_user.reload)
+          expect(user.siret).to eq(new_siret)
+          expect(user.team).not_to eq(old_team)
+          expect(user.team.siret).to eq(new_siret)
+        end
+
+        context "when the new team does not exist" do
+          it "creates a new team and associates the user with it" do
+            expect { from_omniauth }.to change(Team, :count).by(1)
+
+            user = from_omniauth
+            new_team = Team.find_by(siret: new_siret)
+            expect(new_team).not_to be_nil
+            expect(new_team.organizational_unit).to eq(organizational_unit)
+            expect(user.team).to eq(new_team)
+          end
+        end
+      end
     end
 
     context "when team already exists" do
