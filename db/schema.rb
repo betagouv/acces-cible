@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_04_152906) do
-  create_schema "acces_cible_development_cable"
-  create_schema "acces_cible_development_cache"
-  create_schema "acces_cible_development_queue"
-
+ActiveRecord::Schema[8.0].define(version: 2025_08_06_105702) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -86,7 +82,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_04_152906) do
     t.bigint "audit_id"
     t.bigint "team_id", null: false
     t.integer "tags_count", default: 0, null: false
-    t.index ["audit_id"], name: "index_sites_on_audit_id"
     t.index ["slug", "team_id"], name: "index_sites_on_slug_and_team_id", unique: true
     t.index ["team_id"], name: "index_sites_on_team_id"
   end
