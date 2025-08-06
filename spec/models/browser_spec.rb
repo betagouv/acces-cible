@@ -177,6 +177,7 @@ RSpec.describe Browser do
     before do
       allow(instance).to receive(:create_page).and_return(page)
       allow(page).to receive(:close)
+      allow(Rails.logger).to receive(:warn)
     end
 
     it "yields the created page" do
@@ -206,7 +207,6 @@ RSpec.describe Browser do
         end
 
         allow(instance).to receive(:restart!)
-        allow(Rails.logger).to receive(:warn)
       end
 
       it "logs a warning message" do
@@ -230,7 +230,6 @@ RSpec.describe Browser do
       context "when create_page raises timeout error" do
         before do
           allow(instance).to receive(:create_page).and_raise(Ferrum::TimeoutError.new("Timeout"))
-          allow(Rails.logger).to receive(:warn)
         end
 
         it "logs a warning and re-raises when page is not defined" do
@@ -245,7 +244,6 @@ RSpec.describe Browser do
       context "when yield raises timeout error with page present" do
         before do
           allow(instance).to receive(:create_page).and_return(page)
-          allow(Rails.logger).to receive(:warn)
         end
 
         it "logs warning and retries with existing page" do
@@ -269,7 +267,6 @@ RSpec.describe Browser do
     context "when Ferrum::PendingConnectionsError is raised" do
       before do
         allow(instance).to receive(:create_page).and_raise(Ferrum::PendingConnectionsError.new("Pending connections"))
-        allow(Rails.logger).to receive(:warn)
       end
 
       it "logs a warning and re-raises" do
