@@ -80,7 +80,10 @@ class Browser
     end
   end
 
-  private
+  def restart!
+    browser.reset
+    browser.restart
+  end
 
   def browser
     @browser ||= begin
@@ -91,11 +94,17 @@ class Browser
     end
   end
 
+  private
+
   def with_page
     begin
       page = create_page
       result = yield(page)
       result
+    rescue Ferrum::DeadBrowserError => e
+      Rails.logger.warn { "Dead browser detected: #{e.message}, restarting browser" }
+      restart!
+      retry
     rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
       Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
       raise e unless defined?(page) && page
