@@ -77,6 +77,7 @@ gem "omniauth-rails_csrf_protection"
 gem "ferrum"
 gem "brotli"
 gem "zstd-ruby"
+gem "statesman"
 
 group :development, :test do
   gem "debug"

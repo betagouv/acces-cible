@@ -32,6 +32,14 @@ class Audit < ApplicationRecord
     Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
   end
 
+  def check_for(identifier)
+    send(identifier)
+  end
+
+  def check_complete?(identifier)
+    check_for(identifier).complete?
+  end
+
   def check_status(check)
     (send(check)&.status || :pending).to_s.inquiry
   end
