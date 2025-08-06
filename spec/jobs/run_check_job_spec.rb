@@ -1,39 +1,51 @@
 require 'rails_helper'
 
 RSpec.describe RunCheckJob do
-  let(:site) { create(:site) }
-  let(:audit) { create(:audit, site: site) }
-  let(:check) { audit.checks.first }
-  let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
+  include ActiveJob::TestHelper
 
-  describe '#perform' do
-    it 'runs check and updates audit', :aggregate_failures do
-      allow(check).to receive(:run)
-      allow(audit).to receive(:update_from_checks)
-      allow(audit).to receive(:next_check).and_return(nil)
+  let(:check) { create(:check, :ready) }
 
-      described_class.new.perform(check)
-
-      expect(check).to have_received(:run)
-      expect(audit).to have_received(:update_from_checks)
+  context "when the check goes well" do
+    before do
+      # Sure, the any_instance_of is sad but there is no other way:
+      # since ActiveJob deserializes models with GlobalID, mocking the
+      # object here will have no effect when ActiveJob reinstantiates
+      # a model on its side.
+      allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
+        .to receive(:run).and_return :test_success
     end
 
-    context 'when more checks remain' do
-      it 'reschedules itself with the next check' do
-        next_check = audit.checks.last
-        job = described_class.new
-        allow(check).to receive(:run)
-        allow(audit).to receive(:update_from_checks)
-        allow(audit).to receive(:next_check).and_return(next_check)
-
-        job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time)).and_return(job_class_double)
-        allow(job_class_double).to receive(:perform_later)
-
-        job.perform(check)
-
-        expect(job_class_double).to have_received(:perform_later).with(next_check)
+    it "transitions the check to completed" do
+      perform_enqueued_jobs do
+        expect { described_class.perform_later(check) }
+          .to change(check, :current_state)
+                .from("ready")
+                .to("completed")
       end
+    end
+  end
+
+  context "when the check does not go well" do
+    before do
+      allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
+        .to receive(:run).and_raise Check::RuntimeError.new("cry cry")
+    end
+
+    it "transitions the check to failed" do
+      perform_enqueued_jobs do
+        expect { described_class.perform_later(check) }
+          .to change(check, :current_state)
+                .from("ready")
+                .to("failed")
+      end
+    end
+
+    it "stores the error in the transition metadata" do
+      perform_enqueued_jobs do
+        described_class.perform_later(check)
+      end
+
+      expect(check.state_machine.last_transition.metadata).to include "cry cry"
     end
   end
 end

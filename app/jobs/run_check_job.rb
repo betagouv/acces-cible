@@ -1,13 +1,26 @@
 class RunCheckJob < ApplicationJob
-  def perform(check)
-    audit = check.audit
+  queue_as :default
 
-    check.run
-    audit.update_from_checks
+  retry_on Check::RuntimeError, wait: 3.seconds, attempts: Check::MAX_RETRIES do |job, exception|
+    # this block runs when we're out of retries
+    job.arguments.first.transition_to!(:failed, exception)
+  end
 
-    if (next_check = audit.next_check)
-      wait_until = next_check.retry_at || next_check.run_at || 1.second.from_now
-      self.class.set(wait_until:).perform_later(next_check)
+  before_perform do |job|
+    jobs.arguments.first.tap do |job|
+      if job.in_state?(:running) # retry
+        job.increment!(:retry_count)
+      else
+        job.transition_to!(:running)
+      end
     end
+  end
+
+  after_perform do |job|
+    job.arguments.first.transition_to!(:completed)
+  end
+
+  def perform(check)
+    check.run
   end
 end
