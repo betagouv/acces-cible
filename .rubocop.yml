@@ -57,7 +57,7 @@ RSpec/MultipleMemoizedHelpers:
   AllowSubject: true
   Max: 10
 RSpec/NestedGroups:
-  Max: 4
+  Max: 5
 RSpec/ContextWording:
   Prefixes:
     - and

@@ -35,7 +35,7 @@ class User < ApplicationRecord
         given_name: data_source.given_name,
         usual_name: data_source.usual_name
       )
-      user.team ||= Team.find_or_initialize_by(siret:)
+      user.team ||= Team.find_or_initialize_by(siret:) unless user.siret == user.team&.siret
       user.team.save if user.valid?
       return unless user.save
 
