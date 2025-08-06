@@ -205,8 +205,7 @@ RSpec.describe Browser do
           end
         end
 
-        allow(instance).to receive(:reset)
-        allow(instance).to receive(:restart)
+        allow(instance).to receive(:restart!)
         allow(Rails.logger).to receive(:warn)
       end
 
@@ -215,10 +214,9 @@ RSpec.describe Browser do
         expect(Rails.logger).to have_received(:warn)
       end
 
-      it "calls reset and restart" do
+      it "calls restart" do
         instance.send(:with_page) { |p| "result" }
-        expect(instance).to have_received(:reset)
-        expect(instance).to have_received(:restart)
+        expect(instance).to have_received(:restart!)
       end
 
       it "retries and succeeds on second attempt" do
