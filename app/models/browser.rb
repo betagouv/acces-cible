@@ -104,17 +104,13 @@ class Browser
       page = create_page
       result = yield(page)
       result
-    rescue Ferrum::DeadBrowserError => e
-      Rails.logger.warn { "Dead browser detected: #{e.message}, restarting browser" }
+    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError, Ferrum::DeadBrowserError => error
+      Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
       restart!
       retry
-    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
-      Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
-      raise e unless defined?(page) && page
-      yield(page) # Try again to get what we can from the page
-    rescue Ferrum::Error => ferrum_error
-      Rails.logger.error { "Browser error: #{ferrum_error.message}" }
-      raise ferrum_error
+    rescue Ferrum::Error => error
+      Rails.logger.error { "Browser error: #{error.message}" }
+      raise error
     ensure
       page&.close
     end
