@@ -15,6 +15,7 @@ class SiteUpload
   ].freeze
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
+  SUPPORTED_SEPARATORS = [",", ";"].freeze
   BOM = /^\xEF\xBB\xBF/
 
   attr_accessor :file, :team, :tag_ids, :tags, :new_sites, :existing_sites
@@ -63,7 +64,7 @@ class SiteUpload
   def parse_sites
     require "csv"
 
-    CSV.foreach(file.path, headers: true, encoding: "bom|utf-8") do |row|
+    CSV.foreach(file.path, headers: true, encoding: "bom|utf-8", col_sep:) do |row|
       row = row.to_h.transform_keys { |header| header.to_s.downcase } # Case-insensitive headers
 
       url = Link.normalize(row["url"])
@@ -80,6 +81,16 @@ class SiteUpload
 
   private
 
+  def first_line
+    @first_line ||= File.open(file.path, &:gets)&.strip&.sub(BOM, "") || ""
+  end
+
+  def col_sep
+    SUPPORTED_SEPARATORS.max_by { |sep| first_line.count(sep) }
+  rescue StandardError
+    SUPPORTED_SEPARATORS.first
+  end
+
   def valid_file_size
     errors.add(:file, :invalid_size) if file.size.zero? || file.size > MAX_FILE_SIZE
   end
@@ -90,8 +101,7 @@ class SiteUpload
   end
 
   def valid_headers
-    first_line = File.open(file.path, &:gets)&.strip&.sub(BOM, "") || ""
-    headers = CSV.parse_line(first_line) || []
+    headers = CSV.parse_line(first_line, col_sep:) || []
     missing_headers = REQUIRED_HEADERS - headers.collect(&:downcase)
     errors.add(:file, :invalid_headers) unless missing_headers.empty?
   rescue CSV::MalformedCSVError, StandardError
