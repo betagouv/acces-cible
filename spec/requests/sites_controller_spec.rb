@@ -13,8 +13,8 @@ RSpec.describe "Sites" do
 
     it "creates a site and schedules checks automatically" do
       expect { post_site }.to change(Site, :count).by(1)
-                                                  .and change(Audit, :count).by(1)
-                                                                            .and change(Check, :count).by(Check.names.count)
+        .and change(Audit, :count).by(1)
+        .and change(Check, :count).by(Check.names.count)
 
       site = Site.last
       audit = site.audit
