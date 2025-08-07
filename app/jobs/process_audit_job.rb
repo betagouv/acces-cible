@@ -9,6 +9,7 @@ class ProcessAuditJob < ApplicationJob
 
     if (check = next_check)
       check.run
+      audit.derive_status_from_checks
       reschedule
     else
       audit.finalize!
