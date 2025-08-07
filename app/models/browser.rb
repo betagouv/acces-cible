@@ -81,9 +81,11 @@ class Browser
   end
 
   def restart!
+    browser.reset
     browser.close
     browser.quit
-    browser = nil
+    @browser = nil
+    browser
   end
 
   def browser
