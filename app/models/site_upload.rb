@@ -102,7 +102,7 @@ class SiteUpload
 
   def valid_headers
     headers = CSV.parse_line(first_line, col_sep:) || []
-    missing_headers = REQUIRED_HEADERS - headers.collect(&:downcase)
+    missing_headers = REQUIRED_HEADERS - headers.compact.collect(&:downcase)
     errors.add(:file, :invalid_headers) unless missing_headers.empty?
   rescue CSV::MalformedCSVError, StandardError
     errors.add(:file, :invalid_headers)
