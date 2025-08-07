@@ -9,7 +9,7 @@ class SitesController < ApplicationController
     sites = current_user.sites.preloaded.filter_by(params).order_by(params)
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites, limit: pagy_limit }
-      format.csv  { send_data sites.to_csv, filename: sites.to_csv_filename }
+      format.csv { send_data sites.to_csv, filename: sites.to_csv_filename }
     end
   end
 
@@ -31,7 +31,6 @@ class SitesController < ApplicationController
     @site.assign_attributes(site_params)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.save
-      @site.audit.schedule if @site.audit.pending?
       redirect_to @site, notice:
     else
       render :new, status: :unprocessable_content
@@ -42,7 +41,6 @@ class SitesController < ApplicationController
   def upload
     @upload = SiteUpload.new(site_upload_params)
     if @upload.save
-      ScheduleAuditsJob.perform_later
       redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
     else
       render :new, status: :unprocessable_content

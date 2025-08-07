@@ -13,8 +13,8 @@ RSpec.describe "Sites" do
 
     it "creates a site and schedules checks automatically" do
       expect { post_site }.to change(Site, :count).by(1)
-       .and change(Audit, :count).by(1)
-       .and change(Check, :count).by(Check.names.count)
+                                                  .and change(Audit, :count).by(1)
+                                                                            .and change(Check, :count).by(Check.names.count)
 
       site = Site.last
       audit = site.audit
@@ -57,7 +57,7 @@ RSpec.describe "Sites" do
       upload_mock = instance_double(SiteUpload, save: true, count: 2)
       allow(SiteUpload).to receive(:new).and_return(upload_mock)
 
-      expect { upload_sites }.to have_enqueued_job(ScheduleAuditsJob)
+      upload_sites
 
       expect(response).to redirect_to(sites_path)
       follow_redirect!

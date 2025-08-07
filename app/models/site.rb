@@ -10,7 +10,7 @@ class Site < ApplicationRecord
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
   scope :preloaded, -> { with_current_audit.includes(:tags, audits: :checks) }
 
-  after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
+  after_save :set_current_audit!, unless: -> { audits_count == (audits_count_before_last_save || 0) }
 
   friendly_id :url_without_scheme, use: [:slugged, :history, :scoped], scope: :team_id
 
@@ -46,6 +46,7 @@ class Site < ApplicationRecord
   end
 
   def name = super.presence || url_without_scheme
+
   alias to_title name
   alias to_s name
 
@@ -56,6 +57,7 @@ class Site < ApplicationRecord
   end
 
   def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
+
   def update_slug! = tap { self.slug = nil; friendly_id }.save!
 
   def audit
