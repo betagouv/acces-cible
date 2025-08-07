@@ -90,6 +90,22 @@ RSpec.describe SiteUpload do
         expect(site_upload.errors.added?(:file, :invalid_headers)).to be true
       end
     end
+
+    context "when file uses semicolon separator" do
+      let(:csv_content) { "url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site" }
+
+      it "is valid" do
+        expect(site_upload).to be_valid
+      end
+    end
+
+    context "when file uses semicolon separator with uppercase headers" do
+      let(:csv_content) { "URL;NAME\nhttps://example.com/;Example Site" }
+
+      it "is valid" do
+        expect(site_upload).to be_valid
+      end
+    end
   end
 
   describe "#parse_sites" do
@@ -151,6 +167,21 @@ RSpec.describe SiteUpload do
 
       expect(site_upload.existing_sites.size).to eq(1)
       expect(site_upload.existing_sites.values.first).to eq(existing_site)
+    end
+
+    context "when file uses semicolon separator" do
+      it "parses the CSV file correctly" do
+        csv.write("url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site")
+        csv.rewind
+
+        site_upload.parse_sites
+
+        expected_new_sites = {
+          "https://example.com/" => { url: "https://example.com/", name: "Example Site", tag_ids: [], team: },
+          "https://test.com/" => { url: "https://test.com/", name: "Test Site", tag_ids: [], team: }
+        }
+        expect(site_upload.new_sites).to eq(expected_new_sites)
+      end
     end
 
     context "when CSV has nil headers" do
