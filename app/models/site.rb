@@ -56,6 +56,7 @@ class Site < ApplicationRecord
   end
 
   def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
+
   def update_slug! = tap { self.slug = nil; friendly_id }.save!
 
   def audit
