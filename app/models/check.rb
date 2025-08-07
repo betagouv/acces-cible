@@ -14,6 +14,7 @@ class Check < ApplicationRecord
   MAX_RETRIES = 3
   RETRYABLE_ERRORS = [
     "Errno::ECONNREFUSED",
+    "NoMethodError", # raised when Ferrum is restarted while a check is running
     "Ferrum::PendingConnectionsError",
     "Ferrum::ProcessTimeoutError",
     "Ferrum::StatusError",
