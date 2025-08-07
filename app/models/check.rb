@@ -76,7 +76,10 @@ class Check < ApplicationRecord
     elsif retry_at && retry_at > Time.current
       return false  # Not ready to retry yet
     end
+    run!
+  end
 
+  def run!
     begin
       self.data = analyze!
       pass!
