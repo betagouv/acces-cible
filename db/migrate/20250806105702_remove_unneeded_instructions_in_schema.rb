@@ -1,8 +1,9 @@
 class RemoveUnneededInstructionsInSchema < ActiveRecord::Migration[8.0]
   def change
-    drop_schema "acces_cible_development_cable"
-    drop_schema "acces_cible_development_cache"
-    drop_schema "acces_cible_development_queue"
+    [:cable, :cache, :queue].each do |kind|
+      schema_name = "acces_cible_development_#{kind}"
+      drop_schema schema_name if schema_exists?(schema_name)
+    end
 
     remove_index :sites, :audit_id, if_exists: true
   end
