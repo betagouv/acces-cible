@@ -63,7 +63,7 @@ class Site < ApplicationRecord
   end
 
   def audit!
-    audits.create!(url:, current: audits.current.none? || audits.none?).tap(&:schedule)
+    audits.create!(url:, current: audits.current.none? || audits.none?)
   end
 
   def actual_current_audit
