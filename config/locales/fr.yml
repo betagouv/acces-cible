@@ -51,6 +51,9 @@ fr:
         invalid: invalide
 
   activemodel:
+    attributes:
+      site_upload:
+        file: Import
     errors:
       models:
         site_upload:
