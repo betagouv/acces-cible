@@ -8,6 +8,13 @@ RSpec.describe Browser do
   before do
     # Stub file reads that happen during browser initialization
     allow(File).to receive(:read).with(Rails.root.join("vendor/javascript/stealth.min.js")).and_return("/* stealth js */")
+
+    # Stub MockProcess constant for verified doubles
+    stub_const("MockProcess", Class.new do
+      def pid
+        12345
+      end
+    end)
   end
 
   around do |example|
@@ -145,8 +152,9 @@ RSpec.describe Browser do
     before do
       # Always mock Ferrum::Browser to prevent real instances
       allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive(:network).and_return(network)
+      allow(ferrum_browser).to receive_messages(network: network, process: instance_double(MockProcess, pid: 12345))
       allow(network).to receive(:blocklist=)
+      allow(Process).to receive(:kill).with(0, 12345).and_return(1)
     end
 
     it "creates a new Ferrum::Browser instance during initialization" do
@@ -175,7 +183,7 @@ RSpec.describe Browser do
       allow(ferrum_browser).to receive(:close)
       allow(ferrum_browser).to receive(:quit)
 
-      allow(instance).to receive(:create_page).and_return(page)
+      allow(instance).to receive_messages(create_page: page, healthy?: true)
       allow(page).to receive(:close)
       allow(Rails.logger).to receive(:warn)
     end
