@@ -19,13 +19,13 @@
         <%= time_tag checked_at, l(checked_at, format: :long) %>
         (<%= time_ago checked_at %>).
       </p>
-      <%= render(partial: @audit.all_checks, as: :check) %>
     <% else %>
       <p>
         <strong><%= Audit.human(:status) %> :</strong>
         <%= Audit.human("audit/status.pending") %>
       </p>
     <% end %>
+    <%= render(partial: @audit.all_checks, as: :check) %>
   </div>
   <div class="fr-col-12 fr-col-md-4">
     <% audits = @site.audits.checked.sort_by_newest.load %>
