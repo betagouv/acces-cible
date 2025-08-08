@@ -9,9 +9,18 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
-  MAX_RETRIES = 3
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
+  MAX_RETRIES = 3
+  RETRYABLE_ERRORS = [
+    "Errno::ECONNREFUSED",
+    "NoMethodError", # raised when Ferrum is restarted while a check is running
+    "Ferrum::PendingConnectionsError",
+    "Ferrum::ProcessTimeoutError",
+    "Ferrum::StatusError",
+    "Ferrum::TimeoutError",
+    "ThreadError",
+  ].freeze
 
   belongs_to :audit
   has_one :site, through: :audit
@@ -27,7 +36,7 @@ class Check < ApplicationRecord
   scope :past, -> { where.not(status: [:pending, :blocked]) }
   scope :prioritized, -> { order(:priority) }
   scope :errored, ->(type = nil) { type ? where(error_type: type) : where.not(error_type: nil) }
-  scope :retryable, -> { where("retry_count < ? AND (error_type IS NULL OR error_type LIKE 'Ferrum%')", MAX_RETRIES) }
+  scope :retryable, -> { where("retry_count < ? AND error_type IN (?)", MAX_RETRIES, RETRYABLE_ERRORS) }
   scope :retry_due, -> { where("retry_at IS NULL OR retry_at <= now()") }
   scope :to_retry, -> { where(status: [:failed, :blocked]).retryable.retry_due }
   scope :to_run, -> { due.or(to_retry) }
@@ -54,12 +63,10 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
   def blocked? = requirements&.any? { audit.check_status(it).failed? || audit.check_status(it).blocked? } || false
-  def retryable? = retry_count < MAX_RETRIES && (error_type.nil? || error_type.start_with?("Ferrum"))
+  def retryable? = failed? && retry_count < MAX_RETRIES && RETRYABLE_ERRORS.include?(error_type)
   def tooltip? = true
 
   def calculate_retry_at
-    return nil unless retryable?
-
     (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
@@ -112,7 +119,7 @@ class Check < ApplicationRecord
       status: :failed,
       checked_at: Time.zone.now,
       retry_count: retry_count + 1,
-      retry_at: retryable? ? calculate_retry_at : nil
+      retry_at: calculate_retry_at
     )
     report(exception:) do |scope|
       scope.set_context("check", { id:, type:, retry_count: })

@@ -219,54 +219,48 @@ RSpec.describe Browser do
     end
 
     context "when Ferrum::TimeoutError is raised" do
-      context "when create_page raises timeout error" do
-        before do
-          allow(instance).to receive(:create_page).and_raise(Ferrum::TimeoutError.new("Timeout"))
-        end
-
-        it "logs a warning and re-raises when page is not defined" do
-          expect do
-            instance.send(:with_page) { |p| "result" }
-          end.to raise_error(Ferrum::TimeoutError)
-
-          expect(Rails.logger).to have_received(:warn)
-        end
+      before do
+        allow(instance).to receive(:create_page).and_invoke(
+          -> { raise Ferrum::TimeoutError.new("Timeout") },
+          -> { page }
+        )
+        allow(instance).to receive(:restart!)
       end
 
-      context "when yield raises timeout error with page present" do
-        before do
-          allow(instance).to receive(:create_page).and_return(page)
-        end
+      it "logs a warning message and calls restart" do
+        instance.send(:with_page) { |p| "result" }
 
-        it "logs warning and retries with existing page" do
-          call_count = 0
-          result = instance.send(:with_page) do |p|
-            call_count += 1
-            if call_count == 1
-              raise Ferrum::TimeoutError.new("Timeout during yield")
-            else
-              "retry_result"
-            end
-          end
+        expect(Rails.logger).to have_received(:warn)
+        expect(instance).to have_received(:restart!)
+      end
 
-          expect(result).to eq("retry_result")
-          expect(Rails.logger).to have_received(:warn)
-          expect(page).to have_received(:close)
-        end
+      it "retries and succeeds on second attempt" do
+        result = instance.send(:with_page) { |p| "retry_success" }
+        expect(result).to eq("retry_success")
+        expect(instance).to have_received(:create_page).twice
       end
     end
 
     context "when Ferrum::PendingConnectionsError is raised" do
       before do
-        allow(instance).to receive(:create_page).and_raise(Ferrum::PendingConnectionsError.new("Pending connections"))
+        allow(instance).to receive(:create_page).and_invoke(
+          -> { raise Ferrum::PendingConnectionsError.new("Pending connections") },
+          -> { page }
+        )
+        allow(instance).to receive(:restart!)
       end
 
-      it "logs a warning and re-raises" do
-        expect do
-          instance.send(:with_page) { |p| "result" }
-        end.to raise_error(Ferrum::PendingConnectionsError)
+      it "logs a warning message and calls restart" do
+        instance.send(:with_page) { |p| "result" }
 
         expect(Rails.logger).to have_received(:warn)
+        expect(instance).to have_received(:restart!)
+      end
+
+      it "retries and succeeds on second attempt" do
+        result = instance.send(:with_page) { |p| "retry_success" }
+        expect(result).to eq("retry_success")
+        expect(instance).to have_received(:create_page).twice
       end
     end
 

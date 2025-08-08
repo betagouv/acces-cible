@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ProcessAuditJob do
   let(:site) { create(:site) }
   let(:audit) { create(:audit, site: site) }
+  let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
 
   describe '#perform' do
     context 'when there are checks to run' do
@@ -65,7 +66,7 @@ RSpec.describe ProcessAuditJob do
     it 'returns retryable check if no pending' do
       audit.checks.update_all(status: :passed)
       retryable_check = audit.checks.first
-      retryable_check.update!(status: :failed, retry_at: 1.minute.ago)
+      retryable_check.update!(status: :failed, retry_at: 1.minute.ago, error_type: retryable_error)
 
       expect(job.send(:next_check)).to eq(retryable_check)
     end
@@ -87,7 +88,7 @@ RSpec.describe ProcessAuditJob do
 
     context 'when there are failed retryable checks' do
       it 'schedules job to run at earliest retry time' do
-        audit.checks.first.update!(status: :failed, retry_at: 1.minute.from_now)
+        audit.checks.first.update!(status: :failed, retry_at: 1.minute.from_now, error_type: retryable_error)
         audit.checks.where.not(id: audit.checks.first.id).update_all(status: :passed)
         retry_at = audit.checks.first.reload.retry_at
 
