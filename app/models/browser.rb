@@ -142,7 +142,8 @@ class Browser
           "disable-extensions" => nil,
           "disable-plugins" => nil,
           "disable-default-apps" => nil,
-          "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}")
+          "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}"),
+          "remote-debugging-port" => (9222 + Random.rand(1000)).to_s
         }
       }.tap do |options|
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
