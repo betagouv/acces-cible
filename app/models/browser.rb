@@ -91,6 +91,12 @@ class Browser
     @browser = nil
   end
 
+  def healthy?
+    browser&.create_page&.tap(&:close) && true
+  rescue
+    false
+  end
+
   private
 
   def with_page
