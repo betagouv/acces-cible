@@ -4,11 +4,6 @@ module ApplicationHelper
   include PageHelper
   include IconHelper
 
-  # Remove all leading whitespace to prevent markdown code block interpretation (strip_heredoc preserves relative indentation)
-  def safe_unindent(string)
-    string.gsub(/^\s+/, "").html_safe
-  end
-
   def time_ago(datetime)
     datetime = datetime.in_time_zone if datetime.respond_to?(:in_time_zone)
     time = distance_of_time_in_words_to_now(datetime)
