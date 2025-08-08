@@ -37,7 +37,7 @@ RSpec.describe Checks::Reachable do
     let(:redirects) { false }
 
     before do
-      allow(root_page).to receive_messages(success?: reachable, redirected?: redirects, title: "Page title")
+      allow(root_page).to receive_messages(success?: reachable, redirected?: redirects, title: "Page title", status: 200)
       allow(site).to receive_messages(name: nil, update: true)
     end
 
@@ -85,14 +85,28 @@ RSpec.describe Checks::Reachable do
     end
 
     context "when the site is not reachable" do
-      before do
-        allow(root_page).to receive_messages(success?: false, status: 404)
+      context "when the page has a status (HTTP error)" do
+        before do
+          allow(root_page).to receive_messages(success?: false, status: 404)
+        end
+
+        it "raises an UnreachableSiteError" do
+          expect {
+            check.send(:analyze!)
+          }.to raise_error(Checks::Reachable::UnreachableSiteError, "Server response 404 when trying to get #{original_url}")
+        end
       end
 
-      it "raises an UnreachableSiteError" do
-        expect {
-          check.send(:analyze!)
-        }.to raise_error(Checks::Reachable::UnreachableSiteError, "Server response 404 when trying to get #{original_url}")
+      context "when the page has no status (browser/connection error)" do
+        before do
+          allow(root_page).to receive_messages(success?: false, status: nil)
+        end
+
+        it "raises a BrowserError" do
+          expect {
+            check.send(:analyze!)
+          }.to raise_error(Checks::Reachable::BrowserError, "Browser error preventing getting #{original_url}")
+        end
       end
     end
   end

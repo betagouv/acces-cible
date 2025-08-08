@@ -6,6 +6,12 @@ module Checks
       end
     end
 
+    class BrowserError < StandardError
+      def initialize(url)
+        super("Browser error preventing getting #{url}")
+      end
+    end
+
     PRIORITY = 0 # This needs to run before all other checks
     REQUIREMENTS = nil
 
@@ -19,6 +25,7 @@ module Checks
     def custom_badge_status = redirected? ? :info : :success
 
     def analyze!
+      raise BrowserError.new(audit.url) if root_page.status.nil?
       raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
 
       site.update(name: root_page.title) if site && site.name.blank?
