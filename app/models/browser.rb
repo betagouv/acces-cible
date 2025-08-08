@@ -53,13 +53,20 @@ class Browser
     delegate_missing_to :new
   end
 
-  attr_reader :browser
+  def browser
+    return @browser if browser_alive?
+
+    @mutex.synchronize do
+      return @browser if browser_alive?
+      initialize_browser
+    end
+  rescue
+    @mutex.synchronize { initialize_browser }
+  end
 
   def initialize
     @mutex = Mutex.new
-    @browser = Ferrum::Browser.new(settings).tap do |browser|
-      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-    end
+    initialize_browser
   end
 
   def get(url)
@@ -95,7 +102,8 @@ class Browser
   end
 
   def healthy?
-    browser&.create_page&.tap(&:close) && true
+    browser.create_page.tap(&:close)
+    true
   rescue
     false
   end
@@ -116,12 +124,10 @@ class Browser
       raise error
     ensure
       page&.close
-      cleanup_browser
     end
   end
 
   def create_page
-    ensure_browser_initialized
     browser.create_page.tap do |page|
       page.headers.set(HEADERS)
       page.headers.add(random_user_agent)
@@ -129,21 +135,31 @@ class Browser
     end
   end
 
-  def ensure_browser_initialized
-    return if browser&.process&.running?
+  def browser_alive?
+    return false unless @browser&.process&.pid
 
-    @mutex.synchronize do
-      return if browser&.process&.running?
-
-      cleanup_browser if browser
-      initialize_browser
-    end
+    Process.kill(0, @browser.process.pid)
+    true
+  rescue Errno::ESRCH, Errno::EPERM, TypeError
+    false
   end
 
   def initialize_browser
     @browser = Ferrum::Browser.new(settings).tap do |browser|
       browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
+  end
+
+  def cleanup_browser
+    if browser
+      browser.reset
+      browser.close
+      browser.quit
+    end
+  rescue => error
+    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
+  ensure
+    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
   end
 
   def settings
@@ -178,22 +194,6 @@ class Browser
         options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
       end.freeze
     end
-  end
-
-  def cleanup_browser
-    if browser
-      browser.reset
-      browser.close
-      browser.quit
-    end
-  rescue => error
-    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
-  ensure
-    cleanup_user_data_dir
-  end
-
-  def cleanup_user_data_dir
-    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
   end
 
   def random_user_agent
