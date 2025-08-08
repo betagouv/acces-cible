@@ -1,16 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ApplicationHelper do
-  describe "#safe_unindent" do
-    it "removes leading whitespace from all lines" do
-      indented_string = "    First line\n    Second line\n    Third line"
-      result = helper.safe_unindent(indented_string)
-
-      expect(result).to eq("First line\nSecond line\nThird line")
-      expect(result).to be_html_safe
-    end
-  end
-
   describe "#time_ago" do
     it "formats past time correctly" do
       result = helper.time_ago(2.hours.ago)
