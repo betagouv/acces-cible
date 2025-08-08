@@ -73,26 +73,76 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#derive_status_from_checks" do
-    let(:audit) { build(:audit) }
+  describe "#status_from_checks" do
+    context "with new checks" do
+      let(:audit) { build(:audit) }
 
-    it "sets status to pending when any check is new" do
-      audit = build(:audit)
-      audit.derive_status_from_checks
-      expect(audit.status).to eq("pending")
+      it "returns pending when any check is new" do
+        expect(audit.status_from_checks).to eq(:pending)
+      end
     end
 
-    it "sets status to mixed when checks have different statuses" do
-      audit.all_checks.each { |check| check.passed!; check.save }
-      audit.checks.last.update!(status: :failed)
-      audit.derive_status_from_checks
+    context "with existing checks of different statuses" do
+      let(:audit) { create(:audit) }
+
+      before do
+        audit.all_checks.each { |check| check.passed!; check.save }
+        audit.checks.last.update!(status: :failed)
+      end
+
+      it "returns mixed when checks have different statuses" do
+        expect(audit.status_from_checks).to eq(:mixed)
+      end
+    end
+
+    context "with existing checks of same status" do
+      let(:audit) { create(:audit) }
+
+      before do
+        audit.all_checks.each { |check| check.update(status: :passed) }
+      end
+
+      it "returns the unified status when all checks have same status" do
+        expect(audit.status_from_checks).to eq(:passed)
+      end
+    end
+  end
+
+  describe "#update_from_checks" do
+    let(:audit) { create(:audit) }
+
+    it "updates status using status_from_checks" do
+      allow(audit).to receive_messages(status_from_checks: :mixed, latest_checked_at: 1.hour.ago)
+
+      audit.update_from_checks
       expect(audit.status).to eq("mixed")
     end
 
-    it "sets status to match checks when all have same status" do
-      audit.all_checks.each { |check| check.update(status: :passed) }
-      audit.derive_status_from_checks
-      expect(audit.status).to eq("passed")
+    it "updates checked_at using latest_checked_at" do
+      checked_at = 1.hour.ago
+      allow(audit).to receive_messages(status_from_checks: :passed, latest_checked_at: checked_at)
+
+      audit.update_from_checks
+      expect(audit.checked_at).to be_within(1.second).of(checked_at)
+    end
+
+    it "calls set_current_audit! on site when not pending" do
+      allow(audit).to receive_messages(status_from_checks: :passed, latest_checked_at: 1.hour.ago)
+
+      expect(audit.site).to receive(:set_current_audit!)
+      audit.update_from_checks
+    end
+
+    it "does not call set_current_audit! on site when pending" do
+      allow(audit).to receive_messages(status_from_checks: :pending, latest_checked_at: nil)
+
+      expect(audit.site).not_to receive(:set_current_audit!)
+      audit.update_from_checks
+    end
+
+    it "runs in a transaction" do
+      expect(audit).to receive(:transaction).and_yield
+      audit.update_from_checks
     end
   end
 
@@ -117,30 +167,6 @@ RSpec.describe Audit do
     it "calls create_checks when audit is created" do
       expect(audit).to receive(:create_checks).and_call_original
       expect { audit.save! }.to change(Check, :count).by(Check.types.size)
-    end
-  end
-
-  describe "#finalize!" do
-    let(:audit) { create(:audit) }
-    let!(:check1) { audit.checks.first.tap { |c| c.update!(status: :passed, checked_at: 2.hours.ago) } }
-    let!(:check2) { audit.checks.second.tap { |c| c.update!(status: :failed, checked_at: 1.hour.ago) } }
-
-    it "derives status from checks" do
-      expect { audit.finalize! }.to change(audit, :status).to("mixed")
-    end
-
-    it "sets checked_at to latest check's checked_at" do
-      expect { audit.finalize! }.to change(audit, :checked_at).to(check2.checked_at)
-    end
-
-    it "calls set_current_audit! on site" do
-      expect(audit.site).to receive(:set_current_audit!)
-      audit.finalize!
-    end
-
-    it "runs in a transaction" do
-      expect(audit).to receive(:transaction).and_yield
-      audit.finalize!
     end
   end
 
