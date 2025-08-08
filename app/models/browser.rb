@@ -56,6 +56,7 @@ class Browser
   attr_reader :browser
 
   def initialize
+    @mutex = Mutex.new
     @browser = Ferrum::Browser.new(settings).tap do |browser|
       browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
@@ -87,8 +88,10 @@ class Browser
   end
 
   def restart!
-    cleanup_browser
-    @browser = nil
+    @mutex.synchronize do
+      cleanup_browser
+      @browser = nil
+    end
   end
 
   def healthy?
@@ -118,10 +121,28 @@ class Browser
   end
 
   def create_page
+    ensure_browser_initialized
     browser.create_page.tap do |page|
       page.headers.set(HEADERS)
       page.headers.add(random_user_agent)
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
+    end
+  end
+
+  def ensure_browser_initialized
+    return if browser&.process&.running?
+
+    @mutex.synchronize do
+      return if browser&.process&.running?
+
+      cleanup_browser if browser
+      initialize_browser
+    end
+  end
+
+  def initialize_browser
+    @browser = Ferrum::Browser.new(settings).tap do |browser|
+      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
   end
 
