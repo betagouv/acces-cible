@@ -1,8 +1,8 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
 class Browser
-  PAGE_TIMEOUT = 30.seconds
-  PROCESS_TIMEOUT = 3.minutes
+  PAGE_TIMEOUT = 1.minute
+  PROCESS_TIMEOUT = 5.minutes
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
