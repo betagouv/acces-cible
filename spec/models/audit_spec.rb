@@ -108,6 +108,41 @@ RSpec.describe Audit do
     end
   end
 
+  describe "#next_check" do
+    let(:audit) { create(:audit) }
+    let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
+
+    it 'returns pending check first' do
+      pending_check = audit.checks.first
+      pending_check.update!(status: :pending)
+
+      expect(audit.next_check).to eq(pending_check)
+    end
+
+    it 'returns retryable check if no pending' do
+      audit.checks.update_all(status: :passed)
+      retryable_check = audit.checks.first
+      retryable_check.update!(status: :failed, retry_at: 1.minute.ago, error_type: retryable_error)
+
+      expect(audit.next_check).to eq(retryable_check)
+    end
+
+    it 'returns unblocked check if no pending or retryable' do
+      audit.checks.update_all(status: :blocked)
+      blocked_check = audit.checks.first
+      blocked_check.update!(status: :blocked)
+      allow(blocked_check).to receive(:blocked?).and_return(false)
+
+      expect(audit.next_check).to eq(blocked_check)
+    end
+
+    it 'returns nil when no checks are available' do
+      audit.checks.update_all(status: :passed)
+
+      expect(audit.next_check).to be_nil
+    end
+  end
+
   describe "#update_from_checks" do
     let(:audit) { create(:audit) }
 

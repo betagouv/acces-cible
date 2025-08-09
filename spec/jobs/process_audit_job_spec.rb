@@ -3,116 +3,28 @@ require 'rails_helper'
 RSpec.describe ProcessAuditJob do
   let(:site) { create(:site) }
   let(:audit) { create(:audit, site: site) }
-  let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
 
   describe '#perform' do
-    context 'when there are checks to run' do
-      let(:job) { described_class.new }
-
-      it 'runs the next check and reschedules' do
+    context 'when there are checks to process' do
+      it 'launches RunCheckJob with the next check' do
         check = audit.checks.first
-        allow(job).to receive(:next_check).and_return(check)
-        allow(check).to receive(:run).and_return(true)
-
-        job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
-        allow(job_class_double).to receive(:perform_later)
-
-        job.perform(audit)
-        expect(check).to have_received(:run)
-      end
-
-      it 'reschedules even when check returns false' do
-        check = audit.checks.first
-        allow(job).to receive(:next_check).and_return(check)
-        allow(check).to receive(:run).and_return(false)
-
-        job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
-        allow(job_class_double).to receive(:perform_later)
-
-        job.perform(audit)
-        expect(job_class_double).to have_received(:perform_later)
-      end
-    end
-
-    context 'when no checks are available' do
-      let(:audit) { create(:audit, site: site) }
-
-      before do
-        audit.checks.update_all(status: :passed)
-      end
-
-      it 'finalizes the audit' do
-        expect(audit).to receive(:finalize!)
+        allow(audit).to receive(:next_check).and_return(check)
+        allow(RunCheckJob).to receive(:perform_later)
 
         described_class.new.perform(audit)
-      end
-    end
-  end
 
-  describe '#next_check' do
-    let(:job) { described_class.new }
-
-    before { job.instance_variable_set(:@audit, audit) }
-
-    it 'returns pending check first' do
-      pending_check = audit.checks.first
-      pending_check.update!(status: :pending)
-
-      expect(job.send(:next_check)).to eq(pending_check)
-    end
-
-    it 'returns retryable check if no pending' do
-      audit.checks.update_all(status: :passed)
-      retryable_check = audit.checks.first
-      retryable_check.update!(status: :failed, retry_at: 1.minute.ago, error_type: retryable_error)
-
-      expect(job.send(:next_check)).to eq(retryable_check)
-    end
-
-    it 'returns unblocked check if no pending or retryable' do
-      audit.checks.update_all(status: :blocked)
-      blocked_check = audit.checks.first # Use first check which has lowest priority
-      blocked_check.update!(status: :blocked)
-      allow(blocked_check).to receive(:blocked?).and_return(false)
-
-      expect(job.send(:next_check)).to eq(blocked_check)
-    end
-  end
-
-  describe '#reschedule' do
-    let(:job) { described_class.new }
-
-    before { job.instance_variable_set(:@audit, audit) }
-
-    context 'when there are failed retryable checks' do
-      it 'schedules job to run at earliest retry time' do
-        audit.checks.first.update!(status: :failed, retry_at: 1.minute.from_now, error_type: retryable_error)
-        audit.checks.where.not(id: audit.checks.first.id).update_all(status: :passed)
-        retry_at = audit.checks.first.reload.retry_at
-
-        job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: retry_at, group: "audit_#{audit.id}").and_return(job_class_double)
-        allow(job_class_double).to receive(:perform_later)
-
-        job.send(:reschedule)
-        expect(described_class).to have_received(:set).with(wait_until: retry_at, group: "audit_#{audit.id}")
-        expect(job_class_double).to have_received(:perform_later).with(audit)
+        expect(RunCheckJob).to have_received(:perform_later).with(check)
       end
     end
 
-    context 'when there are no failed retryable checks' do
-      it 'schedules job to run in 1 minute' do
-        audit.checks.update_all(status: :passed)
+    context 'when there are no checks to process' do
+      it 'does not launch RunCheckJob' do
+        allow(audit).to receive(:next_check).and_return(nil)
+        allow(RunCheckJob).to receive(:perform_later)
 
-        job_class_double = class_double(described_class)
-        allow(described_class).to receive(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}").and_return(job_class_double)
-        allow(job_class_double).to receive(:perform_later)
+        described_class.new.perform(audit)
 
-        job.send(:reschedule)
-        expect(described_class).to have_received(:set).with(wait_until: kind_of(Time), group: "audit_#{audit.id}")
-        expect(job_class_double).to have_received(:perform_later).with(audit)
+        expect(RunCheckJob).not_to have_received(:perform_later)
       end
     end
   end

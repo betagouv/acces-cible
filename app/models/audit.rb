@@ -40,6 +40,12 @@ class Audit < ApplicationRecord
     all_checks.select(&:new_record?).each(&:save)
   end
 
+  def next_check
+    checks.pending.first ||
+    checks.to_retry.first ||
+    checks.blocked.reject(&:blocked?).first
+  end
+
   def status_from_checks
     if all_checks.any?(&:new_record?)
        :pending
