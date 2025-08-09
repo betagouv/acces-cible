@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_100904) do
     t.datetime "updated_at", null: false
     t.datetime "checked_at"
     t.boolean "current", default: false, null: false
+    t.boolean "scheduled", default: false, null: false
     t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
     t.index ["site_id", "current"], name: "index_audits_on_site_id_and_current", unique: true, where: "(current = true)"
     t.index ["site_id"], name: "index_audits_on_site_id"
@@ -42,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_100904) do
     t.string "error_backtrace", default: [], array: true
     t.datetime "retry_at"
     t.integer "retry_count", default: 0, null: false
-    t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "run_at"
     t.index ["audit_id"], name: "index_checks_on_audit_id"
     t.index ["status", "run_at"], name: "index_checks_on_status_and_run_at"
   end
