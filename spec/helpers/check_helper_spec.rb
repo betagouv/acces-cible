@@ -1,15 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe CheckHelper do
-  let(:check) { create(:check) }
+  let(:check) { create(:check, state) }
+  let(:state) { nil }
 
   describe "#status_to_badge_text" do
     subject { helper.status_to_badge_text(check) }
 
     context "when the check is finished" do
-      before do
-        allow(check).to receive(:passed?).and_return true
-      end
+      let(:state) { :completed }
 
       context "and it responds to custom badge text" do
         before do
@@ -21,6 +20,8 @@ RSpec.describe CheckHelper do
     end
 
     context "when the check is not finished" do
+      let(:state) { :pending }
+
       before do
         allow(Check)
           .to receive(:human)
@@ -36,13 +37,13 @@ RSpec.describe CheckHelper do
     subject { helper.status_link(check) }
 
     context "when then check is not finished" do
+      let(:state) { :pending }
+
       it { should be_nil }
     end
 
     context "when the check is finished" do
-      before do
-        allow(check).to receive(:passed?).and_return true
-      end
+      let(:state) { :completed }
 
       context "when the badge implements the link logic" do
         before do
@@ -63,28 +64,14 @@ RSpec.describe CheckHelper do
       ["blocked", :info],
     ].each do |state, expected_badge_level|
       context "when the check is in the #{state} state" do
-        # NOTE: the check must be built with the right status *and*
-        # the accessor must be overriden as well! Why? Well, the
-        # `#{state}?` methods are defined by ActiveRecord
-        # automatically with the `enum` macro, but we actually
-        # override `blocked?` with our own version which checks
-        # requirements, which means that:
-        #
-        # FactoryBot.create(:check, status: "blocked").blocked?
-        #
-        # is never true, and thus not enough for our test case.
-        let(:check) { build(:check, state) }
-
-        before do
-          allow(check).to receive("#{state}?").and_return true
-        end
+        let(:state) { state }
 
         it { should eq expected_badge_level }
       end
     end
 
     context "when the check is in the passed state" do
-      let(:check) { build(:check, status: :passed) }
+      let(:state) { :completed }
 
       context "with a custom badge level" do
         before do
@@ -109,6 +96,8 @@ RSpec.describe CheckHelper do
 
   describe "#to_badge" do
     subject(:to_badge) { helper.to_badge(check) }
+
+    let(:state) { :pending }
 
     before do
       allow(helper).to receive(:status_to_badge_level).with(check).and_return(:level)

@@ -15,7 +15,7 @@ class CheckStateMachine
   transition from: :running, to: [:failed, :completed]
   transition from: :blocked, to: [:ready]
 
-  before_transition(to: :running) do |check|
+  guard_transition(to: :ready) do |check|
     check.all_requirements_met?
   end
 end
