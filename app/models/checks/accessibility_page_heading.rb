@@ -33,9 +33,10 @@ module Checks
     def total = expected_headings.count
     def failures = comparison.filter { it.error? }
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
+    def human_success_rate = "#{total - failures.count}/#{total}"
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
+    alias custom_badge_text human_success_rate
 
-    def custom_badge_text = "#{total - failures.count}/#{total}"
     def custom_badge_status
       case score
       when 90..100 then :success
