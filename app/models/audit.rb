@@ -40,23 +40,28 @@ class Audit < ApplicationRecord
     all_checks.select(&:new_record?).each(&:save)
   end
 
-  def derive_status_from_checks
-    self.status = if all_checks.any?(&:new_record?)
+  def next_check
+    checks.pending.first ||
+    checks.to_retry.first ||
+    checks.blocked.reject(&:blocked?).first
+  end
+
+  def status_from_checks
+    if all_checks.any?(&:new_record?)
        :pending
     elsif (check_statuses = checks.collect(&:status).uniq).one?
-       check_statuses.first
+       check_statuses.first.to_sym
     else
        :mixed
     end
-    update(status:)
   end
 
-  def finalize!
+  def latest_checked_at = checks.collect(&:checked_at).compact.sort.last
+
+  def update_from_checks
     transaction do
-      derive_status_from_checks
-      latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-      update(checked_at: latest_checked_at)
-      site.set_current_audit!
+      update(status: status_from_checks, checked_at: latest_checked_at)
+      site.set_current_audit! unless pending?
     end
   end
 end
