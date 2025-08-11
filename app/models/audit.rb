@@ -32,43 +32,33 @@ class Audit < ApplicationRecord
     Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
   end
 
-  def check_for(identifier)
-    send(identifier)
-  end
-
-  def check_complete?(identifier)
-    check_for(identifier).complete?
-  end
-
-  def check_status(check)
-    (send(check)&.status || :pending).to_s.inquiry
+  def check_completed?(identifier)
+    send(identifier).completed?
   end
 
   def create_checks
     all_checks.select(&:new_record?).each(&:save)
   end
 
-  def next_check
-    checks.pending.first ||
-    checks.to_retry.first ||
-    checks.blocked.reject(&:blocked?).first
+  def all_check_states
+    all_checks.map(&:current_state)
   end
 
   def status_from_checks
-    if all_checks.any?(&:new_record?)
-       :pending
-    elsif (check_statuses = checks.collect(&:status).uniq).one?
-       check_statuses.first.to_sym
+    states = all_check_states
+
+    if states.uniq.one?
+      states.first
+    elsif states.include?("pending")
+      :pending
     else
-       :mixed
+      :mixed
     end
   end
 
-  def latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-
   def update_from_checks
     transaction do
-      update(status: status_from_checks, checked_at: latest_checked_at)
+      update(status: status_from_checks)
       site.set_current_audit! unless pending?
     end
   end
