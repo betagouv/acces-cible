@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 def fake_auth_hash(email, siret, org)
-  user = FactoryBot.build(:user, email:, siret:, given_name: "Amanda", usual_name: "Rousseau")
+  user = FactoryBot.build(:user, email:, siret:, name: "Amanda Rousseau")
 
   OmniAuth::AuthHash.new(
     {
@@ -12,8 +12,7 @@ def fake_auth_hash(email, siret, org)
       },
       extra: {
         raw_info: {
-          given_name: user.given_name,
-          usual_name: user.usual_name,
+          name: user.name,
           email: user.email,
           siret: user.siret,
           organizational_unit: org
