@@ -1,6 +1,4 @@
 class RunCheckJob < ApplicationJob
-  limits_concurrency to: 1, key: ->(check) { check.audit_id }
-
   attr_reader :check
   delegate :audit, to: :check
   delegate :checks, to: :audit, prefix: true
