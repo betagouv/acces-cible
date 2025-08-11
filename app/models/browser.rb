@@ -53,22 +53,6 @@ class Browser
     delegate_missing_to :new
   end
 
-  def browser
-    return @browser if browser_alive?
-
-    @mutex.synchronize do
-      return @browser if browser_alive?
-      initialize_browser
-    end
-  rescue
-    @mutex.synchronize { initialize_browser }
-  end
-
-  def initialize
-    @mutex = Mutex.new
-    initialize_browser
-  end
-
   def get(url)
     with_page do |page|
       page.go_to(url)
@@ -94,21 +78,34 @@ class Browser
     end
   end
 
-  def restart!
-    @mutex.synchronize do
-      cleanup_browser
-      @browser = nil
+  private
+
+  def browser
+    restart! if crashed?
+    @browser ||= Ferrum::Browser.new(settings).tap do |browser|
+      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
   end
 
-  def healthy?
-    browser.create_page.tap(&:close)
-    true
-  rescue
-    false
+  def restart!
+    if @browser
+      @browser.reset
+      @browser.quit
+    end
+  rescue => error
+    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
+  ensure
+    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
+    @browser = nil
   end
 
-  private
+  def pid = @browser&.process&.pid
+
+  def crashed?
+    pid.nil? || Process.kill(0, pid).zero? # kill 0 only checks that the process is alive and reachable
+  rescue Errno::ESRCH, Errno::EPERM, TypeError
+    true
+  end
 
   def with_page
     page = nil
@@ -133,33 +130,6 @@ class Browser
       page.headers.add(random_user_agent)
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
-  end
-
-  def browser_alive?
-    return false unless @browser&.process&.pid
-
-    Process.kill(0, @browser.process.pid)
-    true
-  rescue Errno::ESRCH, Errno::EPERM, TypeError
-    false
-  end
-
-  def initialize_browser
-    @browser = Ferrum::Browser.new(settings).tap do |browser|
-      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-    end
-  end
-
-  def cleanup_browser
-    if browser
-      browser.reset
-      browser.close
-      browser.quit
-    end
-  rescue => error
-    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
-  ensure
-    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
   end
 
   def settings

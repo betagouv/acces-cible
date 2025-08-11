@@ -159,12 +159,12 @@ RSpec.describe Browser do
 
     it "creates a new Ferrum::Browser instance during initialization" do
       browser_instance = described_class.new
-      expect(browser_instance.browser).to eq(ferrum_browser)
+      expect(browser_instance.send(:browser)).to eq(ferrum_browser)
     end
 
     it "sets network blocklist with extensions and domains during initialization" do
       expect(network).to receive(:blocklist=).with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
-      described_class.new
+      described_class.new.send(:browser)
     end
   end
 
@@ -183,7 +183,7 @@ RSpec.describe Browser do
       allow(ferrum_browser).to receive(:close)
       allow(ferrum_browser).to receive(:quit)
 
-      allow(instance).to receive_messages(create_page: page, healthy?: true)
+      allow(instance).to receive(:create_page).and_return(page)
       allow(page).to receive(:close)
       allow(Rails.logger).to receive(:warn)
     end
@@ -285,6 +285,227 @@ RSpec.describe Browser do
 
         expect(Rails.logger).to have_received(:error)
       end
+    end
+  end
+
+  describe "#crashed?" do
+    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
+    let(:process) { instance_double(MockProcess, pid: 12345) }
+
+    before do
+      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
+      allow(ferrum_browser).to receive_messages(network: instance_double(Ferrum::Network), process:)
+      allow(ferrum_browser.network).to receive(:blocklist=)
+    end
+
+    context "when browser has no process" do
+      before do
+        allow(ferrum_browser).to receive(:process).and_return(nil)
+      end
+
+      it "returns true" do
+        expect(instance.send(:crashed?)).to be(true)
+      end
+    end
+
+    context "when browser process has no pid" do
+      before do
+        allow(process).to receive(:pid).and_return(nil)
+      end
+
+      it "returns true" do
+        expect(instance.send(:crashed?)).to be(true)
+      end
+    end
+
+    context "when process returns valid state" do
+      before do
+        allow(Process).to receive(:kill).with(0, 12345).and_return(1)
+        instance.instance_variable_set(:@browser, ferrum_browser)
+      end
+
+      it "returns false" do
+        expect(instance.send(:crashed?)).to be(false)
+      end
+    end
+
+    context "when process kill raises Errno::ESRCH" do
+      before do
+        allow(Process).to receive(:kill).with(0, 12345).and_raise(Errno::ESRCH)
+      end
+
+      it "returns true" do
+        expect(instance.send(:crashed?)).to be(true)
+      end
+    end
+
+    context "when process kill raises Errno::EPERM" do
+      before do
+        allow(Process).to receive(:kill).with(0, 12345).and_raise(Errno::EPERM)
+      end
+
+      it "returns true" do
+        expect(instance.send(:crashed?)).to be(true)
+      end
+    end
+
+    context "when process kill raises TypeError" do
+      before do
+        allow(Process).to receive(:kill).with(0, 12345).and_raise(TypeError)
+      end
+
+      it "returns true" do
+        expect(instance.send(:crashed?)).to be(true)
+      end
+    end
+  end
+
+  describe "#restart!" do
+    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
+    let(:network) { instance_double(Ferrum::Network) }
+    let(:user_data_dir) { "/tmp/chrome-test123" }
+
+    before do
+      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
+      allow(ferrum_browser).to receive_messages(network:, process: instance_double(MockProcess, pid: 12345))
+      allow(network).to receive(:blocklist=)
+      allow(ferrum_browser).to receive_messages(reset: nil, quit: nil)
+      allow(Rails.logger).to receive(:warn)
+      allow(FileUtils).to receive(:rm_rf)
+      allow(Dir).to receive(:exist?).and_return(true)
+
+      # Set up user data dir
+      instance.instance_variable_set(:@user_data_dir, user_data_dir)
+      instance.instance_variable_set(:@browser, ferrum_browser)
+    end
+
+    context "when browser exists" do
+      it "calls reset, close, and quit on browser" do
+        instance.send(:restart!)
+
+        expect(ferrum_browser).to have_received(:reset)
+        expect(ferrum_browser).to have_received(:quit)
+      end
+
+      it "removes user data directory if it exists" do
+        instance.send(:restart!)
+
+        expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
+      end
+
+      it "sets @browser to nil" do
+        instance.send(:restart!)
+
+        expect(instance.instance_variable_get(:@browser)).to be_nil
+      end
+
+      context "when browser cleanup raises an error" do
+        before do
+          allow(ferrum_browser).to receive(:reset).and_raise(StandardError.new("cleanup error"))
+        end
+
+        it "logs the error and continues cleanup" do
+          instance.send(:restart!)
+
+          expect(Rails.logger).to have_received(:warn)
+          expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
+          expect(instance.instance_variable_get(:@browser)).to be_nil
+        end
+      end
+    end
+
+    context "when browser is nil" do
+      before do
+        instance.instance_variable_set(:@browser, nil)
+      end
+
+      it "still removes user data directory and sets @browser to nil" do
+        instance.send(:restart!)
+
+        expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
+        expect(instance.instance_variable_get(:@browser)).to be_nil
+      end
+    end
+
+    context "when user data directory does not exist" do
+      before do
+        allow(Dir).to receive(:exist?).and_return(false)
+      end
+
+      it "does not attempt to remove the directory" do
+        instance.send(:restart!)
+
+        expect(FileUtils).not_to have_received(:rm_rf)
+      end
+    end
+
+    it "accesses @browser directly without triggering browser creation logic" do
+      allow(instance).to receive(:browser).and_call_original
+      instance.instance_variable_set(:@browser, nil)
+
+      instance.send(:restart!)
+
+      expect(instance).not_to have_received(:browser)
+    end
+  end
+
+  describe "#create_page" do
+    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
+    let(:network) { instance_double(Ferrum::Network) }
+    let(:headers) { instance_double(Ferrum::Headers) }
+
+    before do
+      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
+      allow(ferrum_browser).to receive_messages(network: network, process: instance_double(MockProcess, pid: 12345))
+      allow(network).to receive_messages("blocklist=": nil, wait_for_idle: nil)
+      allow(ferrum_browser).to receive(:create_page).and_return(page)
+      allow(page).to receive_messages(headers: headers, network: network)
+      allow(headers).to receive_messages(set: nil, add: nil)
+      allow(Process).to receive(:kill).with(0, 12345).and_return(1)
+    end
+
+    it "creates a page from the browser" do
+      result = instance.send(:create_page)
+
+      expect(ferrum_browser).to have_received(:create_page)
+      expect(result).to eq(page)
+    end
+
+    it "sets standard headers on the page" do
+      instance.send(:create_page)
+
+      expect(headers).to have_received(:set).with(Browser::HEADERS)
+    end
+
+    it "adds random user agent headers" do
+      allow(instance).to receive(:random_user_agent).and_return({ "User-Agent" => "test-agent" })
+
+      instance.send(:create_page)
+
+      expect(headers).to have_received(:add).with({ "User-Agent" => "test-agent" })
+    end
+
+    it "waits for network idle" do
+      instance.send(:create_page)
+
+      expect(network).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
+    end
+  end
+
+  describe "class methods delegation" do
+    it "delegates missing methods to new instance" do
+      expect(described_class).to respond_to(:get)
+      expect(described_class).to respond_to(:axe_check)
+    end
+
+    it "creates new instance for each class method call" do
+      browser_instance = instance_double(described_class)
+      allow(described_class).to receive(:new).and_return(browser_instance)
+      allow(browser_instance).to receive(:get).and_return({})
+
+      described_class.get(url)
+
+      expect(described_class).to have_received(:new)
     end
   end
 end
