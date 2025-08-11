@@ -7,12 +7,13 @@ class RunCheckJob < ApplicationJob
   end
 
   before_perform do |job|
-    jobs.arguments.first.tap do |job|
-      if job.in_state?(:running) # retry
-        job.increment!(:retry_count)
-      else
-        job.transition_to!(:running)
-      end
+    check = job.arguments.first
+
+    case check.current_state
+    when "ready"
+      check.transition_to!(:running)
+    when "running" # retry
+      check.increment!(:retry_count)
     end
   end
 

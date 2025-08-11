@@ -102,7 +102,6 @@ fr:
       check:
         type: Type de contrôle
         status: État
-        run_at: Vérification prévue le
         checked_at: Vérification effectuée le
         attempts: Tentatives
         count:
