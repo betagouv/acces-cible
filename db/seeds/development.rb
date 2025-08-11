@@ -22,8 +22,7 @@ user = FactoryBot.create(:user,
                          provider: 'developer',
                          uid: 'user@example.com',
                          email: 'user@example.com',
-                         given_name: 'Test',
-                         usual_name: 'User',
+                         name: 'Test User',
                          siret: team.siret
 )
 
@@ -33,6 +32,5 @@ sites = [
   FactoryBot.create(:site, team:, url: 'https://www.example.com', tags: [tag2]),
   FactoryBot.create(:site, team:, url: 'https://www.example-2.com')
 ]
-
 
 puts "Created user #{user.email} with team (uid: #{user.uid} siret: #{team.siret}) and #{sites.count} sites"
