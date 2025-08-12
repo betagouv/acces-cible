@@ -145,40 +145,6 @@ RSpec.describe Check do
     end
   end
 
-  describe "#to_badge" do
-    subject(:to_badge) { check.to_badge }
-
-    context "when check is passed" do
-      let(:check) { build(:check, status: :passed) }
-
-      it "returns success level, custom text, and custom link if available" do
-        allow(check).to receive_messages(
-          respond_to?: true,
-          custom_badge_status: :success,
-          custom_badge_text: "Custom text",
-          custom_badge_link: "https://example.com/")
-        expect(to_badge).to eq([:success, "Custom text", "https://example.com/"])
-      end
-
-      it "returns success level and human status if no custom text" do
-        allow(check).to receive(:respond_to?).and_return(false)
-        expect(to_badge).to eq([:success, check.human_status])
-      end
-    end
-
-    context "when check is pending" do
-      let(:check) { build(:check, status: :pending) }
-
-      it { should eq([:info, check.human_status]) }
-    end
-
-    context "when check is failed" do
-      let(:check) { build(:check, status: :failed) }
-
-      it { should eq([:error, check.human_status]) }
-    end
-  end
-
   describe "#run" do
     let(:check) { build(:check) }
 

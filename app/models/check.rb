@@ -70,10 +70,6 @@ class Check < ApplicationRecord
     (5 * (5 ** retry_count)).minutes.from_now # Exponential backoff: 5min, 25min, 125min (2h5m)
   end
 
-  def to_badge
-    [status_to_badge_level, status_to_badge_text, status_link].compact
-  end
-
   def run
     if waiting?
       return false
@@ -144,18 +140,6 @@ class Check < ApplicationRecord
       self.error_message = self.error_type = self.error_backtrace = nil
     end
   end
-
-  def status_to_badge_level
-    case
-    when failed? then :error
-    when pending? || blocked? then :info
-    when passed? && respond_to?(:custom_badge_status, true) then custom_badge_status
-    else :success
-    end
-  end
-
-  def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
-  def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
 
   def set_priority = self.priority = self.class.priority
 end
