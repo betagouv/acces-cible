@@ -69,6 +69,20 @@ RSpec.describe Check do
         expect { check.run! }.to change(check, :data).from({}).to("result")
       end
     end
+
+    context "when analyze! raises an error" do
+      let(:error) { Ferrum::TimeoutError.new("Test error") }
+
+      before do
+        allow(check).to receive(:analyze!).and_raise(error)
+      end
+
+      it "raises a Check::RuntimeError with the correct root cause" do
+        expect { check.run! }.to raise_error(Check::RuntimeError) do |err|
+          expect(err.cause).to eq error
+        end
+      end
+    end
   end
 
   describe "#priority" do
