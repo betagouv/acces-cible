@@ -17,8 +17,6 @@ module Checks
 
     def mention_text = human("mentions.#{mention || 'none'}")
 
-    private
-
     def custom_badge_text = mention_text
     def custom_badge_status
       { nil => :error,
@@ -26,6 +24,8 @@ module Checks
         partiellement: :new,
         totalement: :success }[mention&.to_sym]
     end
+
+    private
 
     def analyze!
       { mention: find_mention }

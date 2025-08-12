@@ -35,8 +35,6 @@ module Checks
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
 
-    private
-
     def custom_badge_text = "#{total - failures.count}/#{total}"
     def custom_badge_status
       case score
@@ -45,6 +43,8 @@ module Checks
       else              :error
       end
     end
+
+    private
 
     def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
 

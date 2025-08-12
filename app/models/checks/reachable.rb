@@ -19,10 +19,10 @@ module Checks
 
     def redirected? = original_url && redirect_url && normalize(original_url) != normalize(redirect_url)
 
-    private
-
     def custom_badge_text = redirected? ? human(:redirected) : human(:reachable)
     def custom_badge_status = redirected? ? :info : :success
+
+    private
 
     def analyze!
       raise BrowserError.new(audit.url) if root_page.status.nil?

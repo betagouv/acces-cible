@@ -1,4 +1,6 @@
 module CheckHelper
+  # FIXME: the `custom_badge_*` methods should not live in the model
+  # but in some kind of decorator/presenter/facade pattern thing
   def status_to_badge_text(check)
     if check.passed? && check.respond_to?(:custom_badge_text)
       check.custom_badge_text
@@ -18,8 +20,8 @@ module CheckHelper
       :error
     elsif check.pending? || check.blocked?
       :info
-    elsif check.passed? && respond_to?(:custom_badge_status, true)
-      custom_badge_status
+    elsif check.passed? && check.respond_to?(:custom_badge_status)
+      check.custom_badge_status
     else
       :success
     end
