@@ -54,6 +54,59 @@ RSpec.describe CheckHelper do
     end
   end
 
+  describe "#status_to_badge_level" do
+    subject { helper.status_to_badge_level(check) }
+
+    [
+      ["failed", :error],
+      ["pending", :info],
+      ["blocked", :info],
+    ].each do |state, expected_badge_level|
+      context "when the check is in the #{state} state" do
+        # NOTE: the check must be built with the right status *and*
+        # the accessor must be overriden as well! Why? Well, the
+        # `#{state}?` methods are defined by ActiveRecord
+        # automatically with the `enum` macro, but we actually
+        # override `blocked?` with our own version which checks
+        # requirements, which means that:
+        #
+        # FactoryBot.create(:check, status: "blocked").blocked?
+        #
+        # is never true, and thus not enough for our test case.
+        let(:check) { build(:check, state) }
+
+        before do
+          allow(check).to receive("#{state}?").and_return true
+        end
+
+        it { should eq expected_badge_level }
+      end
+    end
+
+    context "when the check is in the passed state" do
+      let(:check) { build(:check, status: :passed) }
+
+      context "with a custom badge level" do
+        before do
+          def check.custom_badge_status = :foobar
+        end
+
+        it { should eq :foobar }
+      end
+
+      context "without a custom badge level" do
+        before do
+          allow(check)
+            .to receive(:respond_to?)
+                  .with(:custom_badge_status)
+                  .and_return false
+        end
+
+        it { should eq :success }
+      end
+    end
+  end
+
   describe "#to_badge" do
     subject(:to_badge) { helper.to_badge(check) }
 

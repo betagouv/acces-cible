@@ -14,8 +14,6 @@ module Checks
       data["violation_data"]&.map { |data| AxeViolation.new(**data) } || []
     end
 
-    private
-
     def custom_badge_text = human_success_rate
     def custom_badge_status
       case success_rate
@@ -25,6 +23,8 @@ module Checks
       else :error
       end
     end
+
+    private
 
     def analyze!
       return unless (results = Browser.axe_check(audit.url))

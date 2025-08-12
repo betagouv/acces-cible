@@ -108,13 +108,14 @@ module Checks
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
+    def custom_badge_status = found_required? ? :success : :warning
+    def custom_badge_text = found_required? ? human_compliance_rate : human(:missing_data)
+
     private
 
     def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
     def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
-    def custom_badge_status = found_required? ? :success : :warning
-    def custom_badge_text = found_required? ? human_compliance_rate : human(:missing_data)
 
     def analyze!
       {
