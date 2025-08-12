@@ -12,7 +12,7 @@ RSpec.describe RunCheckJob do
       # object here will have no effect when ActiveJob reinstantiates
       # a model on its side.
       allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
-        .to receive(:run).and_return :test_success
+        .to receive(:run!).and_return :test_success
     end
 
     it "transitions the check to completed" do
@@ -28,7 +28,7 @@ RSpec.describe RunCheckJob do
   context "when the check does not go well" do
     before do
       allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
-        .to receive(:run).and_raise Check::RuntimeError.new("cry cry")
+        .to receive(:analyze!).and_raise Ferrum::TimeoutError.new("Test error")
     end
 
     it "transitions the check to failed" do

@@ -73,7 +73,7 @@ class Check < ApplicationRecord
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def tooltip? = true
 
-  def run
+  def run!
     self.data = analyze!
 
     save!
