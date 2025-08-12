@@ -45,7 +45,13 @@ RSpec.describe RunCheckJob do
         described_class.perform_later(check)
       end
 
-      expect(check.state_machine.last_transition.metadata).to include "cry cry"
+      error_metadata = check.state_machine.last_transition.metadata
+
+      expect(error_metadata)
+        .to include(
+              "json_class" => "Ferrum::TimeoutError",
+              "m" => /Timed out/
+            )
     end
   end
 end
