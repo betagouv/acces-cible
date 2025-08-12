@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe RunCheckJob do
   include ActiveJob::TestHelper
 
-  let(:check) { create(:check, :ready) }
+  let(:check) { create(:accessibility_mention_check, :ready) }
 
   context "when the check goes well" do
     before do
@@ -11,7 +11,7 @@ RSpec.describe RunCheckJob do
       # since ActiveJob deserializes models with GlobalID, mocking the
       # object here will have no effect when ActiveJob reinstantiates
       # a model on its side.
-      allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
+      allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
         .to receive(:run!).and_return :test_success
     end
 
