@@ -1,9 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Check do
-  subject(:check) { build(:check) }
-
-  let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
+  subject(:check) { build(:accessibility_mention_check) }
 
   it { should be_valid }
 
@@ -39,7 +37,7 @@ RSpec.describe Check do
   end
 
   describe "#human_status" do
-    let(:check) { create(:check, :pending) }
+    let(:check) { create(:accessibility_mention_check, :pending) }
 
     it "returns the humanized status" do
       expect(described_class).to receive(:human).with("status.pending")
@@ -51,14 +49,14 @@ RSpec.describe Check do
   describe "#root_page" do
     it "returns a Page with the audit URL" do
       audit = build(:audit, url: "https://example.com/")
-      check = build(:check, audit:)
+      check = build(:accessibility_mention_check, audit:)
       expect(Page).to receive(:new).with(url: "https://example.com/")
       check.root_page
     end
   end
 
   describe "#run" do
-    let(:check) { build(:check) }
+    let(:check) { build(:accessibility_mention_check) }
 
     context "when the analyze method goes well" do
       before do
