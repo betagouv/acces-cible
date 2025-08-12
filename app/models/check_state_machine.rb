@@ -18,4 +18,8 @@ class CheckStateMachine
   guard_transition(to: :ready) do |check|
     check.all_requirements_met?
   end
+
+  after_transition(to: :completed) do |check|
+    check.audit.after_check_completed(check)
+  end
 end

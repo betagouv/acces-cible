@@ -157,4 +157,12 @@ RSpec.describe Audit do
       expect { audit.save! }.to change(Check, :count).by(Check.types.size)
     end
   end
+
+  describe "after a check has completed" do
+    let(:audit) { create(:audit) }
+
+    it "reschedules a ProcessAuditJob with itself" do
+      expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
+    end
+  end
 end

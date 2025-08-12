@@ -62,4 +62,8 @@ class Audit < ApplicationRecord
       site.set_current_audit! unless pending?
     end
   end
+
+  def after_check_completed(check)
+    ProcessAuditJob.perform_later(self)
+  end
 end
