@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CheckHelper do
-  let(:check) { create(:check, state) }
+  let(:check) { create(:accessibility_mention_check, state) }
   let(:state) { nil }
 
   describe "#status_to_badge_text" do

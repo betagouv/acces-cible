@@ -1,6 +1,10 @@
 FactoryBot.define do
-  factory :accessibility_mention_check, class: "Checks::AccessibilityMention", aliases: [:check] do
+  factory :check do
     audit { association :audit }
+
+    Check.types.each do |type, klass|
+      factory("#{type}_check", class: klass)
+    end
 
     # we could try and emulate the complete logic of going through the
     # chain of states (pending -> ready -> running, etc) but it would
