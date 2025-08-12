@@ -22,6 +22,6 @@ class RunCheckJob < ApplicationJob
   end
 
   def perform(check)
-    check.run
+    check.run!
   end
 end
