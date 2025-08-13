@@ -2,16 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ProcessAuditJob do
   let(:site) { create(:site) }
-  let(:audit) { create(:audit, site: site) }
-
-  # we want to control the output of `audit.checks` (otherwise lots of
-  # things will break when we update the default checks) and that is
-  # very hard to mock (mocking A/R scopes is essentially a bad
-  # idea). In the meantime, remove all checks and add ours, it's not
-  # great but it works.
-  before "remove all existing checks" do
-    audit.checks.destroy_all
-  end
+  let(:audit) { create(:audit, :without_checks, site: site) }
 
   context 'when there are checks that can move to ready' do
     before do

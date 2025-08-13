@@ -66,4 +66,11 @@ class Audit < ApplicationRecord
   def after_check_completed(check)
     ProcessAuditJob.perform_later(self)
   end
+
+  def abort_dependent_checks!(check)
+    checks
+      .remaining
+      .filter { |other_check| other_check.depends_on?(check.to_requirement) }
+      .each   { |other_check| other_check.transition_to!(:failed) }
+  end
 end
