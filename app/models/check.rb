@@ -106,6 +106,17 @@ class Check < ApplicationRecord
     in_state?(:blocked?)
   end
 
+  def depends_on?(requirement)
+    requirements.include?(requirement)
+  end
+
+  def to_requirement
+    type
+      .demodulize
+      .underscore
+      .to_sym
+  end
+
   private
 
   def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")

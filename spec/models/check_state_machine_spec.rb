@@ -28,4 +28,14 @@ describe CheckStateMachine do
       check.transition_to!(:completed)
     end
   end
+
+  context "when moving to failed" do
+    let(:check) { create(:reachable_check, :running) }
+
+    it "tells the audit to look at dependent jobs" do
+      expect(check.audit).to receive(:abort_dependent_checks!).with(check)
+
+      check.transition_to!(:failed)
+    end
+  end
 end
