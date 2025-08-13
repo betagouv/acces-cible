@@ -63,8 +63,16 @@ class Audit < ApplicationRecord
     end
   end
 
+  def complete?
+    checks.remaining.none?
+  end
+
   def after_check_completed(check)
-    ProcessAuditJob.perform_later(self)
+    if complete?
+      update!(checked_at: Time.zone.now)
+    else
+      ProcessAuditJob.perform_later(self)
+    end
   end
 
   def abort_dependent_checks!(check)
