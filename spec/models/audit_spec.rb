@@ -165,4 +165,24 @@ RSpec.describe Audit do
       expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
   end
+
+  describe "abort_dependent_checks!" do
+    let(:audit) { create(:audit, :without_checks) }
+
+    let(:original_check) { create(:reachable_check, :failed, audit: audit) }
+    let(:dependent_check) { create(:accessibility_mention_check, :pending, audit: audit) }
+
+    before do
+      allow(dependent_check)
+        .to receive(:depends_on?)
+              .with(original_check.type)
+              .and_return true
+    end
+
+    it "aborts any check that depends on the failed one" do
+      expect { audit.abort_dependent_checks!(original_check) }
+        .to change(dependent_check, :current_state)
+              .from("pending").to("failed")
+    end
+  end
 end
