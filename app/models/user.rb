@@ -12,7 +12,7 @@ class User < ApplicationRecord
     ]).from("inactive_users")
   end
 
-  validates :provider, :uid, :email, :given_name, :usual_name, :siret, presence: true
+  validates :provider, :uid, :email, :name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }
   validates :email, uniqueness: { scope: :provider, if: :email_changed? }
   validates :email, email: true
@@ -32,8 +32,7 @@ class User < ApplicationRecord
       user.assign_attributes(
         siret:,
         email: data_source.email,
-        given_name: data_source.given_name,
-        usual_name: data_source.usual_name
+        name: data_source.name
       )
       user.team ||= Team.find_or_initialize_by(siret:) unless user.siret == user.team&.siret
       user.team.save if user.valid?
@@ -43,11 +42,6 @@ class User < ApplicationRecord
       user
     end
   end
-
-  def full_name
-    "#{given_name} #{usual_name}"
-  end
-  alias to_title full_name
 
   private
 

@@ -1,12 +1,12 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :developer, fields: [
-             :uid,
-             :email,
-             :given_name,
-             :usual_name,
-             :siret,
-             :organizational_unit
-           ] if Rails.env.local?
+    :uid,
+    :email,
+    :given_name,
+    :usual_name,
+    :siret,
+    :organizational_unit
+  ] if Rails.env.local?
 
   scope = "openid email given_name usual_name siret organizational_unit belonging_population"
 

@@ -16,14 +16,9 @@ RSpec.describe User do
       it { should_not allow_value("not an email, even though there's an @ somewhere").for(:email) }
     end
 
-    context "for given_name" do
-      it { should allow_value("Given Name").for(:given_name) }
-      it { should_not allow_value("").for(:given_name) }
-    end
-
-    context "for usual_name" do
-      it { should allow_value("Usual Name").for(:usual_name) }
-      it { should_not allow_value("").for(:usual_name) }
+    context "for name" do
+      it { should allow_value("Yan Zhu").for(:name) }
+      it { should_not allow_value("").for(:name) }
     end
 
     context "for siret" do
@@ -50,8 +45,7 @@ RSpec.describe User do
               email:,
               siret:,
               organizational_unit:,
-              given_name: "John",
-              usual_name: "Doe"
+              name: "Yan Zhu"
             }
           }
         }
@@ -64,13 +58,12 @@ RSpec.describe User do
 
         user = described_class.last
         expect(user).to have_attributes(
-          siret:,
-          provider: auth.provider,
-          uid: auth.uid,
-          email: auth.info.email,
-          given_name: auth.extra.raw_info.given_name,
-          usual_name: auth.extra.raw_info.usual_name,
-        )
+                          siret:,
+                          provider: auth.provider,
+                          uid: auth.uid,
+                          email: auth.info.email,
+                          name: "Yan Zhu",
+                        )
       end
 
       it "creates a new team if it doesn't exist" do
@@ -102,11 +95,10 @@ RSpec.describe User do
 
         expect(user).to eq(existing_user.reload)
         expect(user).to have_attributes(
-          email: auth.info.email,
-          given_name: auth.extra.raw_info.given_name,
-          usual_name: auth.extra.raw_info.usual_name,
-          siret:
-        )
+                          email: auth.info.email,
+                          name: "Yan Zhu",
+                          siret:
+                        )
       end
 
       it "associates the user with the correct team" do
@@ -119,11 +111,11 @@ RSpec.describe User do
         let!(:old_team) { create(:team, siret: old_siret) }
         let!(:existing_user) do
           create(:user,
-            provider: auth.provider,
-            uid: auth.uid,
-            email: "old@example.com",
-            siret: old_siret,
-            team: old_team
+                 provider: auth.provider,
+                 uid: auth.uid,
+                 email: "old@example.com",
+                 siret: old_siret,
+                 team: old_team
           )
         end
 
@@ -138,8 +130,7 @@ RSpec.describe User do
                   email:,
                   siret: new_siret,
                   organizational_unit:,
-                  given_name: "John",
-                  usual_name: "Doe"
+                  name: "Yan Zhu"
                 }
               }
             }

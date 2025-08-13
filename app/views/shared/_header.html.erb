@@ -3,7 +3,7 @@
 
   <% if authenticated? %>
 
-    <%= header.with_tool_link title: current_user.full_name.truncate(30), path: user_path, html_attributes: { class: [icon_class("account-circle", btn: :tertiary)] } %>
+    <%= header.with_tool_link title: current_user.name.truncate(30), path: user_path, html_attributes: { class: [icon_class("account-circle", btn: :tertiary)] } %>
     <%= header.with_tool_link title: t("shared.logout"), path: logout_path, html_attributes: { class: [icon_class("logout-box-r", btn: :secondary)], "data-turbo-method": :delete } %>
 
     <%= header.with_direct_link_simple title: Site.human(:all), path: sites_path, active: current_page?(controller: :sites, action: :index) %>
