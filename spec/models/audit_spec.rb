@@ -164,6 +164,25 @@ RSpec.describe Audit do
     it "reschedules a ProcessAuditJob with itself" do
       expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
+
+    context "when there are no jobs left" do
+      before do
+        allow(audit.checks).to receive(:remaining).and_return []
+      end
+
+      it "does not enqueue a new ProcessAuditJob" do
+        expect { audit.after_check_completed(nil) }.not_to enqueue_job(ProcessAuditJob)
+      end
+
+      it "updates its checked_at timestamp" do
+        freeze_time do
+          expect { audit.after_check_completed(nil) }
+            .to change(audit, :checked_at)
+                  .from(nil)
+                  .to(Time.current)
+        end
+      end
+    end
   end
 
   describe "abort_dependent_checks!" do
