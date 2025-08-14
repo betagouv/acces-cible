@@ -188,8 +188,8 @@ RSpec.describe Audit do
   describe "abort_dependent_checks!" do
     let(:audit) { create(:audit, :without_checks) }
 
-    let(:original_check) { create(:reachable_check, :failed, audit: audit) }
-    let(:dependent_check) { create(:accessibility_mention_check, :pending, audit: audit) }
+    let(:original_check) { create(:check, :reachable, :failed, audit: audit) }
+    let(:dependent_check) { create(:check, :accessibility_mention, :pending, audit: audit) }
 
     before do
       allow(dependent_check)
