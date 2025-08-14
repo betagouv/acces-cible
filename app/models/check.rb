@@ -1,5 +1,4 @@
 class Check < ApplicationRecord
-  # FIXME: begin state machine glue
   has_many :check_transitions, autosave: false, dependent: :destroy
 
   include Statesman::Adapters::ActiveRecordQueries[
@@ -22,7 +21,13 @@ class Check < ApplicationRecord
            :in_state?,
            :last_transition,
            to: :state_machine
-  # FIXME: end state machine glue
+
+  # defines single word predicates for each state
+  CheckStateMachine.states.each do |state|
+    define_method "#{state}?" do
+      in_state?(state)
+    end
+  end
 
   TYPES = [
     :reachable,
@@ -83,27 +88,6 @@ class Check < ApplicationRecord
 
   def all_requirements_met?
     requirements.all? { |requirement| audit.check_completed?(requirement) }
-  end
-
-  # state-machine sugar
-  def failed?
-    in_state?(:failed)
-  end
-
-  def completed?
-    in_state?(:completed)
-  end
-
-  def passed?
-    completed?
-  end
-
-  def pending?
-    in_state?(:pending)
-  end
-
-  def blocked?
-    in_state?(:blocked?)
   end
 
   def depends_on?(requirement)
