@@ -117,6 +117,12 @@ class Check < ApplicationRecord
       .to_sym
   end
 
+  def error
+    return unless failed?
+
+    last_transition.metadata
+  end
+
   private
 
   def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
