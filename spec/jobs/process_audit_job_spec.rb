@@ -6,7 +6,7 @@ RSpec.describe ProcessAuditJob do
 
   context 'when there are checks that can move to ready' do
     before do
-      create(:reachable_check, audit: audit)
+      create(:check, :reachable, audit: audit)
     end
 
     it 'enqueues RunCheckJob with all the checks that are ready' do
@@ -18,7 +18,7 @@ RSpec.describe ProcessAuditJob do
 
   context "when there are no jobs that can move to ready" do
     before do
-      create(:reachable_check, :running, audit: audit)
+      create(:check, :reachable, :running, audit: audit)
     end
 
     it "does not enqueue any job" do

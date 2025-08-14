@@ -3,7 +3,9 @@ FactoryBot.define do
     audit { association :audit }
 
     Check.types.each do |type, klass|
-      factory("#{type}_check", class: klass)
+      trait(type) do
+        initialize_with { klass.new(attributes) }
+      end
     end
 
     # we could try and emulate the complete logic of going through the

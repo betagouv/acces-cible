@@ -4,7 +4,7 @@ require "rails_helper"
 
 describe CheckStateMachine do
   let(:machine) { check.state_machine }
-  let(:check) { create(:reachable_check) }
+  let(:check) { create(:check, :reachable) }
 
   context "when moving to ready" do
     context "when the requirements aren't met" do
@@ -20,7 +20,7 @@ describe CheckStateMachine do
   end
 
   context "when moving to completed" do
-    let(:check) { create(:reachable_check, :running) }
+    let(:check) { create(:check, :reachable, :running) }
 
     it "calls back to the audit" do
       expect(check.audit).to receive(:after_check_completed).with(check)
@@ -30,7 +30,7 @@ describe CheckStateMachine do
   end
 
   context "when moving to failed" do
-    let(:check) { create(:reachable_check, :running) }
+    let(:check) { create(:check, :reachable, :running) }
 
     it "tells the audit to look at dependent jobs" do
       expect(check.audit).to receive(:abort_dependent_checks!).with(check)
