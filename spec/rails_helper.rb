@@ -85,6 +85,9 @@ RSpec.configure do |config|
     require "view_component/test_helpers"
   end
 
+  # Job-specific config
+  config.include ActiveJob::TestHelper, type: :job
+
   # RSpec Rails uses metadata to mix in different behaviours to your tests,
   # for example enabling you to call `get` and `post` in request specs. e.g.:
   #
