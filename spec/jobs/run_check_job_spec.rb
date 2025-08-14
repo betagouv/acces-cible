@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe RunCheckJob do
-  include ActiveJob::TestHelper
-
   let(:check) { create(:accessibility_mention_check, :ready) }
 
   context "when the check goes well" do
