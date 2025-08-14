@@ -136,4 +136,24 @@ RSpec.describe Check do
       end
     end
   end
+
+  describe "#error" do
+    subject { check.error }
+
+    context "when the check is not failed" do
+      let(:check) { create(:reachable_check, :pending) }
+
+      it { should be_nil }
+    end
+
+    context "when the check has failed" do
+      let(:check) { create(:reachable_check, :failed) }
+
+      before do
+        check.last_transition.update!(metadata: "error")
+      end
+
+      it { should eq "error" }
+    end
+  end
 end
