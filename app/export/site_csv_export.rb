@@ -3,7 +3,7 @@ class SiteCsvExport < CsvExport
     {
       human(:url) => :url,
       Check.human(:checked_at) => [:audit, :checked_at],
-      Checks::Reachable.human(:type) => [:audit, :reachable, :passed?],
+      Checks::Reachable.human(:type) => [:audit, :reachable, :completed?],
       Checks::LanguageIndication.human(:type) => [:audit, :language_indication, :indication],
       Checks::AccessibilityMention.human(:type) => [:audit, :accessibility_mention, :mention_text],
       Checks::FindAccessibilityPage.human(:type) => [:audit, :find_accessibility_page, :url],

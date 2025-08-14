@@ -111,7 +111,7 @@ fr:
       check/status:
         pending: Planifié
         running: En cours
-        passed: Effectué
+        completed: Effectué
         blocked: Inapplicable
         failed: Échoué
       checks/accessibility_mention:

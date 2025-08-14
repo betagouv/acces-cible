@@ -70,7 +70,7 @@ RSpec.describe CheckHelper do
       end
     end
 
-    context "when the check is in the passed state" do
+    context "when the check is in the completed state" do
       let(:state) { :completed }
 
       context "with a custom badge level" do

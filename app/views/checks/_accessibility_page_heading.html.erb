@@ -5,14 +5,14 @@
   <p>
     <%= check.human(:allowed_level_differences) %>
     <br>
-    <% if check.passed? && check.comparison.present? %>
+    <% if check.completed? && check.comparison.present? %>
     <%= check.human_explanation %>
     <% else %>
       <%= check.human(:expectations) %>
     <% end %>
   </p>
   <ul class="fr-raw-list fr-mt-2w">
-    <% if check.passed? && check.comparison.present? %>
+    <% if check.completed? && check.comparison.present? %>
       <% check.comparison.each do |heading_status| %>
         <li class="fr-mb-2w">
           <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v fr-label--success") : icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>

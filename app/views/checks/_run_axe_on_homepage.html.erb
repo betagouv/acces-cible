@@ -2,7 +2,7 @@
   <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
   <%= badge to_badge(check) %>
 
-  <% if check.passed? %>
+  <% if check.completed? %>
     <ul>
       <li><strong><%= check.human(:checks_total) %></strong> : <%= number_to_human(check.checks_total) || check.human(:unknown) %></li>
       <li><strong><%= check.human(:passes) %></strong> : <%= number_to_human(check.passes) || check.human(:unknown) %></li>
