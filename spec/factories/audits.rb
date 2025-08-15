@@ -3,6 +3,12 @@ FactoryBot.define do
     url { "https://example.com" }
     site { association :site, url:, audits: [instance] }
 
+    trait :without_checks do
+      after(:create) do |audit, _eval|
+        audit.checks.destroy_all
+      end
+    end
+
     trait :pending do
       status { "pending" }
     end

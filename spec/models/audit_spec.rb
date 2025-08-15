@@ -74,72 +74,33 @@ RSpec.describe Audit do
   end
 
   describe "#status_from_checks" do
-    context "with new checks" do
-      let(:audit) { build(:audit) }
+    subject { audit.status_from_checks }
 
-      it "returns pending when any check is new" do
-        expect(audit.status_from_checks).to eq(:pending)
-      end
+    let(:combined_states) { [] }
+
+    before do
+      # FIXME: this isn't great but we haven't made enough progress to
+      # factor out the state logic out of the model and mock something
+      # else than the subject under test
+      allow(audit).to receive(:all_check_states).and_return combined_states # rubocop:disable RSpec/SubjectStub
+    end
+
+    context "when some checks are still pending" do
+      let(:combined_states) { ["pending", "completed"] }
+
+      it { should eq :pending }
     end
 
     context "with existing checks of different statuses" do
-      let(:audit) { create(:audit) }
+      let(:combined_states) { ["failed", "completed", "blocked"] }
 
-      before do
-        audit.all_checks.each { |check| check.passed!; check.save }
-        audit.checks.last.update!(status: :failed)
-      end
-
-      it "returns mixed when checks have different statuses" do
-        expect(audit.status_from_checks).to eq(:mixed)
-      end
+      it { should eq :mixed }
     end
 
-    context "with existing checks of same status" do
-      let(:audit) { create(:audit) }
+    context "when all checks have the same status" do
+      let(:combined_states) { ["testing"] }
 
-      before do
-        audit.all_checks.each { |check| check.update(status: :passed) }
-      end
-
-      it "returns the unified status when all checks have same status" do
-        expect(audit.status_from_checks).to eq(:passed)
-      end
-    end
-  end
-
-  describe "#next_check" do
-    let(:audit) { create(:audit) }
-    let(:retryable_error) { Check::RETRYABLE_ERRORS.first }
-
-    it 'returns pending check first' do
-      pending_check = audit.checks.first
-      pending_check.update!(status: :pending)
-
-      expect(audit.next_check).to eq(pending_check)
-    end
-
-    it 'returns retryable check if no pending' do
-      audit.checks.update_all(status: :passed)
-      retryable_check = audit.checks.first
-      retryable_check.update!(status: :failed, retry_at: 1.minute.ago, error_type: retryable_error)
-
-      expect(audit.next_check).to eq(retryable_check)
-    end
-
-    it 'returns unblocked check if no pending or retryable' do
-      audit.checks.update_all(status: :blocked)
-      blocked_check = audit.checks.first
-      blocked_check.update!(status: :blocked)
-      allow(blocked_check).to receive(:blocked?).and_return(false)
-
-      expect(audit.next_check).to eq(blocked_check)
-    end
-
-    it 'returns nil when no checks are available' do
-      audit.checks.update_all(status: :passed)
-
-      expect(audit.next_check).to be_nil
+      it { should eq "testing" }
     end
   end
 
@@ -147,29 +108,21 @@ RSpec.describe Audit do
     let(:audit) { create(:audit) }
 
     it "updates status using status_from_checks" do
-      allow(audit).to receive_messages(status_from_checks: :mixed, latest_checked_at: 1.hour.ago)
+      allow(audit).to receive_messages(status_from_checks: :mixed)
 
       audit.update_from_checks
       expect(audit.status).to eq("mixed")
     end
 
-    it "updates checked_at using latest_checked_at" do
-      checked_at = 1.hour.ago
-      allow(audit).to receive_messages(status_from_checks: :passed, latest_checked_at: checked_at)
-
-      audit.update_from_checks
-      expect(audit.checked_at).to be_within(1.second).of(checked_at)
-    end
-
     it "calls set_current_audit! on site when not pending" do
-      allow(audit).to receive_messages(status_from_checks: :passed, latest_checked_at: 1.hour.ago)
+      allow(audit).to receive_messages(status_from_checks: :passed)
 
       expect(audit.site).to receive(:set_current_audit!)
       audit.update_from_checks
     end
 
     it "does not call set_current_audit! on site when pending" do
-      allow(audit).to receive_messages(status_from_checks: :pending, latest_checked_at: nil)
+      allow(audit).to receive_messages(status_from_checks: :pending)
 
       expect(audit.site).not_to receive(:set_current_audit!)
       audit.update_from_checks
@@ -205,42 +158,50 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#check_status(name)" do
-    subject(:check_status) { audit.check_status(name) }
+  describe "after a check has completed" do
+    let(:audit) { create(:audit) }
 
-    let(:audit) { build(:audit) }
-    let(:name) { Check.names.first }
-
-    context "when check has not run" do
-      before do
-        allow(audit).to receive(name).and_return(nil)
-      end
-
-      it "returns pending" do
-        expect(check_status.pending?).to be true
-      end
+    it "reschedules a ProcessAuditJob with itself" do
+      expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
 
-    context "when check has failed" do
+    context "when there are no jobs left" do
       before do
-        check = instance_double(Check.types[name].name, status: :failed)
-        allow(audit).to receive(name).and_return(check)
+        allow(audit.checks).to receive(:remaining).and_return []
       end
 
-      it "returns failed" do
-        expect(check_status.failed?).to be true
+      it "does not enqueue a new ProcessAuditJob" do
+        expect { audit.after_check_completed(nil) }.not_to enqueue_job(ProcessAuditJob)
+      end
+
+      it "updates its checked_at timestamp" do
+        freeze_time do
+          expect { audit.after_check_completed(nil) }
+            .to change(audit, :checked_at)
+                  .from(nil)
+                  .to(Time.current)
+        end
       end
     end
+  end
 
-    context "when check has passed" do
-      before do
-        check = instance_double(Check.types[name].name, status: :passed)
-        allow(audit).to receive(name).and_return(check)
-      end
+  describe "abort_dependent_checks!" do
+    let(:audit) { create(:audit, :without_checks) }
 
-      it "returns true" do
-        expect(check_status.passed?).to be true
-      end
+    let(:original_check) { create(:check, :reachable, :failed, audit: audit) }
+    let(:dependent_check) { create(:check, :accessibility_mention, :pending, audit: audit) }
+
+    before do
+      allow(dependent_check)
+        .to receive(:depends_on?)
+              .with(original_check.type)
+              .and_return true
+    end
+
+    it "aborts any check that depends on the failed one" do
+      expect { audit.abort_dependent_checks!(original_check) }
+        .to change(dependent_check, :current_state)
+              .from("pending").to("failed")
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_07_100904) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_11_134440) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,23 +28,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_100904) do
     t.index ["url"], name: "index_audits_on_url"
   end
 
+  create_table "check_transitions", force: :cascade do |t|
+    t.string "to_state", null: false
+    t.json "metadata", default: {}
+    t.integer "sort_key", null: false
+    t.integer "check_id", null: false
+    t.boolean "most_recent", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["check_id", "most_recent"], name: "index_check_transitions_parent_most_recent", unique: true, where: "most_recent"
+    t.index ["check_id", "sort_key"], name: "index_check_transitions_parent_sort", unique: true
+  end
+
   create_table "checks", force: :cascade do |t|
     t.bigint "audit_id", null: false
     t.string "type", null: false
-    t.string "status", null: false
-    t.datetime "checked_at"
     t.jsonb "data", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "priority", default: 100, null: false
-    t.string "error_type"
-    t.text "error_message"
-    t.string "error_backtrace", default: [], array: true
-    t.datetime "retry_at"
     t.integer "retry_count", default: 0, null: false
-    t.datetime "run_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["audit_id"], name: "index_checks_on_audit_id"
-    t.index ["status", "run_at"], name: "index_checks_on_status_and_run_at"
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
@@ -120,6 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_100904) do
   end
 
   add_foreign_key "audits", "sites"
+  add_foreign_key "check_transitions", "checks"
   add_foreign_key "checks", "audits"
   add_foreign_key "sessions", "users"
   add_foreign_key "site_tags", "sites"

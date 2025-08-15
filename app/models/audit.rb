@@ -32,36 +32,57 @@ class Audit < ApplicationRecord
     Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
   end
 
-  def check_status(check)
-    (send(check)&.status || :pending).to_s.inquiry
+  def check_for(identifier)
+    send(identifier)
+  end
+
+  def check_completed?(identifier)
+    check_for(identifier).completed?
   end
 
   def create_checks
     all_checks.select(&:new_record?).each(&:save)
   end
 
-  def next_check
-    checks.pending.first ||
-    checks.to_retry.first ||
-    checks.blocked.reject(&:blocked?).first
+  def all_check_states
+    all_checks.map(&:current_state)
   end
 
   def status_from_checks
-    if all_checks.any?(&:new_record?)
-       :pending
-    elsif (check_statuses = checks.collect(&:status).uniq).one?
-       check_statuses.first.to_sym
+    states = all_check_states
+
+    if states.uniq.one?
+      states.first
+    elsif states.include?("pending")
+      :pending
     else
-       :mixed
+      :mixed
     end
   end
 
-  def latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-
   def update_from_checks
     transaction do
-      update(status: status_from_checks, checked_at: latest_checked_at)
+      update(status: status_from_checks)
       site.set_current_audit! unless pending?
     end
+  end
+
+  def complete?
+    checks.remaining.none?
+  end
+
+  def after_check_completed(check)
+    if complete?
+      update!(checked_at: Time.zone.now)
+    else
+      ProcessAuditJob.perform_later(self)
+    end
+  end
+
+  def abort_dependent_checks!(check)
+    checks
+      .remaining
+      .filter { |other_check| other_check.depends_on?(check.to_requirement) }
+      .each   { |other_check| other_check.transition_to!(:failed) }
   end
 end
