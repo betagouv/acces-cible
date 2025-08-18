@@ -6,7 +6,7 @@ RSpec.describe Checks::Reachable do
   let(:redirect_url) { "https://example.org" }
   let(:audit) { instance_double(Audit, url: original_url, update: true) }
   let(:root_page) { instance_double(Page) }
-  let(:site) { instance_double(Site) }
+  let(:site) { build(:site) }
 
   before do
     allow(check).to receive_messages(audit:, root_page:, site:)
@@ -38,7 +38,7 @@ RSpec.describe Checks::Reachable do
 
     before do
       allow(root_page).to receive_messages(success?: reachable, redirected?: redirects, title: "Page title", status: 200)
-      allow(site).to receive_messages(name: nil, update: true)
+      allow(site).to receive_messages(update: true)
     end
 
     context "when the site is reachable" do
