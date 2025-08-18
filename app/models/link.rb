@@ -38,8 +38,8 @@ Link = Data.define(:href, :text) do
   delegate :normalize, to: :class
   delegate :hash, to: :href
 
-  def initialize(href:, text: "")
-    super(href: normalize(href).to_s, text: text&.squish || "")
+  def initialize(href:, text: EMPTY_STRING)
+    super(href: normalize(href).to_s, text: text&.squish || EMPTY_STRING)
   end
 
   def to_str = href
