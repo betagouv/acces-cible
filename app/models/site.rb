@@ -40,12 +40,7 @@ class Site < ApplicationRecord
     end
   end
 
-  def url_without_scheme(url: audit.url)
-    return "" unless url
-
-    parsed_url = Link.parse(url)
-    [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
-  end
+  def url_without_scheme = Link.url_without_scheme_and_www(audit.url)
 
   def name_with_fallback = name.presence || url_without_scheme
   alias to_title name_with_fallback

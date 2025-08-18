@@ -110,6 +110,26 @@ RSpec.describe Link do
     end
   end
 
+  describe ".url_without_scheme_and_www" do
+    subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
+
+    context "when path is empty" do
+      let(:url) { "https://www.example.com/" }
+
+      it "returns hostname only" do
+        expect(url_without_scheme_and_www).to eq("example.com")
+      end
+    end
+
+    context "when path is not empty" do
+      let(:url) { "https://www.example.com/path/to/page#section?query=string" }
+
+      it "returns hostname and path" do
+        expect(url_without_scheme_and_www).to eq("example.com/path/to/page")
+      end
+    end
+  end
+
   describe ".from(source)" do
     subject(:from) { described_class.from(source) }
 

@@ -33,6 +33,17 @@ Link = Data.define(:href, :text) do
       query = uri.query.nil? ? EMPTY_STRING : "?#{uri.query}"
       Addressable::URI.join(uri.origin, path, query).display_uri.to_s
     end
+
+    def url_without_scheme_and_www(href)
+      return EMPTY_STRING unless href
+
+      parsed_url = parse(href)
+      hostname = parsed_url.hostname.to_s.gsub(/\Awww\./, EMPTY_STRING)
+      path = parsed_url.path == SLASH ? nil : parsed_url.path
+      [hostname, path].compact.join(nil)
+    rescue Link::InvalidUriError
+      ""
+    end
   end
 
   delegate :normalize, to: :class
