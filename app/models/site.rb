@@ -47,9 +47,9 @@ class Site < ApplicationRecord
     [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
   end
 
-  def name = super.presence || url_without_scheme
-  alias to_title name
-  alias to_s name
+  def name_with_fallback = name.presence || url_without_scheme
+  alias to_title name_with_fallback
+  alias to_s name_with_fallback
 
   def tags_attributes=(attributes)
     return if (name = attributes[:name]).blank?
