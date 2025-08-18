@@ -82,4 +82,8 @@ class Site < ApplicationRecord
       update_slug!
     end
   end
+
+  def tags_list
+    tags.collect(&:name).join(", ")
+  end
 end
