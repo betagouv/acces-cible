@@ -56,6 +56,7 @@ class Check < ApplicationRecord
 
   scope :prioritized, -> { order(:priority) }
   scope :remaining, -> { in_state(:pending, :blocked) }
+  scope :errored, -> { in_state(:failed) }
 
   broadcasts_refreshes_to ->(check) { "sites" }
 
