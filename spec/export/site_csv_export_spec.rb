@@ -15,8 +15,8 @@ RSpec.describe SiteCsvExport do
 
     it "generates correct headers" do
       expected_headers = [
-        Site.human_attribute_name(:url),
-        Site.human_attribute_name(:tags),
+        Audit.human_attribute_name(:url),
+        Tag.human_attribute_name(:all),
         Check.human_attribute_name(:checked_at),
         Checks::Reachable.human_attribute_name(:type),
         Checks::LanguageIndication.human_attribute_name(:type),
