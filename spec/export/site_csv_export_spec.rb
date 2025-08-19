@@ -15,18 +15,18 @@ RSpec.describe SiteCsvExport do
 
     it "generates correct headers" do
       expected_headers = [
-        Audit.human_attribute_name(:url),
-        Tag.human_attribute_name(:all),
-        Check.human_attribute_name(:checked_at),
-        Checks::Reachable.human_attribute_name(:type),
-        Checks::LanguageIndication.human_attribute_name(:type),
-        Checks::AccessibilityMention.human_attribute_name(:type),
-        Checks::FindAccessibilityPage.human_attribute_name(:type),
-        Checks::AnalyzeAccessibilityPage.human_attribute_name(:compliance_rate),
-        Checks::AnalyzeAccessibilityPage.human_attribute_name(:audit_date),
-        Checks::AnalyzeAccessibilityPage.human_attribute_name(:audit_update_date),
-        Checks::AccessibilityPageHeading.human_attribute_name(:type),
-        Checks::RunAxeOnHomepage.human_attribute_name(:success_rate)
+        Audit.human(:url),
+        Tag.human(:all),
+        Check.human(:checked_at),
+        Checks::Reachable.human(:type),
+        Checks::LanguageIndication.human(:type),
+        Checks::AccessibilityMention.human(:type),
+        Checks::FindAccessibilityPage.human(:type),
+        Checks::AnalyzeAccessibilityPage.human(:compliance_rate),
+        Checks::AnalyzeAccessibilityPage.human(:audit_date),
+        Checks::AnalyzeAccessibilityPage.human(:audit_update_date),
+        Checks::AccessibilityPageHeading.human(:type),
+        Checks::RunAxeOnHomepage.human(:success_rate)
       ]
 
       expect(headers).to eq(expected_headers)
