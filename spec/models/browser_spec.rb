@@ -226,52 +226,6 @@ RSpec.describe Browser do
       end
     end
 
-    context "when Ferrum::TimeoutError is raised" do
-      before do
-        allow(instance).to receive(:create_page).and_invoke(
-          -> { raise Ferrum::TimeoutError.new("Timeout") },
-          -> { page }
-        )
-        allow(instance).to receive(:restart!)
-      end
-
-      it "logs a warning message and calls restart" do
-        instance.send(:with_page) { |p| "result" }
-
-        expect(Rails.logger).to have_received(:warn)
-        expect(instance).to have_received(:restart!)
-      end
-
-      it "retries and succeeds on second attempt" do
-        result = instance.send(:with_page) { |p| "retry_success" }
-        expect(result).to eq("retry_success")
-        expect(instance).to have_received(:create_page).twice
-      end
-    end
-
-    context "when Ferrum::PendingConnectionsError is raised" do
-      before do
-        allow(instance).to receive(:create_page).and_invoke(
-          -> { raise Ferrum::PendingConnectionsError.new("Pending connections") },
-          -> { page }
-        )
-        allow(instance).to receive(:restart!)
-      end
-
-      it "logs a warning message and calls restart" do
-        instance.send(:with_page) { |p| "result" }
-
-        expect(Rails.logger).to have_received(:warn)
-        expect(instance).to have_received(:restart!)
-      end
-
-      it "retries and succeeds on second attempt" do
-        result = instance.send(:with_page) { |p| "retry_success" }
-        expect(result).to eq("retry_success")
-        expect(instance).to have_received(:create_page).twice
-      end
-    end
-
     context "when other Ferrum::Error is raised" do
       before do
         allow(instance).to receive(:create_page).and_raise(Ferrum::Error.new("Generic error"))

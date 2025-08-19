@@ -112,7 +112,7 @@ class Browser
     begin
       page = create_page
       yield(page)
-    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError, Ferrum::DeadBrowserError => error
+    rescue Ferrum::DeadBrowserError => error
       Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
       restart!
       retry
