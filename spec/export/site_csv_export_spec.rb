@@ -25,8 +25,8 @@ RSpec.describe SiteCsvExport do
         Checks::AnalyzeAccessibilityPage.human_attribute_name(:compliance_rate),
         Checks::AnalyzeAccessibilityPage.human_attribute_name(:audit_date),
         Checks::AnalyzeAccessibilityPage.human_attribute_name(:audit_update_date),
-        Checks::RunAxeOnHomepage.human_attribute_name(:success_rate),
-        Checks::AccessibilityPageHeading.human_attribute_name(:type)
+        Checks::AccessibilityPageHeading.human_attribute_name(:type),
+        Checks::RunAxeOnHomepage.human_attribute_name(:success_rate)
       ]
 
       expect(headers).to eq(expected_headers)
@@ -95,8 +95,8 @@ RSpec.describe SiteCsvExport do
       expect(data[7]).to eq("85,5%") # Compliance rate (from factory data)
       expect(data[8]).to eq("2023-06-15") # Audit date (from factory data)
       expect(data[9]).to eq("2025-08-20") # Audit update date (from factory data)
-      expect(data[10]).to eq("94,83%") # Axe success rate: (50+5)/(50+5+3) * 100 = 94.83%
-      expect(data[11]).to eq("13/14") # Accessibility page heading score: based on expected headings count
+      expect(data[10]).to eq("13/14") # Accessibility page heading score: based on expected headings count
+      expect(data[11]).to eq("94,83%") # Axe success rate: (50+5)/(50+5+3) * 100 = 94.83%
     end
   end
 end
