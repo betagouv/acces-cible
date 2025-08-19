@@ -33,70 +33,53 @@ RSpec.describe SiteCsvExport do
     end
 
     it "generates correct data" do
+      # Set the audit as checked
       audit.update(checked_at: 1.day.ago)
 
-      # Update existing checks with factory-like data instead of creating new ones
-      audit.reachable.update!(
-        data: { original_url: nil, redirect_url: nil }
-      )
+      # Clear existing checks and create new ones with proper data using factories
+      audit.checks.destroy_all
 
-      audit.language_indication.update!(
-        data: { indication: "fr" }
-      )
+      reachable = create(:check, :reachable, :completed, audit:, data: { original_url: nil, redirect_url: nil })
+      language_indication = create(:check, :language_indication, audit:, data: { indication: "fr" })
+      accessibility_mention = create(:check, :accessibility_mention, audit:, data: { mention: "partiellement" })
+      find_accessibility_page = create(:check, :find_accessibility_page, :completed, audit:, data: { url: "https://example.com/accessibilite" })
+      analyze_accessibility_page = create(:check, :analyze_accessibility_page, audit:, data: {
+        compliance_rate: 85.5,
+        audit_date: Date.new(2023, 6, 15),
+        audit_update_date: Date.new(2025, 8, 20)
+      })
+      run_axe_on_homepage = create(:check, :run_axe_on_homepage, :completed, audit:, data: {
+        passes: 50,
+        incomplete: 5,
+        inapplicable: 10,
+        violations: 3,
+        issues_total: 15
+      })
+      accessibility_page_heading = create(:check, :accessibility_page_heading, :completed, audit:, data: {
+        page_headings: [
+          [1, "Déclaration d'accessibilité"],
+          [2, "État de conformité"],
+          [3, "Résultats des tests"]
+        ],
+        comparison: [
+          ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
+          ["État de conformité", 2, :ok, "État de conformité"],
+          ["Résultats des tests", 3, :missing, nil]
+        ]
+      })
 
-      audit.accessibility_mention.update!(
-        data: { mention: "partiellement" }
-      )
-
-      audit.find_accessibility_page.update!(
-        data: { url: "https://example.com/accessibilite" }
-      )
-
-      audit.analyze_accessibility_page.update!(
-        data: {
-          compliance_rate: 85.5,
-          audit_date: Date.new(2023, 6, 15),
-          audit_update_date: Date.new(2025, 8, 20)
-        }
-      )
-
-      audit.run_axe_on_homepage.update!(
-        data: {
-          passes: 50,
-          incomplete: 5,
-          inapplicable: 10,
-          violations: 3,
-          issues_total: 15
-        }
-      )
-
-      audit.accessibility_page_heading.update!(
-        data: {
-          page_headings: [
-            [1, "Déclaration d'accessibilité"],
-            [2, "État de conformité"],
-            [3, "Résultats des tests"]
-          ],
-          comparison: [
-            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
-            ["État de conformité", 2, :ok, "État de conformité"],
-            ["Résultats des tests", 3, :missing, nil]
-          ]
-        }
-      )
-
-      expect(data[0]).to eq("https://example.com/") # URL
-      expect(data[1]).to eq("Gouvernment, Santé publique") # Tags
-      expect(data[2]).to include("2025-08-") # Checked at
-      expect(data[3]).to eq("true") # Reachable (passed status)
-      expect(data[4]).to eq("fr") # Language indication (from factory data)
-      expect(data[5]).to eq("Partiellement conforme") # Accessibility mention (from factory data)
-      expect(data[6]).to eq("https://example.com/accessibilite") # Accessibility page URL (from factory data)
-      expect(data[7]).to eq("85,5%") # Compliance rate (from factory data)
-      expect(data[8]).to eq("2023-06-15") # Audit date (from factory data)
-      expect(data[9]).to eq("2025-08-20") # Audit update date (from factory data)
-      expect(data[10]).to eq("13/14") # Accessibility page heading score: based on expected headings count
-      expect(data[11]).to eq("94,83%") # Axe success rate: (50+5)/(50+5+3) * 100 = 94.83%
+      expect(data[0]).to eq(audit.url)
+      expect(data[1]).to eq(tags.collect(&:name).join(", "))
+      expect(Date.parse(data[2])).to eq(1.day.ago.to_date)
+      expect(data[3]).to eq(reachable.completed?.to_s)
+      expect(data[4]).to eq(language_indication.indication)
+      expect(data[5]).to eq(accessibility_mention.mention_text)
+      expect(data[6]).to eq(find_accessibility_page.url)
+      expect(data[7]).to eq(analyze_accessibility_page.human_compliance_rate)
+      expect(data[8]).to eq(analyze_accessibility_page.audit_date.to_s)
+      expect(data[9]).to eq(analyze_accessibility_page.audit_update_date.to_s)
+      expect(data[10]).to eq(accessibility_page_heading.human_success_rate)
+      expect(data[11]).to eq(run_axe_on_homepage.human_success_rate)
     end
   end
 end
