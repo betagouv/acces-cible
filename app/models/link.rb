@@ -1,8 +1,7 @@
+# frozen_string_literal: true
+
 Link = Data.define(:href, :text) do
   include Comparable
-
-  SLASH = "/".freeze
-  EMPTY_STRING = "".freeze
 
   class << self
     def from(source)
@@ -25,13 +24,24 @@ Link = Data.define(:href, :text) do
       return uri if uri.relative?
 
       path = uri.path
-      unless path == SLASH
-        path = File.expand_path(uri.path, SLASH)
-        path = path[1..-1] if path.start_with?(SLASH)
-        path += SLASH if uri.path.end_with?(SLASH) || File.extname(path).empty?
+      unless path == "/"
+        path = File.expand_path(uri.path, "/")
+        path = path[1..-1] if path.start_with?("/")
+        path += "/" if uri.path.end_with?("/") || File.extname(path).empty?
       end
-      query = uri.query.nil? ? EMPTY_STRING : "?#{uri.query}"
+      query = uri.query.nil? ? "" : "?#{uri.query}"
       Addressable::URI.join(uri.origin, path, query).display_uri.to_s
+    end
+
+    def url_without_scheme_and_www(href)
+      return "" unless href
+
+      parsed_url = parse(href)
+      hostname = parsed_url.hostname.to_s.gsub(/\Awww\./, "")
+      path = parsed_url.path == "/" ? nil : parsed_url.path
+      [hostname, path].compact.join(nil)
+    rescue Link::InvalidUriError
+      ""
     end
   end
 

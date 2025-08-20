@@ -7,7 +7,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/sites/show.html.erb",
-      "line": 24,
+      "line": 30,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(partial => current_user.team.sites.friendly.find(params.expect(:site_id)).audit!.all_checks, { :as => :check })",
       "render_path": [
@@ -41,7 +41,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/application_record.rb",
-      "line": 33,
+      "line": 34,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "update_all(\"#{\"#{association}_count\"} = (SELECT count(*) FROM #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)} WHERE #{(reflect_on_association(association).through_reflection.klass.table_name or reflect_on_association(association).through_reflection.join_table)}.#{(reflect_on_association(association).through_reflection.foreign_key or reflect_on_association(association).through_reflection.association_foreign_key)} = #{table_name}.#{primary_key})\")",
       "render_path": null,
@@ -60,13 +60,13 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "c2c45c9376fab69f25eab4c111bc888477b15e78fef3df9ba4251f468bd4332f",
+      "fingerprint": "7ddb9cedcb2dc187bc5b3ae5fc0d5569413f5618fc4d0b7c456cc317a535d09e",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/sites/_site.html.erb",
       "line": 4,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to((Unresolved Model).new.url_without_scheme.truncate(35, :separator => /\\W/), (Unresolved Model).new.url, :target => :_blank, :title => (if ((Unresolved Model).new.url_without_scheme.length > 35) then\n  (Unresolved Model).new.url_without_scheme\nelse\n  nil\nend))",
+      "code": "link_to((Unresolved Model).new.url_without_scheme_and_www.truncate(35, :separator => /\\W/), (Unresolved Model).new.url, :target => :_blank, :title => (if ((Unresolved Model).new.url_without_scheme_and_www.length > 35) then\n  (Unresolved Model).new.url_without_scheme_and_www\nelse\n  nil\nend))",
       "render_path": [
         {
           "type": "template",
@@ -137,5 +137,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "7.0.2"
+  "brakeman_version": "7.1.0"
 }

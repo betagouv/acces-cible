@@ -12,7 +12,7 @@ class Site < ApplicationRecord
 
   after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
 
-  friendly_id :url_without_scheme, use: [:slugged, :history, :scoped], scope: :team_id
+  friendly_id :url_without_scheme_and_www, use: [:slugged, :history, :scoped], scope: :team_id
 
   delegate :url, to: :audit, allow_nil: true
 
@@ -40,14 +40,9 @@ class Site < ApplicationRecord
     end
   end
 
-  def url_without_scheme(url: audit.url)
-    return "" unless url
+  def url_without_scheme_and_www = Link.url_without_scheme_and_www(audit.url)
 
-    parsed_url = Link.parse(url)
-    [parsed_url.hostname, parsed_url.path == "/" ? nil : parsed_url.path].compact.join(nil)
-  end
-
-  def name_with_fallback = name.presence || url_without_scheme
+  def name_with_fallback = name.presence || url_without_scheme_and_www
   alias to_title name_with_fallback
   alias to_s name_with_fallback
 
@@ -57,7 +52,7 @@ class Site < ApplicationRecord
     tags << team.tags.find_or_create_by(name:)
   end
 
-  def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme.parameterize) || super
+  def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme_and_www.parameterize) || super
 
   def update_slug! = tap { self.slug = nil; friendly_id }.save!
 

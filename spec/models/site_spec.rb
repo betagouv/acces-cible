@@ -79,35 +79,13 @@ RSpec.describe Site do
     end
   end
 
-  describe "#url_without_scheme" do
-    let(:site) { build(:site, url:) }
-
-    before do
-      allow(site).to receive(:url).and_return(url)
-    end
-
-    context "when path is empty" do
-      it "returns hostname only" do
-        expect(site.url_without_scheme).to eq("example.com")
-      end
-    end
-
-    context "when path is not empty" do
-      let(:url) { "https://example.com/path/" }
-
-      it "returns hostname and path" do
-        expect(site.url_without_scheme).to eq("example.com/path/")
-      end
-    end
-  end
-
   describe "friendly_id" do
     let(:url) { "https://example.com/path?query=1" }
     let(:site) { create(:site, url:) }
 
-    it "generates slug from url_without_scheme" do
+    it "generates slug from url_without_scheme_and_www" do
       expect(site.slug).to be_present
-      expect(site.slug).to eq(site.url_without_scheme.parameterize)
+      expect(site.slug).to eq(site.url_without_scheme_and_www.parameterize)
     end
 
     it "maintains history of slugs" do
