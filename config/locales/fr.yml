@@ -88,6 +88,7 @@ fr:
         checked_at: Executé le
         status: État
         new: "Nouvelle vérification"
+        url: URL
         count:
           zero: Aucune vérification
           one: Une vérification

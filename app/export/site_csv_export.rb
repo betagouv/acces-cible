@@ -1,8 +1,8 @@
 class SiteCsvExport < CsvExport
   def attributes
     {
-      human(:url) => :url,
-      human(:tags) => :tags_list,
+      Audit.human(:url) => :url,
+      Tag.human(:all) => :tags_list,
       Check.human(:checked_at) => [:audit, :checked_at],
       Checks::Reachable.human(:type) => [:audit, :reachable, :completed?],
       Checks::LanguageIndication.human(:type) => [:audit, :language_indication, :indication],
