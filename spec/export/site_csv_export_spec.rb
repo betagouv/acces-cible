@@ -68,7 +68,7 @@ RSpec.describe SiteCsvExport do
 
       expect(data[0]).to eq(audit.url)
       expect(data[1]).to eq(tags.collect(&:name).join(", "))
-      expect(Date.parse(data[2])).to eq(1.day.ago.to_date)
+      expect(data[2].to_date).to eq(audit.checked_at.to_date)
       expect(data[3]).to eq(reachable.completed?.to_s)
       expect(data[4]).to eq(language_indication.indication)
       expect(data[5]).to eq(accessibility_mention.mention_text)
