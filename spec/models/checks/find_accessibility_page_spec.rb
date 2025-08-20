@@ -18,8 +18,8 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#custom_badge_text" do
-    it "returns :link_to { name: site.name } when url is present" do
-      expect(check).to receive(:human).with(:link_to, { name: nil })
+    it "returns :link_to_page when url is present" do
+      expect(check).to receive(:human).with(:link_to_page)
       check.url = "#{root_url}/accessibility"
       check.send(:custom_badge_text)
     end

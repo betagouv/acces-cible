@@ -8,7 +8,7 @@ module Checks
 
     def found? = url.present?
 
-    def custom_badge_text = found? ? human(:link_to, name: site&.name) : human(:not_found)
+    def custom_badge_text = found? ? human(:link_to_page) : human(:not_found)
     def custom_badge_status = found? ? :success : :error
     def custom_badge_link = url
 

@@ -156,7 +156,7 @@ fr:
         type: Déclaration d'accessibilité
         table_header: Déclaration
         view_page: "Voir la déclaration"
-        link_to: "Déclaration d'accessibilité de %{name}"
+        link_to_page: "Déclaration d'accessibilité"
         not_found: Non trouvée
       checks/language_indication:
         type: Indication de la langue
