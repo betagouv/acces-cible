@@ -74,6 +74,13 @@ module DsfrFormBuilderExtension
     end
   end
 
+  # Override to support the `selected` option for select tags
+  # TODO: Upstream the fix to the gem
+  def dsfr_select_tag(attribute, choices, opts)
+    opts[:class] = @template.class_names("fr-select", opts[:class])
+    select(attribute, choices, { include_blank: opts.delete(:include_blank), selected: opts.delete(:selected) }, **opts)
+  end
+
   private
 
   def selected?(method, value)
