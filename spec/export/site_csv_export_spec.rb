@@ -4,7 +4,6 @@ RSpec.describe SiteCsvExport do
   let(:team) { create(:team) }
   let(:tags) { ["Gouvernment", "Santé publique"].map { |name| create(:tag, name:, team:) } }
   let(:site) { create(:site, :checked, url: "https://example.com", team:, tags:) }
-  let(:audit) { site.audit }
   let(:export) { described_class.new(Site.where(id: site.id)) }
 
   describe "#to_csv" do
@@ -33,6 +32,8 @@ RSpec.describe SiteCsvExport do
     end
 
     it "generates correct data" do
+      # Ensure audit data is fresh
+      audit = site.audit.reload
 
       # Clear existing checks and create new ones with proper data using factories
       audit.checks.destroy_all
