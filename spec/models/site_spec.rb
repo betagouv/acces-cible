@@ -83,9 +83,9 @@ RSpec.describe Site do
     let(:url) { "https://example.com/path?query=1" }
     let(:site) { create(:site, url:) }
 
-    it "generates slug from url_without_scheme" do
+    it "generates slug from url_without_scheme_and_www" do
       expect(site.slug).to be_present
-      expect(site.slug).to eq(site.url_without_scheme.parameterize)
+      expect(site.slug).to eq(site.url_without_scheme_and_www.parameterize)
     end
 
     it "maintains history of slugs" do
