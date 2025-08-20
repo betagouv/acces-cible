@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe SiteCsvExport do
   let(:team) { create(:team) }
   let(:tags) { ["Gouvernment", "Santé publique"].map { |name| create(:tag, name:, team:) } }
-  let(:site) { create(:site, url: "https://example.com", team:, tags:) }
+  let(:site) { create(:site, :checked, url: "https://example.com", team:, tags:) }
   let(:audit) { site.audit }
   let(:export) { described_class.new(Site.where(id: site.id)) }
 
@@ -33,8 +33,6 @@ RSpec.describe SiteCsvExport do
     end
 
     it "generates correct data" do
-      # Set the audit as checked
-      audit.update(checked_at: 1.day.ago)
 
       # Clear existing checks and create new ones with proper data using factories
       audit.checks.destroy_all
