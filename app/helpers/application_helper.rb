@@ -32,13 +32,17 @@ module ApplicationHelper
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc
     link_params = params.permit(:page, search: {}).merge(sort: { param => direction })
-    options[:title] ||= t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
+    link_text = t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
+    options[:title] ||= link_text
+    options["aria-label"] ||= link_text
+
     if current_sort.present?
       arrow = [:arrow, direction == :asc ? :down : :up]
     else
       arrow = [:arrow, :up, :down]
     end
-    "#{text} #{link_icon(arrow, text, { params: link_params }, options.merge(btn: :sort, size: :sm, sr_only: true, line: true))}".html_safe
+
+    "#{text} #{link_icon(arrow, "", { params: link_params }, options.merge(btn: :sort, size: :sm, line: true))}".html_safe
   end
 
   def set_focus(selector)

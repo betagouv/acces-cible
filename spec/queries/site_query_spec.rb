@@ -8,42 +8,43 @@ RSpec.describe SiteQuery do
   describe "#order_by" do
     subject(:result) { query.order_by(params) }
 
-    context "when sort[url]=asc" do
-      let(:request) { { sort: { url: :asc } } }
-
-      # Create audits with domains that will sort alphabetically
-      let!(:apple)  { create(:audit, :passed, :current, url: "https://apple.com") }
-      let!(:banana) { create(:audit, :passed, :current, url: "https://banana.org") }
+    context "when ordering by url" do
+      let!(:apple) { create(:audit, :passed, :current, url: "https://apple.com") }
+      let!(:app) { create(:audit, :passed, :current, url: "http://www.app.apple.com") }
+      let!(:banana) { create(:audit, :passed, :current, url: "https://www.banana.org") }
+      let!(:blog) { create(:audit, :passed, :current, url: "http://blog.beta.com") }
       let!(:carrot) { create(:audit, :passed, :current, url: "https://carrot.bio") }
-      let(:expected_ids) { [apple.site_id, banana.site_id, carrot.site_id] }
 
-      it "sorts sites by their URLs in ascending order" do
-        expect(result.ids).to eq(expected_ids)
+      let(:expected_ids) do
+        [
+          app.site_id,
+          apple.site_id,
+          banana.site_id,
+          blog.site_id,
+          carrot.site_id,
+        ]
       end
 
-      it "ignores protocol and www prefix" do
-        create(:audit, :passed, site: banana.site, url: "http://www.banana.org")
+      context "when sort[url]=asc" do
+        let(:request) { { sort: { url: :asc } } }
 
-        expect(result.ids).to eq(expected_ids)
+        it "sorts sites by their URLs in ascending order" do
+          expect(result.ids).to eq(expected_ids)
+        end
+
+        it "handles multiple different URLs for the same site" do
+          create(:audit, :passed, site: apple.site, url: "https://support.apple.com")
+
+          expect(result.ids).to eq(expected_ids)
+        end
       end
 
-      it "handles multiple different URLs for the same site" do
-        create(:audit, :passed, site: apple.site, url: "https://support.apple.com")
+      context "when sort[url]=desc" do
+        let(:request) { { sort: { url: :desc } } }
 
-        expect(result.ids).to eq(expected_ids)
-      end
-    end
-
-    context "when sort[url]=desc" do
-      let(:request) { { sort: { url: :desc } } }
-
-      let!(:apple)  { create(:audit, :passed, :current, url: "https://apple.com") }
-      let!(:banana) { create(:audit, :passed, :current, url: "https://banana.org") }
-      let!(:carrot) { create(:audit, :passed, :current, url: "https://carrot.bio") }
-      let(:expected_ids) { [apple.site_id, banana.site_id, carrot.site_id] }
-
-      it "sorts sites by their URLs in descending order" do
-        expect(result.ids).to eq(expected_ids.reverse)
+        it "sorts sites by their URLs in descending order" do
+          expect(result.ids).to eq(expected_ids.reverse)
+        end
       end
     end
 
