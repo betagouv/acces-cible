@@ -113,6 +113,22 @@ RSpec.describe Link do
   describe ".url_without_scheme_and_www" do
     subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
 
+    context "when subdomain is www" do
+      let(:url) { "https://www.domain.com/" }
+
+      it "returns the hostname without www" do
+        expect(url_without_scheme_and_www).to eq("domain.com")
+      end
+    end
+
+    context "when subdomain is not www" do
+      let(:url) { "https://sub.domain.com/" }
+
+      it "returns the hostname with subdomain" do
+        expect(url_without_scheme_and_www).to eq("sub.domain.com")
+      end
+    end
+
     context "when path is empty" do
       let(:url) { "https://www.example.com/" }
 
