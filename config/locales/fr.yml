@@ -111,10 +111,11 @@ fr:
           other: "%{count} contrôles"
       check/status:
         pending: Planifié
-        running: En cours
-        completed: Effectué
+        ready: Prêt
         blocked: Inapplicable
+        running: En cours
         failed: Échoué
+        completed: Effectué
       checks/accessibility_mention:
         type: Mention du niveau d'accessibilité
         table_header: Mention
