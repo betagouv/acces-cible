@@ -103,6 +103,11 @@ group :development do
   # Open pry when using rails console
   gem "better_errors"
   gem "binding_of_caller"
+
+  # Profile app in development
+  gem "rack-mini-profiler"
+  gem "memory_profiler"
+  gem "stackprof"
 end
 
 group :test do
