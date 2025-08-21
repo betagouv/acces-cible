@@ -54,4 +54,14 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Detect N+1 in test environment if ENV["STRICT_LOADING"] is set to "TRUE"
+  # Enabled for all the models
+  # N+1 queries only
+  # Raise error on N+1
+  if ENV["STRICT_LOADING"].present? && ENV["STRICT_LOADING"] == "TRUE"
+    config.active_record.strict_loading_by_default = true
+    config.active_record.strict_loading_mode = :n_plus_one_only
+    config.active_record.action_on_strict_loading_violation = :raise
+  end
 end
