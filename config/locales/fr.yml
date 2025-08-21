@@ -264,6 +264,8 @@ fr:
       title: Mentions légales
     plan:
       title: Plan du site
+    display_mode:
+      title: Paramètres d’affichage
   sessions:
     new:
       title: Connexion à Accès Cible

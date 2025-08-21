@@ -31,6 +31,7 @@ Rails.application.routes.draw do
     get "mentions-legales", as: :mentions_legales
     get "cookies", as: :cookies
     get "donnees-personnelles", as: :donnees_personnelles
+    get "display-mode", as: :display_mode
   end
 
   # Error pages
