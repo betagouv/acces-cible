@@ -75,7 +75,7 @@ class Check < ApplicationRecord
   def human_status = Check.human("status.#{state_machine.current_state}")
   def to_partial_path = model_name.i18n_key.to_s
   def root_page = @root_page ||= Page.new(url: audit.url)
-  def crawler = Crawler.new(audit.url)
+  def crawler(crawl_up_to: nil) = Crawler.new(audit.url, crawl_up_to:)
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def tooltip? = true
 
