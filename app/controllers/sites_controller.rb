@@ -72,7 +72,12 @@ class SitesController < ApplicationController
   private
 
   def set_site
-    @site = params[:id].present? ? current_user.team.sites.friendly.find(params.expect(:id)) : current_user.team.sites.build
+    @site = current_user
+              .team
+              .sites
+              .preloaded
+              .friendly
+              .find(params.expect(:id))
   end
 
   def set_sites
