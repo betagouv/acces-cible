@@ -48,7 +48,7 @@ class Browser
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
-  AXE_RULES = [
+  RGAA_AXE_RULES = [
     "aria-conditional-attr",
     "aria-deprecated-role",
     "aria-hidden-body",
@@ -103,7 +103,7 @@ class Browser
       locale = File.read(AXE_LOCALE_PATH)
       page.evaluate_async(<<~JS, PAGE_TIMEOUT)
         axe.configure({locale: #{locale} })
-        axe.run(document, { runOnly: { type: "rule", values: #{AXE_RULES} }, reporter: "v2"}).then(results => __f(results))
+        axe.run(document, { runOnly: { type: "rule", values: #{RGAA_AXE_RULES} }, reporter: "v2"}).then(results => __f(results))
       JS
     end
   end
