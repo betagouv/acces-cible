@@ -13,8 +13,9 @@ class AuditsController < ApplicationController
 
   # GET /sites/1/audits/1
   def show
-    @audit = @site.audits.find(params[:id])
+    @audit = @site.audits.with_check_transitions.find(params[:id])
     @title = @site.to_title
+
     render "sites/show"
   end
 
