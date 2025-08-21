@@ -1,0 +1,5 @@
+<%= turbo_frame_tag :modal do %>
+  <%= dsfr_modal title: page_title, html_attributes: { id: :dsfr_modal, data: { controller: :modal, action: "turbo:frame-load@window->modal#open" } } do %>
+    <%= yield %>
+  <% end %>
+<% end %>
