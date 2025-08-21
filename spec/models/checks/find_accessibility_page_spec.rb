@@ -97,6 +97,34 @@ RSpec.describe Checks::FindAccessibilityPage do
 
       expect(check.send(:find_page)).to be(true)
     end
+
+    ["NoMatchError", "CrawlLimitReachedError"].each do |error_class_name|
+      context "when find raises #{error_class_name}" do
+        let(:mock_error_class) { Class.new(StandardError) }
+
+        before do
+          # Create stub error class to avoid dependency on actual constructor parameters
+          stub_const("Crawler::#{error_class_name}", mock_error_class)
+          allow(crawler).to receive(:find).and_raise(mock_error_class.new("Test error"))
+        end
+
+        it "raises NonRetryableError" do
+          expect {
+            check.send(:find_page)
+          }.to raise_error(Check::NonRetryableError)
+        end
+
+        it "preserves the original exception as cause" do
+          expect {
+            check.send(:find_page)
+          }.to raise_error do |error|
+            expect(error).to be_a(Check::NonRetryableError)
+            expect(error.cause).to be_a(mock_error_class)
+            expect(error.cause.message).to eq("Test error")
+          end
+        end
+      end
+    end
   end
 
   describe "#accessibility_page?" do
