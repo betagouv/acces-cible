@@ -34,19 +34,21 @@ RSpec.describe Checks::LanguageIndication do
     subject(:badge_status) { check.send(:custom_badge_status) }
 
     {
-      nil => :error,
-      "" => :error,
-      "fr" => :success,
-      "FR" => :success,
-      "fr-FR" => :success,
-      "FR-CA" => :success,
-      "fr_FR" => :success,
-      "en" => :warning,
-      "es-ES" => :warning
-    }.each do |indication, status|
-      context "when indication is #{indication.inspect}" do
+      [nil, nil] => :error,
+      ["", nil] => :error,
+      ["fr", "fr"] => :success,
+      ["FR", "fr"] => :success,
+      ["fr_FR", "fr"] => :success,
+      ["fr-FR", "fr"] => :success,
+      ["FR-CA", "fr"] => :success,
+      ["en", "fr"] => :warning,
+      ["fr", "en"] => :warning,
+      ["es-ES", "es"] => :success
+    }.each do |(indication, detected_code), status|
+      context "when indication is #{indication.inspect} and detected_code is #{detected_code.inspect}" do
         it "returns :#{status}" do
           check.indication = indication
+          check.detected_code = detected_code
           expect(badge_status).to eq(status)
         end
       end

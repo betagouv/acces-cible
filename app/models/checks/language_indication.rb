@@ -6,10 +6,12 @@ module Checks
 
     def custom_badge_text = indication || human(:empty)
     def custom_badge_status
-      case indication
-      when nil, "" then :error
-      when /^(?:FR)(?:[_-][A-Z]{2})?$/i then :success
-      else :warning
+      if indication.nil? || indication.empty?
+        :error
+      elsif language_code == (detected_code || "fr") # Default value for old checks without detected_code
+        :success
+      else
+        :warning
       end
     end
 
