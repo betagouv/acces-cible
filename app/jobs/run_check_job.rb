@@ -1,13 +1,15 @@
 require "json/add/exception" # required to serialize errors as JSON
 
 class RunCheckJob < ApplicationJob
+  MAX_RETRIES = 3
+
   queue_as :default
 
   rescue_from Check::PermanentError do |exception|
     arguments.first.transition_to!(:failed, exception.cause.as_json)
   end
 
-  retry_on Check::RuntimeError, wait: 1.minute, attempts: Check::MAX_RETRIES do |job, exception|
+  retry_on Check::RuntimeError, wait: 1.minute, attempts: MAX_RETRIES do |job, exception|
     # this block runs when we're out of retries
     job.arguments.first.transition_to!(:failed, exception.cause.as_json)
   end
