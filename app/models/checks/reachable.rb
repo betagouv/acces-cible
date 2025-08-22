@@ -12,6 +12,12 @@ module Checks
       end
     end
 
+    class DnsResolutionError < Check::NonRetryableError
+      def initialize(url)
+        super("DNS resolution failed for #{url}")
+      end
+    end
+
     PRIORITY = 0 # This needs to run before all other checks
     REQUIREMENTS = []
 
@@ -25,6 +31,7 @@ module Checks
     private
 
     def analyze!
+      raise DnsResolutionError.new(audit.url) unless Browser.resolvable?(audit.url)
       raise BrowserError.new(audit.url) if root_page.status.nil?
       raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
 
