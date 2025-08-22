@@ -53,6 +53,29 @@ RSpec.describe Checks::LanguageIndication do
     end
   end
 
+  describe "#language_code" do
+    subject(:language_code) { check.send(:language_code) }
+
+    {
+      "fr" => "fr",
+      "FR" => "fr",
+      " fr-FR " => "fr",
+      "FR-CA" => "fr",
+      "fr_FR" => "fr",
+      "en-US" => "en",
+      "es-ES" => "es",
+      "" => nil,
+      nil => nil
+    }.each do |indication, expected_code|
+      context "when indication is #{indication.inspect}" do
+        it "returns #{expected_code.inspect}" do
+          check.indication = indication
+          expect(language_code).to eq(expected_code)
+        end
+      end
+    end
+  end
+
   describe "#custom_badge_text" do
     subject(:badge_text) { check.send(:custom_badge_text) }
 

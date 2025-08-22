@@ -22,5 +22,9 @@ module Checks
     def find_language_indication
       root_page.dom.root.attributes["lang"]&.value&.strip
     end
+
+    def language_code
+      indication.to_s.strip.downcase.split(/_|-/).first
+    end
   end
 end
