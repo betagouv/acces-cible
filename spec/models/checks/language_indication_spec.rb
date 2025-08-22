@@ -76,6 +76,29 @@ RSpec.describe Checks::LanguageIndication do
     end
   end
 
+  describe "#detect_page_language" do
+    subject(:detected_code) { check.send(:detect_page_language) }
+
+    before do
+      root_page = double(text:) # rubocop:disable RSpec/VerifiedDoubles
+      allow(check).to receive(:root_page).and_return(root_page)
+    end
+
+    {
+      "Bonjour, texte en français." => "fr",
+      "Hello, some English text." => "en",
+      "Hola, eso es en español." => "es"
+    }.each do |text, expected_code|
+      context "when page contains text: #{text}" do
+        let(:text) { text }
+
+        it "returns '#{expected_code}'" do
+          expect(detected_code).to eq(expected_code)
+        end
+      end
+    end
+  end
+
   describe "#custom_badge_text" do
     subject(:badge_text) { check.send(:custom_badge_text) }
 

@@ -2,7 +2,7 @@ module Checks
   class LanguageIndication < Check
     PRIORITY = 5
 
-    store_accessor :data, :indication
+    store_accessor :data, :indication, :detected_code
 
     def custom_badge_text = indication || human(:empty)
     def custom_badge_status
@@ -16,7 +16,10 @@ module Checks
     private
 
     def analyze!
-      { indication: find_language_indication }
+      {
+        indication: find_language_indication,
+        detected_code: detect_page_language,
+      }
     end
 
     def find_language_indication
@@ -25,6 +28,10 @@ module Checks
 
     def language_code
       indication.to_s.strip.downcase.split(/_|-/).first
+    end
+
+    def detect_page_language
+      CLD.detect_language(root_page.text)[:code].downcase
     end
   end
 end
