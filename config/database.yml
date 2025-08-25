@@ -19,6 +19,19 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
+# Solid component templates
+solid_cable_config: &solid_cable_config
+  schema_search_path: acces_cible_cable
+  migrations_paths: db/cable_migrate
+
+solid_cache_config: &solid_cache_config
+  schema_search_path: acces_cible_cache
+  migrations_paths: db/cache_migrate
+
+solid_queue_config: &solid_queue_config
+  schema_search_path: acces_cible_queue
+  migrations_paths: db/queue_migrate
+
 
 development:
   primary: &primary_dev
@@ -26,9 +39,11 @@ development:
     url: <%= ENV["DATABASE_URL"] %>
     database: acces_cible_development
   cable:
-    <<: *primary_dev
-    database: acces_cible_development_cable
-    migrations_paths: db/cable_migrate
+    <<: [*primary_dev, *solid_cable_config]
+  cache:
+    <<: [*primary_dev, *solid_cache_config]
+  queue:
+    <<: [*primary_dev, *solid_queue_config]
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -61,8 +76,9 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
-  database: acces_cible_test
+  primary: &primary_test
+    <<: *default
+    database: acces_cible_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -89,15 +105,9 @@ production:
     <<: *default
     database: acces_cible_production
     url: <%= ENV["DATABASE_URL"] %>
-  cache:
-    <<: *primary_production
-    schema_search_path: acces_cible_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    schema_search_path: acces_cible_production_queue
-    migrations_paths: db/queue_migrate
   cable:
-    <<: *primary_production
-    schema_search_path: acces_cible_production_cable
-    migrations_paths: db/cable_migrate
+    <<: [*primary_production, *solid_cable_config]
+  cache:
+    <<: [*primary_production, *solid_cache_config]
+  queue:
+    <<: [*primary_production, *solid_queue_config]

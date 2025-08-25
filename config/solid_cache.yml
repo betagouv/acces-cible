@@ -1,0 +1,12 @@
+default: &default
+  store_options:
+    max_age: 3.months
+    max_entries: 1_000_000
+
+development:
+  <<: *default
+  database: cache
+
+production:
+  <<: *default
+  database: cache
