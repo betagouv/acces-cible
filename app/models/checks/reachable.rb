@@ -31,7 +31,7 @@ module Checks
     private
 
     def analyze!
-      raise DnsResolutionError.new(audit.url) unless Browser.resolvable?(audit.url)
+      raise DnsResolutionError.new(audit.url) unless Dns.resolvable?(audit.url)
       raise BrowserError.new(audit.url) if root_page.status.nil?
       raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
 

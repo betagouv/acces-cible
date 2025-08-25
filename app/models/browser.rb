@@ -1,11 +1,7 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
-require "timeout"
-require "resolv"
-
 class Browser
   PAGE_TIMEOUT = 1.minute
-  DNS_TIMEOUT = 10.seconds  # Shorter timeout for DNS resolution
   PROCESS_TIMEOUT = 5.minutes
   WINDOW_SIZES = [
     [1366, 768],
@@ -110,19 +106,6 @@ class Browser
         axe.run(document, { runOnly: { type: "rule", values: #{AXE_RULES} }, reporter: "v2"}).then(results => __f(results))
       JS
     end
-  end
-
-  def resolvable?(url)
-    uri = Link.parse(url)
-    host = uri.host
-    return false unless host
-
-    Timeout.timeout(DNS_TIMEOUT) do
-      Resolv::DNS.new.getaddress(host)
-      true
-    end
-  rescue Resolv::ResolvError, Timeout::Error, URI::InvalidURIError
-    false
   end
 
   private
