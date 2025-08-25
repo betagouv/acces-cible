@@ -94,26 +94,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#pending?" do
-    subject { audit }
-
-    before do
-      allow(audit).to receive(:all_check_states).and_return combined_states # rubocop:disable RSpec/SubjectStub
-    end
-
-    context "when all check states are pending" do
-      let(:combined_states) { ["pending"] }
-
-      it { expect(audit).to be_pending }
-    end
-
-    context "when some checks are pending" do
-      let(:combined_states) { ["pending", "failed"] }
-
-      it { expect(audit).not_to be_pending }
-    end
-  end
-
   describe "#update_from_checks" do
     let(:audit) { create(:audit) }
 

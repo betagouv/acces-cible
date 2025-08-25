@@ -39,10 +39,6 @@ class Audit < ApplicationRecord
     all_checks.map(&:current_state)
   end
 
-  def pending?
-    status_from_checks == "pending"
-  end
-
   def status_from_checks
     states = all_check_states
 
