@@ -33,6 +33,7 @@ module Checks
     end
 
     def detect_page_language
+      # Renvoie le code de langue, ou "un" (pour "unknown")
       CLD.detect_language(root_page.text)[:code].downcase
     end
   end

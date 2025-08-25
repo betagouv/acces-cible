@@ -36,13 +36,14 @@ RSpec.describe Checks::LanguageIndication do
     {
       [nil, nil] => :error,
       ["", nil] => :error,
+      ["fr", nil] => :success,
       ["fr", "fr"] => :success,
       ["FR", "fr"] => :success,
       ["fr_FR", "fr"] => :success,
       ["fr-FR", "fr"] => :success,
       ["FR-CA", "fr"] => :success,
       ["en", "fr"] => :warning,
-      ["fr", "en"] => :warning,
+      ["fr", "un"] => :warning,
       ["es-ES", "es"] => :success
     }.each do |(indication, detected_code), status|
       context "when indication is #{indication.inspect} and detected_code is #{detected_code.inspect}" do
@@ -89,7 +90,8 @@ RSpec.describe Checks::LanguageIndication do
     {
       "Bonjour, texte en français." => "fr",
       "Hello, some English text." => "en",
-      "Hola, eso es en español." => "es"
+      "Hola, eso es en español." => "es",
+      "12345" => "un",
     }.each do |text, expected_code|
       context "when page contains text: #{text}" do
         let(:text) { text }
