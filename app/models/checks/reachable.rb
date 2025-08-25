@@ -12,7 +12,7 @@ module Checks
       end
     end
 
-    class DnsResolutionError < Check::NonRetryableError
+    class DnsResolutionError < Check::PermanentError
       def initialize(url)
         super("DNS resolution failed for #{url}")
       end

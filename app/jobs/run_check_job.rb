@@ -6,7 +6,7 @@ class RunCheckJob < ApplicationJob
   queue_as :default
 
   rescue_from Check::PermanentError do |exception|
-    arguments.first.transition_to!(:failed, exception.cause.as_json)
+    arguments.first.transition_to!(:failed, (exception.cause || exception).as_json)
   end
 
   retry_on Check::RuntimeError, wait: 1.minute, attempts: MAX_RETRIES do |job, exception|

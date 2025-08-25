@@ -108,17 +108,17 @@ RSpec.describe Checks::FindAccessibilityPage do
           allow(crawler).to receive(:find).and_raise(mock_error_class.new("Test error"))
         end
 
-        it "raises NonRetryableError" do
+        it "raises PermanentError" do
           expect {
             check.send(:find_page)
-          }.to raise_error(Check::NonRetryableError)
+          }.to raise_error(Check::PermanentError)
         end
 
         it "preserves the original exception as cause" do
           expect {
             check.send(:find_page)
           }.to raise_error do |error|
-            expect(error).to be_a(Check::NonRetryableError)
+            expect(error).to be_a(Check::PermanentError)
             expect(error.cause).to be_a(mock_error_class)
             expect(error.cause.message).to eq("Test error")
           end

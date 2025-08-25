@@ -39,12 +39,8 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
-  # Wrapper for retryable errors rescued in run!
+  class PermanentError < Exception; end   # Parent class for errors that should not be retried
   class RuntimeError < StandardError; end
-  # Wrapper for all permanent errors
-  class PermanentError < StandardError; end
-  # Parent error class for errors that should not be retried
-  class NonRetryableError < StandardError; end
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
@@ -86,10 +82,8 @@ class Check < ApplicationRecord
     self.data = analyze!
 
     save!
-  rescue NonRetryableError => exception
-    raise Check::PermanentError
   rescue StandardError => exception
-    raise Check::RuntimeError
+    raise Check::RuntimeError, exception.message, cause: exception
   end
 
   def all_requirements_met?

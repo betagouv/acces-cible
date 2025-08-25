@@ -28,10 +28,10 @@ module Checks
           false
         end
       end
-    rescue Crawler::NoMatchError => e
-      raise Check::NonRetryableError, "No accessibility page found: #{e.message}", cause: e
-    rescue Crawler::CrawlLimitReachedError => e
-      raise Check::NonRetryableError, "Crawl limit reached: #{e.message}", cause: e
+    rescue Crawler::NoMatchError => exception
+      raise Check::PermanentError, "No accessibility page found: #{exception.message}", cause: exception
+    rescue Crawler::CrawlLimitReachedError => exception
+      raise Check::PermanentError, "Crawl limit reached: #{exception.message}", cause: exception
     end
 
     def accessibility_page?(current_page)

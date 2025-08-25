@@ -56,7 +56,7 @@ RSpec.describe RunCheckJob do
       allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
         .to receive(:analyze!) do
           original_error = StandardError.new("Original cause error")
-          raise Check::NonRetryableError, "Wrapper error", cause: original_error
+          raise Check::PermanentError, "Wrapper error", cause: original_error
         end
     end
 
@@ -76,8 +76,8 @@ RSpec.describe RunCheckJob do
 
       expect(check.error)
         .to include(
-          "json_class" => "Check::NonRetryableError",
-          "m" => "Wrapper error"
+          "json_class" => "StandardError",
+          "m" => "Original cause error"
         )
     end
   end
