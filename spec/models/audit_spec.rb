@@ -24,16 +24,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "enums" do
-    it do
-      should define_enum_for(:status)
-        .validating
-        .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
-        .backed_by_column_of_type(:string)
-        .with_default(:pending)
-    end
-  end
-
   describe "scopes" do
     before { site.audit.destroy }
 
@@ -107,13 +97,6 @@ RSpec.describe Audit do
   describe "#update_from_checks" do
     let(:audit) { create(:audit) }
 
-    it "updates status using status_from_checks" do
-      allow(audit).to receive_messages(status_from_checks: :mixed)
-
-      audit.update_from_checks
-      expect(audit.status).to eq("mixed")
-    end
-
     it "calls set_current_audit! on site when not pending" do
       allow(audit).to receive_messages(status_from_checks: :passed)
 
@@ -122,7 +105,7 @@ RSpec.describe Audit do
     end
 
     it "does not call set_current_audit! on site when pending" do
-      allow(audit).to receive_messages(status_from_checks: :pending)
+      allow(audit).to receive_messages(pending?: true)
 
       expect(audit.site).not_to receive(:set_current_audit!)
       audit.update_from_checks

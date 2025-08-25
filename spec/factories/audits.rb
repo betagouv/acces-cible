@@ -19,22 +19,6 @@ FactoryBot.define do
 
     trait :checked do
       checked_at { 1.day.ago }
-      status { "passed" }
-    end
-
-    trait :passed do
-      checked
-      status { "passed" }
-    end
-
-    trait :failed do
-      checked
-      status { "failed" }
-    end
-
-    trait :mixed do
-      checked
-      status { "mixed" }
     end
   end
 end
