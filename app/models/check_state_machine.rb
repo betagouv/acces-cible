@@ -24,6 +24,6 @@ class CheckStateMachine
   end
 
   after_transition(to: :completed) do |check|
-    check.audit.after_check_completed(check)
+    check.audit.after_check_completed
   end
 end

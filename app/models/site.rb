@@ -32,7 +32,7 @@ class Site < ApplicationRecord
   def url=(new_url)
     return if url == new_url
 
-    if audit.pending?
+    if audit.checked_at.nil?
       audit.url = new_url
       audit.save if audit.persisted?
     else

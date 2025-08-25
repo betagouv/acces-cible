@@ -24,16 +24,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "enums" do
-    it do
-      should define_enum_for(:status)
-        .validating
-        .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
-        .backed_by_column_of_type(:string)
-        .with_default(:pending)
-    end
-  end
-
   describe "scopes" do
     before { site.audit.destroy }
 
@@ -104,15 +94,28 @@ RSpec.describe Audit do
     end
   end
 
+  describe "#pending?" do
+    subject { audit }
+
+    before do
+      allow(audit).to receive(:all_check_states).and_return combined_states # rubocop:disable RSpec/SubjectStub
+    end
+
+    context "when all check states are pending" do
+      let(:combined_states) { ["pending"] }
+
+      it { expect(audit).to be_pending }
+    end
+
+    context "when some checks are pending" do
+      let(:combined_states) { ["pending", "failed"] }
+
+      it { expect(audit).not_to be_pending }
+    end
+  end
+
   describe "#update_from_checks" do
     let(:audit) { create(:audit) }
-
-    it "updates status using status_from_checks" do
-      allow(audit).to receive_messages(status_from_checks: :mixed)
-
-      audit.update_from_checks
-      expect(audit.status).to eq("mixed")
-    end
 
     it "calls set_current_audit! on site when not pending" do
       allow(audit).to receive_messages(status_from_checks: :passed)
@@ -122,7 +125,7 @@ RSpec.describe Audit do
     end
 
     it "does not call set_current_audit! on site when pending" do
-      allow(audit).to receive_messages(status_from_checks: :pending)
+      allow(audit).to receive_messages(pending?: true)
 
       expect(audit.site).not_to receive(:set_current_audit!)
       audit.update_from_checks
@@ -162,7 +165,7 @@ RSpec.describe Audit do
     let(:audit) { create(:audit) }
 
     it "reschedules a ProcessAuditJob with itself" do
-      expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
+      expect { audit.after_check_completed }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
 
     context "when there are no jobs left" do
@@ -171,12 +174,12 @@ RSpec.describe Audit do
       end
 
       it "does not enqueue a new ProcessAuditJob" do
-        expect { audit.after_check_completed(nil) }.not_to enqueue_job(ProcessAuditJob)
+        expect { audit.after_check_completed }.not_to enqueue_job(ProcessAuditJob)
       end
 
       it "updates its checked_at timestamp" do
         freeze_time do
-          expect { audit.after_check_completed(nil) }
+          expect { audit.after_check_completed }
             .to change(audit, :checked_at)
                   .from(nil)
                   .to(Time.current)
