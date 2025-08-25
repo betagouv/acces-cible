@@ -6,7 +6,7 @@ FactoryBot.define do
     trait :checked do
       after(:create) do |site|
         audit = site.audits.current.first || create(:audit, :current, site:, url: site.url)
-        audit.update!(checked_at: 1.day.ago, status: :passed)
+        audit.update!(checked_at: 1.day.ago)
       end
     end
   end
