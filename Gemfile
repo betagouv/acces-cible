@@ -79,6 +79,9 @@ gem "brotli"
 gem "zstd-ruby"
 gem "statesman"
 
+# Detect main language from text
+gem "cld"
+
 group :development, :test do
   gem "debug"
 
