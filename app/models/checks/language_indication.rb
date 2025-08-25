@@ -5,10 +5,11 @@ module Checks
     store_accessor :data, :indication, :detected_code
 
     def custom_badge_text = indication || human(:empty)
+
     def custom_badge_status
-      if indication.nil? || indication.empty?
+      if indication.blank?
         :error
-      elsif language_code == (detected_code || "fr") # Default value for old checks without detected_code
+      elsif language_code == (detected_code || "fr") # Fallback for checks before page language detection
         :success
       else
         :warning

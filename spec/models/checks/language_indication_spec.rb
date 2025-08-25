@@ -20,7 +20,7 @@ RSpec.describe Checks::LanguageIndication do
       "   " => "",
       nil => nil
     }.each do |value, expected_result|
-      context "when lang attribute #{value.inspect}" do
+      context "when lang attribute is #{value.inspect}" do
         let(:attributes) { { "lang" => double(value:) } } # rubocop:disable RSpec/VerifiedDoubles
 
         it "returns #{expected_result.inspect}" do
@@ -93,7 +93,7 @@ RSpec.describe Checks::LanguageIndication do
       "Hola, eso es en español." => "es",
       "12345" => "un",
     }.each do |text, expected_code|
-      context "when page contains text: #{text}" do
+      context "when page contains #{text.inspect}" do
         let(:text) { text }
 
         it "returns '#{expected_code}'" do
