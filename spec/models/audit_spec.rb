@@ -24,16 +24,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "enums" do
-    it do
-      should define_enum_for(:status)
-               .validating
-               .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
-               .backed_by_column_of_type(:string)
-               .with_default(:pending)
-    end
-  end
-
   describe "scopes" do
     before { site.audit.destroy }
 
@@ -111,6 +101,23 @@ RSpec.describe Audit do
       let(:combined_states) { ["testing"] }
 
       it { should eq "testing" }
+    end
+  end
+
+  describe "#pending?" do
+    subject { audit }
+
+    let(:checked_at) { nil }
+    let(:audit) { build(:audit, checked_at: checked_at) }
+
+    context "when audit is not completed" do
+      it { should be_pending }
+    end
+
+    context "when audit is completed" do
+      let(:checked_at) { Time.current }
+
+      it { should_not be_pending }
     end
   end
 
