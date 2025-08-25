@@ -10,6 +10,8 @@ RSpec.describe Checks::Reachable do
 
   before do
     allow(check).to receive_messages(audit:, root_page:, site:)
+    # Mock DNS resolution to return true by default for existing tests
+    allow(Browser).to receive(:resolvable?).and_return(true)
   end
 
   describe "constants" do
@@ -107,6 +109,18 @@ RSpec.describe Checks::Reachable do
             check.send(:analyze!)
           }.to raise_error(Checks::Reachable::BrowserError, "Browser error preventing getting #{original_url}")
         end
+      end
+    end
+
+    context "when DNS resolution fails" do
+      before do
+        allow(Browser).to receive(:resolvable?).and_return(false)
+      end
+
+      it "raises a DnsResolutionError" do
+        expect {
+          check.send(:analyze!)
+        }.to raise_error(Checks::Reachable::DnsResolutionError, "DNS resolution failed for #{original_url}")
       end
     end
   end

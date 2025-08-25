@@ -15,8 +15,7 @@ module Checks
     private
 
     def analyze!
-      return {} unless (page = find_page)
-
+      page = find_page
       { url: page.url, title: page.title }
     end
 
@@ -29,6 +28,10 @@ module Checks
           false
         end
       end
+    rescue Crawler::NoMatchError => exception
+      raise Check::PermanentError, "No accessibility page found: #{exception.message}", cause: exception
+    rescue Crawler::CrawlLimitReachedError => exception
+      raise Check::PermanentError, "Crawl limit reached: #{exception.message}", cause: exception
     end
 
     def accessibility_page?(current_page)

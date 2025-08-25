@@ -68,14 +68,26 @@ RSpec.describe Check do
       end
     end
 
-    context "when analyze! raises an error" do
+    context "when analyze! raises a PermanentError" do
+      let(:error) { Check::PermanentError.new("DNS resolution failed") }
+
+      before do
+        allow(check).to receive(:analyze!).and_raise(error)
+      end
+
+      it "re-raises the PermanentError unchanged" do
+        expect { check.run! }.to raise_error(Check::PermanentError, "DNS resolution failed")
+      end
+    end
+
+    context "when analyze! raises any other error" do
       let(:error) { Ferrum::TimeoutError.new("Test error") }
 
       before do
         allow(check).to receive(:analyze!).and_raise(error)
       end
 
-      it "raises a Check::RuntimeError with the correct root cause" do
+      it "wraps it in a Check::RuntimeError with the correct root cause" do
         expect { check.run! }.to raise_error(Check::RuntimeError) do |err|
           expect(err.cause).to eq error
         end

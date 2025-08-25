@@ -39,12 +39,11 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
-  # used to signal a check's `run` method has failed
+  class PermanentError < Exception; end   # Parent class for errors that should not be retried
   class RuntimeError < StandardError; end
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
-  MAX_RETRIES = 3
 
   belongs_to :audit
   has_one :site, through: :audit
@@ -75,7 +74,7 @@ class Check < ApplicationRecord
   def human_status = Check.human("status.#{state_machine.current_state}")
   def to_partial_path = model_name.i18n_key.to_s
   def root_page = @root_page ||= Page.new(url: audit.url)
-  def crawler = Crawler.new(audit.url)
+  def crawler(crawl_up_to: nil) = Crawler.new(audit.url, crawl_up_to:)
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def tooltip? = true
 
@@ -84,7 +83,7 @@ class Check < ApplicationRecord
 
     save!
   rescue StandardError => exception
-    raise Check::RuntimeError
+    raise Check::RuntimeError, exception.message, cause: exception
   end
 
   def all_requirements_met?
