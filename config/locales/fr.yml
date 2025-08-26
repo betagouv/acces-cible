@@ -94,11 +94,12 @@ fr:
           one: Une vérification
           other: "%{count} vérifications"
       audit/status:
-        pending: Planifié
-        running: En cours
-        passed: Effectué
-        retryable: À retenter
         failed: Échoué
+        mixed: Mixe
+        passed: Effectué
+        pending: Planifié
+        retryable: À retenter
+        running: En cours
 
       check:
         type: Type de contrôle

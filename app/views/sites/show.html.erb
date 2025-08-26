@@ -24,7 +24,7 @@
     <% else %>
       <p>
         <strong><%= Audit.human(:status) %> :</strong>
-        <%= Audit.human("audit/status.pending") %>
+        <%= Audit.human("audit/status.#{@audit.status_from_checks}") %>
       </p>
     <% end %>
     <%= render(partial: @audit.all_checks, as: :check) %>
