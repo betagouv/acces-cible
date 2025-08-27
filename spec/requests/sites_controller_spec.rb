@@ -19,7 +19,7 @@ RSpec.describe "Sites" do
       site = Site.last
       audit = site.audit
       expect(audit).to be_present
-      expect(audit.status).to eq("pending")
+      expect(audit).to be_pending
 
       expect(response).to redirect_to(site_path(site))
       follow_redirect!

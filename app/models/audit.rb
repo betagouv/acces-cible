@@ -8,16 +8,9 @@ class Audit < ApplicationRecord
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
-  enum :status, [
-    "pending",    # Initial state, no checks started
-    "passed",     # All checks passed
-    "mixed",      # Some checks failed
-    "failed",     # All checks failed
-  ].index_by(&:itself), validate: true, default: :pending
-
   scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :checked, -> { where.not(status: :pending) }
+  scope :checked, -> { where.not(checked_at: nil) }
   scope :current, -> { where(current: true) }
 
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
@@ -46,6 +39,10 @@ class Audit < ApplicationRecord
     all_checks.map(&:current_state)
   end
 
+  def pending?
+    status_from_checks == "pending"
+  end
+
   def status_from_checks
     states = all_check_states
 
@@ -60,7 +57,6 @@ class Audit < ApplicationRecord
 
   def update_from_checks
     transaction do
-      update(status: status_from_checks)
       site.set_current_audit! unless pending?
     end
   end
@@ -69,7 +65,7 @@ class Audit < ApplicationRecord
     checks.remaining.none?
   end
 
-  def after_check_completed(check)
+  def after_check_completed
     if complete?
       update!(checked_at: Time.zone.now)
     else
@@ -81,6 +77,6 @@ class Audit < ApplicationRecord
     checks
       .remaining
       .filter { |other_check| other_check.depends_on?(check.to_requirement) }
-      .each   { |other_check| other_check.transition_to!(:failed) }
+      .each { |other_check| other_check.transition_to!(:failed) }
   end
 end
