@@ -12,9 +12,9 @@ class SiteQuery < SimpleDelegator
       from(subquery, :sites).order(Arel.sql("sortable_url #{direction}"))
     else
       subquery = model.with_current_audit
-                      .select("sites.*, audits.checked_at AS last_checked_at")
-                      .order(Arel.sql("last_checked_at #{direction} NULLS LAST"))
-      from(subquery, :sites).order(Arel.sql("last_checked_at #{direction} NULLS LAST, sites.created_at #{direction}"))
+                      .select("sites.*, audits.completed_at AS last_completed_at")
+                      .order(Arel.sql("last_completed_at #{direction} NULLS LAST"))
+      from(subquery, :sites).order(Arel.sql("last_completed_at #{direction} NULLS LAST, sites.created_at #{direction}"))
     end
   end
 

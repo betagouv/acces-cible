@@ -32,11 +32,11 @@ class Site < ApplicationRecord
   def url=(new_url)
     return if url == new_url
 
-    if audit.checked_at.nil?
+    if audit.completed?
+      audits.build(url: new_url)
+    else
       audit.url = new_url
       audit.save if audit.persisted?
-    else
-      audits.build(url: new_url)
     end
   end
 
@@ -65,7 +65,7 @@ class Site < ApplicationRecord
   end
 
   def actual_current_audit
-    audits.checked.sort_by_newest.first || audits.sort_by_newest.first
+    audits.completed.sort_by_newest.first || audits.sort_by_newest.first
   end
 
   def set_current_audit!

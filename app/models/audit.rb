@@ -8,9 +8,9 @@ class Audit < ApplicationRecord
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
-  scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
+  scope :sort_by_newest, -> { order(arel_table[:completed_at].desc.nulls_last, arel_table[:created_at].desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :checked, -> { where.not(checked_at: nil) }
+  scope :completed, -> { where.not(completed_at: nil) }
   scope :current, -> { where(current: true) }
 
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
@@ -53,17 +53,17 @@ class Audit < ApplicationRecord
 
   def update_from_checks
     transaction do
-      site.set_current_audit! unless pending?
+      site.set_current_audit! if completed?
     end
   end
 
-  def complete?
-    checks.remaining.none?
+  def completed?
+    completed_at.present?
   end
 
-  def after_check_completed
-    if complete?
-      update!(checked_at: Time.zone.now)
+  def after_check_completed(check)
+    if checks.remaining.none?
+      update!(completed_at: Time.zone.now)
     else
       ProcessAuditJob.perform_later(self)
     end

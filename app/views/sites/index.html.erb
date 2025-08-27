@@ -17,7 +17,7 @@
         <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
       <% end %>
       <th scope="col"><%= Tag.human(:all) %></th>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:completed_at) %>><%= sortable_header Site.human(:last_audit_at), :completed_at %></th>
     </tr>
   <% end %>
   <% t.with_body do %>

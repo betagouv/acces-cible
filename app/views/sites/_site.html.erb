@@ -15,8 +15,8 @@
     <% end %>
   </td>
   <td>
-    <% if checked_at = site.audit.checked_at %>
-      <% local_time = checked_at.in_time_zone %>
+    <% if completed_at = site.audit.completed_at %>
+      <% local_time = completed_at.in_time_zone %>
       <%= time_tag local_time, l(local_time, format: :compact), title: l(local_time, format: :long) %>
       <br>
       (<%= time_ago local_time %>)

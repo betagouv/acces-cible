@@ -48,7 +48,7 @@ RSpec.describe SiteCsvExport do
       expected_data = {
         Audit.human(:url) => audit.url,
         Tag.human(:all) => tags.collect(&:name).join(", "),
-        Check.human(:checked_at) => audit.checked_at.to_s,
+        Check.human(:completed_at) => audit.completed_at.to_s,
         Checks::Reachable.human(:type) => reachable.completed?.to_s,
         Checks::LanguageIndication.human(:type) => language_indication.indication,
         Checks::AccessibilityMention.human(:type) => accessibility_mention.mention_text,

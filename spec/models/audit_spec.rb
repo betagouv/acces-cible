@@ -27,10 +27,10 @@ RSpec.describe Audit do
   describe "scopes" do
     before { site.audit.destroy }
 
-    it ".sort_by_newest returns audits in descending order by checked_at date" do
-      oldest = create(:audit, site:, checked_at: 3.days.ago)
-      older = create(:audit, site:, checked_at: 2.days.ago)
-      newer = create(:audit, site:, checked_at: 1.day.ago)
+    it ".sort_by_newest returns audits in descending order by completed_at date" do
+      oldest = create(:audit, site:, completed_at: 3.days.ago)
+      older = create(:audit, site:, completed_at: 2.days.ago)
+      newer = create(:audit, site:, completed_at: 1.day.ago)
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
@@ -157,10 +157,10 @@ RSpec.describe Audit do
         expect { audit.after_check_completed }.not_to enqueue_job(ProcessAuditJob)
       end
 
-      it "updates its checked_at timestamp" do
+      it "updates its completed_at timestamp" do
         freeze_time do
-          expect { audit.after_check_completed }
-            .to change(audit, :checked_at)
+          expect { audit.after_check_completed(nil) }
+            .to change(audit, :completed_at)
                   .from(nil)
                   .to(Time.current)
         end
