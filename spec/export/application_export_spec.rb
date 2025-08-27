@@ -10,7 +10,7 @@ RSpec.describe ApplicationExport do
         {
           "Name" => :name,
           "URL" => :url,
-          "Nested" => [:audit, :checked_at]
+          "Nested" => [:audit, :completed_at]
         }
       end
     end
@@ -52,11 +52,11 @@ RSpec.describe ApplicationExport do
     subject(:result) { export.serialize(site) }
 
     let(:site) { build(:site, name: "Test Site", audits: [audit]) }
-    let(:audit) { build(:audit, checked_at:, url: "https://test.com/") }
-    let(:checked_at) { Time.zone.parse("2024-01-01 12:00:00") }
+    let(:audit) { build(:audit, completed_at:, url: "https://test.com/") }
+    let(:completed_at) { Time.zone.parse("2024-01-01 12:00:00") }
 
     it "serializes simple and nested attributes" do
-      expect(result).to eq(["Test Site", "https://test.com/", checked_at])
+      expect(result).to eq(["Test Site", "https://test.com/", completed_at])
     end
 
     context "when a chained method returns nil" do

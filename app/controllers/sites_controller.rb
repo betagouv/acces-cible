@@ -5,7 +5,7 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    params[:sort] ||= { checked_at: :desc }
+    params[:sort] ||= { completed_at: :desc }
     sites = current_user.sites.preloaded.filter_by(params).order_by(params)
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites, limit: pagy_limit }
