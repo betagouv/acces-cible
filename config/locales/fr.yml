@@ -264,6 +264,13 @@ fr:
       title: Mentions légales
     plan:
       title: Plan du site
+    display_mode:
+      title: Paramètres d’affichage
+      legend: Choisissez un thème pour personnaliser l’apparence du site.
+      dark: Thème sombre
+      light: Thème clair
+      system: Système
+      system_hint: Utilise les paramètres système
   sessions:
     new:
       title: Connexion à Accès Cible

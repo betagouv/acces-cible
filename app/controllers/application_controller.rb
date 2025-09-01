@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  layout :layout_selector
+
   helper_method :resource, :resource_model
 
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
@@ -40,6 +42,10 @@ class ApplicationController < ActionController::Base
 
   def instance_variable_name
     @instance_variable_name ||= "@#{action_name == "index" ? controller_name : controller_name.singularize}"
+  end
+
+  def layout_selector
+    "modal" if turbo_frame_request_id == "modal" # => link with "data-turbo-frame": :modal
   end
 
   def get_request? = request.request_method_symbol == :get
