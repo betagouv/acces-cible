@@ -2,6 +2,7 @@ module Checks
   class FindAccessibilityPage < Check
     PRIORITY = 20
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
+    DECLARATION_URL = /"(declaration-)?accessibilit[e|y]"/i
     REQUIRED_DECLARATION_HEADINGS = 3
     ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
 
@@ -26,7 +27,7 @@ module Checks
         if mentions_article?(current_page) && required_headings_present?(current_page)
           true
         else
-          sort_queue_by_likelihood(queue)
+          filter_queue(queue)
           false
         end
       end
@@ -45,19 +46,12 @@ module Checks
 
     def fuzzy_match?(a, b) = StringComparison.similar?(a, b, ignore_case: true, fuzzy: 0.6)
 
-    def sort_queue_by_likelihood(queue)
-      queue.sort_by! { |link| likelihood_of(link) }
-    end
-
-    # Most relevant links need to have a negative score to come first in the queue
-    def likelihood_of(link)
-      return unless link.is_a?(Link)
-
-      [
-        link.text.match?(DECLARATION),
-        link.href.match?("(declaration-)?accessibilit[e|y]"),
+    def filter_queue(queue)
+      queue.filter! do |link|
+        link.href.match?(DECLARATION_URL) ||
+        link.text.match?(DECLARATION) ||
         link.text.match?(Checks::AccessibilityMention::MENTION_REGEX)
-      ].count(&:itself).then { |n| n.zero? ? 1 : -n + 1 }
+      end
     end
   end
 end

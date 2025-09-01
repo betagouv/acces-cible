@@ -42,38 +42,18 @@ RSpec.describe Checks::FindAccessibilityPage do
     end
   end
 
-  describe "#likelihood_of" do
-    let(:basic_link) { build(:link, text: "Handicap et accessibilité", href: "/handicap-et-accessibilite") }
-    let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
+  describe "#filter_queue" do
+    let(:declaration_url_link) { build(:link, text: "Page", href: '"declaration-accessibilite"') }
+    let(:declaration_text_link) { build(:link, text: "Déclaration d'accessibilité", href: "/other") }
+    let(:accessibility_mention_link) { build(:link, text: "Accessibilité : totalement conforme", href: "/handicap") }
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
+    let(:queue) { LinkList.new(declaration_url_link, declaration_text_link, accessibility_mention_link, unrelated_link) }
 
-    it "returns nil for non-Link objects" do
-      expect(check.send(:likelihood_of, "not a link")).to be_nil
-    end
+    it "only keeps links matching DECLARATION, DECLARATION_URL, or MENTION pattern" do
+      filtered_queue = check.send(:filter_queue, queue).to_a
 
-    it "returns 1 for links not matching any criteria" do
-      expect(check.send(:likelihood_of, unrelated_link)).to eq(1)
-    end
-
-    it "returns 0 for links matching only one criteria" do
-      expect(check.send(:likelihood_of, basic_link)).to eq(0)
-    end
-
-    it "returns -1 for links matching two criteria or more" do
-      expect(check.send(:likelihood_of, declaration_link)).to eq(-1)
-    end
-  end
-
-  describe "#sort_queue_by_likelihood(queue)" do
-    let(:basic_link) { build(:link, text: "Handicap et accessibilité", href: "/handicap-et-accessibilite") }
-    let(:declaration_link) { build(:link, text: "Déclaration d'accessibilité", href: "/declaration-accessibilite") }
-    let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
-    let(:queue) { LinkList.new(basic_link, declaration_link, unrelated_link) }
-
-    it "sorts the queue, with the likeliest links first" do
-      expect(queue.to_a).to eq([basic_link, declaration_link, unrelated_link])
-      check.send(:sort_queue_by_likelihood, queue)
-      expect(queue.to_a).to eq([declaration_link, basic_link, unrelated_link])
+      expect(filtered_queue).to contain_exactly(declaration_url_link, declaration_text_link, accessibility_mention_link)
+      expect(filtered_queue).not_to include(unrelated_link)
     end
   end
 
@@ -89,15 +69,16 @@ RSpec.describe Checks::FindAccessibilityPage do
       allow(check).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
       allow(check).to receive(:mentions_article?).with(matching_page).and_return(true)
       allow(check).to receive(:required_headings_present?).with(matching_page).and_return(true)
-      allow(check).to receive(:sort_queue_by_likelihood)
+      allow(check).to receive(:filter_queue)
     end
 
     it "finds a matching page through crawling links" do
       expect(crawler).to receive(:find)
         .and_yield(non_matching_page, LinkList.new(non_matching_page.url))
         .and_yield(matching_page, LinkList.new(matching_page_url))
+        .and_return(matching_page)
 
-      expect(check.send(:find_page)).to be(true)
+      expect(check.send(:find_page)).to be(matching_page)
     end
 
     it "continues crawling when page has article mention but insufficient headings" do
@@ -109,8 +90,9 @@ RSpec.describe Checks::FindAccessibilityPage do
       expect(crawler).to receive(:find)
         .and_yield(page_with_article_only, LinkList.new("https://example.com/other"))
         .and_yield(matching_page, LinkList.new(matching_page_url))
+        .and_return(matching_page)
 
-      expect(check.send(:find_page)).to be(true)
+      expect(check.send(:find_page)).to be(matching_page)
     end
 
     it "continues crawling when page has sufficient headings but no article mention" do
@@ -122,8 +104,9 @@ RSpec.describe Checks::FindAccessibilityPage do
       expect(crawler).to receive(:find)
         .and_yield(page_with_headings_only, LinkList.new("https://example.com/other"))
         .and_yield(matching_page, LinkList.new(matching_page_url))
+        .and_return(matching_page)
 
-      expect(check.send(:find_page)).to be(true)
+      expect(check.send(:find_page)).to be(matching_page)
     end
   end
 
