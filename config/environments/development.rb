@@ -82,4 +82,7 @@ Rails.application.configure do
   config.active_record.strict_loading_by_default = true
   config.active_record.strict_loading_mode = :n_plus_one_only
   config.active_record.action_on_strict_loading_violation = :log
+
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
 end
