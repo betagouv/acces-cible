@@ -85,8 +85,10 @@ RSpec.describe Checks::FindAccessibilityPage do
 
     before do
       allow(check).to receive(:crawler).and_return(crawler)
-      allow(check).to receive(:accessibility_page?).with(non_matching_page).and_return(false)
-      allow(check).to receive(:accessibility_page?).with(matching_page).and_return(true)
+      allow(check).to receive(:mentions_article?).with(non_matching_page).and_return(false)
+      allow(check).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
+      allow(check).to receive(:mentions_article?).with(matching_page).and_return(true)
+      allow(check).to receive(:required_headings_present?).with(matching_page).and_return(true)
       allow(check).to receive(:sort_queue_by_likelihood)
     end
 
@@ -97,50 +99,63 @@ RSpec.describe Checks::FindAccessibilityPage do
 
       expect(check.send(:find_page)).to be(true)
     end
+
+    it "continues crawling when page has article mention but insufficient headings" do
+      page_with_article_only = build(:page, url: "https://example.com/partial", body: "Some content")
+
+      allow(check).to receive(:mentions_article?).with(page_with_article_only).and_return(true)
+      allow(check).to receive(:required_headings_present?).with(page_with_article_only).and_return(false)
+
+      expect(crawler).to receive(:find)
+        .and_yield(page_with_article_only, LinkList.new("https://example.com/other"))
+        .and_yield(matching_page, LinkList.new(matching_page_url))
+
+      expect(check.send(:find_page)).to be(true)
+    end
+
+    it "continues crawling when page has sufficient headings but no article mention" do
+      page_with_headings_only = build(:page, url: "https://example.com/headings", body: "Some content")
+
+      allow(check).to receive(:mentions_article?).with(page_with_headings_only).and_return(false)
+      allow(check).to receive(:required_headings_present?).with(page_with_headings_only).and_return(true)
+
+      expect(crawler).to receive(:find)
+        .and_yield(page_with_headings_only, LinkList.new("https://example.com/other"))
+        .and_yield(matching_page, LinkList.new(matching_page_url))
+
+      expect(check.send(:find_page)).to be(true)
+    end
   end
 
-  describe "#accessibility_page?" do
-    {
-      "Déclaration de conformité" => false,
-      "ACCESSIBILITE" => true,
-      "Accessibilité" => true,
-      "DECLARATION D'ACCESSIBILITE" => true,
-      "Déclaration d’accessibilité" => true,
-      "Déclaration d’accessibilité du site internet" => true,
-    }.each do |title, expectation|
-      context "when page title is '#{title}'" do
-        subject { check.send(:accessibility_page?, page) }
+  describe "#mentions_article?" do
+    subject { check.send(:mentions_article?, page) }
 
-        let(:page) { build(:page, title:) }
+    {
+      "article 47 loi n°2005-102 du 11 février 2005" => true,
+      "art. 47 de la loi numéro 2005-102 du 11 fevrier 2005" => true,
+      "Contactez-nous pour plus d'informations" => false,
+      "" => false
+    }.each do |body, expectation|
+      context "when page contains #{body.inspect}" do
+        let(:page) { build(:page, body:) }
 
         it { should eq(expectation) }
       end
     end
+  end
 
-    it "returns true when declaration is in headings" do
-      page = build(:page,
-        title: "Other Page",
-        headings: ["Déclaration d'accessibilité RGAA"],
-        body: "article 47 loi n°2005-102 du 11 février 2005"
-      )
-      expect(check.send(:accessibility_page?, page)).to be true
-    end
+  describe "#required_headings_present?" do
+    subject(:headings_check) { check.send(:required_headings_present?, page) }
 
-    it "returns true when article text is present" do
-      page = build(:page,
-        title: "Other Page",
-        headings: ["Accessibilité RGAA"],
-        body: "article 47 loi n°2005-102 du 11 février 2005"
-      )
-      expect(check.send(:accessibility_page?, page)).to be true
-    end
+    let(:page) { build(:page, headings:, body: "") }
+    let(:expected_headings) { Checks::AccessibilityPageHeading.expected_headings }
 
-    it "returns false for unrelated pages" do
-      page = build(:page,
-        title: "Contact",
-        body: "Contactez-nous"
-      )
-      expect(check.send(:accessibility_page?, page)).to be false
+    [0, 2, 3, 6].each do |i|
+      context "when #{i} required headings are present" do
+        let(:headings) { expected_headings.first(i) }
+
+        it { should eq(i >= described_class::REQUIRED_DECLARATION_HEADINGS) }
+      end
     end
   end
 end
