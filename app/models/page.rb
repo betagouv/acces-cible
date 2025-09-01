@@ -75,9 +75,6 @@ class Page
         raise InvalidTypeError.new url, content_type
       end
       [@actual_url, @status, @headers, @html]
-    rescue Ferrum::Error => e
-      Rails.logger.error { "Browser error fetching #{url}: #{e.message}" }
-      raise e
     end
   end
 end
