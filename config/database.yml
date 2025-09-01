@@ -31,6 +31,11 @@ development:
     <<: *primary_dev
     database: acces_cible_development_cable
     migrations_paths: db/cable_migrate
+  queue:
+    <<: *primary_dev
+    database: acces_cible_development_queue
+    migrations_paths: db/queue_migrate
+
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
