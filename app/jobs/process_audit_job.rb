@@ -4,12 +4,10 @@
 # harmless.
 class ProcessAuditJob < ApplicationJob
   def perform(audit)
-    ready_check_jobs = audit
-                       .checks
-                       .remaining
-                       .filter { |check| check.transition_to(:ready) }
-                       .map { |check| RunCheckJob.new(check) }
-
-    ActiveJob.perform_all_later(ready_check_jobs)
+    audit
+      .checks
+      .remaining
+      .filter { |check| check.transition_to(:ready) }
+      .each { |check| RunCheckJob.set(group: "check_#{check.id}").perform_later(check) }
   end
 end
