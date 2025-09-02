@@ -128,6 +128,7 @@ jobs:
         run: curl -O https://cli-dl.scalingo.com/install && bash install
 
       - run: scalingo login --api-token ${{ secrets.SCALINGO_TOKEN }}
+
       - name: Déploiement sur staging
         if: ${{ github.ref == 'refs/heads/staging' }}
         run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
@@ -135,3 +136,15 @@ jobs:
       - name: Déploiement en production
         if: ${{ github.ref == 'refs/heads/production' }}
         run: scalingo --app acces-cible-prod --region osc-secnum-fr1 integration-link-manual-deploy production
+
+      - name: Notification Mattermost
+        uses: mattermost/action-mattermost-notify@master
+        if: contains(fromJSON('["staging", "production"]'), github.ref_name)
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: startup-acces-cible
+          MATTERMOST_USERNAME: ${{ github.triggering_actor }}
+          MATTERMOST_ICON_URL: https://cdn4.iconfinder.com/data/icons/christmas-2434/128/Artboard_40-256.png
+          TEXT: |
+            :rocket: **${{ github.ref_name }}** mis à jour
+            :eyes: [Voir les commits déployés](${{ github.server_url }}/${{ github.repository }}/commits/${{ github.ref_name }}/${{ github.sha }})
