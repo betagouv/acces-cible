@@ -21,6 +21,12 @@ services:
     command: ["bin/rails", "dartsass:watch"]
     ports: []
     entrypoint: ''
+  jobs:
+    <<: *server
+    command: "bin/jobs"
+    ports: []
+    environment:
+      RUBY_DEBUG_PORT: ''
   db:
     image: postgres
     environment:
