@@ -34,6 +34,8 @@ bin/dev
 Afin d'accéder à l'interface utilisateur des jobs, vous devrez aller sur `http://127.0.0.1:3000/jobs` et entrer les
 informations authentication présentes dans les `credentials`.
 
+Pour supprimer les jobs terminés : `SolidQueue::Job.finished.delete_all`
+
 ### Seeds
 
 - Pour lancer les seeds (`db/seeds/development.rb`)
