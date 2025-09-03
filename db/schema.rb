@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_134440) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_03_135530) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,7 +47,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_134440) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "priority", default: 100, null: false
-    t.integer "retry_count", default: 0, null: false
     t.index ["audit_id"], name: "index_checks_on_audit_id"
   end
 
