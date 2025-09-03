@@ -19,6 +19,7 @@ class Check < ApplicationRecord
            :transition_to,
            :transition_to!,
            :in_state?,
+           :can_transition_to?,
            :last_transition,
            to: :state_machine
 

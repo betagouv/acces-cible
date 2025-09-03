@@ -7,17 +7,12 @@ class RunCheckJob < ApplicationJob
 
   before_perform do |job|
     check = job.arguments.first
-
-    case check.current_state
-    when "ready"
-      check.transition_to!(:running)
-    when "running" # retry
-      check.increment!(:retry_count)
-    end
+    check.transition_to!(:running) if check.can_transition_to?(:running)
   end
 
   after_perform do |job|
-    job.arguments.first.transition_to!(:completed)
+    check = job.arguments.first
+    check.transition_to!(:completed) if check.can_transition_to?(:completed)
   end
 
   def perform(check)
