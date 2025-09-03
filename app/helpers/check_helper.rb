@@ -6,7 +6,7 @@ module CheckHelper
     pending:   :info,
     blocked:   :info,
     ready:     :info,
-    running:   :info,
+    running:   :new,
     completed: :success,
     failed:    :error,
   }
