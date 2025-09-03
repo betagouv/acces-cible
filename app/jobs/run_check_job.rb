@@ -2,7 +2,9 @@ require "json/add/exception" # required to serialize errors as JSON
 
 class RunCheckJob < ApplicationJob
   rescue_from Check::RuntimeError do |exception|
-    arguments.first.transition_to!(:failed, exception.cause.as_json)
+    cleaned_exception = exception.cause.dup
+    cleaned_exception.set_backtrace Rails.backtrace_cleaner.clean(exception.cause.backtrace)
+    arguments.first.transition_to!(:failed, cleaned_exception.as_json)
   end
 
   before_perform do |job|
