@@ -147,7 +147,7 @@ class Browser
       restart!
       retry
     rescue Ferrum::Error => error
-      Rails.logger.error { "Browser error: #{error.message}" }
+      Rails.logger.error { "[#{error.class.name}] #{error.message}" }
       raise error
     ensure
       page&.close
