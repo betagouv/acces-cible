@@ -7,9 +7,9 @@ class User < ApplicationRecord
   scope :logged_out, -> { where.missing(:sessions) }
   scope :inactive, -> do
     with(inactive_users: [
-      logged_out.where(updated_at: ..1.year.ago),
-      logged_in.where(sessions: { created_at: ..18.months.ago })
-    ]).from("inactive_users")
+      logged_out.where(updated_at: ..1.year.ago).select(:id),
+      logged_in.where(sessions: { created_at: ..18.months.ago }).select(:id)
+    ]).from("users").where(id: User.from("inactive_users").select(:id))
   end
 
   validates :provider, :uid, :email, :name, :siret, presence: true
