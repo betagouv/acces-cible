@@ -49,5 +49,15 @@ RSpec.describe RunCheckJob do
           "m" => /Timed out/
         )
     end
+
+    it "cleans the backtrace before storing the exception" do
+      perform_enqueued_jobs do
+        described_class.perform_later(check)
+      end
+
+      backtrace = check.error["b"] # backtrace is stored in "b" key when using as_json
+      expect(backtrace).to be_present
+      expect(backtrace).to all(match(/^app\//)) # Should only contain app paths after cleaning
+    end
   end
 end
