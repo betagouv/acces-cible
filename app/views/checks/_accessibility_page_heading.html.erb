@@ -31,7 +31,7 @@
         </li>
       <% end %>
     <% else %>
-      <% check.expected_headings.each do |level, heading| %>
+      <% Checks::AccessibilityPageHeading::EXPECTED_HEADINGS.each do |level, heading| %>
         <li class="fr-mb-2w">
           <strong>
             <code>&lt;h<%= level %>&gt;</code>
