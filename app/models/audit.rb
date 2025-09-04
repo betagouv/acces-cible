@@ -44,7 +44,7 @@ class Audit < ApplicationRecord
   end
 
   def all_check_states
-    all_checks.map(&:current_state)
+    all_checks.collect(&:current_state)
   end
 
   def status_from_checks
