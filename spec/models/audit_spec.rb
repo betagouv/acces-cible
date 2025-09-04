@@ -61,6 +61,16 @@ RSpec.describe Audit do
       expect(checks.size).to eq(Check.types.size)
       expect(checks.all?(&:new_record?)).to be true
     end
+
+    it "caches built checks in instance variables" do
+      audit = build(:audit)
+      audit.all_checks
+
+      Check.types.each do |name, klass|
+        expect(audit.instance_variable_get("@#{name}")).to be_present
+        expect(audit.instance_variable_get("@#{name}")).to be_a(klass)
+      end
+    end
   end
 
   describe "#schedule" do
