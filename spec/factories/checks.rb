@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :check do
-    audit { association :audit }
+    audit { association(:audit, :without_checks) }
 
     Check.types.each do |type, klass|
       trait(type) do
