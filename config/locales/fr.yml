@@ -116,6 +116,7 @@ fr:
         running: En cours
         failed: Échoué
         completed: Effectué
+        aborted: Annulé
       checks/accessibility_mention:
         type: Mention du niveau d'accessibilité
         table_header: Mention

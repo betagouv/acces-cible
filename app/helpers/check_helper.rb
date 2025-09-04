@@ -9,6 +9,7 @@ module CheckHelper
     running:   :new,
     completed: :success,
     failed:    :error,
+    aborted:   :error,
   }
 
   def status_to_badge_text(check)

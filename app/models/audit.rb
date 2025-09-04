@@ -81,6 +81,6 @@ class Audit < ApplicationRecord
     checks
       .remaining
       .filter { |other_check| other_check.depends_on?(check.to_requirement) }
-      .each   { |other_check| other_check.transition_to!(:failed) }
+      .each   { |other_check| other_check.transition_to!(:aborted) }
   end
 end

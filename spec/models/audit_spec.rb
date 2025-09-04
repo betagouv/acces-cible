@@ -201,7 +201,7 @@ RSpec.describe Audit do
     it "aborts any check that depends on the failed one" do
       expect { audit.abort_dependent_checks!(original_check) }
         .to change(dependent_check, :current_state)
-              .from("pending").to("failed")
+              .from("pending").to("aborted")
     end
   end
 end
