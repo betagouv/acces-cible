@@ -24,14 +24,15 @@ class Audit < ApplicationRecord
 
   Check.types.each do |name, klass|
     define_method(name) do
-      checks.to_a.find { |check| check.type == klass.name }
+      instance_variable_get("@#{name}") ||
+        instance_variable_set("@#{name}", checks.to_a.find { |check| klass === check } || checks.build(type: klass))
     end
   end
 
   def schedule = ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
 
   def all_checks
-    Check.types.map { |name, klass| send(name) || checks.build(type: klass) }
+    Check.names.map { |name| public_send(name) }
   end
 
   def check_completed?(identifier)
