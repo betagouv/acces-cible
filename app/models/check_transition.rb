@@ -1,6 +1,8 @@
 class CheckTransition < ApplicationRecord
   belongs_to :check, inverse_of: :check_transitions
 
+  scope :failed, -> { where(to_state: :failed) }
+
   validates :to_state, inclusion: { in: CheckStateMachine.states }
 
   after_destroy :update_most_recent, if: :most_recent?
