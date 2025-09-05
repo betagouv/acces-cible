@@ -4,12 +4,12 @@ class Crawler
 
   class NoMatchError < StandardError
     def initialize(root, crawled, &block)
-      super("Crawled #{crawled.size} pages starting from #{root} but #{block} found no match.")
+      super("Crawled #{crawled.size} pages starting from #{root.href} but #{block} found no match.")
     end
   end
   class CrawlLimitReachedError < StandardError
     def initialize(root, crawl_up_to)
-      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
+      super("Stopping after crawling #{crawl_up_to} pages starting from #{root.href}.")
     end
   end
 
