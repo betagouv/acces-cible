@@ -27,7 +27,7 @@
         <%= Audit.human("audit/status.pending") %>
       </p>
     <% end %>
-    <%= render(partial: @audit.all_checks, as: :check) %>
+    <%= render partial: @audit.all_checks, as: :check %>
   </div>
   <div class="fr-col-12 fr-col-md-4">
     <% audits = @site.audits.checked.sort_by_newest.load %>

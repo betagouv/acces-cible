@@ -1,7 +1,4 @@
-<div class="fr-mb-5w" id="<%= dom_id check %>">
-  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
-  <%= badge to_badge(check) %>
-
+<%= render "checks/check", check: do %>
   <p>
     <%= check.human(:allowed_level_differences) %>
     <br>
@@ -41,5 +38,5 @@
         </li>
       <% end %>
     <% end %>
-  </ul>
-</div>
+</ul>
+<% end %>
