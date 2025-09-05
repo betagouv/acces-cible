@@ -7,10 +7,17 @@ class ApplicationRecord < ActiveRecord::Base
 
   class << self
     delegate :helpers, to: ApplicationController
-
-    alias human human_attribute_name
     def human_count(attr = :count, count: nil) = human(attr, count: count || send(attr))
     def to_percent(number, **options) = helpers.number_to_percentage(number, options.merge(precision: 2, strip_insignificant_zeros: true))
+
+    def human(attribute, options = {})
+      if attribute.to_s.match?(/\/[^.]+$/) # human_attribute_name ignores nested_attributes unless there's a dot
+        scope = options[:scope] || "activerecord.attributes"
+        I18n.t("#{scope}.#{attribute}", **options.except(:scope))
+      else
+        human_attribute_name(attribute, options)
+      end
+    end
 
     def bulk_reset_counter(association, counter: nil)
       counter ||= "#{association}_count"
