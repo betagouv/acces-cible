@@ -3,8 +3,10 @@ class Crawler
   MAX_CRAWLED_PAGES = 5
 
   class NoMatchError < StandardError
-    def initialize(root, crawled, &block)
-      super("Crawled #{crawled.size} pages starting from #{root.href} but #{block} found no match.")
+    def initialize(root, crawled)
+      location = caller_locations(1, 1).first
+      caller = location ? "#{File.basename(location.path)}:#{location.lineno}" : "block"
+      super("Crawled #{crawled.size} pages starting from #{root.href} but #{caller} found no match.")
     end
   end
   class CrawlLimitReachedError < StandardError
@@ -23,7 +25,7 @@ class Crawler
   def find(&block)
     found = nil
     detect { |page, queue| found = page if block.call(page, queue) }
-    found or raise NoMatchError.new(root, crawled, &block)
+    found or raise NoMatchError.new(root, crawled)
   end
 
   private
