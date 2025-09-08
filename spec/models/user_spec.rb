@@ -49,6 +49,16 @@ RSpec.describe User do
         expect(described_class.logged_out).not_to include(user_with_session)
       end
     end
+
+    describe ".inactive" do
+      it "returns users not updated in 18 months" do
+        active_user = create(:user, updated_at: 1.month.ago)
+        inactive_user = create(:user, updated_at: 19.months.ago)
+
+        expect(described_class.inactive).to include(inactive_user)
+        expect(described_class.inactive).not_to include(active_user)
+      end
+    end
   end
 
   describe ".from_omniauth" do

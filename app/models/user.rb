@@ -5,12 +5,7 @@ class User < ApplicationRecord
 
   scope :logged_in, -> { joins(:sessions) }
   scope :logged_out, -> { where.missing(:sessions) }
-  scope :inactive, -> do
-    with(inactive_users: [
-      logged_out.where(updated_at: ..1.year.ago).select(:id),
-      logged_in.where(sessions: { created_at: ..18.months.ago }).select(:id)
-    ]).from("users").where(id: User.from("inactive_users").select(:id))
-  end
+  scope :inactive, -> { where(updated_at: ..18.months.ago) }
 
   validates :provider, :uid, :email, :name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }

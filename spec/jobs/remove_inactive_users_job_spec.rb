@@ -5,12 +5,15 @@ RSpec.describe RemoveInactiveUsersJob do
     let!(:team) { create(:team) }
     let!(:active_user) { create(:user, siret: team.siret) }
     let!(:inactive_logged_out_user) { create(:user, siret: team.siret, updated_at: 2.years.ago) }
-    let!(:inactive_logged_in_user) { create(:user, siret: team.siret) }
+    let!(:inactive_logged_in_user) { create(:user, siret: team.siret, updated_at: 2.years.ago) }
     let!(:recent_logged_out_user) { create(:user, siret: team.siret, updated_at: 6.months.ago) }
     let!(:recent_logged_in_user) { create(:user, siret: team.siret) }
 
     before do
-      create(:session, user: inactive_logged_in_user, created_at: 2.years.ago) if inactive_logged_in_user
+      if inactive_logged_in_user
+        create(:session, user: inactive_logged_in_user, created_at: 2.years.ago)
+        inactive_logged_in_user.update_column(:updated_at, 2.years.ago) # Force old timestamp after session creation
+      end
       create(:session, user: recent_logged_in_user, created_at: 1.month.ago)
     end
 
