@@ -1,16 +1,13 @@
 class User < ApplicationRecord
+  MAX_IDLE_TIME = 18.months
+
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
   has_many :sites, through: :team
   has_many :sessions, dependent: :destroy
 
   scope :logged_in, -> { joins(:sessions) }
   scope :logged_out, -> { where.missing(:sessions) }
-  scope :inactive, -> do
-    with(inactive_users: [
-      logged_out.where(updated_at: ..1.year.ago),
-      logged_in.where(sessions: { created_at: ..18.months.ago })
-    ]).from("inactive_users")
-  end
+  scope :inactive, -> { where(updated_at: ...MAX_IDLE_TIME.ago) }
 
   validates :provider, :uid, :email, :name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }
