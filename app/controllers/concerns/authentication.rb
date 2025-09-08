@@ -1,5 +1,6 @@
 module Authentication
   extend ActiveSupport::Concern
+  SESSION_DURATION = 1.month
 
   included do
     before_action :require_authentication
@@ -30,11 +31,11 @@ module Authentication
   end
 
   def resume_session
-    Current.session ||= find_session_by_cookie
+    Current.session ||= find_session_by_cookie&.tap(&:touch)
   end
 
   def find_session_by_cookie
-    Session.find(cookies.signed[:session_id]) if cookies.signed[:session_id]
+    Session.where(updated_at: ..SESSION_DURATION.ago).find(cookies.signed[:session_id]) if cookies.signed[:session_id]
   rescue ActiveRecord::RecordNotFound
     cookies.delete(:session_id)
     nil
