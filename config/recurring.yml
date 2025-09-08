@@ -7,6 +7,10 @@ production:
     class: RemoveInactiveUsersJob
     queue: background
     schedule: every month at 1am
+  remove_inactive_sessions:
+    class: RemoveInactiveSessionsJob
+    queue: background
+    schedule: every day at 1am
   remove_inactive_teams:
     class: RemoveInactiveTeamsJob
     queue: background
