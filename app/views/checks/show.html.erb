@@ -4,12 +4,15 @@
 </div>
 
 <% if @check.errored? %>
-  <%= dsfr_alert(size: :md, type: :error, title: @check.error[:klass], starting_header_level: 2, html_attributes: { class: "fr-mb-4w" }) do %>
-    <p><%= @check.error[:message] %></p>
-    <details class="error-details fr-mt-2w">
-      <summary class="fr-btn fr-btn--sm fr-btn--secondary"><%= Check.human(:display_backtrace) %></summary>
-      <pre class="fr-text--xs fr-mt-1w"><%= @check.error[:backtrace].join("\n") %></pre>
-    </details>
+  <%= dsfr_alert(size: :md, type: :error, title: @check.error[:klass], starting_header_level: 2, html_attributes: { class: "fr-my-4w" }) do %>
+    <p class="fr-mb-2w"><%= @check.error[:message] %></p>
+    <%= dsfr_accordion_section(title: Check.human(:backtrace), starting_header_level: 3) do %>
+      <ol class="fr-mb-0">
+        <% @check.error[:backtrace].each do |line| %>
+          <li><code class="text-wrap"><%= line %></code></li>
+        <% end %>
+      </ol>
+    <% end %>
   <% end %>
 <% elsif @check.failed? %>
   <p class="fr-mb-3w">

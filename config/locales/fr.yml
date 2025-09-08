@@ -108,7 +108,7 @@ fr:
         status: État
         checked_at: Vérification effectuée le
         error: Erreur
-        display_backtrace: Afficher la pile d'appels
+        backtrace: Pile d'appels
         unknown_error: Pas d'informations sur l'erreur
         view: Voir le contrôle
         view_name: Voir %{name}
