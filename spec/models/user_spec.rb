@@ -39,14 +39,13 @@ RSpec.describe User do
         {
           provider: "test",
           uid: "123",
-          info: { email: },
+          info: {
+            email:,
+            organizational_unit:,
+            name: "Yan Zhu"
+          },
           extra: {
-            raw_info: {
-              email:,
-              siret:,
-              organizational_unit:,
-              name: "Yan Zhu"
-            }
+            raw_info: { siret: }
           }
         }
       )
@@ -124,14 +123,13 @@ RSpec.describe User do
             {
               provider: "test",
               uid: "123",
-              info: { email: },
+              info: {
+                email:,
+                organizational_unit:,
+                name: "Yan Zhu"
+              },
               extra: {
-                raw_info: {
-                  email:,
-                  siret: new_siret,
-                  organizational_unit:,
-                  name: "Yan Zhu"
-                }
+                raw_info: { siret: new_siret }
               }
             }
           )
