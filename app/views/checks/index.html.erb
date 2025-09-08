@@ -1,0 +1,66 @@
+<%= dsfr_table(caption: Check.human(:all)) do |t| %>
+  <%
+    hidden_fields = params.permit(:limit)
+    params.permit(filter: {})["filter"].to_h.compact_blank.each do |key, value|
+      hidden_fields["filter[#{key}]"] = value
+    end
+  %>
+  <% t.with_search(url: url_for, name: :q, value: params[:q], hidden_fields:) %>
+  <% t.with_header_action do %>
+    <%= render "filter", attribute: :type, include_blank: Check.human(:type), options: Check.human_types.invert %>
+    <%= render "filter", attribute: :site_id, include_blank: Site.human(:url), options: current_user.sites.joins(:audits).where(audits: { current: true }).order(audits: { url: :asc }).pluck(:id, audits: :url).to_h.invert %>
+    <%= render "filter", attribute: :status, include_blank: Check.human(:status), options: Check.statuses.invert %>
+  <% end %>
+  <% t.with_head do %>
+    <tr>
+      <th scope="col"><%= Check.human(:type) %></th>
+      <th scope="col"><%= Site.human(:url) %></th>
+      <th scope="col"><%= Check.human(:checked_at) %></th>
+      <th scope="col"><%= Check.human(:status) %></th>
+      <th scope="col"><%= t("shared.actions") %></th>
+    </tr>
+  <% end %>
+  <% t.with_body do %>
+    <% if @checks.load.empty? %>
+      <tr>
+        <td colspan="5" class="fr-text--center fr-py-4w">
+          <%= Check.human_count(count: 0) %>
+        </td>
+      </tr>
+    <% else %>
+      <% @checks.each do |check| %>
+        <% site = check.site %>
+        <tr>
+          <td><%= check.human_type %></td>
+          <td><%= dsfr_link_to site.url.truncate(50), site.url, target: :_blank, title: "#{site.url}#{t('shared.new_window')}" %></td>
+          <td>
+            <% local_time = check.last_transition.created_at.in_time_zone %>
+            <%= time_tag local_time, l(local_time, format: :compact), title: l(local_time, format: :long) %>
+            <br>
+            (<%= time_ago local_time %>)
+          </td>
+          <td>
+            <% if error = check.error %>
+              <strong><%= highlight(error[:klass], params[:q]) %></strong>
+            <% else %>
+              <%= check.human_status %>
+            <% end %>
+          </td>
+          <td>
+            <% if check.failed? %>
+              <%= link_to check_path(check), class: "fr-btn fr-btn--sm fr-btn--secondary d-block", title: Check.human(:view_error_details, name: check.name) do %>
+                <%= icon :bug %>
+                <%= Check.human(:view_error) %>
+              <% end %>
+            <% else %>
+              <%= link_to [site, check.audit], class: "fr-btn fr-btn--sm fr-btn--secondary d-block", title: Site.human(:view_name, name: site.url_without_scheme_and_www) do %>
+                <%= icon :article, line: true %>
+                <%= Site.human(:view) %>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

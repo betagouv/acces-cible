@@ -1,0 +1,37 @@
+<div class="fr-mb-2w">
+  <strong><%= Check.human(:status) %> :</strong>
+  <%= badge to_badge(@check) %>
+</div>
+
+<% if @check.errored? %>
+  <%= dsfr_alert(size: :md, type: :error, title: @check.error[:klass], starting_header_level: 2, html_attributes: { class: "fr-mb-4w" }) do %>
+    <p><%= @check.error[:message] %></p>
+    <details class="error-details fr-mt-2w">
+      <summary class="fr-btn fr-btn--sm fr-btn--secondary"><%= Check.human(:display_backtrace) %></summary>
+      <pre class="fr-text--xs fr-mt-1w"><%= @check.error[:backtrace].join("\n") %></pre>
+    </details>
+  <% end %>
+<% elsif @check.failed? %>
+  <p class="fr-mb-3w">
+    <strong><%= Check.human :error %> :</strong>
+    <%= Check.human(:unknown_error) %>
+  </p>
+<% end %>
+
+<p>
+  <strong><%= Site.human :url %> :</strong>
+  <%= link_to @check.site.url, @check.site.url, target: :_blank %>
+</p>
+
+<p>
+  <strong><%= Check.human :checked_at %> :</strong>
+  <% transition = @check.last_transition %>
+  <% local_time = transition.created_at.in_time_zone %>
+  <%= time_tag local_time, l(local_time, format: :long) %>
+  (<%= time_ago local_time %>).
+</p>
+
+<%= page_actions do %>
+  <%= link_to Site.human(:view), [@check.site, @check.audit, anchor: dom_id(@check)], class: "fr-btn" %>
+  <%= link_to t("shared.back_to_list"), checks_path, class: "fr-btn fr-btn--secondary" %>
+<% end %>

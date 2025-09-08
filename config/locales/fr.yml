@@ -12,6 +12,8 @@ fr:
     apply: Appliquer
     applying: Appliquer…
     add: Ajouter
+    filter: Filtrer
+    reset: Réinitialiser
     send: Envoyer
     save: Enregistrer
     saving: Enregistrement…
@@ -101,10 +103,18 @@ fr:
         failed: Échoué
 
       check:
+        all: Contrôles
         type: Type de contrôle
         status: État
         checked_at: Vérification effectuée le
-        attempts: Tentatives
+        error: Erreur
+        display_backtrace: Afficher la pile d'appels
+        unknown_error: Pas d'informations sur l'erreur
+        view: Voir le contrôle
+        view_name: Voir %{name}
+        view_error: Voir l'erreur
+        view_error_details: Voir l'erreur de %{name}
+        name: "%{type} - %{site}"
         count:
           zero: Aucun contrôle
           one: Un contrôle
@@ -314,3 +324,6 @@ fr:
   audits:
     create:
       notice: Vérification créée
+  checks:
+    index:
+      title: Contrôles

@@ -1,6 +1,7 @@
 <div class="fr-mb-5w" id="<%= dom_id check %>">
   <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
   <%= badge to_badge(check) %>
+  <%= link_icon :bug, Check.human(:view_error), check_path(check), btn: :secondary, size: :sm, class: "fr-mb-1w with-icon-and-text", title: Check.human(:view_error_details, name: check.human_type) if check.errored? %>
 
   <%= yield %>
 </div>

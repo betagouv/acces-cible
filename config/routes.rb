@@ -22,6 +22,8 @@ Rails.application.routes.draw do
 
   resource :user, only: [:show]
 
+  resources :checks, only: [:index, :show]
+
   # Static pages
   scope controller: :pages do
     root action: :accueil

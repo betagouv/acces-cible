@@ -71,6 +71,8 @@ class Check < ApplicationRecord
     end
     def names = types.keys
     def classes = types.values
+    def human_types = TYPES.to_h { |type| [type, human("checks.#{type}.type")] }
+    def statuses = human("check/status")
     def priority = self::PRIORITY
   end
 
@@ -80,6 +82,8 @@ class Check < ApplicationRecord
   def crawler = Crawler.new(audit.url)
   def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
   def tooltip? = true
+  def errored? = failed? && last_transition.metadata.present?
+  def name = human(:name, type: human_type, site: site.url)
 
   def run!
     self.data = analyze!
@@ -105,9 +109,8 @@ class Check < ApplicationRecord
   end
 
   def error
-    return unless failed?
-
-    last_transition.metadata
+    klass, message, backtrace = last_transition.metadata.slice("json_class", "m", "b").values
+    { klass:, message:, backtrace: } if klass
   end
 
   private

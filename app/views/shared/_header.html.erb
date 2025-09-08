@@ -10,6 +10,7 @@
     <%= header.with_direct_link_simple title: Site.human(:all), path: sites_path, active: current_page?(controller: :sites, action: :index) %>
     <%= header.with_direct_link_simple title: Site.human(:add), path: new_site_path, active: current_page?(controller: :sites, action: :new) %>
     <%= header.with_direct_link_simple title: Tag.human(:all), path: tags_path, active: current_page?(controller: :tags, action: :index) %>
+    <%= header.with_direct_link_simple title: Check.human(:all), path: checks_path, active: controller_name.to_sym == :checks %>
   <% else %>
     <%= header.with_tool_link title: t("shared.login"), path: login_path, html_attributes: { class: [icon_class(:account, :circle, btn: :secondary)] } %>
   <% end %>

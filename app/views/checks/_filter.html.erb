@@ -1,0 +1,10 @@
+<%# locals: (attribute:, options:, include_blank:) %>
+
+<%= form_with(model: Check.new, url: url_for, method: :get, class: "fr-mb-md-1w fr-mx-1w fr-ml-md-2w fr-mr-md-0", data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
+  <% (params[:filter] || {}).except(attribute).compact_blank.each do |key, value| %>
+  <%= f.hidden_field key, value:, name: "filter[#{key}]", id: nil %>
+  <% end %>
+
+  <%= f.dsfr_label_with_hint attribute, class: "fr-sr-only" %>
+  <%= f.dsfr_select_tag attribute, options, include_blank:, selected: params.dig(:filter, attribute), name: "filter[#{attribute}]" %>
+<% end %>
