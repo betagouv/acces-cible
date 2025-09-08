@@ -109,8 +109,13 @@ class Check < ApplicationRecord
   end
 
   def error
-    klass, message, backtrace = last_transition.metadata.slice("json_class", "m", "b").values
-    { klass:, message:, backtrace: } if klass
+    return nil unless last_transition&.metadata.present?
+
+    metadata = last_transition.metadata
+    return metadata unless metadata.is_a?(Hash) && metadata.key?("json_class")
+
+    klass, message, backtrace = metadata.slice("json_class", "m", "b").values
+    { klass:, message:, backtrace: }
   end
 
   private

@@ -45,8 +45,8 @@ RSpec.describe RunCheckJob do
 
       expect(check.error)
         .to include(
-          "json_class" => "Ferrum::TimeoutError",
-          "m" => /Timed out/
+          klass: "Ferrum::TimeoutError",
+          message: /Timed out/
         )
     end
 
@@ -55,7 +55,7 @@ RSpec.describe RunCheckJob do
         described_class.perform_later(check)
       end
 
-      backtrace = check.error["b"] # backtrace is stored in "b" key when using as_json
+      backtrace = check.error[:backtrace]
       expect(backtrace).to be_present
       expect(backtrace).to all(match(/^app\//)) # Should only contain app paths after cleaning
     end
