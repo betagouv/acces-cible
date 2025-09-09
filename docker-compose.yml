@@ -26,7 +26,9 @@ services:
     command: "bin/jobs"
     ports: []
     environment:
-      RUBY_DEBUG_PORT: ''
+      DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
+      RUBY_DEBUG_PORT: 3500
+      RUBY_DEBUG_PORT_RANGE: 10
   db:
     image: postgres
     environment:
