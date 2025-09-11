@@ -20,7 +20,7 @@ module AuthHelpers
       }
     )
 
-    visit "/auth/developer"
+    get "/auth/developer/callback"
   end
 end
 
