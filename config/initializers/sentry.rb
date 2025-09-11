@@ -19,11 +19,15 @@ Sentry.init do |config|
     event
   end
 
-  # Set tracesSampleRate to 1.0 to capture 100%
-  # of transactions for performance monitoring.
-  # We recommend adjusting this value in production
-  config.traces_sample_rate = 0.005
-  config.profiles_sample_rate = 0.5
-  config.profiler_class = Sentry::Vernier::Profiler
+  # Environment-specific performance and debugging settings
+  if Rails.application.staging?
+    config.traces_sample_rate = 0.1
+    config.profiles_sample_rate = 0.8
+    config.include_local_variables = true
+  else
+    config.traces_sample_rate = 0.005
+    config.profiles_sample_rate = 0.5
+  end
 
+  config.profiler_class = Sentry::Vernier::Profiler
 end
