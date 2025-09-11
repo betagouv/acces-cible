@@ -25,7 +25,7 @@ class User < ApplicationRecord
   class << self
     def from_omniauth(auth)
       data_source = auth.info
-      siret = auth.extra.raw_info.siret
+      siret = auth.provider == "developer" ? data_source.siret : auth.extra.raw_info.siret
 
       user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
       user.assign_attributes(

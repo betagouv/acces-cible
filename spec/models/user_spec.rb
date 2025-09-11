@@ -51,6 +51,38 @@ RSpec.describe User do
       )
     end
 
+    context 'when in development environment' do
+      let(:auth) do
+        OmniAuth::AuthHash.new(
+          {
+            provider: "developer",
+            uid: "123",
+            info: {
+              email:,
+              organizational_unit:,
+              name: "Yan Zhu",
+              siret:
+            }
+          }
+        )
+      end
+
+      context "when user does not exist" do
+        it "creates a new user with the provided attributes" do
+          expect { from_omniauth }.to change(described_class, :count).by(1)
+
+          user = described_class.last
+          expect(user).to have_attributes(
+                            siret:,
+                            provider: auth.provider,
+                            uid: auth.uid,
+                            email: auth.info.email,
+                            name: "Yan Zhu",
+                          )
+        end
+      end
+    end
+
     context "when user does not exist" do
       it "creates a new user with the provided attributes" do
         expect { from_omniauth }.to change(described_class, :count).by(1)
