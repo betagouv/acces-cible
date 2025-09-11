@@ -150,10 +150,21 @@ RSpec.describe Check do
       let(:check) { create(:check, :reachable, :failed) }
 
       before do
-        check.last_transition.update!(metadata: "error")
+        app_path = Rails.root.to_s
+        check.last_transition.update!(metadata: {
+          json_class: "StandardError",
+          m: "Test error message",
+          b: [
+            "#{app_path}/app/models/check.rb:124:in `analyze!'",
+            "#{app_path}/app/models/check.rb:89:in `run!'",
+            "#{app_path}/app/jobs/run_check_job.rb:12:in `perform'",
+            "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:245:in `command'",
+            "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/page.rb:134:in `evaluate'",
+          ]
+        })
       end
 
-      it { should eq "error" }
+      it { should include(klass: "StandardError", message: "Test error message") }
     end
   end
 end

@@ -107,7 +107,10 @@ class Check < ApplicationRecord
   def error
     return unless failed?
 
-    last_transition.metadata
+    klass, message, backtrace = last_transition.metadata.slice("json_class", "m", "b").values
+    app_path = Rails.root.to_s
+    backtrace = backtrace.collect { it.sub(app_path, "") }
+    { klass:, message:, backtrace: }
   end
 
   private
