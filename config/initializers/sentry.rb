@@ -15,6 +15,8 @@ Sentry.init do |config|
   # of transactions for performance monitoring.
   # We recommend adjusting this value in production
   config.traces_sample_rate = 0.005
+  config.profiles_sample_rate = 0.5
+  config.profiler_class = Sentry::Vernier::Profiler
 
   config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
   config.environment = :staging if Rails.application.staging?
