@@ -28,6 +28,28 @@ RSpec.describe User do
   end
 
   describe "scopes" do
+    describe ".logged_in" do
+      it "returns users with sessions" do
+        user_with_session = create(:user)
+        create(:session, user: user_with_session)
+        user_without_session = create(:user)
+
+        expect(described_class.logged_in).to include(user_with_session)
+        expect(described_class.logged_in).not_to include(user_without_session)
+      end
+    end
+
+    describe ".logged_out" do
+      it "returns users without sessions" do
+        user_with_session = create(:user)
+        create(:session, user: user_with_session)
+        user_without_session = create(:user)
+
+        expect(described_class.logged_out).to include(user_without_session)
+        expect(described_class.logged_out).not_to include(user_with_session)
+      end
+    end
+
     describe ".inactive" do
       it "returns users not updated in 18 months" do
         active_user = create(:user, updated_at: 1.minute.ago)
