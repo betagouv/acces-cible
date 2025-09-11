@@ -3,7 +3,8 @@ Sentry.init do |config|
 
   config.dsn = Rails.application.credentials.sentry.dsn
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
-  config.release = ENV["CONTAINER_VERSION"]
+  config.environment = :staging if Rails.application.staging?
+  config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
 
   config.before_send = lambda do |event, hint|
     # Remove server_name from the event so it doesn't affect grouping
@@ -18,6 +19,4 @@ Sentry.init do |config|
   config.profiles_sample_rate = 0.5
   config.profiler_class = Sentry::Vernier::Profiler
 
-  config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
-  config.environment = :staging if Rails.application.staging?
 end
