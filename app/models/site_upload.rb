@@ -69,12 +69,18 @@ class SiteUpload
 
       url = Link.normalize(row["url"])
       name = row["nom"] || row["name"]
-      if existing_site = team.sites.find_by_url(url:)
-        existing_site.assign_attributes(tag_ids: tag_ids.union(existing_site.tag_ids))
+      tag_names = row["tags"].present? ? row["tags"].split(",").map(&:strip).compact_blank.uniq : []
+
+      row_tag_ids = tag_names.map { |n| team.tags.find_or_create_by(name: n).id }
+      combined_tag_ids = (tag_ids + row_tag_ids).uniq
+      existing_site = team.sites.find_by_url(url:)
+
+      if existing_site
+        existing_site.assign_attributes(tag_ids: combined_tag_ids.union(existing_site.tag_ids))
         existing_site.assign_attributes(name:) unless existing_site.name
         self.existing_sites[url] = existing_site
       else
-        self.new_sites[url] = { url:, team:, name:, tag_ids: }
+        self.new_sites[url] = { url:, team:, name:, tag_ids: combined_tag_ids }
       end
     end
   end

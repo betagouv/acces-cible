@@ -3,8 +3,7 @@ require "rails_helper"
 RSpec.describe SiteUpload do
   subject(:site_upload) { described_class.new(file:, team:) }
 
-  let(:team) { build(:team) }
-  let(:file_path) { Rails.root.join("spec/fixtures/files/sites.csv") }
+  let(:team) { create(:team) }
   let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttps://test.com/,Test Site" }
   let(:encoding) { Encoding::UTF_8 }
   let(:csv) do
@@ -192,6 +191,19 @@ RSpec.describe SiteUpload do
         expect { site_upload.parse_sites }.not_to raise_error
         expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
         expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
+      end
+    end
+
+    context "when CSV has tags column" do
+      let!(:public_tag) { create(:tag, name: "Public", team:) }
+      let(:csv_content) { "url,name,tags\nhttps://example.com/,Example Site,\"Beta, Gouv\"" }
+
+      it "populates tags" do
+        site_upload.parse_sites
+
+        expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
+        expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
+        expect(team.reload.tags.pluck(:name)).to include("Beta", "Gouv", "Public")
       end
     end
   end
