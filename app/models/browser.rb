@@ -110,6 +110,10 @@ class Browser
 
   private
 
+  def request_headers
+    HEADERS.merge(random_user_agent)
+  end
+
   def browser
     restart! if crashed?
     @browser ||= Ferrum::Browser.new(settings).tap do |browser|
@@ -156,8 +160,7 @@ class Browser
 
   def create_page
     browser.create_page.tap do |page|
-      page.headers.set(HEADERS)
-      page.headers.add(random_user_agent)
+      page.headers.set(request_headers)
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
   end

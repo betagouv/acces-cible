@@ -425,18 +425,13 @@ RSpec.describe Browser do
       expect(result).to eq(page)
     end
 
-    it "sets standard headers on the page" do
-      instance.send(:create_page)
-
-      expect(headers).to have_received(:set).with(Browser::HEADERS)
-    end
-
-    it "adds random user agent headers" do
-      allow(instance).to receive(:random_user_agent).and_return({ "User-Agent" => "test-agent" })
+    it "sets all headers including user agent on the page" do
+      request_headers = Browser::HEADERS.merge({ "User-Agent" => "test-agent" })
+      allow(instance).to receive(:request_headers).and_return(request_headers)
 
       instance.send(:create_page)
 
-      expect(headers).to have_received(:add).with({ "User-Agent" => "test-agent" })
+      expect(headers).to have_received(:set).with(request_headers)
     end
 
     it "waits for network idle" do
