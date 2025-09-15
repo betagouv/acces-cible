@@ -12,13 +12,13 @@ RSpec.describe ApplicationJob do
   describe "#monitor_with_sentry" do
     # We need basic doubles because Sentry is not loaded in test environment
     # rubocop:disable RSpec/VerifiedDoubles
-    let(:transaction_double) { double("Transaction", set_data: nil) }
+    let(:transaction_double) { double("Transaction", set_data: nil, finish: nil) }
     let(:sentry_double) { double("Sentry") }
     # rubocop:enable RSpec/VerifiedDoubles
 
     before do
       stub_const("Sentry", sentry_double)
-      allow(sentry_double).to receive(:with_transaction).and_yield(transaction_double)
+      allow(sentry_double).to receive(:start_transaction).and_return(transaction_double)
       allow(sentry_double).to receive(:capture_exception)
     end
 
@@ -28,10 +28,11 @@ RSpec.describe ApplicationJob do
       it "creates a Sentry transaction with queue name and arguments" do
         expect(transaction_double).to receive(:set_data).with(:queue, "background")
         expect(transaction_double).to receive(:set_data).with(:arguments, ["test", { arg2: "value" }])
-        expect(sentry_double).to receive(:with_transaction).with(
+        expect(sentry_double).to receive(:start_transaction).with(
           op: "queue.solid_queue",
           name: "ApplicationJob"
         )
+        expect(transaction_double).to receive(:finish)
 
         job_instance.send(:monitor_with_sentry) { "success" }
       end
@@ -43,10 +44,11 @@ RSpec.describe ApplicationJob do
       let(:error) { StandardError.new("Test error") }
 
       it "creates a Sentry transaction, captures and reraises the exception" do
-        expect(sentry_double).to receive(:with_transaction).with(
+        expect(sentry_double).to receive(:start_transaction).with(
           op: "queue.solid_queue",
           name: "ApplicationJob"
         )
+        expect(transaction_double).to receive(:finish)
         expect(sentry_double).to receive(:capture_exception).with(
           error,
           extra: {

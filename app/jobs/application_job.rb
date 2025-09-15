@@ -13,21 +13,22 @@ class ApplicationJob < ActiveJob::Base
   private
 
   def monitor_with_sentry
-    Sentry.with_transaction(
+    transaction = Sentry.start_transaction(
       op: "queue.solid_queue",
       name: self.class.name
-    ) do |transaction|
-      transaction.set_data(:queue, queue_name)
-      transaction.set_data(:arguments, arguments)
+    )
+    transaction&.set_data(:queue, queue_name)
+    transaction&.set_data(:arguments, arguments)
 
-      yield
-    end
+    yield
   rescue => error
     Sentry.capture_exception(error, extra: {
+      queue: queue_name,
       job_class: self.class.name,
-      arguments: arguments,
-      queue: queue_name
+      arguments:
     })
     raise
+  ensure
+    transaction&.finish
   end
 end

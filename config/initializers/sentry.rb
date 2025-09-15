@@ -9,6 +9,13 @@ Sentry.init do |config|
   config.before_send = lambda do |event, hint|
     # Remove server_name from the event so it doesn't affect grouping
     event.server_name = nil
+
+    # Filter sensitive data using Rails parameter filtering
+    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+    event.extra = filter.filter(event.extra) if event.extra
+    event.user = filter.filter(event.user) if event.user
+    event.contexts = filter.filter(event.contexts) if event.contexts
+
     event
   end
 
