@@ -33,4 +33,13 @@ Sentry.init do |config|
 
   # Enable SQL query performance monitoring
   config.enable_tracing = true
+
+  # Filter common non-actionable exceptions
+  config.excluded_exceptions += %w[
+    ActionController::BadRequest
+    ActionController::UnknownFormat
+    ActionDispatch::Http::MimeNegotiation::InvalidType
+    Rack::QueryParser::InvalidParameterError
+    CGI::Session::CookieStore::TamperedWithCookie
+  ]
 end
