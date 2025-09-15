@@ -1,7 +1,7 @@
 module Checks
   class AnalyzeAccessibilityPage < Check
     PRIORITY = 21
-    REQUIREMENTS = [:find_accessibility_page]
+    REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze

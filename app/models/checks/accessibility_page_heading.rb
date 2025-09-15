@@ -1,7 +1,7 @@
 module Checks
   class AccessibilityPageHeading < Check
     PRIORITY = 22
-    REQUIREMENTS = [:find_accessibility_page]
+    REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     EXPECTED_HEADINGS = [
       [1, "Déclaration d'accessibilité"],
         [2, "État de conformité"],

@@ -99,6 +99,7 @@ fr:
         passed: Effectué
         retryable: À retenter
         failed: Échoué
+        mixed: Mixte
 
       check:
         type: Type de contrôle
