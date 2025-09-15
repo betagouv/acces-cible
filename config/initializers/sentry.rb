@@ -42,4 +42,15 @@ Sentry.init do |config|
     Rack::QueryParser::InvalidParameterError
     CGI::Session::CookieStore::TamperedWithCookie
   ]
+
+  # Add user context for authenticated requests
+  config.before_send_transaction = lambda do |event, hint|
+    if defined?(Current) && Current.respond_to?(:user) && Current.user
+      Sentry.set_user(
+        id: Current.user.id,
+        email: Current.user.email
+      )
+    end
+    event
+  end
 end
