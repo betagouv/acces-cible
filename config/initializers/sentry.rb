@@ -30,4 +30,7 @@ Sentry.init do |config|
   end
 
   config.profiler_class = Sentry::Vernier::Profiler
+
+  # Enable SQL query performance monitoring
+  config.enable_tracing = true
 end
