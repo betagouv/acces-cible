@@ -4,7 +4,7 @@ Sentry.init do |config|
   config.dsn = Rails.application.credentials.sentry.dsn
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
   config.environment = :staging if Rails.application.staging?
-  config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
+  config.release = ENV["CONTAINER_VERSION"]
 
   config.before_send = lambda do |event, hint|
     # Remove server_name from the event so it doesn't affect grouping
