@@ -23,7 +23,145 @@ RSpec.describe Browser do
     WebMock.disable_net_connect!
   end
 
-  describe "#get" do
+  describe ".exists?" do
+    subject(:exists?) { described_class.exists?(url) }
+
+    before do
+      allow(described_class).to receive(:head).and_return(head_response)
+    end
+
+    context "when URL is nil" do
+      let(:url) { nil }
+      let(:head_response) { { status: 200 } }
+
+      it "returns false" do
+        expect(exists?).to be_falsey
+      end
+
+      it "does not make a HEAD request" do
+        exists?
+        expect(described_class).not_to have_received(:head)
+      end
+    end
+
+    context "when URL is present and HEAD returns 200" do
+      let(:head_response) { { status: 200 } }
+
+      it "returns true" do
+        expect(exists?).to be(true)
+      end
+
+      it "makes a HEAD request with the URL" do
+        exists?
+        expect(described_class).to have_received(:head).with(url)
+      end
+    end
+
+    [0, 404, 500].each do |status|
+      context "when URL is present but HEAD returns #{status}" do
+        let(:head_response) { { status: } }
+
+        it "returns false" do
+          expect(exists?).to be(false)
+        end
+      end
+    end
+  end
+
+  describe ".head" do
+    subject(:head_result) { described_class.head(url) }
+
+    let(:response) { instance_double(HTTP::Response) }
+    let(:uri) { instance_double(Addressable::URI) }
+    let(:http_chain) { instance_double(HTTP::Client) }
+
+    before do
+      allow(HTTP).to receive(:headers).and_return(http_chain)
+      allow(http_chain).to receive_messages(timeout: http_chain, follow: http_chain)
+      allow(http_chain).to receive(:head).with(url).and_return(response)
+      allow(response).to receive(:uri).and_return(uri)
+      allow(uri).to receive(:to_s).and_return(url)
+      allow(Link).to receive(:normalize).and_return(url)
+    end
+
+    context "when request is successful" do
+      before do
+        allow(response).to receive(:code).and_return(200)
+      end
+
+      it "makes HEAD request with correct options" do
+        head_result
+
+        expect(HTTP).to have_received(:headers)
+        expect(http_chain).to have_received(:timeout).with(connect: 3, read: 3)
+        expect(http_chain).to have_received(:follow).with(max_hops: 3)
+        expect(http_chain).to have_received(:head).with(url)
+      end
+
+      it "returns hash with status and normalized current_url" do
+        expect(head_result).to be_a(Hash)
+        expect(head_result.keys).to contain_exactly(:status, :current_url)
+        expect(head_result[:status]).to eq(200)
+        expect(head_result[:current_url]).to eq(url)
+        expect(Link).to have_received(:normalize).with(url)
+      end
+    end
+
+    context "when request follows redirects" do
+      let(:final_url) { "https://example.com/final" }
+      let(:normalized_url) { "https://example.com/final/" }
+
+      before do
+        allow(response).to receive(:code).and_return(200)
+        allow(uri).to receive(:to_s).and_return(final_url)
+        allow(Link).to receive(:normalize).with(final_url).and_return(normalized_url)
+      end
+
+      it "returns normalized effective URL" do
+        expect(head_result[:current_url]).to eq(normalized_url)
+        expect(Link).to have_received(:normalize).with(final_url)
+      end
+    end
+
+    context "when request times out" do
+      before do
+        allow(http_chain).to receive(:head).with(url).and_raise(HTTP::Error)
+      end
+
+      it "returns status 0" do
+        expect(head_result[:status]).to eq(0)
+      end
+
+      it "returns normalized original URL when request fails" do
+        expect(head_result[:current_url]).to eq(url)
+        expect(Link).to have_received(:normalize).with(url)
+      end
+    end
+
+    context "when response code is nil" do
+      before do
+        allow(response).to receive(:code).and_return(nil)
+      end
+
+      it "returns status 0" do
+        expect(head_result[:status]).to eq(0)
+      end
+    end
+
+    [404, 500, 301, 302].each do |code|
+      context "when response code is #{code}" do
+        before do
+          allow(response).to receive(:code).and_return(code)
+        end
+
+        it "returns correct status code" do
+          expect(head_result[:status]).to eq(code)
+        end
+      end
+    end
+  end
+
+  describe ".get" do
     subject(:get_result) { described_class.get(url) }
 
     let(:network) { instance_double(Ferrum::Network, status: 200, response: nil) }
@@ -100,7 +238,7 @@ RSpec.describe Browser do
     end
   end
 
-  describe "#axe_check", :aggregate_failures do
+  describe ".axe_check", :aggregate_failures do
     subject(:axe_check) { described_class.axe_check(url) }
 
     let(:axe_source) { "/* axe source code */" }
@@ -443,18 +581,13 @@ RSpec.describe Browser do
       expect(result).to eq(page)
     end
 
-    it "sets standard headers on the page" do
-      instance.send(:create_page)
-
-      expect(headers).to have_received(:set).with(Browser::HEADERS)
-    end
-
-    it "adds random user agent headers" do
-      allow(instance).to receive(:random_user_agent).and_return({ "User-Agent" => "test-agent" })
+    it "sets all headers including user agent on the page" do
+      request_headers = Browser::HEADERS.merge({ "User-Agent" => "test-agent" })
+      allow(instance).to receive(:request_headers).and_return(request_headers)
 
       instance.send(:create_page)
 
-      expect(headers).to have_received(:add).with({ "User-Agent" => "test-agent" })
+      expect(headers).to have_received(:set).with(request_headers)
     end
 
     it "waits for network idle" do

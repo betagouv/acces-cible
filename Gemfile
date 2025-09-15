@@ -79,6 +79,9 @@ gem "ferrum"
 # State machine
 gem "statesman"
 
+# Pure Ruby HTTP client for simple requests
+gem "http"
+
 # Detect main language from text
 gem "cld"
 
