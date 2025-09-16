@@ -4,22 +4,30 @@ require "optparse"
 
 def help_message
   puts <<~HELP
-    Usage: bin/scalingo [ENVIRONMENT] [OPTIONS]
+    Usage: bin/scalingo [ENVIRONMENT] [COMMAND] [OPTIONS]
 
     ENVIRONMENT:
       staging    Connect to staging environment (default)
       prod       Connect to production environment
 
+    COMMAND:
+      console    Start Rails console (default)
+      bash       Start bash shell
+
     OPTIONS:
       -s, --sandbox  Start Rails console in sandbox mode (changes are rolled back)
+                     Note: Only applies to Rails console, not bash
       -h, --help     Show this help message
 
     Examples:
-      bin/scalingo                    # Connect to staging console
-      bin/scalingo staging            # Connect to staging console
-      bin/scalingo prod               # Connect to production console
-      bin/scalingo staging -s         # Connect to staging console in sandbox mode
-      bin/scalingo prod --sandbox     # Connect to production console in sandbox mode
+      bin/scalingo                    # Connect to Rails console on staging
+      bin/scalingo staging            # Connect to Rails console on staging
+      bin/scalingo prod               # Connect to Rails console on production
+      bin/scalingo bash               # Connect to bash shell on staging
+      bin/scalingo staging bash       # Connect to bash shell on staging
+      bin/scalingo prod bash          # Connect to bash shell on production
+      bin/scalingo staging -s         # Connect to Rails console in sandbox mode on staging
+      bin/scalingo prod --sandbox     # Connect to Rails console in sandbox mode on production
 
     Note: This script requires the Scalingo CLI to be installed and configured.
     If you haven't set it up yet, visit: https://doc.scalingo.com/platform/cli/start
@@ -35,51 +43,64 @@ def check_scalingo_cli
   end
 end
 
-# Parse command line arguments
+# Check if Scalingo CLI is available
+check_scalingo_cli
+
+# Default values
 environment = "staging"
+command = "console"
 sandbox = false
 
 OptionParser.new do |opts|
   opts.on("-s", "--sandbox", "Start console in sandbox mode") do
     sandbox = true
   end
-
   opts.on("-h", "--help", "Show help message") do
     help_message
     exit 0
   end
 end.parse!
 
-# Handle positional argument for environment
-if ARGV.length > 0
-  case ARGV[0].downcase
-  when "staging", "stage"
+# Parse positional arguments - split into environments and commands
+ARGV.each do |arg|
+  case arg.downcase
+  when "staging"
     environment = "staging"
   when "prod", "production"
-    environment = "prod"
+    environment = "production"
+  when "console"
+    command = "console"
+  when "bash"
+    command = "bash"
   else
-    puts "Error: Invalid environment '#{ARGV[0]}'. Use 'staging' or 'prod'."
+    puts "Error: Invalid argument '#{arg}'. Use 'staging', 'production', 'console', or 'bash'."
     puts "Use --help for usage information."
     exit 1
   end
 end
 
-# Check if Scalingo CLI is available
-check_scalingo_cli
-
 # Build the command based on environment
 case environment
 when "staging"
   app_config = "--region osc-fr1 --app acces-cible-staging"
-when "prod"
-  app_config = "--region osc-secnum-fr1 -a acces-cible-prod"
+when "production"
+  app_config = "--region osc-secnum-fr1 -app acces-cible-prod"
 end
 
-# Build the Rails console command
-console_cmd = sandbox ? "rails console --sandbox" : "rails console"
-scalingo_cmd = "scalingo #{app_config} run #{console_cmd}"
+# Build the command based on command type
+case command
+when "console"
+  run_cmd = sandbox ? "rails console --sandbox" : "rails console"
+  puts "Connecting to #{environment} Rails console#{sandbox ? ' (sandbox mode)' : ''}..."
+when "bash"
+  if sandbox
+    puts "Warning: Sandbox mode is not applicable to bash shells. Ignoring --sandbox option."
+  end
+  run_cmd = "bash"
+  puts "Connecting to #{environment} bash shell..."
+end
 
-puts "Connecting to #{environment} environment#{sandbox ? ' (sandbox mode)' : ''}..."
+scalingo_cmd = "scalingo #{app_config} run #{run_cmd}"
 puts "Running: #{scalingo_cmd}"
 puts
 
