@@ -4,8 +4,11 @@ class Crawler
 
   class NoMatchError < StandardError
     def initialize(root, crawled)
-      location = caller_locations(1, 1).first
-      caller = location ? "#{File.basename(location.path)}:#{location.lineno}" : "block"
+      # Get parent information from backtrace
+      # caller_locations takes 2 arguments: number of skipped frames, number of returned frames
+      parent_frame = caller_locations(1, 1).first
+      # caller = "method (file.rb:line)"
+      caller = "#{parent_frame.label} (#{File.basename(parent_frame.path)}:#{parent_frame.lineno})"
       super("Crawled #{crawled.size} pages starting from #{root.href} but #{caller} found no match.")
     end
   end
