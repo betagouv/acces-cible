@@ -1,6 +1,8 @@
 require "json/add/exception" # required to serialize errors as JSON
 
 class RunCheckJob < ApplicationJob
+  limits_concurrency to: 1, duration: 1.minute, key: ->(check) { check.audit }
+
   rescue_from Check::RuntimeError do |exception|
     cleaned_exception = exception.cause.dup
     cleaned_exception.set_backtrace Rails.backtrace_cleaner.clean(exception.cause.backtrace)
