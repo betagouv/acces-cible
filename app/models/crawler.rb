@@ -3,13 +3,18 @@ class Crawler
   MAX_CRAWLED_PAGES = 5
 
   class NoMatchError < StandardError
-    def initialize(root, crawled, &block)
-      super("Crawled #{crawled.size} pages starting from #{root} but #{block} found no match.")
+    def initialize(root, crawled)
+      # Get parent information from backtrace
+      # caller_locations takes 2 arguments: number of skipped frames, number of returned frames
+      parent_frame = caller_locations(1, 1).first
+      # caller = "method (file.rb:line)"
+      caller = "#{parent_frame.label} (#{File.basename(parent_frame.path)}:#{parent_frame.lineno})"
+      super("Crawled #{crawled.size} pages starting from #{root.href} but #{caller} found no match.")
     end
   end
   class CrawlLimitReachedError < StandardError
     def initialize(root, crawl_up_to)
-      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
+      super("Stopping after crawling #{crawl_up_to} pages starting from #{root.href}.")
     end
   end
 
@@ -23,7 +28,7 @@ class Crawler
   def find(&block)
     found = nil
     detect { |page, queue| found = page if block.call(page, queue) }
-    found or raise NoMatchError.new(root, crawled, &block)
+    found or raise NoMatchError.new(root, crawled)
   end
 
   private
