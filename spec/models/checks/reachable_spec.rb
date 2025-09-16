@@ -10,6 +10,7 @@ RSpec.describe Checks::Reachable do
 
   before do
     allow(check).to receive_messages(audit:, root_page:, site:)
+    allow(Browser).to receive(:head).and_return({ status: 200, current_url: original_url })
   end
 
   describe "constants" do
@@ -43,6 +44,10 @@ RSpec.describe Checks::Reachable do
 
     context "when the site is reachable" do
       context "when the site has a blank name" do
+        before do
+          allow(site).to receive(:name).and_return("")
+        end
+
         it "updates the site name" do
           expect(site).to receive(:update).with(name: root_page.title)
 
@@ -51,8 +56,11 @@ RSpec.describe Checks::Reachable do
       end
 
       context "when the site already has a name" do
-        it "doesn't update site name" do
+        before do
           allow(site).to receive(:name).and_return("Site name already set")
+        end
+
+        it "doesn't update site name" do
           expect(site).not_to receive(:update)
 
           check.send(:analyze!)
@@ -87,6 +95,7 @@ RSpec.describe Checks::Reachable do
     context "when the site is not reachable" do
       context "when the page has a status (HTTP error)" do
         before do
+          allow(Browser).to receive(:head).and_return({ status: 404, current_url: original_url })
           allow(root_page).to receive_messages(success?: false, status: 404)
         end
 
@@ -99,6 +108,7 @@ RSpec.describe Checks::Reachable do
 
       context "when the page has no status (browser/connection error)" do
         before do
+          allow(Browser).to receive(:head).and_return({ status: 200, current_url: original_url })
           allow(root_page).to receive_messages(success?: false, status: nil)
         end
 
