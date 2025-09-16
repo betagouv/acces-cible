@@ -79,8 +79,23 @@ class Browser
     "valid-lang"
   ].to_json.freeze
 
+  delegate :request_headers, to: :class
+
   class << self
     delegate_missing_to :new
+
+    def request_headers
+      HEADERS.merge(random_user_agent)
+    end
+
+    def random_user_agent
+      macos_version = MACOS_VERSIONS.sample
+      chrome_version = CHROME_VERSIONS.sample
+      {
+        "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
+      }
+    end
   end
 
   def get(url)
@@ -109,10 +124,6 @@ class Browser
   end
 
   private
-
-  def request_headers
-    HEADERS.merge(random_user_agent)
-  end
 
   def browser
     restart! if crashed?
@@ -196,14 +207,5 @@ class Browser
         options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
       end.freeze
     end
-  end
-
-  def random_user_agent
-    macos_version = MACOS_VERSIONS.sample
-    chrome_version = CHROME_VERSIONS.sample
-    {
-      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
-      "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
-    }
   end
 end
