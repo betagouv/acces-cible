@@ -84,6 +84,24 @@ class Browser
   class << self
     delegate_missing_to :new
 
+    def head(url)
+      options = {
+        headers: request_headers,
+        followlocation: true,
+        maxredirs: 3,
+        timeout: 3.seconds,
+        connecttimeout: 3.seconds,
+        ssl_verifyhost: 0,
+        ssl_verifypeer: false
+      }
+      Typhoeus.head(url, options).then do |response|
+        {
+          status: response.code || 0,
+          current_url: Link.normalize(response.effective_url || url)
+        }
+      end
+    end
+
     def request_headers
       HEADERS.merge(random_user_agent)
     end

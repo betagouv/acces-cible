@@ -23,7 +23,103 @@ RSpec.describe Browser do
     WebMock.disable_net_connect!
   end
 
-  describe "#get" do
+  describe ".head" do
+    subject(:head_result) { described_class.head(url) }
+
+    let(:response) { instance_double(Typhoeus::Response) }
+
+    before do
+      allow(Typhoeus).to receive(:head).and_return(response)
+      allow(Link).to receive(:normalize).and_return(url)
+    end
+
+    context "when request is successful" do
+      before do
+        allow(response).to receive_messages(code: 200, effective_url: url)
+      end
+
+      it "makes HEAD request with correct options" do
+        head_result
+
+        expect(Typhoeus).to have_received(:head).with(url, hash_including(
+          followlocation: true,
+          maxredirs: 3,
+          timeout: 3.seconds,
+          connecttimeout: 3.seconds,
+          ssl_verifyhost: 0,
+          ssl_verifypeer: false
+        ))
+        expect(Typhoeus).to have_received(:head) do |_, options|
+          expect(options).to have_key(:headers)
+          expect(options[:headers]).to include("Accept", "User-Agent", "Accept-Language")
+        end
+      end
+
+      it "returns hash with status and normalized current_url" do
+        expect(head_result).to be_a(Hash)
+        expect(head_result.keys).to contain_exactly(:status, :current_url)
+        expect(head_result[:status]).to eq(200)
+        expect(head_result[:current_url]).to eq(url)
+        expect(Link).to have_received(:normalize).with(url)
+      end
+    end
+
+    context "when request follows redirects" do
+      let(:final_url) { "https://example.com/final" }
+      let(:normalized_url) { "https://example.com/final/" }
+
+      before do
+        allow(response).to receive_messages(code: 200, effective_url: final_url)
+        allow(Link).to receive(:normalize).with(final_url).and_return(normalized_url)
+      end
+
+      it "returns normalized effective URL" do
+        expect(head_result[:current_url]).to eq(normalized_url)
+        expect(Link).to have_received(:normalize).with(final_url)
+      end
+    end
+
+    context "when request times out" do
+      before do
+        allow(response).to receive_messages(code: 0, effective_url: nil)
+      end
+
+      it "returns status 0" do
+        expect(head_result[:status]).to eq(0)
+      end
+
+      it "returns normalized original URL when effective_url is nil" do
+        expect(head_result[:current_url]).to eq(url)
+        expect(Link).to have_received(:normalize).with(url)
+      end
+    end
+
+    context "when response code is nil" do
+      before do
+        allow(response).to receive_messages(code: nil, effective_url: url)
+      end
+
+      it "returns status 0" do
+        expect(head_result[:status]).to eq(0)
+      end
+    end
+
+    context "with different HTTP status codes" do
+      [404, 500, 301, 302].each do |code|
+        context "when status is #{code}" do
+          before do
+            allow(response).to receive_messages(code:, effective_url: url)
+          end
+
+          it "returns correct status code" do
+            expect(head_result[:status]).to eq(code)
+          end
+        end
+      end
+    end
+  end
+
+  describe ".get" do
     subject(:get_result) { described_class.get(url) }
 
     let(:network) { instance_double(Ferrum::Network, status: 200, response: nil) }
@@ -100,7 +196,7 @@ RSpec.describe Browser do
     end
   end
 
-  describe "#axe_check", :aggregate_failures do
+  describe ".axe_check", :aggregate_failures do
     subject(:axe_check) { described_class.axe_check(url) }
 
     let(:axe_source) { "/* axe source code */" }
