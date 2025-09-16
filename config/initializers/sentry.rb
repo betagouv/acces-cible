@@ -29,6 +29,7 @@ Sentry.init do |config|
     config.profiles_sample_rate = 0.5
   end
 
+  # Use new Ruby profiler (requires gem "vernier" in Gemfile)
   config.profiler_class = Sentry::Vernier::Profiler
 
   # Enable SQL query performance monitoring
