@@ -149,7 +149,6 @@ class Browser
         raise error
       else
         Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
-        restart!
         restarted = true
         retry
       end
@@ -158,6 +157,7 @@ class Browser
       raise error
     ensure
       page&.close
+      cleanup!
     end
   end
 
