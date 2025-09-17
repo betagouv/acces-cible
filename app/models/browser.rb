@@ -111,13 +111,13 @@ class Browser
   private
 
   def browser
-    restart! if crashed?
+    cleanup! if crashed?
     @browser ||= Ferrum::Browser.new(settings).tap do |browser|
       browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
   end
 
-  def restart!
+  def cleanup!
     if @browser
       @browser.reset
       @browser.quit

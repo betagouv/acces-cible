@@ -209,14 +209,14 @@ RSpec.describe Browser do
           -> { page }
         )
 
-        allow(instance).to receive(:restart!)
+        allow(instance).to receive(:cleanup!)
       end
 
-      it "logs a warning message and calls restart" do
+      it "logs a warning message and calls cleanup!" do
         instance.send(:with_page) { |p| "result" }
 
         expect(Rails.logger).to have_received(:warn)
-        expect(instance).to have_received(:restart!)
+        expect(instance).to have_received(:cleanup!)
       end
 
       it "retries and succeeds on second attempt" do
@@ -245,7 +245,7 @@ RSpec.describe Browser do
           expect(Rails.logger).to have_received(:error) do |&block|
             expect(block.call).to include("Browser already restarted once, giving up")
           end
-          expect(instance).to have_received(:restart!).once
+          expect(instance).to have_received(:cleanup!)
           expect(instance).to have_received(:create_page).twice
         end
       end
@@ -339,7 +339,7 @@ RSpec.describe Browser do
     end
   end
 
-  describe "#restart!" do
+  describe "#cleanup!" do
     let(:ferrum_browser) { instance_double(Ferrum::Browser) }
     let(:network) { instance_double(Ferrum::Network) }
     let(:user_data_dir) { "/tmp/chrome-test123" }
@@ -360,20 +360,20 @@ RSpec.describe Browser do
 
     context "when browser exists" do
       it "calls reset, close, and quit on browser" do
-        instance.send(:restart!)
+        instance.send(:cleanup!)
 
         expect(ferrum_browser).to have_received(:reset)
         expect(ferrum_browser).to have_received(:quit)
       end
 
       it "removes user data directory if it exists" do
-        instance.send(:restart!)
+        instance.send(:cleanup!)
 
         expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
       end
 
       it "sets @browser to nil" do
-        instance.send(:restart!)
+        instance.send(:cleanup!)
 
         expect(instance.instance_variable_get(:@browser)).to be_nil
       end
@@ -384,7 +384,7 @@ RSpec.describe Browser do
         end
 
         it "logs the error and continues cleanup" do
-          instance.send(:restart!)
+          instance.send(:cleanup!)
 
           expect(Rails.logger).to have_received(:warn)
           expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
@@ -399,7 +399,7 @@ RSpec.describe Browser do
       end
 
       it "still removes user data directory and sets @browser to nil" do
-        instance.send(:restart!)
+        instance.send(:cleanup!)
 
         expect(FileUtils).to have_received(:rm_rf).with(user_data_dir)
         expect(instance.instance_variable_get(:@browser)).to be_nil
@@ -412,7 +412,7 @@ RSpec.describe Browser do
       end
 
       it "does not attempt to remove the directory" do
-        instance.send(:restart!)
+        instance.send(:cleanup!)
 
         expect(FileUtils).not_to have_received(:rm_rf)
       end
@@ -422,7 +422,7 @@ RSpec.describe Browser do
       allow(instance).to receive(:browser).and_call_original
       instance.instance_variable_set(:@browser, nil)
 
-      instance.send(:restart!)
+      instance.send(:cleanup!)
 
       expect(instance).not_to have_received(:browser)
     end
