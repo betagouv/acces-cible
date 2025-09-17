@@ -12,6 +12,11 @@ RSpec.describe Link do
       expect(normalized.to_s).to include("?param=value")
     end
 
+    it "normalizes paths with doubled slashes" do
+      normalized = described_class.normalize("http://example.com/folder//")
+      expect(normalized.to_s).to eq("http://example.com/folder/")
+    end
+
     it "normalizes paths with parent directory references" do
       normalized = described_class.normalize("http://example.com/folder/../page.html")
       expect(normalized.to_s).to eq("http://example.com/page.html")
