@@ -44,6 +44,7 @@ gem "bootsnap", require: false
 # gem "image_processing", "~> 1.2"
 
 # Monitor errors and performance
+gem "vernier"
 gem "sentry-ruby"
 gem "sentry-rails"
 
