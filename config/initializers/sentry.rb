@@ -32,9 +32,6 @@ Sentry.init do |config|
   # Use new Ruby profiler (requires gem "vernier" in Gemfile)
   config.profiler_class = Sentry::Vernier::Profiler
 
-  # Enable SQL query performance monitoring
-  config.enable_tracing = true
-
   # Filter common non-actionable exceptions
   config.excluded_exceptions += %w[
     ActionController::BadRequest
