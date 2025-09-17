@@ -24,6 +24,7 @@ Link = Data.define(:href, :text) do
       return uri if uri.relative?
 
       path = uri.path
+      path = path.gsub("//", "/")
       unless path == "/"
         path = File.expand_path(uri.path, "/")
         path = path[1..-1] if path.start_with?("/")
