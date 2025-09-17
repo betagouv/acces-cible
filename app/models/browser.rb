@@ -139,13 +139,20 @@ class Browser
 
   def with_page
     page = nil
+    restarted = false
     begin
       page = create_page
       yield(page)
     rescue Ferrum::DeadBrowserError => error
-      Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
-      cleanup!
-      retry
+      if restarted
+        Rails.logger.error { "[#{error.class.name}] Browser already restarted once, giving up" }
+        raise error
+      else
+        Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
+        cleanup!
+        restarted = true
+        retry
+      end
     rescue Ferrum::Error => error
       Rails.logger.error { "[#{error.class.name}] #{error.message}" }
       raise error
