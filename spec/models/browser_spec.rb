@@ -224,6 +224,31 @@ RSpec.describe Browser do
         expect(result).to eq("retry_success")
         expect(instance).to have_received(:create_page).twice
       end
+
+      context "when DeadBrowserError is raised twice" do
+        before do
+          allow(instance).to receive(:create_page).and_invoke(
+            -> { raise Ferrum::DeadBrowserError.new("Chrome just crashed") },
+            -> { raise Ferrum::DeadBrowserError.new("Chrome crashed again") }
+          )
+          allow(Rails.logger).to receive(:error)
+        end
+
+        it "restarts once then raises error on second occurrence" do
+          expect do
+            instance.send(:with_page) { |p| "result" }
+          end.to raise_error(Ferrum::DeadBrowserError, "Chrome crashed again")
+
+          expect(Rails.logger).to have_received(:warn) do |&block|
+            expect(block.call).to include("Restarting browser")
+          end
+          expect(Rails.logger).to have_received(:error) do |&block|
+            expect(block.call).to include("Browser already restarted once, giving up")
+          end
+          expect(instance).to have_received(:restart!).once
+          expect(instance).to have_received(:create_page).twice
+        end
+      end
     end
 
     context "when other Ferrum::Error is raised" do
