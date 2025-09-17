@@ -26,33 +26,31 @@ RSpec.describe Browser do
   describe ".head" do
     subject(:head_result) { described_class.head(url) }
 
-    let(:response) { instance_double(Typhoeus::Response) }
+    let(:response) { instance_double(HTTP::Response) }
+    let(:uri) { instance_double(Addressable::URI) }
+    let(:http_chain) { instance_double(HTTP::Client) }
 
     before do
-      allow(Typhoeus).to receive(:head).and_return(response)
+      allow(HTTP).to receive(:headers).and_return(http_chain)
+      allow(http_chain).to receive_messages(timeout: http_chain, follow: http_chain)
+      allow(http_chain).to receive(:head).with(url).and_return(response)
+      allow(response).to receive(:uri).and_return(uri)
+      allow(uri).to receive(:to_s).and_return(url)
       allow(Link).to receive(:normalize).and_return(url)
     end
 
     context "when request is successful" do
       before do
-        allow(response).to receive_messages(code: 200, effective_url: url)
+        allow(response).to receive(:code).and_return(200)
       end
 
       it "makes HEAD request with correct options" do
         head_result
 
-        expect(Typhoeus).to have_received(:head).with(url, hash_including(
-          followlocation: true,
-          maxredirs: 3,
-          timeout: 3.seconds,
-          connecttimeout: 3.seconds,
-          ssl_verifyhost: 0,
-          ssl_verifypeer: false
-        ))
-        expect(Typhoeus).to have_received(:head) do |_, options|
-          expect(options).to have_key(:headers)
-          expect(options[:headers]).to include("Accept", "User-Agent", "Accept-Language")
-        end
+        expect(HTTP).to have_received(:headers)
+        expect(http_chain).to have_received(:timeout).with(connect: 3, read: 3)
+        expect(http_chain).to have_received(:follow).with(max_hops: 3)
+        expect(http_chain).to have_received(:head).with(url)
       end
 
       it "returns hash with status and normalized current_url" do
@@ -69,7 +67,8 @@ RSpec.describe Browser do
       let(:normalized_url) { "https://example.com/final/" }
 
       before do
-        allow(response).to receive_messages(code: 200, effective_url: final_url)
+        allow(response).to receive(:code).and_return(200)
+        allow(uri).to receive(:to_s).and_return(final_url)
         allow(Link).to receive(:normalize).with(final_url).and_return(normalized_url)
       end
 
@@ -81,14 +80,14 @@ RSpec.describe Browser do
 
     context "when request times out" do
       before do
-        allow(response).to receive_messages(code: 0, effective_url: nil)
+        allow(http_chain).to receive(:head).with(url).and_raise(HTTP::Error)
       end
 
       it "returns status 0" do
         expect(head_result[:status]).to eq(0)
       end
 
-      it "returns normalized original URL when effective_url is nil" do
+      it "returns normalized original URL when request fails" do
         expect(head_result[:current_url]).to eq(url)
         expect(Link).to have_received(:normalize).with(url)
       end
@@ -96,7 +95,7 @@ RSpec.describe Browser do
 
     context "when response code is nil" do
       before do
-        allow(response).to receive_messages(code: nil, effective_url: url)
+        allow(response).to receive(:code).and_return(nil)
       end
 
       it "returns status 0" do
@@ -108,7 +107,7 @@ RSpec.describe Browser do
       [404, 500, 301, 302].each do |code|
         context "when status is #{code}" do
           before do
-            allow(response).to receive_messages(code:, effective_url: url)
+            allow(response).to receive(:code).and_return(code)
           end
 
           it "returns correct status code" do

@@ -80,8 +80,8 @@ gem "brotli"
 gem "zstd-ruby"
 gem "statesman"
 
-# HTTP client using Curl for simple requests
-gem "typhoeus"
+# Pure Ruby HTTP client for simple requests
+gem "http"
 
 # Detect main language from text
 gem "cld"

@@ -85,21 +85,21 @@ class Browser
     delegate_missing_to :new
 
     def head(url)
-      options = {
-        headers: request_headers,
-        followlocation: true,
-        maxredirs: 3,
-        timeout: 3.seconds,
-        connecttimeout: 3.seconds,
-        ssl_verifyhost: 0,
-        ssl_verifypeer: false
+      response = HTTP
+        .headers(request_headers)
+        .timeout(connect: 3, read: 3)
+        .follow(max_hops: 3)
+        .head(url)
+
+      {
+        status: response.code || 0,
+        current_url: Link.normalize(response.uri.to_s)
       }
-      Typhoeus.head(url, options).then do |response|
-        {
-          status: response.code || 0,
-          current_url: Link.normalize(response.effective_url || url)
-        }
-      end
+    rescue => e
+      {
+        status: 0,
+        current_url: Link.normalize(url)
+      }
     end
 
     def request_headers
