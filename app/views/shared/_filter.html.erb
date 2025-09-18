@@ -1,0 +1,12 @@
+<%# locals: (hint: nil, attribute:, options:, include_blank:, params_key:) %>
+<%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
+  <% (params[params_key] || {}).except(attribute).compact_blank.each do |key, value| %>
+    <%= f.hidden_field key, value:, name: "#{params_key}[#{key}]", id: nil %>
+  <% end %>
+
+  <label class="fr-label" for="table-filter">
+    <span class="fr-hint-text"><%= hint %></span>
+  </label>
+
+  <%= f.dsfr_select_tag attribute, options, include_blank:, selected: params.dig(params_key, attribute), name: "#{params_key}[#{attribute}]" %>
+<% end %>
