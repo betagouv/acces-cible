@@ -23,6 +23,25 @@ RSpec.describe RunCheckJob do
     end
   end
 
+  context "when the check analyze! returns nil" do
+    before do
+      allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
+        .to receive(:run!) do |instance|
+          instance.data = nil
+          instance.save!
+        end
+    end
+
+    it "transitions the check to failed" do
+      perform_enqueued_jobs do
+        expect { described_class.perform_later(check) }
+          .to change(check, :current_state)
+                .from("ready")
+                .to("failed")
+      end
+    end
+  end
+
   context "when check#run! raises an error" do
     before do
       error = Ferrum::TimeoutError.new("Timed out waiting for response")
