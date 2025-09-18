@@ -51,7 +51,7 @@ RSpec.describe User do
     end
 
     describe ".inactive" do
-      it "returns users not updated in 18 months" do
+      it "returns users not updated in a year" do
         active_user = create(:user, updated_at: 1.minute.ago)
         inactive_user = create(:user, updated_at: described_class::MAX_IDLE_TIME.ago - 1.day)
 

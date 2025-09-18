@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  MAX_IDLE_TIME = 18.months
+  MAX_IDLE_TIME = 1.year
 
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
   has_many :sites, through: :team
