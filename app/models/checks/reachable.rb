@@ -1,11 +1,5 @@
 module Checks
   class Reachable < Check
-    class UnreachableSiteError < StandardError
-      def initialize(url, status)
-        super("Server response #{status} when trying to get #{url}")
-      end
-    end
-
     class BrowserError < StandardError
       def initialize(url)
         super("Browser error preventing getting #{url}")
@@ -26,7 +20,7 @@ module Checks
 
     def analyze!
       raise BrowserError.new(audit.url) if root_page.status.nil?
-      raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
+      return unless root_page.success?
 
       site.update(name: root_page.title) if site && site.name.blank?
       if root_page.redirected?

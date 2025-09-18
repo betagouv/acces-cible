@@ -90,10 +90,8 @@ RSpec.describe Checks::Reachable do
           allow(root_page).to receive_messages(success?: false, status: 404)
         end
 
-        it "raises an UnreachableSiteError" do
-          expect {
-            check.send(:analyze!)
-          }.to raise_error(Checks::Reachable::UnreachableSiteError, "Server response 404 when trying to get #{original_url}")
+        it "returns nil" do
+          expect(check.send(:analyze!)).to be_nil
         end
       end
 

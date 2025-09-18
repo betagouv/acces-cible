@@ -16,7 +16,8 @@ class RunCheckJob < ApplicationJob
 
   after_perform do |job|
     check = job.arguments.first
-    check.transition_to!(:completed) if check.can_transition_to?(:completed)
+    state = check.data ? :completed : :failed
+    check.transition_to!(state) if check.can_transition_to?(state)
   end
 
   def perform(check)
