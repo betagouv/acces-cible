@@ -7,12 +7,8 @@
   <% end %>
   <td class="fr-cell--multiline">
     <% tags = site.tags.collect(&:name) %>
-    <% if tags.any? %>
-      <%= safe_join site.tags.take(3).collect(&:name).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
-      <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: site.tags[3..].collect(&:name).to_sentence) if tags.size > 3 %>
-    <% else %>
-      N/A
-    <% end %>
+    <%= safe_join tags.take(3).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
+    <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: tags[3..].to_sentence) if tags.size > 3 %>
   </td>
   <td>
     <% checked_at = site.audit.checked_at || site.audit.updated_at %>

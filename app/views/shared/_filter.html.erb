@@ -1,0 +1,20 @@
+<%# locals: (label:, attribute:, options:, include_blank:, params_key:) %>
+
+<%= form_with(url: url_for, method: :get) do |f| %>
+  <% (params[params_key] || {}).except(attribute).compact_blank.each do |key, value| %>
+    <%= f.hidden_field key, value:, name: "#{params_key}[#{key}]", id: nil %>
+  <% end %>
+  <div class="fr-grid-row fr-grid-row--gutters">
+    <div class="fr-col">
+      <div class="fr-row">
+        <%= f.dsfr_label_with_hint attribute, label:, for: attribute, class: "fr-sr-only" %>
+      </div>
+      <div class="fr-row">
+        <%= f.dsfr_select_tag attribute, options, include_blank:, selected: params.dig(params_key, attribute), name: "#{params_key}[#{attribute}]" %>
+      </div>
+    </div>
+    <div class="fr-col">
+      <%= f.submit t("shared.filter"), class: "fr-btn fr-btn--secondary" %>
+    </div>
+  </div>
+<% end %>

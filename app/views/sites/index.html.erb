@@ -1,5 +1,14 @@
 <%= turbo_stream_from :sites %>
 
+<div class="fr-col-6">
+  <%= render "shared/filter",
+             attribute: :tag_id,
+             label: Tag.human(:filter),
+             params_key: :search,
+             include_blank: Tag.human(:all),
+             options: options_from_collection_for_select(@tags, :id, :name, params.dig(:search, :tag_id)) %>
+</div>
+
 <% form_id = :table_form %>
 <%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
 <%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
