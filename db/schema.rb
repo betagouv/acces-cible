@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_18_094744) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_18_170533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_18_094744) do
   create_table "checks", force: :cascade do |t|
     t.bigint "audit_id", null: false
     t.string "type", null: false
-    t.jsonb "data", default: {}, null: false
+    t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "priority", default: 100, null: false
