@@ -59,18 +59,12 @@ RSpec.describe Crawler do
           .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
-      it "raises NoMatchError" do
-        expect { crawler.find { |page, _queue| page.title == "Target" } }
-          .to raise_error(Crawler::NoMatchError)
-      end
-
       it "crawls unique pages only" do
         expect(Page).to receive(:new)
           .exactly(3).times # root + 2 unique links
           .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
 
-        expect { crawler.find { |page, _queue| page.title == "Target" } }
-          .to raise_error(Crawler::NoMatchError)
+        expect(crawler.find { |page, _queue| page.title == "Target" }).to be_nil
       end
     end
 

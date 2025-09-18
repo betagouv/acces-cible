@@ -2,14 +2,6 @@ class Crawler
   include Enumerable
   MAX_CRAWLED_PAGES = 5
 
-  class NoMatchError < StandardError
-    def initialize(root, crawled)
-      # Get parent information from backtrace
-      # caller_locations takes 2 arguments: number of skipped frames, number of returned frames
-      caller = caller_locations(3, 1).first.label
-      super("Crawled #{crawled.size} pages starting from #{root.href} but #{caller} found no match.")
-    end
-  end
   class CrawlLimitReachedError < StandardError
     def initialize(root, crawl_up_to)
       super("Stopping after crawling #{crawl_up_to} pages starting from #{root.href}.")
@@ -24,9 +16,7 @@ class Crawler
   end
 
   def find(&block)
-    found = nil
-    detect { |page, queue| found = page if block.call(page, queue) }
-    found or raise NoMatchError.new(root, crawled)
+    detect { |page, queue| break page if block.call(page, queue) }
   end
 
   private
