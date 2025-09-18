@@ -25,8 +25,10 @@ module Checks
     private
 
     def analyze!
+      status = Browser.head(audit.url)[:status]
+      raise UnreachableSiteError.new(audit.url, status) unless status == 200
+
       raise BrowserError.new(audit.url) if root_page.status.nil?
-      raise UnreachableSiteError.new(audit.url, root_page.status) unless root_page.success?
 
       site.update(name: root_page.title) if site && site.name.blank?
       if root_page.redirected?

@@ -79,8 +79,41 @@ class Browser
     "valid-lang"
   ].to_json.freeze
 
+  delegate :request_headers, to: :class
+
   class << self
     delegate_missing_to :new
+
+    def head(url)
+      response = HTTP
+        .headers(request_headers)
+        .timeout(connect: 3, read: 3)
+        .follow(max_hops: 3)
+        .head(url)
+
+      {
+        status: response.code || 0,
+        current_url: Link.normalize(response.uri.to_s)
+      }
+    rescue => e
+      {
+        status: 0,
+        current_url: Link.normalize(url)
+      }
+    end
+
+    def request_headers
+      HEADERS.merge(random_user_agent)
+    end
+
+    def random_user_agent
+      macos_version = MACOS_VERSIONS.sample
+      chrome_version = CHROME_VERSIONS.sample
+      {
+        "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
+      }
+    end
   end
 
   def get(url)
@@ -157,8 +190,7 @@ class Browser
 
   def create_page
     browser.create_page.tap do |page|
-      page.headers.set(HEADERS)
-      page.headers.add(random_user_agent)
+      page.headers.set(request_headers)
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
   end
@@ -191,18 +223,8 @@ class Browser
         }
       }.tap do |options|
         options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
-        options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
         options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
       end.freeze
     end
-  end
-
-  def random_user_agent
-    macos_version = MACOS_VERSIONS.sample
-    chrome_version = CHROME_VERSIONS.sample
-    {
-      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
-      "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
-    }
   end
 end
