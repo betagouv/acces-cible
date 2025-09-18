@@ -12,6 +12,7 @@ fr:
     apply: Appliquer
     applying: Appliquer…
     add: Ajouter
+    filter: Filtrer
     send: Envoyer
     save: Enregistrer
     saving: Enregistrement…
@@ -224,13 +225,14 @@ fr:
           one: Un site
           other: "%{count} sites"
       tag:
-        all: Étiquettes
+        all: Toutes les étiquettes
         name: Libellé
         new: Nouvelle étiquette
         add: Créer une nouvelle étiquette
         sites: Sites
         delete: Supprimer cette étiquette
         edit: Modifier cette étiquette
+        filter: Filtrer par étiquette
         count:
           zero: Aucune étiquette
           one: Une étiquette
