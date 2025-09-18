@@ -111,13 +111,13 @@ class Browser
   private
 
   def browser
-    restart! if crashed?
+    cleanup! if crashed?
     @browser ||= Ferrum::Browser.new(settings).tap do |browser|
       browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
     end
   end
 
-  def restart!
+  def cleanup!
     if @browser
       @browser.reset
       @browser.quit
@@ -144,13 +144,14 @@ class Browser
       yield(page)
     rescue Ferrum::DeadBrowserError => error
       Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
-      restart!
+      cleanup!
       retry
     rescue Ferrum::Error => error
       Rails.logger.error { "[#{error.class.name}] #{error.message}" }
       raise error
     ensure
       page&.close
+      cleanup!
     end
   end
 
