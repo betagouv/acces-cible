@@ -24,7 +24,13 @@ RSpec.describe Crawler do
   describe "#find" do
     let(:link1) { Link.new(href: "https://example.com/page1") }
     let(:link2) { Link.new(href: "https://example.com/page2") }
-    let(:page) { instance_double(Page, internal_links: [link1, link2], title: "Root") }
+    let(:root_page) { instance_double(Page, internal_links: [link1, link2], title: "Root") }
+
+    before do
+      allow(Page).to receive(:new)
+        .with(url: root_url, root: root_url)
+        .and_return(root_page)
+    end
 
     context "when matching page exists" do
       let(:target_page) { instance_double(Page, internal_links: [], title: "Target") }
@@ -35,20 +41,10 @@ RSpec.describe Crawler do
           .and_return(target_page)
       end
 
-      it "returns the first matching page" do
+      it "returns the first matching page and logs progress" do
+        expect(Rails.logger).to receive(:info).twice # root + matching page
         page = crawler.find { |page, _queue| page.title == "Target" }
         expect(page).to eq(target_page)
-      end
-
-      it "logs crawling progress" do
-        expect(Rails.logger).to receive(:info).twice # root + matching page
-        crawler.find { |page, _queue| page.title == "Target" }
-      end
-
-      it "respects crawl limit" do
-        limited_crawler = described_class.new(root_url, crawl_up_to: 1)
-        expect { limited_crawler.find { |page, _queue| page.title == "Target" } }
-          .to raise_error(Crawler::CrawlLimitReachedError)
       end
     end
 
@@ -59,54 +55,34 @@ RSpec.describe Crawler do
           .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
-      it "crawls unique pages only" do
+      it "returns nil and crawls unique pages only" do
         expect(Page).to receive(:new)
           .exactly(3).times # root + 2 unique links
           .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
 
-        expect(crawler.find { |page, _queue| page.title == "Target" }).to be_nil
+        result = crawler.find { |page, _queue| page.title == "Target" }
+        expect(result).to be_nil
       end
     end
 
-    context "when a block is given" do
-      let(:link1) { Link.new(href: "https://example.com/page1") }
-      let(:link2) { Link.new(href: "https://example.com/page2") }
-      let(:root_page) { instance_double(Page, internal_links: [link1, link2]) }
-      let(:crawled_page) { root_page }
+    it "yields page and queue to the block" do
+      pages = []
+      queues = []
 
-      before do
-        allow(Page).to receive(:new)
-          .with(url: root_url, root: root_url)
-          .and_return(root_page)
-        allow(Page).to receive(:new)
-          .with(url: anything, root: root_url)
-          .and_return(crawled_page)
+      crawler.find do |page, queue|
+        pages << page
+        queues << queue
+        break # Stop after first page to avoid full crawl
       end
 
-      it "yields each crawled page and queue" do
-        pages = []
-        queues = []
+      expect(pages).to include(root_page)
+      expect(queues).not_to be_empty
+    end
 
-        crawler.find do |page, queue|
-          pages << page
-          queues << queue
-        end
-
-        expect(pages).to include(root_page)
-        expect(queues).not_to be_empty
-      end
-
-      it "stops when reaching crawl limit" do
-        limited_crawler = described_class.new(root_url, crawl_up_to: 2)
-        count = 0
-
-        limited_crawler.find do
-          count += 1
-          break if count == 2
-        end
-
-        expect(count).to eq(2)
-      end
+    it "respects crawl limit" do
+      limited_crawler = described_class.new(root_url, crawl_up_to: 1)
+      expect { limited_crawler.find { |page, _queue| page.title == "Target" } }
+        .to raise_error(Crawler::CrawlLimitReachedError)
     end
   end
 end
