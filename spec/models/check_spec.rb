@@ -140,14 +140,14 @@ RSpec.describe Check do
   describe "#error" do
     subject { check.error }
 
-    context "when the check is not failed" do
+    context "when the check is not errored" do
       let(:check) { create(:check, :reachable, :pending) }
 
       it { should be_nil }
     end
 
-    context "when the check has failed" do
-      let(:check) { create(:check, :reachable, :failed) }
+    context "when the check has errored" do
+      let(:check) { create(:check, :reachable, :errored) }
 
       before do
         app_path = Rails.root.to_s

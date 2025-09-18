@@ -47,12 +47,12 @@ RSpec.describe RunCheckJob do
         .to receive(:analyze!).and_raise error
     end
 
-    it "transitions the check to failed" do
+    it "transitions the check to errored" do
       perform_enqueued_jobs do
         expect { described_class.perform_later(check) }
           .to change(check, :current_state)
                 .from("ready")
-                .to("failed")
+                .to("errored")
       end
     end
 
