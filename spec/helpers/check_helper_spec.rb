@@ -59,6 +59,7 @@ RSpec.describe CheckHelper do
     subject { helper.status_to_badge_level(check) }
 
     [
+      ["errored", :error],
       ["failed", :error],
       ["pending", :info],
       ["blocked", :info],

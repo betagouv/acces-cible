@@ -118,6 +118,8 @@ module Checks
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
 
     def analyze!
+      return unless audit.find_accessibility_page&.url
+
       {
         audit_date: find_audit_date,
         audit_update_date: find_audit_update_date,

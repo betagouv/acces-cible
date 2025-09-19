@@ -17,7 +17,7 @@ module Checks
     private
 
     def analyze!
-      return {} unless (page = find_page)
+      return unless (page = find_page)
 
       { url: page.url, title: page.title }
     end

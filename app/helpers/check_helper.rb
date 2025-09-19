@@ -8,6 +8,7 @@ module CheckHelper
     ready:     :info,
     running:   :new,
     completed: :success,
+    errored:   :error,
     failed:    :error,
     aborted:   :error,
   }
