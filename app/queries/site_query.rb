@@ -26,6 +26,9 @@ class SiteQuery < SimpleDelegator
       case key.to_sym
       when :q
         scope = scope.joins(:audits).where("sites.name ILIKE :term OR audits.url ILIKE :term", term: "%#{value}%")
+      when :tag_id
+        scope = scope.joins(:site_tags)
+                     .where(site_tags: { tag_id: value })
       end
     end
     scope
