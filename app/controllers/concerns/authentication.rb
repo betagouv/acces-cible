@@ -30,11 +30,11 @@ module Authentication
   end
 
   def resume_session
-    Current.session ||= find_session_by_cookie
+    Current.session ||= find_session_by_cookie&.tap(&:touch)
   end
 
   def find_session_by_cookie
-    Session.find(cookies.signed[:session_id]) if cookies.signed[:session_id]
+    Session.active.find(cookies.signed[:session_id]) if cookies.signed[:session_id]
   rescue ActiveRecord::RecordNotFound
     cookies.delete(:session_id)
     nil
@@ -46,7 +46,7 @@ module Authentication
   end
 
   def after_authentication_url
-    session.delete(:return_to_after_authenticating) || root_url
+    session.delete(:return_to_after_authenticating) || authenticated_root_url
   end
 
   def start_new_session_for(user)

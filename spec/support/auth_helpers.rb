@@ -8,15 +8,19 @@ module AuthHelpers
   def feature_login_as(user)
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:developer] = OmniAuth::AuthHash.new(
-      provider: "developer",
-      uid: user.email,
+      provider: user.provider,
+      uid: user.uid,
       info: {
         email: user.email,
-        name: user.name
+        name: user.name,
+        organizational_unit: user.team.organizational_unit
+      },
+      extra: {
+        raw_info: { siret: user.team.siret }
       }
     )
 
-    visit "/auth/developer"
+    get "/auth/developer/callback"
   end
 end
 
