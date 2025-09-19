@@ -203,7 +203,7 @@ fr:
         url: Adresse du site
         url_hint: Saisissez une url valide, commençant par https:// ou http://
         file: Fichier CSV
-        file_hint: "Format attendu : fichier CSV avec une colonne 'URL' (obligatoire), et une colonne 'Nom' (optionnelle). Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
+        file_hint: "Format attendu : fichier CSV avec une colonne 'URL' (obligatoire), une colonne 'Tags' avec les tags séparés par une virgule (optionnelle), et une colonne 'Nom' (optionnelle). Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
         name: "Nom du site"
         name_hint: "Nom utilisé pour l'affichage. S'il est laissé vide, il est récupéré automatiquement lors du prochain audit."
         audits: Toutes les vérifications
