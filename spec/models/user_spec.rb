@@ -27,6 +27,40 @@ RSpec.describe User do
     end
   end
 
+  describe "scopes" do
+    describe ".logged_in" do
+      it "returns users with sessions" do
+        user_with_session = create(:user)
+        create(:session, user: user_with_session)
+        user_without_session = create(:user)
+
+        expect(described_class.logged_in).to include(user_with_session)
+        expect(described_class.logged_in).not_to include(user_without_session)
+      end
+    end
+
+    describe ".logged_out" do
+      it "returns users without sessions" do
+        user_with_session = create(:user)
+        create(:session, user: user_with_session)
+        user_without_session = create(:user)
+
+        expect(described_class.logged_out).to include(user_without_session)
+        expect(described_class.logged_out).not_to include(user_with_session)
+      end
+    end
+
+    describe ".inactive" do
+      it "returns users not updated in a year" do
+        active_user = create(:user, updated_at: 1.minute.ago)
+        inactive_user = create(:user, updated_at: described_class::MAX_IDLE_TIME.ago - 1.day)
+
+        expect(described_class.inactive).to include(inactive_user)
+        expect(described_class.inactive).not_to include(active_user)
+      end
+    end
+  end
+
   describe ".from_omniauth" do
     subject(:from_omniauth) { described_class.from_omniauth(auth) }
 
