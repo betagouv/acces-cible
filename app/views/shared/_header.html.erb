@@ -1,4 +1,10 @@
-<%= dsfr_header logo_text: t("global.sponsor_html"), title: t("global.service_name"), tagline: t("global.service_description"), html_attributes: { id: :nav } do |header| %>
+<%= dsfr_header(
+  logo_text: t("global.sponsor_html"),
+  title: t("global.service_name"),
+  tagline: t("global.service_description"),
+  html_attributes: {
+    id: :nav
+  }) do |header| %>
   <%= header.with_direct_link_simple title: t("pages.accueil.title"), path: root_path, active: current_page?(root_path) %>
 
   <%= header.with_tool_link title: t("pages.display_mode.title"), path: display_mode_path, html_attributes: { class: icon_class(:theme), "data-turbo-frame": :modal } %>
