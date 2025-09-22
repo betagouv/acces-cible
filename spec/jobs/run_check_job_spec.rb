@@ -10,7 +10,10 @@ RSpec.describe RunCheckJob do
       # object here will have no effect when ActiveJob reinstantiates
       # a model on its side.
       allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
-        .to receive(:run!).and_return :test_success
+        .to receive(:run!) do |instance|
+          instance.data = { test: "success" }
+          instance.save!
+        end
     end
 
     it "transitions the check to completed" do
@@ -19,6 +22,25 @@ RSpec.describe RunCheckJob do
           .to change(check, :current_state)
                 .from("ready")
                 .to("completed")
+      end
+    end
+  end
+
+  context "when the check analyze! returns nil" do
+    before do
+      allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
+        .to receive(:run!) do |instance|
+          instance.data = nil
+          instance.save!
+        end
+    end
+
+    it "transitions the check to failed" do
+      perform_enqueued_jobs do
+        expect { described_class.perform_later(check) }
+          .to change(check, :current_state)
+                .from("ready")
+                .to("failed")
       end
     end
   end

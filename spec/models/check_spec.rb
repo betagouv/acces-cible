@@ -64,7 +64,7 @@ RSpec.describe Check do
       end
 
       it "saves the result" do
-        expect { check.run! }.to change(check, :data).from({}).to("result")
+        expect { check.run! }.to change(check, :data).from(nil).to("result")
       end
     end
 

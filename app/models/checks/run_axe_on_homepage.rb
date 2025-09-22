@@ -2,7 +2,7 @@ module Checks
   class RunAxeOnHomepage < Check
     PRIORITY = 30
 
-    store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :issues_total
+    store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
 
     def tooltip? = !completed?
     def applicable_total = completed? ? passes + incomplete + violations : nil
@@ -11,7 +11,7 @@ module Checks
     def human_success_rate = to_percent(success_rate)
 
     def violation_data
-      data["violation_data"]&.map { |data| AxeViolation.new(**data) } || []
+      (super || []).map { |data| AxeViolation.new(**data) }
     end
 
     def custom_badge_text = human_success_rate
