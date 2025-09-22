@@ -1,4 +1,8 @@
 production:
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    queue: background
+    schedule: every day at 7:00 and 21:00
   remove_orphan_tags:
     class: RemoveOrphanTagsJob
     queue: background
