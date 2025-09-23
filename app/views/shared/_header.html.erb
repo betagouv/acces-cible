@@ -3,7 +3,8 @@
   title: t("global.service_name"),
   tagline: t("global.service_description"),
   html_attributes: {
-    id: :nav
+    id: :nav,
+    class: class_names(development: Rails.env.development?, staging: Rails.application.staging?)
   }) do |header| %>
   <%= header.with_direct_link_simple title: t("pages.accueil.title"), path: root_path, active: current_page?(root_path) %>
 
