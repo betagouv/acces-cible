@@ -165,6 +165,25 @@ form.button_to {
   margin-bottom: 0;
 }
 
+// Add visual distinction for dev & staging environments
+.fr-header {
+  &.staging::before,
+  &.development::before {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    padding: .5em;
+  }
+  &.staging::before {
+    content: "Environnement de staging";
+    background-color: orange;
+  }
+  &.development::before {
+    content: "Environnement de développement";
+    background-color: #87ec87;
+  }
+}
+
 // Fix vertical alignment of search and counter on narrow screens
 @media (max-width: 47.999em) {
   .fr-search-bar + .fr-table__detail {
