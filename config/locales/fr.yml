@@ -31,6 +31,7 @@ fr:
     page_unavailable: Cette page n'est pas disponible.
     x_more: Et %{x} de plus…
     select_name: "Sélectionner %{name}"
+    required_fields: Les champs obligatoires sont indiqués par un astérisque.
     all_lines: "toutes les lignes"
     selected_lines:
       one: ligne sélectionnée

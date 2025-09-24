@@ -1,5 +1,7 @@
 <% use_centered_layout %>
 
+<p><%= t("shared.required_fields") %></p>
+
 <%= render "form", site: @site || current_user.team.sites.build %>
 
 <%= or_separator %>
