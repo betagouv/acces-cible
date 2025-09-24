@@ -32,8 +32,9 @@ module Checks
     def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
     def total = expected_headings.count
     def failures = comparison.filter { it.error? }
+    def success_count = comparison.empty? ? 0 : total - failures.count
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
-    def human_success_rate = "#{total - failures.count}/#{total}"
+    def human_success_rate = "#{success_count}/#{total}"
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
     alias custom_badge_text human_success_rate
 

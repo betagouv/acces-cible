@@ -164,4 +164,49 @@ RSpec.describe Checks::AccessibilityPageHeading do
       end
     end
   end
+
+  describe "#success_count" do
+    subject(:success_count) { check.success_count }
+
+    before { check.data = comparison_data }
+
+    context "when comparison is empty" do
+      let(:comparison_data) { {} }
+
+      it "returns 0" do
+        expect(success_count).to eq 0
+      end
+    end
+
+    context "when all headings are correct" do
+      let(:comparison_data) do
+        {
+          comparison: described_class::EXPECTED_HEADINGS.map do |level, heading|
+            [heading, level, :ok, heading]
+          end
+        }
+      end
+
+      it "returns total count" do
+        expect(success_count).to eq 14
+      end
+    end
+
+    context "when some headings have errors" do
+      let(:comparison_data) do
+        {
+          comparison: [
+            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
+            ["État de conformité", 2, :ok, "État de conformité"],
+            ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"], # error
+            *described_class::EXPECTED_HEADINGS[3..-1].map { |level, heading| [heading, level, :missing, nil] }
+          ]
+        }
+      end
+
+      it "returns total minus failures count" do
+        expect(success_count).to eq 2
+      end
+    end
+  end
 end
