@@ -1,6 +1,6 @@
 ## Éditeur
 
-Ce site est édité par la direction interministérielle du numérique (<abbr>DINUM</abbr>), un service du Premier Ministre sous l’autorité du ministre de la Transformation et de la Fonction publiques.
+Ce site est édité par la Direction Interministérielle du Numérique (<abbr>DINUM</abbr>), un service du Premier Ministre sous l’autorité du ministre de la Transformation et de la Fonction publiques.
 
 <abbr>DINUM</abbr>
 20 avenue de Ségur \
@@ -18,7 +18,7 @@ Stéphanie Schaer, directrice interministérielle du numérique
 
 Ce site est développé selon un principe d’amélioration continue.
 
-Le suivi éditorial et graphique est assuré au quotidien par le pôle Communication de la <abbr>DINUM</abbr>.
+Le suivi éditorial et graphique est assuré au quotidien par l'équipe d'Accès Cible.
 
 ## Code source du site
 
