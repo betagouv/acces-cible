@@ -7,8 +7,7 @@ Ce site est édité par la Direction Interministérielle du Numérique (<abbr>DI
 75007 Paris \
 France
 
-<abbr>SIRET</abbr> : 120 001 011 000 10 (secrétariat général du gouvernement)
-<abbr>SIREN</abbr> : 120 001 011
+<abbr>SIRET</abbr> : 130&nbsp;025&nbsp;265&nbsp;000&nbsp;13
 
 ## Directrice de publication
 
@@ -37,4 +36,4 @@ La mise en place de liens vers nos contenus et documents est cependant est à pr
 Scalingo SAS, \
 13 rue Jacques Peirotes \
 67000 Strasbourg France \
-<abbr>SIRET</abbr> 80866548300018
+<abbr>SIRET</abbr> 808&nbsp;665&nbsp;483&nbsp;000&nbsp;18
