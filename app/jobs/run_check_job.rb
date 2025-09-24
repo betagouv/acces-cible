@@ -1,6 +1,16 @@
 require "json/add/exception" # required to serialize errors as JSON
 
 class RunCheckJob < ApplicationJob
+  queue_as do
+    check = self.arguments.first
+
+    if check.is_a? Checks::Reachable
+      :slow
+    else
+      :default
+    end
+  end
+
   rescue_from Check::RuntimeError do |exception|
     cleaned_exception = exception.cause.dup
     cleaned_exception.set_backtrace Rails.backtrace_cleaner.clean(exception.cause.backtrace)
@@ -9,13 +19,15 @@ class RunCheckJob < ApplicationJob
 
   before_perform do |job|
     check = job.arguments.first
-    check.transition_to!(:running) if check.can_transition_to?(:running)
+
+    check.transition_to!(:running)
   end
 
   after_perform do |job|
     check = job.arguments.first
     state = check.data ? :completed : :failed
-    check.transition_to!(state) if check.can_transition_to?(state)
+
+    check.transition_to!(state)
   end
 
   def perform(check)
