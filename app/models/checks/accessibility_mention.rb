@@ -3,10 +3,9 @@ module Checks
     PRIORITY = 10
     MENTION_REGEX = /accessibilit[ée]     # Match "accessibilité" or "accessibilite"
                     \s*                   # Optional whitespace
-                    (?:\w+\s+){0,3}       # Optional words (up to 3)
                     :?                    # Optional colon
                     \s*                   # Optional whitespace
-                    (?:\w+\s+){0,3}       # Optional words (up to 3)
+                    \(?                   # Optional open parenthesis
                     (?<level>non|partiellement|totalement)  # Capture the level
                     \s+                   # Required whitespace
                     conforme              # Match "conforme"
