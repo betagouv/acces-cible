@@ -91,15 +91,27 @@ RSpec.describe SiteQuery do
   describe "#filter_by" do
     subject(:result) { query.filter_by(params) }
 
-    let(:request) { { search: { q: "bar" } } }
+    let(:tag) { create(:tag) }
+    let(:another_tag) { create(:tag) }
+    let!(:no_match) { create(:site, :checked, url: "https://foo.com/") }
+    let!(:domain_match) { create(:site, :checked, url: "https://www.bar.com/", tags: [tag]) }
+    let!(:path_match) { create(:site, :checked, url: "https://baz.com/bar/", tags: [tag, another_tag]) }
+    let!(:name_match) { create(:site, :checked, url: "https://www.apple.com/", name: "Foo Bar Baz") }
 
-    it "returns only sites matching the query" do
-      no_match = create(:site, :checked, url: "https://foo.com/")
-      domain_match = create(:site, :checked, url: "https://www.bar.com/")
-      path_match = create(:site, :checked, url: "https://baz.com/bar/")
-      name_match = create(:site, :checked, url: "https://www.apple.com/", name: "Foo Bar Baz")
+    context 'when filtering by site name or url' do
+      let(:request) { { search: { q: "bar" } } }
 
-      expect(result.to_a).to contain_exactly(domain_match, path_match, name_match)
+      it "returns only sites matching the query" do
+        expect(result.to_a).to contain_exactly(domain_match, path_match, name_match)
+      end
+    end
+
+    context 'when filtering by a tag' do
+      let(:request) { { search: { tag_id: "#{tag.id}" } } }
+
+      it "returns only sites matching the query" do
+        expect(result.to_a).to contain_exactly(domain_match, path_match)
+      end
     end
   end
 
