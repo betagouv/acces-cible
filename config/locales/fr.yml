@@ -230,6 +230,7 @@ fr:
         sites: Sites
         delete: Supprimer cette étiquette
         edit: Modifier cette étiquette
+        search: Rechercher par étiquette
         count:
           zero: Aucune étiquette
           one: Une étiquette

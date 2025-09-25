@@ -7,6 +7,7 @@ class SitesController < ApplicationController
   def index
     params[:sort] ||= { checked_at: :desc }
     sites = current_user.sites.preloaded.filter_by(params).order_by(params)
+    @tags = current_user.team.tags.in_alphabetical_order
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites, limit: pagy_limit }
       format.csv { send_data sites.to_csv, filename: sites.to_csv_filename }
