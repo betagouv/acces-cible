@@ -58,20 +58,14 @@ class Audit < ApplicationRecord
     end
   end
 
-  def update_from_checks
-    transaction do
-      update(status: status_from_checks)
-      site.set_current_audit! unless pending?
-    end
-  end
-
   def complete?
     checks.remaining.none?
   end
 
-  def after_check_completed(check)
+  def after_check_completed
     if complete?
       update!(checked_at: Time.zone.now)
+      site.set_current_audit!
     else
       ProcessAuditJob.perform_later(self)
     end

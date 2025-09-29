@@ -23,7 +23,7 @@ describe CheckStateMachine do
     let(:check) { create(:check, :reachable, :running) }
 
     it "calls back to the audit" do
-      expect(check.audit).to receive(:after_check_completed).with(check)
+      expect(check.audit).to receive(:after_check_completed)
 
       check.transition_to!(:completed)
     end
