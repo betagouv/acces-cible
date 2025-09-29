@@ -646,7 +646,7 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.3)
-    zstd-ruby (1.5.7.0)
+    zstd-ruby (2.0.0)
 
 PLATFORMS
   aarch64-linux
