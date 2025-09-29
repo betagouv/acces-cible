@@ -142,7 +142,7 @@ RSpec.describe Audit do
     let(:audit) { create(:audit) }
 
     it "reschedules a ProcessAuditJob with itself" do
-      expect { audit.after_check_completed(nil) }.to have_enqueued_job(ProcessAuditJob).with(audit)
+      expect { audit.after_check_completed }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
 
     context "when there are no jobs left" do
@@ -151,12 +151,12 @@ RSpec.describe Audit do
       end
 
       it "does not enqueue a new ProcessAuditJob" do
-        expect { audit.after_check_completed(nil) }.not_to enqueue_job(ProcessAuditJob)
+        expect { audit.after_check_completed }.not_to enqueue_job(ProcessAuditJob)
       end
 
       it "updates its checked_at timestamp" do
         freeze_time do
-          expect { audit.after_check_completed(nil) }
+          expect { audit.after_check_completed }
             .to change(audit, :checked_at)
                   .from(nil)
                   .to(Time.current)
