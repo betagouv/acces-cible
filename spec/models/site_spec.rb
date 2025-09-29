@@ -143,9 +143,9 @@ RSpec.describe Site do
     context "when there are multiple audits" do
       subject(:site) { create(:site) }
 
-      it "marks the newest checked audit as current" do
+      it "marks the newest audit as current" do
         old_audit = site.audit
-        newest_audit = create(:audit, :checked, site:, checked_at: 1.day.ago)
+        newest_audit = create(:audit, site:, checked_at: 1.day.ago)
         expect { site.set_current_audit! }.to change { newest_audit.reload.current }.from(false).to(true)
           .and change { old_audit.reload.current }.from(true).to(false)
       end

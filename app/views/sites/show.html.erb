@@ -30,7 +30,7 @@
     <%= render(partial: @audit.all_checks, as: :check) %>
   </div>
   <div class="fr-col-12 fr-col-md-4">
-    <% audits = @site.audits.checked.sort_by_newest.load %>
+    <% audits = @site.audits.sort_by_newest.load %>
     <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: audits.count), right: true) do |sidemenu| %>
       <% audits.each do |audit| %>
         <% sidemenu.with_item text: l(audit.created_at.in_time_zone, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
