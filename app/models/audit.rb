@@ -15,11 +15,10 @@ class Audit < ApplicationRecord
     "failed",     # All checks failed
   ].index_by(&:itself), validate: true, default: :pending
 
-  scope :sort_by_newest, -> { order(arel_table[:checked_at].desc.nulls_last, arel_table[:created_at].desc) }
+  scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :checked, -> { where.not(status: :pending) }
+  scope :checked, -> { where.not(checked_at: nil) }
   scope :current, -> { where(current: true) }
-
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
 
   Check.types.each do |name, klass|

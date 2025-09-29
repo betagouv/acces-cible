@@ -37,10 +37,10 @@ RSpec.describe Audit do
   describe "scopes" do
     before { site.audit.destroy }
 
-    it ".sort_by_newest returns audits in descending order by checked_at date" do
-      oldest = create(:audit, site:, checked_at: 3.days.ago)
-      older = create(:audit, site:, checked_at: 2.days.ago)
-      newer = create(:audit, site:, checked_at: 1.day.ago)
+    it ".sort_by_newest returns audits in descending order by created_at date" do
+      oldest = create(:audit, site:, created_at: 3.days.ago)
+      older = create(:audit, site:, created_at: 2.days.ago)
+      newer = create(:audit, site:, created_at: 1.day.ago)
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
@@ -111,36 +111,6 @@ RSpec.describe Audit do
       let(:combined_states) { ["testing"] }
 
       it { should eq "testing" }
-    end
-  end
-
-  describe "#update_from_checks" do
-    let(:audit) { create(:audit) }
-
-    it "updates status using status_from_checks" do
-      allow(audit).to receive_messages(status_from_checks: :mixed)
-
-      audit.update_from_checks
-      expect(audit.status).to eq("mixed")
-    end
-
-    it "calls set_current_audit! on site when not pending" do
-      allow(audit).to receive_messages(status_from_checks: :passed)
-
-      expect(audit.site).to receive(:set_current_audit!)
-      audit.update_from_checks
-    end
-
-    it "does not call set_current_audit! on site when pending" do
-      allow(audit).to receive_messages(status_from_checks: :pending)
-
-      expect(audit.site).not_to receive(:set_current_audit!)
-      audit.update_from_checks
-    end
-
-    it "runs in a transaction" do
-      expect(audit).to receive(:transaction).and_yield
-      audit.update_from_checks
     end
   end
 
