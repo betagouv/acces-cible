@@ -117,6 +117,7 @@ fr:
         ready: Prêt
         blocked: Inapplicable
         running: En cours
+        errored: En erreur
         failed: Échoué
         completed: Effectué
         aborted: Annulé
