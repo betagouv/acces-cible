@@ -1,11 +1,5 @@
 module Checks
   class Reachable < Check
-    class BrowserError < StandardError
-      def initialize(url)
-        super("Browser error preventing getting #{url}")
-      end
-    end
-
     PRIORITY = 0 # This needs to run before all other checks
     REQUIREMENTS = []
 
@@ -19,7 +13,6 @@ module Checks
     private
 
     def analyze!
-      raise BrowserError.new(audit.url) if root_page.status.nil?
       return unless root_page.success?
 
       site.update(name: root_page.title) if site && site.name.blank?
@@ -29,6 +22,8 @@ module Checks
       else
         {}
       end
+    rescue Ferrum::StatusError
+      nil
     end
 
     def normalize(url)
