@@ -4,9 +4,6 @@ class ApplicationController < ActionController::Base
   include ErrorHelper
   include ActionView::RecordIdentifier
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
-
   layout :layout_selector
 
   helper_method :resource, :resource_model
