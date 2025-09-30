@@ -65,8 +65,8 @@ class Check < ApplicationRecord
   broadcasts_refreshes_to ->(check) { "sites" }
 
   class << self
-    def human_type = human("checks.#{model_name.element}.type")
-    def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
+    def human_type = human(:type)
+    def table_header = human(:table_header, default: human_type)
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }.sort_by { |_name, klass| klass.priority }.to_h

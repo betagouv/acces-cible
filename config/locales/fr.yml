@@ -142,7 +142,7 @@ fr:
           zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
           one: "Un seul problème relevé sur %{total} titres atendus (%{error})."
           other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
-      checks/accessibility_page_heading/statuses:
+      checks/accessibility_page_heading/status:
         ok: valide
         missing: non trouvé
         incorrect_order: ordre incorrect
