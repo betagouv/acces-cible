@@ -118,7 +118,6 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.1.0)
       racc
-    brotli (0.7.0)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -648,7 +647,6 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.3)
-    zstd-ruby (1.5.7.0)
 
 PLATFORMS
   aarch64-linux
@@ -673,7 +671,6 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   brakeman
-  brotli
   capybara
   cld
   csv
@@ -731,7 +728,6 @@ DEPENDENCIES
   view_component
   webmock
   whiny_validation
-  zstd-ruby
 
 RUBY VERSION
    ruby 3.4.5p51

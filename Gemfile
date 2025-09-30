@@ -74,10 +74,9 @@ gem "omniauth-proconnect"
 gem "omniauth-rails_csrf_protection"
 
 # Crawl websites using a headless Chrome browser, controlled by Ferrum
-# Use brotli and zstd compression to save bandwidth
 gem "ferrum"
-gem "brotli"
-gem "zstd-ruby"
+
+# State machine
 gem "statesman"
 
 # Detect main language from text
