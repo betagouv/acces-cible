@@ -8,7 +8,7 @@ class Check < ApplicationRecord
 
   def state_machine
     Statesman::Machine.retry_conflicts do
-      CheckStateMachine.new(
+      @state_machine ||= CheckStateMachine.new(
         self,
         transition_class: CheckTransition,
         association_name: :check_transitions,

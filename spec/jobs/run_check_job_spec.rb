@@ -19,10 +19,19 @@ RSpec.describe RunCheckJob do
     it "transitions the check to completed" do
       perform_enqueued_jobs do
         expect { described_class.perform_later(check) }
-          .to change(check, :current_state)
+          .to change { check.reload.current_state }
                 .from("ready")
                 .to("completed")
       end
+    end
+  end
+
+  context "when the check is a reachable" do
+    let(:check) { create(:check, :reachable) }
+
+    it "is enqueued on the slow queue" do
+      expect { described_class.perform_later(check) }
+        .to have_enqueued_job.on_queue("slow")
     end
   end
 
@@ -38,7 +47,7 @@ RSpec.describe RunCheckJob do
     it "transitions the check to failed" do
       perform_enqueued_jobs do
         expect { described_class.perform_later(check) }
-          .to change(check, :current_state)
+          .to change { check.reload.current_state }
                 .from("ready")
                 .to("failed")
       end
@@ -72,7 +81,7 @@ RSpec.describe RunCheckJob do
     it "transitions the check to errored" do
       perform_enqueued_jobs do
         expect { described_class.perform_later(check) }
-          .to change(check, :current_state)
+          .to change { check.reload.current_state }
                 .from("ready")
                 .to("errored")
       end

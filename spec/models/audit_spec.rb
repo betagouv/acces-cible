@@ -27,10 +27,10 @@ RSpec.describe Audit do
   describe "enums" do
     it do
       should define_enum_for(:status)
-        .validating
-        .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
-        .backed_by_column_of_type(:string)
-        .with_default(:pending)
+               .validating
+               .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
+               .backed_by_column_of_type(:string)
+               .with_default(:pending)
     end
   end
 
@@ -180,7 +180,7 @@ RSpec.describe Audit do
 
     it "aborts any check that depends on the failed one" do
       expect { audit.abort_dependent_checks!(original_check) }
-        .to change(dependent_check, :current_state)
+        .to change { dependent_check.reload.current_state }
               .from("pending").to("aborted")
     end
   end
