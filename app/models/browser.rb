@@ -48,36 +48,6 @@ class Browser
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
   AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
-  RGAA_AXE_RULES = [
-    "aria-conditional-attr",
-    "aria-deprecated-role",
-    "aria-hidden-body",
-    "aria-required-attr",
-    "aria-required-parent",
-    "aria-roles",
-    "aria-valid-attr",
-    "avoid-inline-spacing",
-    "blink",
-    "definition-list",
-    "dlitem",
-    "document-title",
-    "html-has-lang",
-    "html-lang-valid",
-    "html-xml-lang-mismatch",
-    "label-content-name-mismatch",
-    "landmark-no-duplicate-banner",
-    "landmark-no-duplicate-contentinfo",
-    "landmark-one-main",
-    "list",
-    "listitem",
-    "marquee",
-    "meta-refresh",
-    "meta-viewport",
-    "scrollable-region-focusable",
-    "table-fake-caption",
-    "td-has-header",
-    "valid-lang"
-  ].to_json.freeze
 
   class << self
     delegate_missing_to :new
@@ -103,7 +73,7 @@ class Browser
       locale = File.read(AXE_LOCALE_PATH)
       page.evaluate_async(<<~JS, PAGE_TIMEOUT)
         axe.configure({locale: #{locale} })
-        axe.run(document, { runOnly: { type: "rule", values: #{RGAA_AXE_RULES} }, reporter: "v2"}).then(results => __f(results))
+        axe.run(document, { runOnly: "RGAAv4", reporter: "v2"}).then(results => __f(results))
       JS
     end
   end
