@@ -25,7 +25,7 @@
 # be configured to provide at least as many connections as the number of
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
 workers Integer(ENV["WEB_CONCURRENCY"] || 2)
-threads_count = Integer(ENV["MAX_THREADS"] || 3)
+threads_count = Integer(ENV["RAILS_MAX_THREADS"] || 3)
 threads threads_count, threads_count
 
 preload_app!
