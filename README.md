@@ -82,6 +82,69 @@ bin/scalingo prod
 bin/scalingo prod --sandbox
 ```
 
+### Nombre de connexions à la base de données
+
+Le projet utilise PostgreSQL et Rails avec SolidQueue, SolidCable, et SolidCache,
+chaque *thread* (Puma ou SolidQueue) se connecte donc à **4 bases de données**.
+
+De plus, le nombre de connexions utilisées dépend des variables d'environnement suivantes :
+
+- `WEB_CONCURRENCY` : nombre de workers Puma par dyno web (2 par défaut)
+- `RAILS_MAX_THREADS` : nombre de threads par worker Puma ET taille du pool de connexions (3 par défaut)
+- `JOB_CONCURRENCY` : nombre de workers SolidQueue par dyno worker (2 par défaut)
+- `JOB_THREADS` : nombre de threads par worker SolidQueue (4 par défaut)
+
+**Formule par dyno web :**
+```
+Connexions max = WEB_CONCURRENCY × RAILS_MAX_THREADS × 4 bases
+```
+
+**Formule par dyno worker :**
+```
+Connexions max = (JOB_CONCURRENCY × JOB_THREADS + (1 slow queue × 3 slow threads)) × 4 bases
+```
+
+#### Configuration actuelle
+
+##### Dynos web (Puma)
+
+- `WEB_CONCURRENCY=2`
+- `RAILS_MAX_THREADS=3`
+- **Par dyno : 2 × 3 × 4 = 24 connexions max**
+
+##### Dynos worker (SolidQueue)
+
+- Queue "slow" : 1 processus × 3 threads
+- Queues default/cable/background : 2 processus × 4 threads chacun
+- Total : (1×3) + (2×4) = 11 jobs concurrents max
+- **Par dyno : 11 × 4 DB = 44 connexions max**
+
+##### Notes
+- Scalingo réserve 1 connexion pour le rôle super-admin (donc le plan à 120 connexions n'en permet que 119 en réalité).
+- Les connexions sont créées à la demande (lazy loading)
+- Pour être sûr que chaque thread Puma puisse se connecter à la base, utiliser `RAILS_MAX_THREADS` dans `puma.rb` (`threads_count`) ET `database.yml` (`pool`).
+- Les dynos worker utilisent une configuration différente (2 processus × 4 threads) adaptée à leur charge mémoire.
+- Utiliser des requêtes asynchrones (`async_count` par exemple) augmente le nombre de connections utilisée par thread web.
+
+##### Exemples de configuration
+
+Pour **120 connexions** (Starter 1G) :
+```bash
+# 1 dyno WEB
+WEB_CONCURRENCY=2
+RAILS_MAX_THREADS=3
+# 1 × 2 × 3 × 4 = 24 connexions MAXI
+
+# 2 dynos WORKER
+JOB_CONCURRENCY=2
+JOB_THREADS=4
+# Slow queue: 1 process × 3 threads
+# Default queues: JOB_CONCURRENCY × JOB_THREADS = 2 × 4
+# 2 dynos × (((1×3) + (2×4)) × 4 DB) = 2 × 11 × 4 = 88 connexions
+
+# Total WEB + WORKER : 112 connexions
+```
+
 ## 🧰 Outils et technologies
 
 - Framework : Ruby on Rails, ViewComponents, SolidQueue
