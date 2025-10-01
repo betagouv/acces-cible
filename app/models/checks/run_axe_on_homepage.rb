@@ -1,5 +1,6 @@
 module Checks
   class RunAxeOnHomepage < Check
+    SLOW = true
     PRIORITY = 30
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
