@@ -1,5 +1,6 @@
 module Checks
   class Reachable < Check
+    SLOW = true
     PRIORITY = 0 # This needs to run before all other checks
     REQUIREMENTS = []
 

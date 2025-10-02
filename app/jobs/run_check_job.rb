@@ -3,12 +3,7 @@ require "json/add/exception" # required to serialize errors as JSON
 class RunCheckJob < ApplicationJob
   queue_as do
     check = self.arguments.first
-
-    if check.is_a? Checks::Reachable
-      :slow
-    else
-      :default
-    end
+    check.slow? ? :slow : :default
   end
 
   rescue_from Check::RuntimeError do |exception|
