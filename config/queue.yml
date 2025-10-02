@@ -6,7 +6,7 @@ default: &default
     - queue: "slow"
       processes: 1
       threads: 3
-      polling_interval: 5
+      polling_interval: 0.1
     - queues: [ default,cable,background ]
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 2) %>
       threads: <%= ENV.fetch("JOB_THREADS", 4) %>
