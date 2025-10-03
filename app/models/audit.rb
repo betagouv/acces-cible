@@ -8,13 +8,6 @@ class Audit < ApplicationRecord
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
-  enum :status, [
-    "pending",    # Initial state, no checks started
-    "passed",     # All checks passed
-    "mixed",      # Some checks failed
-    "failed",     # All checks failed
-  ].index_by(&:itself), validate: true, default: :pending
-
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(checked_at: nil) }
@@ -46,6 +39,10 @@ class Audit < ApplicationRecord
     all_checks.collect(&:current_state)
   end
 
+  def pending?
+    checked_at.nil?
+  end
+
   def status_from_checks
     states = all_check_states
 
@@ -75,6 +72,6 @@ class Audit < ApplicationRecord
     checks
       .remaining
       .filter { |other_check| other_check.depends_on?(check.to_requirement) }
-      .each   { |other_check| other_check.transition_to!(:aborted) }
+      .each { |other_check| other_check.transition_to!(:aborted) }
   end
 end
