@@ -209,8 +209,8 @@ RSpec.describe Page do
         HTML
       end
 
-      it "strips fragments from URLs" do
-        expect(page.links.collect(&:href)).to contain_exactly("https://external.com/")
+      it "strips fragments from URLs but keeps duplicate links" do
+        expect(page.links.collect(&:href)).to eq(["https://external.com/", "https://external.com/"])
       end
     end
 

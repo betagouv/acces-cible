@@ -63,7 +63,7 @@ class Page
       Link.new(href:, text:)
     rescue Link::InvalidUriError
       next
-    end.uniq.compact
+    end.compact
   end
 
   private
