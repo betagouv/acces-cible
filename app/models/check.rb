@@ -12,7 +12,7 @@ class Check < ApplicationRecord
         self,
         transition_class: CheckTransition,
         association_name: :check_transitions,
-        initial_transition: true
+        initial_transition: persisted?
       )
     end
   end
