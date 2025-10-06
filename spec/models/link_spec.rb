@@ -113,6 +113,10 @@ RSpec.describe Link do
         expect(normalized_urls.first).to eq("http://example.com/folder/page.html")
       end
     end
+
+    it "raises InvalidUriError for malformed URIs like maitlo:accueil@example.com" do
+      expect { described_class.normalize("maitlo:accueil@itxassou.fr") }.to raise_error(Link::InvalidUriError)
+    end
   end
 
   describe ".url_without_scheme_and_www" do
