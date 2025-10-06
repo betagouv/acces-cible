@@ -32,6 +32,8 @@ Link = Data.define(:href, :text) do
       end
       query = uri.query.nil? ? "" : "?#{uri.query}"
       Addressable::URI.join(uri.origin, path, query).display_uri.to_s
+    rescue Addressable::URI::InvalidURIError
+      raise Link::InvalidUriError.new(href)
     end
 
     def url_without_scheme_and_www(href)
