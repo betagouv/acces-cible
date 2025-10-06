@@ -20,27 +20,27 @@ module DsfrHelper
   def dsfr_row_check(record)
     input_id = "row_check_#{record.id}"
     text = t("shared.select_name", name: record.to_s)
-    <<-HTML.html_safe
-    <th class="fr-cell--fixed fr-enlarge-input" scope="row">
-      <div class="fr-checkbox-group fr-checkbox-group--sm" title="#{text}">
-        <input type="checkbox" name="id[]" value="#{record.id}" id="#{input_id}" form="table_form" data-fr-row-select="true" data-action="table#toggle" data-table-target="checkbox">
-        <label for="#{input_id}" class="fr-label">#{text}</label>
-      </div>
-    </th>
-    HTML
+    content_tag :th, class: "fr-cell--fixed fr-enlarge-input", scope: "row" do
+      content_tag :div, class: "fr-checkbox-group fr-checkbox-group--sm", title: text do
+        safe_join([
+          check_box_tag("id[]", record.id, false, id: input_id, form: "table_form", data: { fr_row_select: "true", action: "table#toggle", table_target: "checkbox" }),
+          label_tag(input_id, text, class: "fr-label")
+        ])
+      end
+    end
   end
 
   def dsfr_row_check_all
     input_id = "row_check_all"
     text = t("shared.select_name", name: t("shared.all_lines"))
-    <<-HTML.html_safe
-    <th class="fr-cell--fixed fr-enlarge-input" role="columnheader">
-      <div class="fr-checkbox-group fr-checkbox-group--sm" title="#{text}">
-        <input type="checkbox" id="#{input_id}" data-action="table#toggleAll" data-table-target="toggleAll">
-        <label for="#{input_id}" class="fr-label">#{text}</label>
-      </div>
-    </th>
-    HTML
+    content_tag :th, class: "fr-cell--fixed fr-enlarge-input", role: "columnheader" do
+      content_tag :div, class: "fr-checkbox-group fr-checkbox-group--sm", title: text do
+        safe_join([
+          check_box_tag(nil, nil, false, id: input_id, data: { action: "table#toggleAll", table_target: "toggleAll" }),
+          label_tag(input_id, text, class: "fr-label")
+        ])
+      end
+    end
   end
 
   def dsfr_badge(status:, html_attributes: {}, &block)

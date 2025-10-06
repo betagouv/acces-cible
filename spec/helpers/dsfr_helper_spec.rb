@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe DsfrHelper do
   describe "#dsfr_row_check" do
-    let(:site) { build(:site) }
+    let(:site) { build(:site, id: 1) }
 
     it "renders checkbox with record data" do
       result = helper.dsfr_row_check(site)
