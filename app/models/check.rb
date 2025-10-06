@@ -41,6 +41,7 @@ class Check < ApplicationRecord
     :find_accessibility_page,
     :analyze_accessibility_page,
     :analyze_schema,
+    :analyze_plan,
     :accessibility_page_heading,
     :run_axe_on_homepage,
   ].freeze
