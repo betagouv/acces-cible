@@ -151,6 +151,16 @@ JOB_THREADS=4
 - Tests : RSpec, Cucumber, Factory Bot
 - UI : Composants DSFR (Design System de l'État Français)
 
+### Mise à jour des dépendances
+
+Les tests automatique d'accessibilité utilisent Axe-core, localisé en français.
+Le navigateur utilise puppeteer-stealth-evasion pour éviter d'être identifié comme un robot.
+Pour mettre à jour ces dépendances, il suffit de lancer la commande suivante :
+
+```shell
+bin/rails vendor:update
+```
+
 ## 📁 Organisation du code
 
 - L'application est structurée en Modèle/View/Controller (MVC) avec une architecture REST, comme Rails le préconise.
