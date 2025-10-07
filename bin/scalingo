@@ -90,7 +90,7 @@ end
 # Build the command based on command type
 case command
 when "console"
-  run_cmd = sandbox ? "rails console --sandbox" : "rails console"
+  run_cmd = sandbox ? "'rails console --sandbox'" : "rails console"
   puts "Connecting to #{environment} Rails console#{sandbox ? ' (sandbox mode)' : ''}..."
 when "bash"
   if sandbox
