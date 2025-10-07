@@ -113,12 +113,12 @@ module Checks
 
     private
 
-    def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
+    def page = @page ||= audit.page(:accessibility)
     def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
 
     def analyze!
-      return unless audit.find_accessibility_page&.url
+      return unless page
 
       {
         audit_date: find_audit_date,

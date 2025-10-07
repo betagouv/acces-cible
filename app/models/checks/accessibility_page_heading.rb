@@ -48,10 +48,8 @@ module Checks
 
     private
 
-    def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
-
     def analyze!
-      return unless audit.find_accessibility_page&.url
+      return unless page = audit.page(:accessibility)
 
       {
         page_headings: page.heading_levels,
