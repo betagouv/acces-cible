@@ -123,9 +123,11 @@ RSpec.describe Checks::AnalyzePlan do
   describe "#validate_year" do
     current_year = Date.current.year
     {
-      current_year => true,
-      current_year - 1 => false,
-      current_year + 1 => false
+      current_year + 1 => false,
+      current_year     => true,
+      current_year - 1 => true,
+      current_year - 2 => true,
+      current_year - 4 => false
     }.each do |year, expected_result|
       it "returns #{expected_result} for #{year}" do
         expect(check.send(:validate_year, year)).to eq(expected_result)
