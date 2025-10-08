@@ -57,7 +57,7 @@ module Checks
         link_url: link.href,
         link_text: link.text,
         valid_year: validate_year(year),
-        reachable: reachable?(link.href)
+        reachable: Browser.exists?(link.href)
       }
     end
 
@@ -69,7 +69,5 @@ module Checks
       valid_years = (current_year - MAX_YEARS_VALIDITY).upto(current_year)
       valid_years.include?(year)
     end
-
-    def reachable?(url) = url && Browser.get(url)[:status] == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   end
 end

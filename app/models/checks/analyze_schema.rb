@@ -65,13 +65,12 @@ module Checks
         link_url: link.href,
         link_text: link.text,
         valid_years: validate_years(years),
-        reachable: reachable?(link.href)
+        reachable: Browser.exists?(link.href)
       }
     end
 
     def page = @page ||= audit.page(:accessibility)
     def extract_years(string) = string.to_s.scan(/\d{4}/).map(&:to_i).sort
     def validate_years(years) = years.size.in?(1..3) && years.first.upto(years.last).include?(Date.current.year)
-    def reachable?(url) = url && Browser.get(url)[:status] == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   end
 end
