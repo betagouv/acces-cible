@@ -186,12 +186,15 @@ fr:
         issues_total: Erreurs relevées
         success_rate: Taux de réussite
         unknown: Inconnu
-        elements: Éléments concernés
+        elements_count:
+          zero: aucun élément concerné
+          one: un élément concerné
+          other: "%{count} éléments concernés"
       checks/run_axe_on_homepage/impacts:
-        minor: Mineur
-        moderate: Modéré
-        serious: Important
-        critical: Critique
+        minor: impact mineur
+        moderate: impact modéré
+        serious: impact important
+        critical: critique
 
       session:
         login_failed: Nous n'avons pas réussi à vous identifier.
