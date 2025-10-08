@@ -13,9 +13,6 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     end
 
     it "returns complete accessibility information" do
-      # rubocop:disable RSpec/MessageChain
-      allow(check).to receive_message_chain(:audit, :find_accessibility_page, :url).and_return("https://example.com/accessibility")
-      # rubocop:enable RSpec/MessageChain
       allow(check).to receive(:page).and_return(build(:page, body: text))
       expect(check.send(:analyze!)).to include(
         audit_date: Date.new(2024, 3, 15),
