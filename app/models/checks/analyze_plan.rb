@@ -2,6 +2,7 @@ module Checks
   class AnalyzePlan < Check
     PRIORITY = 24
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
+    MAX_YEARS_VALIDITY = 3
     LINK_PATTERN = /
       plan\s+
       (?:
@@ -62,7 +63,13 @@ module Checks
 
     def page = @page ||= audit.page(:accessibility)
     def extract_year(string) = string.to_s.scan(/\d{4}/).map(&:to_i).sort.last
-    def validate_year(year) =  year == Date.current.year
+
+    def validate_year(year)
+      current_year = Date.current.year
+      valid_years = (current_year - MAX_YEARS_VALIDITY).upto(current_year)
+      valid_years.include?(year)
+    end
+
     def reachable?(url) = url && Browser.get(url)[:status] == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   end
 end
