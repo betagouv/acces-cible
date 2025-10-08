@@ -2,30 +2,24 @@
   <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
   <%= badge to_badge(check) %>
 
-  <% if check.completed? %>
+  <% if check.completed? && check.link_url %>
     <ul>
-      <% if check.link_url %>
-        <li>
-          <strong><%= Checks::AnalyzePlan.human(:link_text) %> :</strong>
-          <%= check.link_text %>
-        </li>
-        <li>
-          <strong><%= Checks::AnalyzePlan.human(:link_url) %> :</strong>
-          <%= link_to check.link_url, check.link_url, target: :_blank %>
-        </li>
-        <li>
-          <strong><%= Checks::AnalyzePlan.human(:year) %> :</strong>
-          <% if check.year %>
-            <%= check.year %>
-          <% else %>
-            <%= Checks::AnalyzePlan.human(:year_not_found) %>
-          <% end %>
-        </li>
-      <% else %>
-        <li>
-          <%= Checks::AnalyzePlan.human(:link_not_found) %>
-        </li>
-      <% end %>
+      <li>
+        <strong><%= Checks::AnalyzePlan.human(:link_text) %> :</strong>
+        <%= check.link_text %>
+      </li>
+      <li>
+        <strong><%= Checks::AnalyzePlan.human(:link_url) %> :</strong>
+        <%= link_to check.link_url, check.link_url, target: :_blank %>
+      </li>
+      <li>
+        <strong><%= Checks::AnalyzePlan.human(:year) %> :</strong>
+        <% if check.year %>
+          <%= check.year %>
+        <% else %>
+          <%= Checks::AnalyzePlan.human(:year_not_found) %>
+        <% end %>
+      </li>
     </ul>
   <% end %>
 </div>
