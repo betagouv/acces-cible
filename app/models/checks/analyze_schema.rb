@@ -11,10 +11,10 @@ module Checks
     LINK_PATTERN = /
       sch[eé]ma\s+
       (?:
-        pluriannuel\s+(?:de\s+(?:mise\s+en\s+|l['’])?|d['’])accessibilit[eé](?:\s+num[eé]rique)?|
-        pluriannuel\s+rgaa|
+        pluri-?annuel\s+(?:de\s+(?:mise\s+en\s+|l['’])?|d['’])accessibilit[eé](?:\s+num[eé]rique)?|
+        pluri-?annuel\s+rgaa|
         annuel\s+d['’]accessibilit[eé]|
-        d['’]accessibilit[eé]\s+(?:num[eé]rique|pluriannuel)
+        d['’]accessibilit[eé]\s+(?:num[eé]rique|pluri-?annuel)
       )|
       accessibilit[eé]\s+num[eé]rique\s+[—–-]\s+sch[eé]ma\s+annuel
     /xi
