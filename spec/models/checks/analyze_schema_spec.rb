@@ -57,6 +57,7 @@ RSpec.describe Checks::AnalyzeSchema do
         "Schéma d'accessibilité numérique",
         "schéma pluriannuel d’accessibilité",
         "Schéma pluriannuel d'accessibilité",
+        "Télécharger le schéma pluri-annuel d'accessibilité (PDF, 169.31 Ko)",
         "Schéma pluriannuel d'accessibilité numérique",
         "Schéma pluriannuel de l'accessibilité numérique",
         "Schéma pluriannuel de l'accessibilité",
