@@ -29,7 +29,8 @@ RSpec.describe Checks::AnalyzeSchema do
       it "returns a hash containing link_url, link_text, years, reachable, and valid_years" do
         page = build(:page, html: "<html><body></body></html>")
         link = Link.new(href: "schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{year - 1}-#{year + 1}")
-        allow(check).to receive_messages(page:, find_link: link, reachable?: true)
+        allow(check).to receive_messages(page:, find_link: link)
+        allow(Browser).to receive(:exists?).with(link.href).and_return(true)
 
         expect(analyze).to include(
           link_url: link.href,
