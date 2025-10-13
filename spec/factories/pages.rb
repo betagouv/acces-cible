@@ -23,10 +23,12 @@ FactoryBot.define do
             #{headings.map { |h| "<h1>#{h}</h1>" }.join("\n")}
             #{links.map do |link|
               case link
-              when String
-                %(<a href="#{link}">#{link}</a>)
+              when Link
+                %(<a href="#{link.href}">#{link.text}</a>)
               when Array
                 %(<a href="#{link[0]}">#{link[1]}</a>)
+              when String
+                %(<a href="#{link}">#{link}</a>)
               end
             end.join("\n")}
             #{body}
