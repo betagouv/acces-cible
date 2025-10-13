@@ -38,7 +38,11 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   def error? = status > 399
-  def refresh = fetch(clear: true)
+
+  def refresh
+    fetch(clear: true)
+    self
+  end
 
   def dom
     Nokogiri::HTML(html).tap do |document|
