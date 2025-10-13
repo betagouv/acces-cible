@@ -124,25 +124,21 @@ module Checks
 
     def first_heading_offset
       @first_heading_offset ||= begin
-        if page_headings.empty?
-          0
-        else
-          matches = []
+        matches = []
 
-          indexed_expected_headings.each do |_, expected_heading, expected_level|
-            indexed_page_headings.each do |_, page_heading, page_level|
-              score = similarity_ratio(expected_heading, page_heading, partial: false)
+        indexed_expected_headings.each do |_, expected_heading, expected_level|
+          indexed_page_headings.each do |_, page_heading, page_level|
+            score = similarity_ratio(expected_heading, page_heading, partial: false)
 
-              if score >= COMPARISON_OPTIONS[:fuzzy]
-                matches << [expected_level, page_level, score]
-              end
+            if score >= COMPARISON_OPTIONS[:fuzzy]
+              matches << [expected_level, page_level, score]
             end
           end
-          return 0 if matches.empty?
-
-          expected_level, page_level, _ = matches.max_by { |_, _, score| score }
-          page_level - expected_level
         end
+        return 0 if matches.empty?
+
+        expected_level, page_level, _ = matches.max_by { |_, _, score| score }
+        page_level - expected_level
       end
     end
 
