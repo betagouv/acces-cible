@@ -71,9 +71,9 @@ module Checks
       # Two-pass approach: first match all headings, then determine status
       expected_to_actual = {}
 
-      # First pass: find best matches for each expected heading without order constraints
+      # First pass: find best matches for each expected heading, avoiding "stealing" exact matches
       indexed_expected_headings.each do |(expected_index, expected_heading, expected_level)|
-        best_match = find_unconstrained_best_match(expected_heading, expected_to_actual.values)
+        best_match = find_unconstrained_best_match(expected_heading, expected_index, expected_to_actual.values)
         expected_to_actual[expected_index] = best_match if best_match
       end
 
@@ -101,7 +101,7 @@ module Checks
       end
     end
 
-    def find_unconstrained_best_match(expected_heading, already_matched)
+    def find_unconstrained_best_match(expected_heading, current_expected_index, already_matched)
       best_match = nil
       best_score = 0
 
@@ -120,14 +120,6 @@ module Checks
       end
 
       best_match
-    end
-
-    def find_best_match(expected_heading, candidates)
-      candidates
-        .map { |index, heading, level| [heading, level, index, similarity_ratio(expected_heading, heading)] }
-        .select { |_, _, _, score| score >= COMPARISON_OPTIONS[:fuzzy] }
-        .max_by { |_, _, _, score| score }
-        &.first(3)
     end
 
     def first_heading_offset
