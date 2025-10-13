@@ -3,6 +3,7 @@ module Checks
     PRIORITY = 21
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
+    ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
     COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité|conforme à|révèle que).*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)/i
@@ -21,7 +22,7 @@ module Checks
 
     LAW_DATE = Date.new(2005, 2, 11)
 
-    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor
+    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article
 
     def tooltip? = !(completed? && found_required?)
     def audit_date = super&.to_date
@@ -110,13 +111,15 @@ module Checks
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
+    def find_article_mention = page.text.match?(ARTICLE)
+
     def custom_badge_status = found_required? ? :success : :warning
     def custom_badge_text = found_required? ? human_compliance_rate : human(:missing_data)
 
     private
 
     def page = @page ||= audit.page(:accessibility)
-    def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
+    def found_required? = [:audit_date, :compliance_rate, :mentions_article].all? { send(it).present? }
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
 
     def analyze!
@@ -127,7 +130,8 @@ module Checks
         audit_update_date: find_audit_update_date,
         compliance_rate: find_compliance_rate,
         standard: find_standard,
-        auditor: find_auditor
+        auditor: find_auditor,
+        mentions_article: find_article_mention
       }
     end
 
