@@ -4,6 +4,9 @@ class Page
   DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
   FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
+  SELECTORS = {
+    main: "main, [role=main], article, #main, #content, #main-content, .main-content, .content, .site-content"
+  }.freeze
 
   class InvalidTypeError < StandardError
     def initialize(url, content_type)
@@ -53,8 +56,9 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def links(skip_files: true)
-    dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
+  def links(skip_files: true, scope: nil)
+    source = css(SELECTORS[scope]).first || dom
+    source.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
