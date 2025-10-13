@@ -33,6 +33,14 @@ module StringComparison
     str1, str2 = str1.downcase, str2.downcase if options[:ignore_case]
     return 1.0 if str1 == str2
 
+    if options[:partial]
+      partial_match_score(str1, str2)
+    else
+      levenshtein_similarity(str1, str2)
+    end
+  end
+
+  def levenshtein_similarity(str1, str2)
     max_len = [str1.length, str2.length].max
     if max_len.zero?
       0.0
@@ -52,34 +60,42 @@ module StringComparison
 
   def partial_match?(str1, str2, options)
     if fuzzy_matching?(options)
-      max_substring_similarity(str1, str2, options) >= options[:fuzzy]
+      partial_match_score(str1, str2) >= options[:fuzzy]
     else
       str1.include?(str2) || str2.include?(str1)
     end
   end
 
-  def max_substring_similarity(str1, str2, options)
-    str1, str2 = str2, str1 if str1.length < str2.length # Use the longest string as str1
-    return 1.0 if str1.include?(str2)
+  def partial_match_score(str1, str2)
+    str1, str2 = str2, str1 if str1.length < str2.length
 
-    # Use a windowing approach for long strings
-    max_similarity = 0.0
-    if str1.length < 100
-      (0..str1.length - str2.length).each do |i|
-        substring = str1[i, str2.length]
-        similarity = similarity_ratio(substring, str2, options)
-        max_similarity = [max_similarity, similarity].max
-      end
+    best_score = if str1.include?(str2)
+      1.0
     else
-      step = [str1.length / 20, 1].max
-      (0..str1.length - str2.length).step(step).each do |i|
-        substring = str1[i, str2.length]
-        similarity = similarity_ratio(substring, str2, options)
-        max_similarity = [max_similarity, similarity].max
-      end
+      max_fuzzy_substring_match(str1, str2)
     end
 
-    max_similarity
+    # Penalize length differences
+    length_ratio = str2.length.to_f / str1.length
+    best_score * Math.sqrt(length_ratio)
+  end
+
+  def max_fuzzy_substring_match(str1, str2)
+    overlapping_substrings(str1, str2.length).map do |substring|
+      levenshtein_similarity(substring, str2)
+    end.max || 0.0
+  end
+
+  def overlapping_substrings(str, length)
+    return [str] if str.length == length
+
+    max_shift = str.length - length
+    # Check every position for short strings, sample for long strings
+    shift = max_shift < 200 ? 1 : [length / 2, 1].max
+
+    (0..max_shift).step(shift).map do |position|
+      str[position, length]
+    end
   end
 
   def fuzzy_matching?(options)
