@@ -162,6 +162,12 @@ RSpec.describe Page do
       expect(page.dom.css("style, meta, div.d-none")).to be_empty
     end
 
+    it "caches the parsed document" do
+      first_dom = page.dom
+      second_dom = page.dom
+      expect(first_dom).to be(second_dom)
+    end
+
     context "when HTML is invalid" do
       let(:nokogiri_document) { instance_double(Nokogiri::HTML::Document) }
 

@@ -45,7 +45,7 @@ class Page
   end
 
   def dom
-    Nokogiri::HTML(html).tap do |document|
+    @dom ||= Nokogiri::HTML(html).tap do |document|
       document.css(INVISIBLE_ELEMENTS).each(&:remove)
       document.xpath("//text()[normalize-space(.) != '']").each { |node| node.content = " #{node.content} " }
     end
