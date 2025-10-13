@@ -65,9 +65,7 @@ RSpec.describe Checks::FindAccessibilityPage do
 
     before do
       allow(check).to receive(:crawler).and_return(crawler)
-      allow(check).to receive(:mentions_article?).with(non_matching_page).and_return(false)
       allow(check).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
-      allow(check).to receive(:mentions_article?).with(matching_page).and_return(true)
       allow(check).to receive(:required_headings_present?).with(matching_page).and_return(true)
       allow(check).to receive(:filter_queue)
     end
@@ -81,49 +79,17 @@ RSpec.describe Checks::FindAccessibilityPage do
       expect(check.send(:find_page)).to be(matching_page)
     end
 
-    it "continues crawling when page has article mention but insufficient headings" do
-      page_with_article_only = build(:page, url: "https://example.com/partial", body: "Some content")
+    it "continues crawling when page has insufficient headings" do
+      page_with_insufficient_headings = build(:page, url: "https://example.com/partial", body: "Some content")
 
-      allow(check).to receive(:mentions_article?).with(page_with_article_only).and_return(true)
-      allow(check).to receive(:required_headings_present?).with(page_with_article_only).and_return(false)
+      allow(check).to receive(:required_headings_present?).with(page_with_insufficient_headings).and_return(false)
 
       expect(crawler).to receive(:find)
-        .and_yield(page_with_article_only, LinkList.new("https://example.com/other"))
+        .and_yield(page_with_insufficient_headings, LinkList.new("https://example.com/other"))
         .and_yield(matching_page, LinkList.new(matching_page_url))
         .and_return(matching_page)
 
       expect(check.send(:find_page)).to be(matching_page)
-    end
-
-    it "continues crawling when page has sufficient headings but no article mention" do
-      page_with_headings_only = build(:page, url: "https://example.com/headings", body: "Some content")
-
-      allow(check).to receive(:mentions_article?).with(page_with_headings_only).and_return(false)
-      allow(check).to receive(:required_headings_present?).with(page_with_headings_only).and_return(true)
-
-      expect(crawler).to receive(:find)
-        .and_yield(page_with_headings_only, LinkList.new("https://example.com/other"))
-        .and_yield(matching_page, LinkList.new(matching_page_url))
-        .and_return(matching_page)
-
-      expect(check.send(:find_page)).to be(matching_page)
-    end
-  end
-
-  describe "#mentions_article?" do
-    subject { check.send(:mentions_article?, page) }
-
-    {
-      "article 47 loi n°2005-102 du 11 février 2005" => true,
-      "art. 47 de la loi numéro 2005-102 du 11 fevrier 2005" => true,
-      "Contactez-nous pour plus d'informations" => false,
-      "" => false
-    }.each do |body, expectation|
-      context "when page contains #{body.inspect}" do
-        let(:page) { build(:page, body:) }
-
-        it { should eq(expectation) }
-      end
     end
   end
 
