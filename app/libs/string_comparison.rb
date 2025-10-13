@@ -101,4 +101,8 @@ module StringComparison
   def fuzzy_matching?(options)
     options[:fuzzy] && options[:fuzzy] < 1.0
   end
+
+  private_class_method :levenshtein_similarity, :exact_match?, :partial_match?,
+                       :partial_match_score, :max_fuzzy_substring_match,
+                       :overlapping_substrings, :fuzzy_matching?
 end
