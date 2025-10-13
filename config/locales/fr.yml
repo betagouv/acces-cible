@@ -172,13 +172,15 @@ fr:
       checks/analyze_plan:
         type: Plan d'action
         table_header: Plan d'action
-        year: Année du plan
+        years: Année(s) du plan
         year_not_found: non détectée
         link_text: Intitulé du lien
         link_url: Adresse du lien
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
-        invalid_year: Année invalide
+        invalid_year: Année(s) invalide(s)
+        page_heading: Titre de page
+        plan_in_page_heading: Plan trouvé dans un titre de page
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
         table_header: Déclaration
