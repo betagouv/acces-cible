@@ -169,7 +169,6 @@ fr:
         type: Indication de la langue
         table_header: Langue
         empty: Absente
-        totalement: Totalement conforme
       checks/reachable:
         type: Site joignable
         redirected: Redirection
