@@ -10,3 +10,8 @@ Quand("je filtre par étiquette {string}") do |tag|
     Et que je clique sur "Filtrer"
   )
 end
+
+Quand("je recherche {string}") do |term|
+  fill_in "Rechercher", with: term
+  click_button "Rechercher"
+end

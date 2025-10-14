@@ -1,8 +1,8 @@
 <%# locals: (label:, attribute:, options:, include_blank:, params_key:) %>
 
 <%= form_with(url: url_for, method: :get) do |f| %>
-  <% (params[params_key] || {}).except(attribute).compact_blank.each do |key, value| %>
-    <%= f.hidden_field key, value:, name: "#{params_key}[#{key}]", id: nil %>
+  <% flatten_params(:sort, :filter, :limit).except("#{params_key}[#{attribute}]").each do |name, value| %>
+    <%= f.hidden_field name, value:, id: nil %>
   <% end %>
   <div class="fr-grid-row fr-grid-row--gutters">
     <div class="fr-col">

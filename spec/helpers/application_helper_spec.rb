@@ -127,6 +127,17 @@ RSpec.describe ApplicationHelper do
         expect(email_href).to include("sort[email]=asc")
       end
     end
+
+    context "when filter and limit params are present", :aggregate_failures do
+      let(:params) { { page: 2, filter: { tag_id: 5, q: "test" }, limit: 20 } }
+
+      it "preserves filter and limit params in the sort link" do
+        expect(decoded_href).to include("filter[tag_id]=5")
+        expect(decoded_href).to include("filter[q]=test")
+        expect(decoded_href).to include("limit=20")
+        expect(decoded_href).to include("sort[name]=asc")
+      end
+    end
   end
 
   describe "#set_focus" do

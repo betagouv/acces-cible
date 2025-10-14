@@ -31,7 +31,7 @@ module ApplicationHelper
   def sortable_header(text, param, **options)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc
-    link_params = params.permit(:page, search: {}).merge(sort: { param => direction })
+    link_params = params.permit(:page, :limit, filter: {}).merge(sort: { param => direction })
     link_text = t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
     options[:title] ||= link_text
     options["aria-label"] ||= link_text
