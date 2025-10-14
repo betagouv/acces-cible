@@ -33,7 +33,7 @@ describe CheckStateMachine do
     let(:check) { create(:check, :reachable, :running) }
 
     it "tells the audit to look at dependent jobs" do
-      expect(check.audit).to receive(:abort_dependent_checks!).with(check)
+      expect(check.audit).to receive(:abort_dependent_checks!)
 
       check.transition_to!(:failed)
     end
