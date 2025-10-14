@@ -8,7 +8,22 @@ class ApplicationRecord < ActiveRecord::Base
   class << self
     delegate :helpers, to: ApplicationController
 
-    alias human human_attribute_name
+    # Improved human_attribute_name: shorter, and doesn't default to key.humanized
+    def human(key, **options)
+      key = key.to_s
+      defaults = lookup_ancestors.flat_map do |klass|
+        [:"#{i18n_scope}.attributes.#{klass.model_name.i18n_key}.#{key}",
+         :"#{i18n_scope}.attributes.#{klass.model_name.i18n_key}/#{key}"]
+      end
+      defaults += [
+        :"#{i18n_scope}.attributes.#{key}",
+        :"attributes.#{key}",
+        options[:default]
+      ].compact_blank.flatten
+      options[:count] ||= 1
+      I18n.t defaults.shift, **options, default: defaults
+    end
+
     def human_count(attr = :count, count: nil) = human(attr, count: count || send(attr))
     def to_percent(number, **options) = helpers.number_to_percentage(number, options.merge(precision: 2, strip_insignificant_zeros: true))
 
