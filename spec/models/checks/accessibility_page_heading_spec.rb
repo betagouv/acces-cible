@@ -21,9 +21,8 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "returns array of headings with :ok status" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
-          # The actual heading may have trailing spaces removed by .squish
-          actual_heading = page_headings[index].last
-          [heading, level, :ok, actual_heading]
+          actual_page_heading = page_headings[index].last
+          [heading, level, :ok, actual_page_heading]
         end
         expect(comparison).to eq expected_result
       end
@@ -33,10 +32,9 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:fixture_file_name) { :valid_with_shift }
 
       it "returns :ok status for all headings (ignores start level difference)" do
-        # Skip the first heading (extra h1), rest are shifted by 1
         expected_result = expected_headings.map.with_index do |(level, heading), index|
-          actual_heading = page_headings[index + 1].last
-          [heading, level, :ok, actual_heading]
+          shifted_heading = page_headings[index + 1].last
+          [heading, level, :ok, shifted_heading]
         end
         expect(comparison).to eq expected_result
       end
