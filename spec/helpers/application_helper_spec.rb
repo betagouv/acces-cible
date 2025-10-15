@@ -156,4 +156,63 @@ RSpec.describe ApplicationHelper do
       expect(helper.aria_sort(:name)).to eq('aria-sort=ascending')
     end
   end
+
+  describe "#flatten_params" do
+    let(:params) do
+      {
+        sort: { name: :asc },
+        filter: { tag_id: 2, q: ".gouv" },
+        page: 1,
+        other: "ignored"
+      }
+    end
+
+    before do
+      allow(helper).to receive(:params).and_return(ActionController::Parameters.new(**params))
+    end
+
+    it "flattens single nested hash param" do
+      result = helper.flatten_params(:sort)
+
+      expect(result).to eq({ "sort[name]" => :asc })
+    end
+
+    it "flattens multiple nested hash params" do
+      result = helper.flatten_params(:sort, :filter)
+
+      expect(result).to eq({
+        "sort[name]" => :asc,
+        "filter[tag_id]" => 2,
+        "filter[q]" => ".gouv"
+      })
+    end
+
+    it "handles non-nested params" do
+      result = helper.flatten_params(:page)
+
+      expect(result).to eq({ "page" => 1 })
+    end
+
+    context "with deeply nested params" do
+      let(:params) { { filter: { user: { profile: { age: 25 } } } } }
+
+      it "handles deeply nested params" do
+        result = helper.flatten_params(:filter)
+
+        expect(result).to eq({ "filter[user][profile][age]" => 25 })
+      end
+    end
+
+    it "returns empty hash when no keys match" do
+      result = helper.flatten_params(:nonexistent)
+
+      expect(result).to eq({})
+    end
+
+    it "ignores unpermitted keys" do
+      result = helper.flatten_params(:sort)
+
+      expect(result).not_to have_key("other")
+    end
+  end
 end

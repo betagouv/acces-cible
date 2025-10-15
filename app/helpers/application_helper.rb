@@ -60,4 +60,22 @@ module ApplicationHelper
   def current_git_commit
     ENV["CONTAINER_VERSION"] || `git show -s --format=%H`
   end
+
+  def flatten_params(*keys)
+    params.slice(*keys).permit!.to_h.flat_map do |key, value|
+      flatten_params_hash(key.to_s, value)
+    end.to_h
+  end
+
+  private
+
+  def flatten_params_hash(prefix, value)
+    if value.is_a?(Hash) || value.is_a?(ActionController::Parameters)
+      value.flat_map do |k, v|
+        flatten_params_hash("#{prefix}[#{k}]", v)
+      end
+    else
+      [[prefix, value]]
+    end
+  end
 end
