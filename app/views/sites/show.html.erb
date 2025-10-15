@@ -9,7 +9,9 @@
     <p>
       <strong><%= Tag.human(:all) %> :</strong>
       <% if @site.tags.load.any? %>
-        <%= safe_join @site.tags.collect(&:name).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
+        <% @site.tags.each do |tag| %>
+          <%= dsfr_tag(title: tag.name.truncate(35), url: tag_path(tag), size: :sm, html_attributes: { title: Tag.human(:tag, name: tag.name) }) %>
+        <% end %>
       <% else %>
         <%= Tag.human_count(count: 0) %>
       <% end %>

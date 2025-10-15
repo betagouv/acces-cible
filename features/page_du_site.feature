@@ -21,3 +21,15 @@ Fonctionnalité: Page du site
     Quand je clique sur "Ajouter"
     Et que je clique sur "Nouvelle vérification"
     Alors la page contient "Historique des vérifications (2)"
+
+  Scénario: Un agent peut accéder aux étiquettes depuis la page du site
+    Sachant que je possède un fichier "tmp/sites.csv" qui contient
+      """
+      url;tags
+      https://beta.gouv.fr;éticouette
+      """
+    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
+    Quand je clique sur "Importer"
+    Et que je clique sur "Voir la fiche de beta.gouv.fr"
+    Et que je clique sur "Étiquette éticouette"
+    Alors la page est titrée "éticouette"

@@ -236,6 +236,8 @@ fr:
         delete: Supprimer cette étiquette
         edit: Modifier cette étiquette
         filter: Filtrer par étiquette
+        see_sites: Sites avec l'étiquette %{tag} (%{count})
+        tag: Étiquette %{name}
         count:
           zero: Aucune étiquette
           one: Une étiquette

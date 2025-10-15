@@ -3,14 +3,12 @@
     <% t.with_head do %>
       <tr>
         <th scope="col" aria-sort="ascending"><%= Site.human(:name) %></th>
-        <th scope="col" class="fr-cell--right"><%= Tag.human(:all) %></th>
       </tr>
     <% end %>
     <% t.with_body do %>
       <% @sites.each do |site| %>
         <tr>
-          <td><%= link_to site.name, site %></td>
-          <td class="fr-cell--right"><%= Tag.human_count(count: site.tags_count) %></td>
+          <td><%= dsfr_link_to site.to_s, site %></td>
         </tr>
       <% end %>
     <% end %>
@@ -20,7 +18,8 @@
 <% end %>
 
 <%= page_actions do %>
-  <%= link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
+  <%= dsfr_link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
   <%= button_to Tag.human(:delete), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  <%= dsfr_link_to Tag.human(:see_sites, tag: @tag.name, count: @tag.sites_count), sites_path(search: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
+  <%= dsfr_link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>
