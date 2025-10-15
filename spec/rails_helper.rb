@@ -88,6 +88,9 @@ RSpec.configure do |config|
   # Job-specific config
   config.include ActiveJob::TestHelper, type: :job
 
+  # Request-specific config
+  config.include Capybara::RSpecMatchers, type: :request
+
   # RSpec Rails uses metadata to mix in different behaviours to your tests,
   # for example enabling you to call `get` and `post` in request specs. e.g.:
   #
