@@ -18,7 +18,7 @@ module Checks
         [2, "Retour d'information et contact"],
         [2, "Voies de recours"],
     ].freeze
-    COMPARISON_OPTIONS = { partial: true, fuzzy: 0.65, ignore_case: true }.freeze
+    COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
 
     delegate :expected_headings, to: :class
 
