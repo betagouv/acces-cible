@@ -43,6 +43,7 @@ class Site < ApplicationRecord
   def url_without_scheme_and_www = Link.url_without_scheme_and_www(audit.url)
 
   def name_with_fallback = name.presence || url_without_scheme_and_www
+
   alias to_title name_with_fallback
   alias to_s name_with_fallback
 
