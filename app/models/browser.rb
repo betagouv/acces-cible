@@ -9,6 +9,7 @@ class Browser
     [1280, 800],
     [1920, 1080]
   ].freeze
+  SUCCESS_CODE = 200
   CHROME_VERSIONS = (101..134).to_a.freeze
   MACOS_VERSIONS = ["10_15_7", "13_4_1", "13_6_6", "14_1_2", "14_7_1", "14_7_3", "15_1_1"].freeze
 
@@ -79,8 +80,43 @@ class Browser
     "valid-lang"
   ].to_json.freeze
 
+  delegate :request_headers, to: :class
+
   class << self
     delegate_missing_to :new
+
+    def exists?(url) = url && head(url)[:status] == SUCCESS_CODE
+
+    def head(url)
+      response = HTTP
+        .headers(request_headers)
+        .timeout(connect: 3, read: 3)
+        .follow(max_hops: 3)
+        .head(url)
+
+      {
+        status: response.code || 0,
+        current_url: Link.normalize(response.uri.to_s)
+      }
+    rescue => e
+      {
+        status: 0,
+        current_url: Link.normalize(url)
+      }
+    end
+
+    def request_headers
+      HEADERS.merge(random_user_agent)
+    end
+
+    def random_user_agent
+      macos_version = MACOS_VERSIONS.sample
+      chrome_version = CHROME_VERSIONS.sample
+      {
+        "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
+      }
+    end
   end
 
   def get(url)
@@ -157,8 +193,7 @@ class Browser
 
   def create_page
     browser.create_page.tap do |page|
-      page.headers.set(HEADERS)
-      page.headers.add(random_user_agent)
+      page.headers.set(request_headers)
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
   end
@@ -195,14 +230,5 @@ class Browser
         options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
       end.freeze
     end
-  end
-
-  def random_user_agent
-    macos_version = MACOS_VERSIONS.sample
-    chrome_version = CHROME_VERSIONS.sample
-    {
-      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
-      "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
-    }
   end
 end

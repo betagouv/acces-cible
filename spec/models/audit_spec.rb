@@ -73,6 +73,89 @@ RSpec.describe Audit do
     end
   end
 
+  describe "#page" do
+    subject(:page) { audit.page(kind) }
+
+    let(:audit) { create(:audit, :without_checks, url: "https://example.com") }
+    let(:mock_page) { instance_double(Page) }
+
+    before do
+      allow(Page).to receive(:new).and_return(mock_page)
+    end
+
+    context "when kind is :home" do
+      let(:kind) { :home }
+
+      it "creates a Page with the audit url" do
+        expect(Page).to receive(:new).with(url: audit.url, root: audit.url)
+        page
+      end
+
+      it "returns the Page instance" do
+        expect(page).to eq(mock_page)
+      end
+    end
+
+    context "when kind is :accessibility" do
+      let(:kind) { :accessibility }
+
+      context "when find_accessibility_page check has a url" do
+        let(:check) { instance_double(Checks::FindAccessibilityPage, url: "#{audit.url}/accessibilite") }
+
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(check)
+        end
+
+        it "creates a Page with the accessibility page url" do
+          expect(Page).to receive(:new).with(url: "#{audit.url}/accessibilite", root: audit.url)
+          page
+        end
+
+        it "returns the Page instance" do
+          expect(page).to eq(mock_page)
+        end
+      end
+
+      context "when find_accessibility_page check has no url" do
+        let(:check) { instance_double(Checks::FindAccessibilityPage, url: nil) }
+
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(check)
+        end
+
+        it "returns nil" do
+          expect(page).to be_nil
+        end
+      end
+
+      context "when find_accessibility_page check does not exist" do
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(nil)
+        end
+
+        it "returns nil" do
+          expect(page).to be_nil
+        end
+      end
+    end
+
+    context "when kind is nil" do
+      let(:kind) { nil }
+
+      it "raises an ArgumentError" do
+        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind ''/)
+      end
+    end
+
+    context "when kind is unrecognised" do
+      let(:kind) { :hmoe }
+
+      it "raises an ArgumentError" do
+        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind 'hmoe'/)
+      end
+    end
+  end
+
   describe "#status_from_checks" do
     subject { audit.status_from_checks }
 

@@ -28,6 +28,13 @@ RSpec.describe Page do
           <a href="relative/path">Relative</a>
           <a href="javascript:alert('')">Javascript</a>
           <a href="void(location.href='')">Void</a>
+          <a href="document.pdf">PDF</a>
+          <a href="file.zip">ZIP</a>
+          <a href="report.docx">DOCX</a>
+          <a href="image.jpg">JPG</a>
+          <a href="webcal.ical">ICAL</a>
+          <a href="rss.atom">ATOM</a>
+          <a href="holidays.mov">MOV</a>
           <div class="d-none" style="display: none;">display: none;</div>
         </body>
       </html>
@@ -125,6 +132,27 @@ RSpec.describe Page do
     end
   end
 
+  describe "#refresh" do
+    let(:body) { nil }
+    let(:new_body) { "<html><body><h1>Refreshed Content</h1></body></html>" }
+
+    before do
+      allow(Browser).to receive(:get)
+        .with(normalized_url)
+        .and_return({ body: new_body, status: 200, headers:, current_url: normalized_url })
+    end
+
+    it "clears the cache and calls Browser.get" do
+      expect(Rails.cache).to receive(:clear).with(normalized_url)
+      expect(Browser).to receive(:get).with(normalized_url)
+      page.refresh
+    end
+
+    it "returns self for method chaining" do
+      expect(page.refresh).to eq(page)
+    end
+  end
+
   describe "#dom" do
     it "returns a Nokogiri::HTML document" do
       expect(page.dom).to be_a(Nokogiri::HTML::Document)
@@ -132,6 +160,12 @@ RSpec.describe Page do
 
     it "ignores invisible elements" do
       expect(page.dom.css("style, meta, div.d-none")).to be_empty
+    end
+
+    it "caches the parsed document" do
+      first_dom = page.dom
+      second_dom = page.dom
+      expect(first_dom).to be(second_dom)
     end
 
     context "when HTML is invalid" do
@@ -194,20 +228,6 @@ RSpec.describe Page do
       expect(page.links.collect(&:text)).not_to include("Section")
     end
 
-    context "with links to non-HTML files" do
-      let(:body) do
-        <<~HTML
-          <a href="document.pdf">PDF</a>
-          <a href="file.zip">ZIP</a>
-          <a href="image.jpg">JPG</a>
-        HTML
-      end
-
-      it "excludes links to non-HTML files" do
-        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
-      end
-    end
-
     context "with fragment URLs" do
       let(:body) do
         <<~HTML
@@ -216,8 +236,150 @@ RSpec.describe Page do
         HTML
       end
 
-      it "strips fragments from URLs" do
-        expect(page.links.collect(&:href)).to contain_exactly("https://external.com/")
+      it "strips fragments from URLs but keeps duplicate links" do
+        expect(page.links.collect(&:href)).to eq(["https://external.com/", "https://external.com/"])
+      end
+    end
+
+    context "with skip_files: true (default)" do
+      it "excludes links to non-HTML files" do
+        expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
+      end
+    end
+
+    context "with skip_files: false" do
+      it "excludes ical, atom, movies, etc" do
+        expect(page.links(skip_files: false).collect(&:text)).not_to include("ICAL", "ATOM", "MOV")
+      end
+
+      it "includes file links" do
+        expect(page.links(skip_files: false).collect(&:text)).to include("PDF", "ZIP", "DOCX")
+      end
+    end
+
+    context "with scope: :main" do
+      it "returns only links within the main content area" do
+        page = build(:page, html: <<~HTML)
+          <nav><a href="/nav-link">Navigation Link</a></nav>
+          <main><a href="/main-link">Main Link</a><a href="/another-main-link">Another Main Link</a></main>
+          <footer><a href="/footer-link">Footer Link</a></footer>
+        HTML
+
+        links = page.links(scope: :main)
+        expect(links.collect(&:text)).to eq(["Main Link", "Another Main Link"])
+        expect(links.collect(&:text)).not_to include("Navigation Link", "Footer Link")
+      end
+
+      context "when main tag is not present" do
+        it "falls back to [role=main] selector" do
+          page = build(:page, html: <<~HTML)
+            <nav><a href="/nav-link">Navigation Link</a></nav>
+            <div role="main"><a href="/main-link">Main Link</a></div>
+            <footer><a href="/footer-link">Footer Link</a></footer>
+          HTML
+
+          links = page.links(scope: :main)
+          expect(links.collect(&:text)).to eq(["Main Link"])
+          expect(links.collect(&:text)).not_to include("Navigation Link", "Footer Link")
+        end
+      end
+
+      context "when no main content selector matches" do
+        it "returns all links from the page" do
+          page = build(:page, links: ["/link1/", "/link2/"])
+
+          links = page.links(scope: :main)
+          expect(links.collect(&:href)).to include("https://www.example.com/link1/", "https://www.example.com/link2/")
+        end
+      end
+
+      context "when multiple main content elements exist" do
+        it "uses only the first matching element" do
+          page = build(:page, html: "<main><a href='/first-main-link'>First Main Link</a></main><div class='content'><a href='/content-link'>Content Link</a></div>")
+
+          links = page.links(scope: :main)
+          expect(links.collect(&:text)).to eq(["First Main Link"])
+          expect(links.collect(&:text)).not_to include("Content Link")
+        end
+      end
+
+      context "when invalid scope is provided" do
+        it "falls back to full page" do
+          page = build(:page, links: ["/link1/", "/link2/"])
+
+          links = page.links(scope: :invalid_scope)
+          expect(links.collect(&:href)).to include("https://www.example.com/link1/", "https://www.example.com/link2/")
+        end
+      end
+
+      context "with factory wrap_in parameter" do
+        it "wraps links in specified tag when using string" do
+          page = build(:page,
+            links: [["/main-link", "Main Link"], ["/other-link", "Other Link"]],
+            wrap_in: "main")
+
+          main_links = page.links(scope: :main)
+          expect(main_links.collect(&:text)).to eq(["Main Link", "Other Link"])
+
+          expect(page.links).to eq(main_links)
+        end
+
+        it "wraps links in specified tags when using array" do
+          page = build(:page,
+            links: [["/content-link", "Content Link"]],
+            wrap_in: ['<div role="main">', "</div>"])
+
+          scoped_links = page.links(scope: :main)
+          expect(scoped_links.collect(&:text)).to eq(["Content Link"])
+        end
+
+        it "wraps all content (headings, links, body) in specified tag" do
+          page = build(:page,
+            headings: ["Main Heading"],
+            links: [["/link1", "Link 1"]],
+            body: "<p>Body content</p>",
+            wrap_in: "main")
+
+          expect(page.css("main h1").text.squish).to eq("Main Heading")
+          expect(page.css("main a").first.text.squish).to eq("Link 1")
+          expect(page.css("main p").text.squish).to include("Body content")
+
+          scoped_links = page.links(scope: :main)
+          expect(scoped_links.collect(&:text)).to eq(["Link 1"])
+        end
+
+        it "wraps body content inside main when using wrap_in" do
+          page = build(:page,
+            links: [["/main-link", "Main Link"]],
+            body: "<div><a href='/body-link'>Body Link</a></div>",
+            wrap_in: "main")
+
+          main_links = page.links(scope: :main)
+          expect(main_links.collect(&:text)).to include("Main Link", "Body Link")
+
+          expect(page.css("main a").length).to eq(2)
+        end
+
+        it "keeps content outside main when not using factory attributes" do
+          page = build(:page,
+            links: [["/main-link", "Main Link"]],
+            wrap_in: "main",
+            html: <<~HTML)
+              <html>
+                <body>
+                  <main><a href="/main-link">Main Link</a></main>
+                  <footer><a href="/footer-link">Footer Link</a></footer>
+                </body>
+              </html>
+            HTML
+
+          main_links = page.links(scope: :main)
+          expect(main_links.collect(&:text)).to eq(["Main Link"])
+          expect(main_links.collect(&:text)).not_to include("Footer Link")
+
+          all_links = page.links
+          expect(all_links.collect(&:text)).to include("Main Link", "Footer Link")
+        end
       end
     end
   end

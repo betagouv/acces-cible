@@ -1,8 +1,12 @@
 class Page
   CACHE_TTL = 30.minutes
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
-  SKIPPED_EXTENSIONS = /\.(xml|rss|atom|ics|ical|pdf|zip|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
+  DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
+  FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
+  SELECTORS = {
+    main: "main, [role=main], article, #main, #content, #main-content, .main-content, .content, .site-content"
+  }.freeze
 
   class InvalidTypeError < StandardError
     def initialize(url, content_type)
@@ -37,10 +41,14 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   def error? = status > 399
-  def refresh = fetch(clear: true)
+
+  def refresh
+    fetch(clear: true)
+    self
+  end
 
   def dom
-    Nokogiri::HTML(html).tap do |document|
+    @dom ||= Nokogiri::HTML(html).tap do |document|
       document.css(INVISIBLE_ELEMENTS).each(&:remove)
       document.xpath("//text()[normalize-space(.) != '']").each { |node| node.content = " #{node.content} " }
     end
@@ -48,20 +56,22 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def links
-    dom.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
+  def links(skip_files: true, scope: nil)
+    source = css(SELECTORS[scope]).first || dom
+    source.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
       uri = Link.parse(href)
-      next if uri.path && File.extname(uri.path).match?(SKIPPED_EXTENSIONS)
+      next if uri.path && File.extname(uri.path).match?(FILES_EXTENSIONS)
+      next if skip_files && uri.path && File.extname(uri.path).match?(DOCUMENT_EXTENSIONS)
 
       href = parsed_root.join(href) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
     rescue Link::InvalidUriError
       next
-    end.uniq.compact
+    end.compact
   end
 
   private
