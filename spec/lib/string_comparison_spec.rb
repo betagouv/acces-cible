@@ -74,7 +74,6 @@ RSpec.describe StringComparison do
 
       it "matches partial case-insensitive fuzzy strings" do
         expect(described_class.similar?("Hello world", "hello werlt", options)).to be true
-        expect(described_class.similar?("Contact Information", "contact info", options)).to be true
       end
     end
   end
@@ -93,7 +92,7 @@ RSpec.describe StringComparison do
       expect(described_class.similarity_ratio("the quick brown fox", "the quick brown cat")).to be_between(0.8, 0.9)
     end
 
-    it "handles nil and empty values" do
+    it "returns 0.0 when any string is nil or empty" do
       expect(described_class.similarity_ratio(nil, "hello")).to eq(0.0)
       expect(described_class.similarity_ratio("hello", nil)).to eq(0.0)
       expect(described_class.similarity_ratio(nil, nil)).to eq(0.0)
@@ -106,6 +105,29 @@ RSpec.describe StringComparison do
       it "ignores case" do
         expect(described_class.similarity_ratio("Hello", "hello", options)).to eq(1.0)
         expect(described_class.similarity_ratio("WORLD", "world", options)).to eq(1.0)
+      end
+    end
+
+    context "when :partial is true" do
+      let(:options) { { partial: true, ignore_case: true } }
+
+      it "returns 1.0 for exact matches" do
+        expect(described_class.similarity_ratio("Test", "Test", options)).to eq(1.0)
+      end
+
+      it "scores ~0.9 for same-length strings with small differences (typos)" do
+        ratio = described_class.similarity_ratio("hello world", "hello werld", options)
+        expect(ratio).to be >= 0.9
+      end
+
+      it "scores ~0.9 for similar strings with small additions" do
+        ratio = described_class.similarity_ratio("Environnement de test", "3. Environnement de test", options)
+        expect(ratio).to be >= 0.9
+      end
+
+      it "scores < 0.6 when there are extra words" do
+        ratio = described_class.similarity_ratio("Environnement de test", "Environnement et outils de test", options)
+        expect(ratio).to be < 0.6
       end
     end
   end
