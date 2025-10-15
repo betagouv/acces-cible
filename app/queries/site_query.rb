@@ -19,7 +19,7 @@ class SiteQuery < SimpleDelegator
   end
 
   def filter_by(params)
-    return self unless (filters = params[:search]).present?
+    return self unless (filters = params[:filter]).present?
 
     scope = self
     filters.compact_blank.each do |key, value|

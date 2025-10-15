@@ -99,7 +99,7 @@ RSpec.describe SiteQuery do
     let!(:name_match) { create(:site, :checked, url: "https://www.apple.com/", name: "Foo Bar Baz") }
 
     context 'when filtering by site name or url' do
-      let(:request) { { search: { q: "bar" } } }
+      let(:request) { { filter: { q: "bar" } } }
 
       it "returns only sites matching the query" do
         expect(result.to_a).to contain_exactly(domain_match, path_match, name_match)
@@ -107,7 +107,7 @@ RSpec.describe SiteQuery do
     end
 
     context 'when filtering by a tag' do
-      let(:request) { { search: { tag_id: "#{tag.id}" } } }
+      let(:request) { { filter: { tag_id: "#{tag.id}" } } }
 
       it "returns only sites matching the query" do
         expect(result.to_a).to contain_exactly(domain_match, path_match)
@@ -118,7 +118,7 @@ RSpec.describe SiteQuery do
   describe "chaining methods" do
     subject(:result) { query.filter_by(params).order_by(params) }
 
-    let(:request) { { search: { q: "bar" }, sort: { url: :desc } } }
+    let(:request) { { filter: { q: "bar" }, sort: { url: :desc } } }
 
     it "does not raise" do
       expect { result.includes(:audit).distinct.load }.not_to raise_error
