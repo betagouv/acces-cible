@@ -76,7 +76,6 @@ class SitesController < ApplicationController
     @site = current_user
               .team
               .sites
-              .preloaded
               .friendly
               .find(params.expect(:id))
   end

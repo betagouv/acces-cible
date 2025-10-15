@@ -22,6 +22,14 @@ Fonctionnalité: Page du site
     Et que je clique sur "Nouvelle vérification"
     Alors la page contient "Historique des vérifications (2)"
 
+  Scénario: Un agent peut supprimer un site
+    Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr"
+    Et que je remplis "Nom du site" avec "beta.gouv.fr"
+    Quand je clique sur "Ajouter"
+    Et que je clique sur "Nouvelle vérification"
+    Et que je clique sur "Supprimer ce site"
+    Alors la page contient "Site supprimé"
+
   Scénario: Un agent peut accéder aux étiquettes depuis la page du site
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
       """
