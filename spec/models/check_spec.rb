@@ -56,7 +56,7 @@ RSpec.describe Check do
   end
 
   describe "#run" do
-    let(:check) { build(:check, :accessibility_mention) }
+    let(:check) { create(:check, :accessibility_mention) }
 
     context "when the analyze method goes well" do
       before do

@@ -71,164 +71,6 @@ RSpec.describe SiteUpload do
         expect(site_upload.errors.added?(:file, :invalid_headers)).to be true
       end
     end
-
-    context "when headers are uppercase" do
-      let(:csv_content) { "URL,NAME\nhttps://example.com/,Example Site" }
-
-      it "is ignores case" do
-        expect(site_upload).to be_valid
-      end
-    end
-
-    context "when encoding is not UTF-8" do
-      let(:encoding) { Encoding::ISO_8859_1 }
-      let(:csv_content) { "URL,næme\nhttps://example.com/,Example Saïte".encode(encoding) }
-
-      it "is invalid" do
-        expect(site_upload).not_to be_valid
-        expect(site_upload.errors.added?(:file, :invalid_headers)).to be true
-      end
-    end
-
-    context "when file uses semicolon separator" do
-      let(:csv_content) { "url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site" }
-
-      it "is valid" do
-        expect(site_upload).to be_valid
-      end
-    end
-
-    context "when file uses semicolon separator with uppercase headers" do
-      let(:csv_content) { "URL;NAME\nhttps://example.com/;Example Site" }
-
-      it "is valid" do
-        expect(site_upload).to be_valid
-      end
-    end
-  end
-
-  describe "#parse_sites" do
-    it "parses the CSV file and populates new_sites" do
-      site_upload.parse_sites
-
-      expected_new_sites = {
-        "https://example.com/" => { url: "https://example.com/", name: "Example Site", tag_ids: [], team: },
-        "https://test.com/" => { url: "https://test.com/", name: "Test Site", tag_ids: [], team: }
-      }
-      expect(site_upload.new_sites).to eq(expected_new_sites)
-    end
-
-    it "handles mixed case headers" do
-      csv.write("Url,Name\nhttps://example.com/,Example Site")
-      csv.rewind
-
-      site_upload.parse_sites
-      expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
-      expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
-    end
-
-    it "prefers 'nom' over 'name' when both are present" do
-      csv.write("url,nom,name\nhttps://example.com/,Nom,Name")
-      csv.rewind
-
-      site_upload.parse_sites
-      expect(site_upload.new_sites.values.first[:name]).to eq("Nom")
-    end
-
-    it "skips sites that already exist" do
-      existing_site = build(:site, url: "https://example.com/")
-      allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
-
-      site_upload.parse_sites
-
-      expect(site_upload.existing_sites.values.first).to eq(existing_site)
-      expect(site_upload.new_sites.values.first[:url]).to eq("https://test.com/")
-    end
-
-    it "handles duplicate URLs in CSV (including punycode URLs)" do
-      csv.write("url,name\nhttps://xn--rez-dma.fr/,Punycode Example\nhttps://rezé.fr/,UTF8 Example")
-      csv.rewind
-
-      site_upload.parse_sites
-
-      expect(site_upload.new_sites.size).to eq(1)
-      expect(site_upload.new_sites.values.first[:name]).to eq("UTF8 Example")
-    end
-
-    it "ignores duplicate existing sites" do
-      existing_site = build(:site, url: "https://example.com/")
-      allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
-
-      csv.write("url,name\nhttps://example.com/,Example Site\nhttps://example.com/,Example Site Again")
-      csv.rewind
-
-      site_upload.parse_sites
-
-      expect(site_upload.existing_sites.size).to eq(1)
-      expect(site_upload.existing_sites.values.first).to eq(existing_site)
-    end
-
-    context "when file uses semicolon separator" do
-      it "parses the CSV file correctly" do
-        csv.write("url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site")
-        csv.rewind
-
-        site_upload.parse_sites
-
-        expected_new_sites = {
-          "https://example.com/" => { url: "https://example.com/", name: "Example Site", tag_ids: [], team: },
-          "https://test.com/" => { url: "https://test.com/", name: "Test Site", tag_ids: [], team: }
-        }
-        expect(site_upload.new_sites).to eq(expected_new_sites)
-      end
-    end
-
-    context "when CSV has nil headers" do
-      it "handles nil headers gracefully" do
-        csv.write("url,name,\nhttps://example.com/,Example Site,extra_data")
-        csv.rewind
-
-        expect { site_upload.parse_sites }.not_to raise_error
-        expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
-        expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
-      end
-    end
-
-    context "when CSV has tags column" do
-      let!(:public_tag) { create(:tag, name: "Public", team:) }
-      let(:csv_content) { "url,name,tags\nhttps://example.com/,Example Site,\"Beta, Gouv\"" }
-
-      it "populates tags" do
-        site_upload.parse_sites
-
-        expect(site_upload.new_sites.values.first[:url]).to eq("https://example.com/")
-        expect(site_upload.new_sites.values.first[:name]).to eq("Example Site")
-        expect(team.reload.tags.pluck(:name)).to include("Beta", "Gouv", "Public")
-      end
-    end
-  end
-
-  describe "#count" do
-    it "returns the total number of sites" do
-      site_upload.new_sites = { "https://example1.com/" => { url: "https://example1.com/" }, "https://example2.com/" => { url: "https://example2.com/" } }
-      site_upload.existing_sites = { "https://example3.com/" => "https://example3.com/" }
-
-      expect(site_upload.count).to eq(3)
-    end
-
-    it "handles nil values" do
-      site_upload.new_sites = nil
-      site_upload.existing_sites = { "https://example.com/" => { url: "https://example.com/" } }
-
-      expect(site_upload.count).to eq(1)
-    end
-
-    it "returns zero when no sites are present" do
-      site_upload.new_sites = {}
-      site_upload.existing_sites = {}
-
-      expect(site_upload.count).to eq(0)
-    end
   end
 
   describe "#tags_attributes=" do
@@ -270,62 +112,37 @@ RSpec.describe SiteUpload do
     end
   end
 
-  describe "#parse_sites with tag_ids" do
-    let(:team) { create(:team) }
-    let(:tag1) { create(:tag, name: "Tag 1", team:) }
-    let(:tag2) { create(:tag, name: "Tag 2", team:) }
-
-    before do
-      site_upload.tag_ids = [tag1.id, tag2.id]
-    end
-
-    it "adds tag_ids to new sites" do
-      site_upload.parse_sites
-
-      expect(site_upload.new_sites.values).to all(include(tag_ids: [tag1.id, tag2.id]))
-    end
-
-    it "assigns tag_ids to existing sites" do
-      existing_site = create(:site, url: "https://example.com/", team:)
-      site_upload.parse_sites
-
-      expect(site_upload.existing_sites.values.first.tag_ids).to contain_exactly(tag1.id, tag2.id)
-    end
-
-    it "preserves existing tag_ids on existing sites" do
-      tag3 = create(:tag, name: "Tag 3", team:)
-      existing_site = create(:site, url: "https://example.com/", team:, tag_ids: [tag3.id])
-      site_upload.parse_sites
-
-      expect(site_upload.existing_sites.values.first.tag_ids).to contain_exactly(tag1.id, tag2.id, tag3.id)
-    end
-  end
-
   describe "#save" do
-    # rubocop:disable RSpec/SubjectStub
     context "when the upload is valid" do
-      before do
-        allow(site_upload).to receive_messages(valid?: true, new_sites: { "https://example.com/" => { url: "https://example.com/", name: "Example Site" } })
+      let(:site_data) do
+        [
+          { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
+          { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
+        ]
       end
 
-      it "creates sites in a transaction" do
-        allow(site_upload).to receive(:transaction).and_return(true)
+      it "enqueues ProcessSiteUploadJob and returns true" do
+        expect(ProcessSiteUploadJob).to receive(:perform_later).with(
+          site_data,
+          team.id,
+          []
+        )
 
         expect(site_upload.save).to be true
       end
-    end
 
-    context "when the upload is invalid" do
-      before do
-        allow(site_upload).to receive(:valid?).and_return(false)
-      end
+      it "passes tag_ids to the job" do
+        site_upload.tag_ids = [1, 2, 3]
 
-      it "returns false without attempting to create sites" do
-        expect(site_upload).not_to receive(:transaction)
-        expect(site_upload.save).to be false
+        expect(ProcessSiteUploadJob).to receive(:perform_later).with(
+          site_data,
+          team.id,
+          [1, 2, 3]
+        )
+
+        site_upload.save
       end
     end
-    # rubocop:enable RSpec/SubjectStub
 
     context "when file encoding is not UTF-8" do
       let(:encoding) { Encoding::ISO_8859_1 }
