@@ -2,7 +2,7 @@ class Site < ApplicationRecord
   extend FriendlyId
 
   belongs_to :team, touch: true
-  has_many :audits, -> { sort_by_newest }, dependent: :destroy
+  has_many :audits, -> { sort_by_newest.current_first }, dependent: :destroy
   has_many :site_tags, dependent: :destroy
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
   accepts_nested_attributes_for :tags, reject_if: :all_blank
@@ -57,7 +57,7 @@ class Site < ApplicationRecord
   def update_slug! = tap { self.slug = nil; friendly_id }.save!
 
   def audit
-    audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
+    audits.find(&:current?) || audits.first || audits.build(current: true)
   end
 
   def audit!
@@ -65,15 +65,17 @@ class Site < ApplicationRecord
   end
 
   def actual_current_audit
-    audits.checked.sort_by_newest.first || audits.sort_by_newest.first
+    audits.checked.order(checked_at: :desc).first || audits.order(created_at: :desc).first
   end
 
   def set_current_audit!
-    return if actual_current_audit && audit == actual_current_audit
+    audits.reload
+    current_audit = actual_current_audit
+    return if current_audit && audit == current_audit
 
     transaction do
       audit&.update!(current: false)
-      actual_current_audit&.update!(current: true)
+      current_audit&.update!(current: true)
       update_slug!
     end
   end

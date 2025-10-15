@@ -9,6 +9,7 @@ class Audit < ApplicationRecord
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
+  scope :current_first, -> { order(current: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :checked, -> { where.not(checked_at: nil) }
   scope :current, -> { where(current: true) }
