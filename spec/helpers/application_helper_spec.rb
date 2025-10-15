@@ -60,6 +60,7 @@ RSpec.describe ApplicationHelper do
     let(:direction) { :asc }
     let(:options) { {} }
     let(:params) { { page: 2 } }
+    let(:decoded_href) { CGI.unescape(Capybara.string(sortable_header).find("a")[:href]) }
 
     before do
       allow(helper).to receive(:params).and_return(ActionController::Parameters.new(**params))
@@ -74,7 +75,7 @@ RSpec.describe ApplicationHelper do
 
     context "when no current sort exists", :aggregate_failures do
       it "generates a link with ascending sort parameter" do
-        expect(sortable_header).to have_selector("a[href='/?page=2&sort%5Bname%5D=asc']")
+        expect(decoded_href).to eq("/?page=2&sort[name]=asc")
         expect(sortable_header).to have_text("Name")
         expect(sortable_header).not_to include("fr-icon-arrow")
         expect(sortable_header).to have_selector("a[title='Sort by Name ascending']")
@@ -86,7 +87,7 @@ RSpec.describe ApplicationHelper do
       let(:params) { { page: 2, sort: { name: "asc" } } }
 
       it "generates a link to sort descending" do
-        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=desc']")
+        expect(decoded_href).to include("sort[name]=desc")
         expect(sortable_header).to have_selector("a.icon-class")
         expect(sortable_header).to have_selector("a[title='Sort by Name descending']")
       end
@@ -96,7 +97,7 @@ RSpec.describe ApplicationHelper do
       let(:params) { { page: 2, sort: { name: "desc" } } }
 
       it "generates a link to sort ascending" do
-        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=asc']")
+        expect(decoded_href).to include("sort[name]=asc")
         expect(sortable_header).to have_selector("a.icon-class")
         expect(sortable_header).to have_selector("a[title='Sort by Name ascending']")
       end
@@ -117,11 +118,13 @@ RSpec.describe ApplicationHelper do
       let(:params) { { sort: { name: "asc", email: "desc" } } }
 
       it "allows sorting by another column" do
-        sortable_header = helper.sortable_header("Name", :name)
-        expect(sortable_header).to have_selector("a[href*='sort%5Bname%5D=desc']")
+        name_header = helper.sortable_header("Name", :name)
+        name_href = CGI.unescape(Capybara.string(name_header).find("a")[:href])
+        expect(name_href).to include("sort[name]=desc")
 
-        sortable_header = helper.sortable_header("Email", :email)
-        expect(sortable_header).to have_selector("a[href*='sort%5Bemail%5D=asc']")
+        email_header = helper.sortable_header("Email", :email)
+        email_href = CGI.unescape(Capybara.string(email_header).find("a")[:href])
+        expect(email_href).to include("sort[email]=asc")
       end
     end
   end
