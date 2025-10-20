@@ -31,7 +31,7 @@ module ApplicationHelper
   def sortable_header(text, param, **options)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc
-    link_params = params.permit(:page, search: {}).merge(sort: { param => direction })
+    link_params = params.permit(:page, :limit, filter: {}).merge(sort: { param => direction })
     link_text = t("shared.sort_by", column: text, direction: t("shared.#{direction}"))
     options[:title] ||= link_text
     options["aria-label"] ||= link_text
@@ -59,5 +59,23 @@ module ApplicationHelper
 
   def current_git_commit
     ENV["CONTAINER_VERSION"] || `git show -s --format=%H`
+  end
+
+  def flatten_params(*keys)
+    params.slice(*keys).permit!.to_h.flat_map do |key, value|
+      flatten_params_hash(key.to_s, value)
+    end.to_h
+  end
+
+  private
+
+  def flatten_params_hash(prefix, value)
+    if value.is_a?(Hash) || value.is_a?(ActionController::Parameters)
+      value.flat_map do |k, v|
+        flatten_params_hash("#{prefix}[#{k}]", v)
+      end
+    else
+      [[prefix, value]]
+    end
   end
 end
