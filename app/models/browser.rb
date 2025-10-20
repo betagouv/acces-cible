@@ -15,7 +15,7 @@ class Browser
   HEADERS = {
     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "Accept-Encoding" => "gzip, deflate, br, zstd",
-    "Accept-Language" => "fr-FR,en-US;q=0.9,en;q=0.8",
+    "Accept-Language" => "fr;q=1",
     "Cache-Control" => "no-cache",
     "Pragma" => "no-cache",
     "Priority" => "u=0, i",
