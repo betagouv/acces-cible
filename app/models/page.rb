@@ -34,8 +34,8 @@ class Page
   def css(selector) = dom.css(selector)
   def title = dom.title.to_s.squish
   def text = dom.text&.squish
-  def heading_levels = dom.css(HEADINGS).map { |hx| [hx.name[1].to_i, hx.text.squish] }
-  def headings = dom.css(HEADINGS).collect(&:text).collect(&:squish)
+  def heading_levels = dom_headings.map { |hx| [hx.name[1].to_i, hx.text.squish] }
+  def headings = dom_headings.collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
@@ -86,5 +86,9 @@ class Page
       end
       [@actual_url, @status, @headers, @html]
     end
+  end
+
+  def dom_headings
+    @dom_headings ||= dom.css(HEADINGS)
   end
 end
