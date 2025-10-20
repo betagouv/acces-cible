@@ -428,10 +428,10 @@ RSpec.describe Browser do
 
     before do
       allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive_messages(network: network, process: instance_double(MockProcess, pid: 12345))
+      allow(ferrum_browser).to receive_messages(network:, process: instance_double(MockProcess, pid: 12345))
       allow(network).to receive_messages("blocklist=": nil, wait_for_idle: nil)
       allow(ferrum_browser).to receive(:create_page).and_return(page)
-      allow(page).to receive_messages(headers: headers, network: network)
+      allow(page).to receive_messages(headers:, network:)
       allow(headers).to receive_messages(set: nil, add: nil)
       allow(Process).to receive(:kill).with(0, 12345).and_return(1)
     end
