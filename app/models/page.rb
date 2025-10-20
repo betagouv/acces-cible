@@ -56,6 +56,14 @@ class Page
     raise ParseError.new url, e.message
   end
 
+  def text_between_headings(start_matcher, end_matcher)
+    start_node = heading(start_matcher)
+    end_node = heading(end_matcher)
+    return "" unless start_node && end_node
+
+    dom_between(start_node, end_node).text.squish
+  end
+
   def links(skip_files: true, scope: nil)
     source = css(SELECTORS[scope]).first || dom
     source.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
@@ -90,5 +98,24 @@ class Page
 
   def dom_headings
     @dom_headings ||= dom.css(HEADINGS)
+  end
+
+  def heading(matcher)
+    dom_headings.find { |heading| matcher.match?(heading.text.squish) }
+  end
+
+  def dom_between(start_node, end_node)
+    # Find all nodes between start_node and end_node
+    # (following-siblings only works when nodes are at the same level)
+    nodes_between = start_node.xpath("following::*") & end_node.xpath("preceding::*")
+
+    # Remove nodes whose parent is already included (UL>LI,P>EM etc)
+    deduped_nodes = nodes_between.reject do |node|
+      node.ancestors.any? { |ancestor| nodes_between.include?(ancestor) }
+    end
+
+    dom.fragment.tap do |fragment|
+      deduped_nodes.each { |node| fragment.add_child(node.dup) }
+    end
   end
 end

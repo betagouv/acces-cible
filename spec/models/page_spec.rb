@@ -402,4 +402,178 @@ RSpec.describe Page do
       expect(page.external_links).to eq(expected_external_links)
     end
   end
+
+  describe "#text_between_headings" do
+    let(:page) { build(:page, body:) }
+    let(:body) { "" }
+
+    it "returns text between two matching headings" do
+      page = build(:page, body: <<~HTML)
+        <h1>Start Section</h1>
+        <p>This is the target content.</p>
+        <p>Multiple paragraphs here.</p>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+        <h1>End Section</h1>
+      HTML
+
+      result = page.text_between_headings(/Start Section/, /End Section/)
+      expect(result).to eq("This is the target content. Multiple paragraphs here. Item 1 Item 2")
+    end
+
+    context "when start heading is not found" do
+      let(:body) { "<h1>End Section</h1>" }
+
+      it "returns empty string" do
+        result = page.text_between_headings(/Nonexistent Start/, /End Section/)
+        expect(result).to eq("")
+      end
+    end
+
+    context "when end heading is not found" do
+      let(:body) { "<h1>Start Section</h1>" }
+
+      it "returns empty string" do
+        result = page.text_between_headings(/Start Section/, /Nonexistent End/)
+        expect(result).to eq("")
+      end
+    end
+
+    context "when both headings are not found" do
+      let(:body) { "<h1>Some Heading</h1>" }
+
+      it "returns empty string" do
+        result = page.text_between_headings(/Nonexistent Start/, /Nonexistent End/)
+        expect(result).to eq("")
+      end
+    end
+
+    context "when headings are adjacent with no content between" do
+      let(:body) { "<h1>First</h1><h1>Second</h1>" }
+
+      it "returns empty string" do
+        result = page.text_between_headings(/First/, /Second/)
+        expect(result).to eq("")
+      end
+    end
+
+    context "with nested elements between headings" do
+      let(:body) do
+        <<~HTML
+          <h1>Start Section</h1>
+          <div>
+            <p>Nested <strong>bold</strong> and <em>italic</em> text</p>
+            <div><span>Deeply nested content</span></div>
+          </div>
+          <h1>End Section</h1>
+        HTML
+      end
+
+      it "extracts all text from nested elements" do
+        result = page.text_between_headings(/Start/, /End/)
+        expect(result).to include("Nested bold and italic text")
+        expect(result).to include("Deeply nested content")
+      end
+    end
+
+    context "with invisible elements between headings" do
+      let(:body) do
+        <<~HTML
+          <h1>Start Section</h1>
+          <p>Visible content</p>
+          <div style="display: none;">Hidden content</div>
+          <script>console.log('script')</script>
+          <h1>End Section</h1>
+        HTML
+      end
+
+      it "excludes invisible elements from result" do
+        result = page.text_between_headings(/Start/, /End/)
+        expect(result).to eq("Visible content")
+        expect(result).not_to include("Hidden content")
+        expect(result).not_to include("script")
+      end
+    end
+
+    context "with different heading levels" do
+      let(:body) do
+        <<~HTML
+          <h1>H1 Start</h1>
+          <p>Content between h1 and h3</p>
+          <h3>H3 End</h3>
+        HTML
+      end
+
+      it "works across different heading levels" do
+        result = page.text_between_headings(/H1 Start/, /H3 End/)
+        expect(result).to eq("Content between h1 and h3")
+      end
+    end
+
+    context "with regex patterns" do
+      let(:body) do
+        <<~HTML
+          <h1>Section 1: Introduction</h1>
+          <p>Target content</p>
+          <h1>Section 2: Conclusion</h1>
+        HTML
+      end
+
+      it "matches headings using regex patterns" do
+        result = page.text_between_headings(/Section 1:/, /Section 2:/)
+        expect(result).to eq("Target content")
+      end
+
+      it "uses partial pattern matching" do
+        result = page.text_between_headings(/Introduction/, /Conclusion/)
+        expect(result).to eq("Target content")
+      end
+    end
+
+    context "when multiple headings match the pattern" do
+      let(:body) do
+        <<~HTML
+          <h1>Start</h1>
+          <p>First section</p>
+          <h1>Start</h1>
+          <p>Second section</p>
+          <h1>End</h1>
+        HTML
+      end
+
+      it "uses the first matching heading" do
+        result = page.text_between_headings(/Start/, /End/)
+        expect(result).to include("First section")
+        expect(result).to include("Second section")
+      end
+    end
+
+    context "with custom matcher responding to match?" do
+      let(:simple_matcher_class) do
+        Class.new do
+          def initialize(expected)
+            @expected = expected
+          end
+
+          def match?(text)
+            text == @expected
+          end
+        end
+      end
+
+      it "works with custom matchers" do
+        page = build(:page, body: <<~HTML)
+          <h1>Start Section</h1>
+          <p>Content here</p>
+          <h1>End Section</h1>
+        HTML
+
+        matcher = simple_matcher_class.new("Start Section")
+        result = page.text_between_headings(matcher, /End/)
+        expect(result).to eq("Content here")
+      end
+    end
+  end
 end
