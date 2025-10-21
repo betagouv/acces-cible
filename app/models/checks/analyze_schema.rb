@@ -24,10 +24,7 @@ module Checks
     def find_link
       return unless page
 
-      page.links(skip_files: false, scope: :main, between: [
-        :previous,
-        fuzzy_match_for("État de conformité")
-      ])
+      page.links(skip_files: false, scope: :main, between: [:previous, "État de conformité"])
         .select { |link| link.text.match? LINK_PATTERN }
         .max_by { |link| extract_years(link.text) }
     end

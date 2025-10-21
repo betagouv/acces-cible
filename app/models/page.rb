@@ -58,7 +58,7 @@ class Page
   end
 
   def links(skip_files: true, scope: nil, between: nil)
-    source_for(scope:, between_headings:).css(LINKS_SELECTOR).collect do |link|
+    source_for(scope:, between:).css(LINKS_SELECTOR).collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
@@ -93,7 +93,13 @@ class Page
   end
 
   def heading(matcher, scope: nil)
-    source_for(scope:).css(HEADINGS).find { |heading| matcher.match?(heading.text.squish) }
+    source_for(scope:).css(HEADINGS).find do |heading|
+      if matcher.is_a?(Regexp)
+        matcher.match?(heading.text.squish)
+      else
+        StringComparison.match?(matcher, heading.text.squish, ignore_case: true, fuzzy: 0.85)
+      end
+    end
   end
 
   def heading_relative_to(node, direction, headings = dom_headings)

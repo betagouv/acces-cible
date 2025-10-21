@@ -326,6 +326,30 @@ RSpec.describe Page do
         end
       end
 
+      context "with string patterns" do
+        let(:body) do
+          <<~HTML
+            <h1>Section 1: Introduction</h1>
+            <p>Target content</p>
+            <h1>Section 2: Conclusion</h1>
+          HTML
+        end
+
+        it "uses StringComparison.match? for string matchers" do
+          allow(StringComparison).to receive(:match?).and_call_original
+
+          page.text(between: ["Section 1", "Section 2"])
+
+          expect(StringComparison).to have_received(:match?).with("Section 1", "Section 1: Introduction", ignore_case: true, fuzzy: 0.85)
+          expect(StringComparison).to have_received(:match?).with("Section 2", "Section 2: Conclusion", ignore_case: true, fuzzy: 0.85)
+        end
+
+        it "matches headings with fuzzy case-insensitive matching" do
+          result = page.text(between: ["section 1 introduction", "section 2 conclusion"])
+          expect(result).to eq("Target content")
+        end
+      end
+
       context "when multiple headings match the pattern" do
         let(:body) do
           <<~HTML
@@ -341,32 +365,6 @@ RSpec.describe Page do
           result = page.text(between: [/Start/, /End/])
           expect(result).to include("First section")
           expect(result).to include("Second section")
-        end
-      end
-
-      context "with custom matcher responding to match?" do
-        let(:simple_matcher_class) do
-          Class.new do
-            def initialize(expected)
-              @expected = expected
-            end
-
-            def match?(text)
-              text == @expected
-            end
-          end
-        end
-
-        it "works with custom matchers" do
-          page = build(:page, body: <<~HTML)
-            <h1>Start Section</h1>
-            <p>Content here</p>
-            <h1>End Section</h1>
-          HTML
-
-          matcher = simple_matcher_class.new("Start Section")
-          result = page.text(between: [matcher, /End/])
-          expect(result).to eq("Content here")
         end
       end
 
@@ -840,6 +838,35 @@ RSpec.describe Page do
 
           links = page.links(between: [/Start/, /End/], skip_files: false)
           expect(links.collect(&:text)).to eq(["PDF Document", "Regular Link"])
+        end
+      end
+
+      context "with string patterns" do
+        it "uses StringComparison.match? for string matchers" do
+          page = build(:page, body: <<~HTML)
+            <h1>Start Section</h1>
+            <a href="/link1">Link 1</a>
+            <h1>End Section</h1>
+          HTML
+
+          allow(StringComparison).to receive(:match?).and_call_original
+
+          page.links(between: ["Start", "End"])
+
+          expect(StringComparison).to have_received(:match?).with("Start", "Start Section", ignore_case: true, fuzzy: 0.85)
+          expect(StringComparison).to have_received(:match?).with("End", "End Section", ignore_case: true, fuzzy: 0.85)
+        end
+
+        it "matches headings with fuzzy case-insensitive matching" do
+          page = build(:page, body: <<~HTML)
+            <h1>Start Section</h1>
+            <a href="/link1">Link 1</a>
+            <a href="/link2">Link 2</a>
+            <h1>End Section</h1>
+          HTML
+
+          links = page.links(between: ["start section", "end section"])
+          expect(links.collect(&:text)).to eq(["Link 1", "Link 2"])
         end
       end
     end

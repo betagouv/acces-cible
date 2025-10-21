@@ -123,8 +123,4 @@ class Check < ApplicationRecord
   def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
 
   def set_priority = self.priority = self.class.priority
-
-  def fuzzy_match_for(string)
-    FuzzyMatcher.new(string)
-  end
 end
