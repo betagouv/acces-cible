@@ -20,6 +20,6 @@
 <%= page_actions do %>
   <%= dsfr_link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
   <%= button_to Tag.human(:delete), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= dsfr_link_to Tag.human(:see_sites, tag: @tag.name, count: @tag.sites_count), sites_path(search: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
+  <%= dsfr_link_to Tag.human(:see_sites, tag: @tag.name, count: @tag.sites_count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
   <%= dsfr_link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>
