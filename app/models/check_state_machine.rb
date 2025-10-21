@@ -24,10 +24,12 @@ class CheckStateMachine
 
   after_transition(to: :errored) do |check|
     check.audit.abort_dependent_checks!(check)
+    check.audit.after_check_completed
   end
 
   after_transition(to: :failed) do |check|
     check.audit.abort_dependent_checks!(check)
+    check.audit.after_check_completed
   end
 
   after_transition(to: :completed) do |check|
