@@ -34,7 +34,7 @@ class Page
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
   def title = dom.title.to_s.squish
-  def text(scope: nil, between: nil) = source_for(scope:, between:).text&.squish
+  def text(scope: nil, between_headings: nil) = source_for(scope:, between_headings:).text&.squish
   def heading_levels = dom_headings.map { |hx| [hx.name[1].to_i, hx.text.squish] }
   def headings = dom_headings.collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
@@ -57,8 +57,8 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def links(skip_files: true, scope: nil, between: nil)
-    source_for(scope:, between:).css(LINKS_SELECTOR).collect do |link|
+  def links(skip_files: true, scope: nil, between_headings: nil)
+    source_for(scope:, between_headings:).css(LINKS_SELECTOR).collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
@@ -131,9 +131,9 @@ class Page
     [start_node, end_node]
   end
 
-  def source_for(scope: nil, between: nil)
-    if between
-      start_matcher, end_matcher = between
+  def source_for(scope: nil, between_headings: nil)
+    if between_headings
+      start_matcher, end_matcher = between_headings
       start_node, end_node = find_heading_nodes(start_matcher, end_matcher, scope:)
       return dom.fragment unless start_node && end_node
       dom_between(start_node, end_node)

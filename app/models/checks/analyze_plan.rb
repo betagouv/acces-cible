@@ -15,7 +15,7 @@ module Checks
     def find_link
       return unless page
 
-      page.links(skip_files: false, scope: :main, between: [:previous, "État de conformité"])
+      page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
         .select { |link| link.text.match? PLAN_PATTERN }
         .max_by { |link| extract_years(link.text) }
     end

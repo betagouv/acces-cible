@@ -197,7 +197,7 @@ RSpec.describe Page do
       expect(page.text).not_to include("CSS comment")
     end
 
-    context "with between: parameter" do
+    context "with between_headings: parameter" do
       let(:page) { build(:page, body:) }
       let(:body) { "" }
 
@@ -213,7 +213,7 @@ RSpec.describe Page do
           <h1>End Section</h1>
         HTML
 
-        result = page.text(between: [/Start Section/, /End Section/])
+        result = page.text(between_headings: [/Start Section/, /End Section/])
         expect(result).to eq("This is the target content. Multiple paragraphs here. Item 1 Item 2")
       end
 
@@ -221,7 +221,7 @@ RSpec.describe Page do
         let(:body) { "<h1>End Section</h1>" }
 
         it "returns empty string" do
-          result = page.text(between: [/Nonexistent Start/, /End Section/])
+          result = page.text(between_headings: [/Nonexistent Start/, /End Section/])
           expect(result).to eq("")
         end
       end
@@ -230,7 +230,7 @@ RSpec.describe Page do
         let(:body) { "<h1>Start Section</h1>" }
 
         it "returns empty string" do
-          result = page.text(between: [/Start Section/, /Nonexistent End/])
+          result = page.text(between_headings: [/Start Section/, /Nonexistent End/])
           expect(result).to eq("")
         end
       end
@@ -239,7 +239,7 @@ RSpec.describe Page do
         let(:body) { "<h1>Some Heading</h1>" }
 
         it "returns empty string" do
-          result = page.text(between: [/Nonexistent Start/, /Nonexistent End/])
+          result = page.text(between_headings: [/Nonexistent Start/, /Nonexistent End/])
           expect(result).to eq("")
         end
       end
@@ -248,7 +248,7 @@ RSpec.describe Page do
         let(:body) { "<h1>First</h1><h1>Second</h1>" }
 
         it "returns empty string" do
-          result = page.text(between: [/First/, /Second/])
+          result = page.text(between_headings: [/First/, /Second/])
           expect(result).to eq("")
         end
       end
@@ -266,7 +266,7 @@ RSpec.describe Page do
         end
 
         it "extracts all text from nested elements" do
-          result = page.text(between: [/Start/, /End/])
+          result = page.text(between_headings: [/Start/, /End/])
           expect(result).to include("Nested bold and italic text")
           expect(result).to include("Deeply nested content")
         end
@@ -284,7 +284,7 @@ RSpec.describe Page do
         end
 
         it "excludes invisible elements from result" do
-          result = page.text(between: [/Start/, /End/])
+          result = page.text(between_headings: [/Start/, /End/])
           expect(result).to eq("Visible content")
           expect(result).not_to include("Hidden content")
           expect(result).not_to include("script")
@@ -301,7 +301,7 @@ RSpec.describe Page do
         end
 
         it "works across different heading levels" do
-          result = page.text(between: [/H1 Start/, /H3 End/])
+          result = page.text(between_headings: [/H1 Start/, /H3 End/])
           expect(result).to eq("Content between h1 and h3")
         end
       end
@@ -316,12 +316,12 @@ RSpec.describe Page do
         end
 
         it "matches headings using regex patterns" do
-          result = page.text(between: [/Section 1:/, /Section 2:/])
+          result = page.text(between_headings: [/Section 1:/, /Section 2:/])
           expect(result).to eq("Target content")
         end
 
         it "uses partial pattern matching" do
-          result = page.text(between: [/Introduction/, /Conclusion/])
+          result = page.text(between_headings: [/Introduction/, /Conclusion/])
           expect(result).to eq("Target content")
         end
       end
@@ -338,14 +338,14 @@ RSpec.describe Page do
         it "uses StringComparison.match? for string matchers" do
           allow(StringComparison).to receive(:match?).and_call_original
 
-          page.text(between: ["Section 1", "Section 2"])
+          page.text(between_headings: ["Section 1", "Section 2"])
 
           expect(StringComparison).to have_received(:match?).with("Section 1", "Section 1: Introduction", ignore_case: true, fuzzy: 0.85)
           expect(StringComparison).to have_received(:match?).with("Section 2", "Section 2: Conclusion", ignore_case: true, fuzzy: 0.85)
         end
 
         it "matches headings with fuzzy case-insensitive matching" do
-          result = page.text(between: ["section 1 introduction", "section 2 conclusion"])
+          result = page.text(between_headings: ["section 1 introduction", "section 2 conclusion"])
           expect(result).to eq("Target content")
         end
       end
@@ -362,7 +362,7 @@ RSpec.describe Page do
         end
 
         it "uses the first matching heading" do
-          result = page.text(between: [/Start/, /End/])
+          result = page.text(between_headings: [/Start/, /End/])
           expect(result).to include("First section")
           expect(result).to include("Second section")
         end
@@ -380,25 +380,25 @@ RSpec.describe Page do
         end
 
         it "returns text from matched heading to next heading" do
-          result = page.text(between: [/First Heading/, :next])
+          result = page.text(between_headings: [/First Heading/, :next])
           expect(result).to eq("Content in first section")
         end
 
         it "works across different heading levels" do
-          result = page.text(between: [/Second Heading/, :next])
+          result = page.text(between_headings: [/Second Heading/, :next])
           expect(result).to eq("Content in second section")
         end
 
         context "when matched heading is the last heading" do
           it "returns empty string" do
-            result = page.text(between: [/Third Heading/, :next])
+            result = page.text(between_headings: [/Third Heading/, :next])
             expect(result).to eq("")
           end
         end
 
         context "when matched heading is not found" do
           it "returns empty string" do
-            result = page.text(between: [/Nonexistent/, :next])
+            result = page.text(between_headings: [/Nonexistent/, :next])
             expect(result).to eq("")
           end
         end
@@ -416,25 +416,25 @@ RSpec.describe Page do
         end
 
         it "returns text from previous heading to matched heading" do
-          result = page.text(between: [:previous, /Second Heading/])
+          result = page.text(between_headings: [:previous, /Second Heading/])
           expect(result).to eq("Content in first section")
         end
 
         it "works across different heading levels" do
-          result = page.text(between: [:previous, /Third Heading/])
+          result = page.text(between_headings: [:previous, /Third Heading/])
           expect(result).to eq("Content in second section")
         end
 
         context "when matched heading is the first heading" do
           it "returns empty string" do
-            result = page.text(between: [:previous, /First Heading/])
+            result = page.text(between_headings: [:previous, /First Heading/])
             expect(result).to eq("")
           end
         end
 
         context "when matched heading is not found" do
           it "returns empty string" do
-            result = page.text(between: [:previous, /Nonexistent/])
+            result = page.text(between_headings: [:previous, /Nonexistent/])
             expect(result).to eq("")
           end
         end
@@ -449,7 +449,7 @@ RSpec.describe Page do
         end
 
         it "returns empty string as there is no anchor heading" do
-          result = page.text(between: [:previous, :next])
+          result = page.text(between_headings: [:previous, :next])
           expect(result).to eq("")
         end
       end
@@ -472,14 +472,14 @@ RSpec.describe Page do
         end
 
         it "extracts content between heading and next with nested elements" do
-          result = page.text(between: [/Overview/, :next])
+          result = page.text(between_headings: [/Overview/, :next])
           expect(result).to include("Overview content with bold text")
           expect(result).to include("Item 1 Item 2")
           expect(result).not_to include("Details section")
         end
 
         it "extracts content from previous to heading" do
-          result = page.text(between: [:previous, /Details/])
+          result = page.text(between_headings: [:previous, /Details/])
           expect(result).to include("Overview content with bold text")
           expect(result).to include("Item 1 Item 2")
         end
@@ -518,7 +518,7 @@ RSpec.describe Page do
       end
     end
 
-    context "when combined with scope: and between: parameters" do
+    context "when combined with scope: and between_headings: parameters" do
       it "extracts text between headings within main content only" do
         page = build(:page, html: <<~HTML)
           <nav>
@@ -533,7 +533,7 @@ RSpec.describe Page do
           </main>
         HTML
 
-        result = page.text(scope: :main, between: [/Main Start/, /Main End/])
+        result = page.text(scope: :main, between_headings: [/Main Start/, /Main End/])
         expect(result).to eq("Main content")
         expect(result).not_to include("Nav content")
       end
@@ -551,7 +551,7 @@ RSpec.describe Page do
           </main>
         HTML
 
-        result = page.text(scope: :main, between: [/Start Section/, /End Section/])
+        result = page.text(scope: :main, between_headings: [/Start Section/, /End Section/])
         expect(result).to eq("")
       end
 
@@ -568,7 +568,7 @@ RSpec.describe Page do
           </main>
         HTML
 
-        result = page.text(scope: :main, between: [/Main First/, :next])
+        result = page.text(scope: :main, between_headings: [/Main First/, :next])
         expect(result).to eq("Main content")
         expect(result).not_to include("Nav content")
       end
@@ -586,7 +586,7 @@ RSpec.describe Page do
           </main>
         HTML
 
-        result = page.text(scope: :main, between: [:previous, /Main Second/])
+        result = page.text(scope: :main, between_headings: [:previous, /Main Second/])
         expect(result).to eq("Main content")
         expect(result).not_to include("Nav content")
       end
@@ -708,7 +708,7 @@ RSpec.describe Page do
       end
     end
 
-    context "with between: parameter" do
+    context "with between_headings: parameter" do
       it "returns links between two matching headings" do
         page = build(:page, body: <<~HTML)
           <h1>Start Section</h1>
@@ -718,7 +718,7 @@ RSpec.describe Page do
           <a href="/link3">Link 3</a>
         HTML
 
-        links = page.links(between: [/Start Section/, /End Section/])
+        links = page.links(between_headings: [/Start Section/, /End Section/])
         expect(links.collect(&:text)).to eq(["Link 1", "Link 2"])
         expect(links.collect(&:text)).not_to include("Link 3")
       end
@@ -726,21 +726,21 @@ RSpec.describe Page do
       it "returns empty array when start heading is not found" do
         page = build(:page, body: "<h1>End Section</h1><a href='/link'>Link</a>")
 
-        links = page.links(between: [/Nonexistent Start/, /End Section/])
+        links = page.links(between_headings: [/Nonexistent Start/, /End Section/])
         expect(links).to eq([])
       end
 
       it "returns empty array when end heading is not found" do
         page = build(:page, body: "<h1>Start Section</h1><a href='/link'>Link</a>")
 
-        links = page.links(between: [/Start Section/, /Nonexistent End/])
+        links = page.links(between_headings: [/Start Section/, /Nonexistent End/])
         expect(links).to eq([])
       end
 
       it "returns empty array when headings are adjacent with no links between" do
         page = build(:page, body: "<h1>First</h1><h2>Second</h2><a href='/link'>Link</a>")
 
-        links = page.links(between: [/First/, /Second/])
+        links = page.links(between_headings: [/First/, /Second/])
         expect(links).to eq([])
       end
 
@@ -753,7 +753,7 @@ RSpec.describe Page do
             <a href="/link2">Link 2</a>
           HTML
 
-          links = page.links(between: [/First Heading/, :next])
+          links = page.links(between_headings: [/First Heading/, :next])
           expect(links.collect(&:text)).to eq(["Link 1"])
           expect(links.collect(&:text)).not_to include("Link 2")
         end
@@ -761,7 +761,7 @@ RSpec.describe Page do
         it "returns empty array when matched heading is the last heading" do
           page = build(:page, body: "<h1>Last Heading</h1><a href='/link'>Link</a>")
 
-          links = page.links(between: [/Last Heading/, :next])
+          links = page.links(between_headings: [/Last Heading/, :next])
           expect(links).to eq([])
         end
       end
@@ -775,7 +775,7 @@ RSpec.describe Page do
             <a href="/link2">Link 2</a>
           HTML
 
-          links = page.links(between: [:previous, /Second Heading/])
+          links = page.links(between_headings: [:previous, /Second Heading/])
           expect(links.collect(&:text)).to eq(["Link 1"])
           expect(links.collect(&:text)).not_to include("Link 2")
         end
@@ -783,7 +783,7 @@ RSpec.describe Page do
         it "returns empty array when matched heading is the first heading" do
           page = build(:page, body: "<h1>First Heading</h1><a href='/link'>Link</a>")
 
-          links = page.links(between: [:previous, /First Heading/])
+          links = page.links(between_headings: [:previous, /First Heading/])
           expect(links).to eq([])
         end
       end
@@ -804,7 +804,7 @@ RSpec.describe Page do
             </main>
           HTML
 
-          links = page.links(scope: :main, between: [/Main Start/, /Main End/])
+          links = page.links(scope: :main, between_headings: [/Main Start/, /Main End/])
           expect(links.collect(&:text)).to eq(["Main Link 1"])
           expect(links.collect(&:text)).not_to include("Nav Link", "Main Link 2")
         end
@@ -822,7 +822,7 @@ RSpec.describe Page do
             </main>
           HTML
 
-          links = page.links(scope: :main, between: [/Start Section/, /End Section/])
+          links = page.links(scope: :main, between_headings: [/Start Section/, /End Section/])
           expect(links).to eq([])
         end
       end
@@ -836,7 +836,7 @@ RSpec.describe Page do
             <h1>End</h1>
           HTML
 
-          links = page.links(between: [/Start/, /End/], skip_files: false)
+          links = page.links(between_headings: [/Start/, /End/], skip_files: false)
           expect(links.collect(&:text)).to eq(["PDF Document", "Regular Link"])
         end
       end
@@ -851,7 +851,7 @@ RSpec.describe Page do
 
           allow(StringComparison).to receive(:match?).and_call_original
 
-          page.links(between: ["Start", "End"])
+          page.links(between_headings: ["Start", "End"])
 
           expect(StringComparison).to have_received(:match?).with("Start", "Start Section", ignore_case: true, fuzzy: 0.85)
           expect(StringComparison).to have_received(:match?).with("End", "End Section", ignore_case: true, fuzzy: 0.85)
@@ -865,7 +865,7 @@ RSpec.describe Page do
             <h1>End Section</h1>
           HTML
 
-          links = page.links(between: ["start section", "end section"])
+          links = page.links(between_headings: ["start section", "end section"])
           expect(links.collect(&:text)).to eq(["Link 1", "Link 2"])
         end
       end

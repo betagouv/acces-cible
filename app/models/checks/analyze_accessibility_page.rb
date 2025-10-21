@@ -93,7 +93,7 @@ module Checks
     end
 
     def find_compliance_rate
-      test_results_section = page.text(between: ["Résultats des tests", :next])
+      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
 
       return unless (match = test_results_section.match(COMPLIANCE_PATTERN))
 
