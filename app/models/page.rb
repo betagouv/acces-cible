@@ -4,6 +4,7 @@ class Page
   DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
   FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
+  LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
   SELECTORS = {
     main: "main, [role=main], article, #main, #content, #main-content, .main-content, .content, .site-content"
   }.freeze
@@ -57,7 +58,7 @@ class Page
   end
 
   def links(skip_files: true, scope: nil, between: nil)
-    source_for(scope:, between:).css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
+    source_for(scope:, between_headings:).css(LINKS_SELECTOR).collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
