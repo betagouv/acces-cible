@@ -158,8 +158,8 @@ module Checks
       StringComparison.similarity_ratio(a, b, **COMPARISON_OPTIONS.merge(options))
     end
 
-    def similar?(a, b, options = {})
-      StringComparison.similar?(a, b, **COMPARISON_OPTIONS)
+    def match?(a, b, options = {})
+      StringComparison.match?(a, b, **COMPARISON_OPTIONS)
     end
   end
 end

@@ -45,7 +45,7 @@ module Checks
       matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
     end
 
-    def fuzzy_match?(a, b) = StringComparison.similar?(a, b, ignore_case: true, fuzzy: 0.6)
+    def fuzzy_match?(a, b) = StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
 
     def filter_queue(queue)
       queue.filter! do |link|
