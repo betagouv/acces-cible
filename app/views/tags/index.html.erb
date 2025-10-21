@@ -11,7 +11,7 @@
       <% @tags.each do |tag| %>
         <tr>
           <td><%= dsfr_link_to tag.name, tag %></td>
-          <td><%= dsfr_link_to Tag.human(:see_sites, tag: tag.name, count: tag.sites_count), sites_path(search: { tag_id: tag.id }) %></td>
+          <td><%= dsfr_link_to Tag.human(:see_sites, tag: tag.name, count: tag.sites_count), sites_path(filter: { tag_id: tag.id }) %></td>
         </tr>
       <% end %>
     <% end %>

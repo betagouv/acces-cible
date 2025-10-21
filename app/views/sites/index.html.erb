@@ -33,7 +33,7 @@
     <% else %>
       <tr>
         <td colspan="<%= 5 + Check.classes.size %>">
-          <%= Site.human(params.dig(:search, :q).present? ? :no_search_results : :no_results) %>
+          <%= Site.human(params.dig(:filter, :q).present? ? :no_search_results : :no_results) %>
         </td>
       </tr>
     <% end %>
