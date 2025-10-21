@@ -74,6 +74,6 @@ module Checks
 
     def page = @page ||= audit.page(:accessibility)
     def extract_years(string) = string.to_s.scan(/\d{4}/).map(&:to_i).sort
-    def validate_years(years) = years.size.in?(1..3) && years.first.upto(years.last).include?(Date.current.year)
+    def validate_years(years) = years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
   end
 end
