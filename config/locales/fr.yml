@@ -91,6 +91,7 @@ fr:
         status: État
         new: "Nouvelle vérification"
         url: URL
+        site_url_address: Adresse du site
         count:
           zero: Aucune vérification
           one: Une vérification
@@ -153,8 +154,8 @@ fr:
         found_all: Déclaration complète
         missing_data: Déclaration incomplète
         unknown: Non détecté
-        audit_date: Date de l'audit
-        audit_update_date: Audit mis à jour le
+        audit_date: Date de la déclaration
+        audit_update_date: Déclaration mise à jour le
         compliance_rate: Taux de conformité
         standard: Référentiel
         auditor: Audit réalisé par

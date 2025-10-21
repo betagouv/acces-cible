@@ -1,6 +1,7 @@
 class SiteCsvExport < CsvExport
   def attributes
     {
+      Audit.human(:site_url_address) => :url_without_scheme_and_www,
       Audit.human(:url) => :url,
       Tag.human(:all) => :tags_list,
       Check.human(:checked_at) => [:audit, :checked_at],

@@ -46,6 +46,7 @@ RSpec.describe SiteCsvExport do
       })
 
       expected_data = {
+        Audit.human(:site_url_address) => site.url_without_scheme_and_www,
         Audit.human(:url) => audit.url,
         Tag.human(:all) => tags.collect(&:name).join(", "),
         Check.human(:checked_at) => audit.checked_at.to_s,
