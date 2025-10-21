@@ -93,7 +93,12 @@ module Checks
     end
 
     def find_compliance_rate
-      return unless (match = page.text.match(COMPLIANCE_PATTERN))
+      test_results_section = page.text(between: [
+        fuzzy_match_for("Résultats des tests"),
+        :next
+      ])
+
+      return unless (match = test_results_section.match(COMPLIANCE_PATTERN))
 
       rate = match[1].tr(",", ".").to_f
       rate % 1 == 0 ? rate.to_i : rate
