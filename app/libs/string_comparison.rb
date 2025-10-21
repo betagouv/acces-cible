@@ -9,7 +9,7 @@ module StringComparison
 
   module_function
 
-  def similar?(str1, str2, options = {})
+  def match?(str1, str2, options = {})
     raise ArgumentError.new("Fuzzy option must be greater than 0.") if options[:fuzzy]&.zero?
     return false if str1.nil? || str2.nil?
 

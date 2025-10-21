@@ -3,7 +3,7 @@ module Checks
     SLOW = true
     PRIORITY = 20
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
-    DECLARATION_URL = /"(declaration-)?accessibilit[e|y]"/i
+    DECLARATION_URL = /(declaration-)?accessibilit[e|y]/i
     REQUIRED_DECLARATION_HEADINGS = 3
     ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
 
@@ -45,7 +45,7 @@ module Checks
       matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
     end
 
-    def fuzzy_match?(a, b) = StringComparison.similar?(a, b, ignore_case: true, fuzzy: 0.6)
+    def fuzzy_match?(a, b) = StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
 
     def filter_queue(queue)
       queue.filter! do |link|

@@ -93,7 +93,9 @@ module Checks
     end
 
     def find_compliance_rate
-      return unless (match = page.text.match(COMPLIANCE_PATTERN))
+      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+
+      return unless (match = test_results_section.match(COMPLIANCE_PATTERN))
 
       rate = match[1].tr(",", ".").to_f
       rate % 1 == 0 ? rate.to_i : rate
@@ -113,12 +115,12 @@ module Checks
 
     private
 
-    def page = @page ||= Page.new(url: audit.find_accessibility_page.url) # TODO: Refactor to stop breaking the law of Demeter
+    def page = @page ||= audit.page(:accessibility)
     def found_required? = [:audit_date, :compliance_rate].all? { send(it).present? }
     def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
 
     def analyze!
-      return unless audit.find_accessibility_page&.url
+      return unless page
 
       {
         audit_date: find_audit_date,
