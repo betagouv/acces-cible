@@ -14,7 +14,7 @@ module Checks
     store_accessor :data, :mention
     delegate :text, to: :root_page, prefix: true
 
-    def mention_text = human("mentions.#{mention || 'none'}")
+    def mention_text = completed? ? human("mentions.#{mention || 'none'}") : ""
 
     def custom_badge_text = mention_text
     def custom_badge_status
