@@ -29,7 +29,17 @@ RSpec.describe Checks::AnalyzePlan do
 
       it "returns a hash containing link_url, link_text, years, reachable, and valid_year" do
         link = Link.new(href: "https://www.example.com/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
-        page = build(:page, links: [link], headings: [])
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <a href="#{link.href}">#{link.text}</a>
+            <h2>État de conformité</h2>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
         allow(check).to receive(:page).and_return(page)
         allow(Browser).to receive(:exists?).with(link.href).and_return(true)
 
@@ -66,7 +76,20 @@ RSpec.describe Checks::AnalyzePlan do
   describe "#find_link" do
     subject(:find_link) { check.find_link }
 
-    let(:page) { build(:page, links:) }
+    let(:links_html) { links.map { |link| %(<a href="#{link}">#{link}</a>) }.join("\n") }
+    let(:page_html) do
+      <<~HTML
+        <!DOCTYPE html>
+        <html>
+        <body>
+          <h1>Déclaration d'accessibilité</h1>
+          #{links_html}
+          <h1>État de conformité</h1>
+        </body>
+        </html>
+      HTML
+    end
+    let(:page) { build(:page, html: page_html) }
 
     before { allow(audit).to receive(:page).with(:accessibility).and_return(page) }
 

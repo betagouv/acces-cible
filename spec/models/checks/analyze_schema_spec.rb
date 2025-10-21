@@ -46,7 +46,20 @@ RSpec.describe Checks::AnalyzeSchema do
   describe "#find_link" do
     subject(:find_link) { check.find_link }
 
-    let(:page) { build(:page, links:) }
+    let(:links_html) { links.map { |link| %(<a href="#{link}">#{link}</a>) }.join("\n") }
+    let(:page_html) do
+      <<~HTML
+        <!DOCTYPE html>
+        <html>
+        <body>
+          <h1>Déclaration d'accessibilité</h1>
+          #{links_html}
+          <h2>État de conformité</h2>
+        </body>
+        </html>
+      HTML
+    end
+    let(:page) { build(:page, html: page_html) }
 
     before { allow(check).to receive(:page).and_return(page) }
 
