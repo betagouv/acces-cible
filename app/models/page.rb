@@ -33,7 +33,7 @@ class Page
   def redirected? = actual_url.present? && actual_url != url
   def css(selector) = dom.css(selector)
   def title = dom.title.to_s.squish
-  def text = dom.text&.squish
+  def text(scope: nil, between: nil) = source_for(scope:, between:).text&.squish
   def heading_levels = dom_headings.map { |hx| [hx.name[1].to_i, hx.text.squish] }
   def headings = dom_headings.collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
@@ -56,25 +56,8 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def text_between_headings(start_matcher, end_matcher)
-    if start_matcher == :previous
-      end_node = heading(end_matcher)
-      start_node = heading_relative_to(end_node, :previous)
-    elsif end_matcher == :next
-      start_node = heading(start_matcher)
-      end_node = heading_relative_to(start_node, :next)
-    else
-      start_node = heading(start_matcher)
-      end_node = heading(end_matcher)
-    end
-    return "" unless start_node && end_node
-
-    dom_between(start_node, end_node).text.squish
-  end
-
-  def links(skip_files: true, scope: nil)
-    source = css(SELECTORS[scope]).first || dom
-    source.css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
+  def links(skip_files: true, scope: nil, between: nil)
+    source_for(scope:, between:).css("a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])").collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
@@ -108,19 +91,47 @@ class Page
     @dom_headings ||= dom.css(HEADINGS)
   end
 
-  def heading(matcher)
-    dom_headings.find { |heading| matcher.match?(heading.text.squish) }
+  def heading(matcher, scope: nil)
+    source_for(scope:).css(HEADINGS).find { |heading| matcher.match?(heading.text.squish) }
   end
 
-  def heading_relative_to(node, direction)
-    index = dom_headings.index(node)
+  def heading_relative_to(node, direction, headings = dom_headings)
+    index = headings.index(node)
     return nil unless index
 
     case direction
     when :next
-      dom_headings[index + 1]
+      headings[index + 1]
     when :previous
-      index > 0 ? dom_headings[index - 1] : nil
+      index > 0 ? headings[index - 1] : nil
+    end
+  end
+
+  def find_heading_nodes(start_matcher, end_matcher, scope: nil)
+    headings = source_for(scope:).css(HEADINGS)
+
+    if start_matcher == :previous
+      end_node = heading(end_matcher, scope:)
+      start_node = heading_relative_to(end_node, :previous, headings)
+    elsif end_matcher == :next
+      start_node = heading(start_matcher, scope:)
+      end_node = heading_relative_to(start_node, :next, headings)
+    else
+      start_node = heading(start_matcher, scope:)
+      end_node = heading(end_matcher, scope:)
+    end
+
+    [start_node, end_node]
+  end
+
+  def source_for(scope: nil, between: nil)
+    if between
+      start_matcher, end_matcher = between
+      start_node, end_node = find_heading_nodes(start_matcher, end_matcher, scope:)
+      return dom.fragment unless start_node && end_node
+      dom_between(start_node, end_node)
+    else
+      scope ? (css(SELECTORS[scope]).first || dom) : dom
     end
   end
 
