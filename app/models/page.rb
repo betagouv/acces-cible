@@ -57,8 +57,16 @@ class Page
   end
 
   def text_between_headings(start_matcher, end_matcher)
-    start_node = heading(start_matcher)
-    end_node = heading(end_matcher)
+    if start_matcher == :previous
+      end_node = heading(end_matcher)
+      start_node = heading_relative_to(end_node, :previous)
+    elsif end_matcher == :next
+      start_node = heading(start_matcher)
+      end_node = heading_relative_to(start_node, :next)
+    else
+      start_node = heading(start_matcher)
+      end_node = heading(end_matcher)
+    end
     return "" unless start_node && end_node
 
     dom_between(start_node, end_node).text.squish
@@ -102,6 +110,18 @@ class Page
 
   def heading(matcher)
     dom_headings.find { |heading| matcher.match?(heading.text.squish) }
+  end
+
+  def heading_relative_to(node, direction)
+    index = dom_headings.index(node)
+    return nil unless index
+
+    case direction
+    when :next
+      dom_headings[index + 1]
+    when :previous
+      index > 0 ? dom_headings[index - 1] : nil
+    end
   end
 
   def dom_between(start_node, end_node)

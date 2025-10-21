@@ -575,5 +575,122 @@ RSpec.describe Page do
         expect(result).to eq("Content here")
       end
     end
+
+    context "with :next relative matcher" do
+      let(:body) do
+        <<~HTML
+          <h1>First Heading</h1>
+          <p>Content in first section</p>
+          <h2>Second Heading</h2>
+          <p>Content in second section</p>
+          <h3>Third Heading</h3>
+        HTML
+      end
+
+      it "returns text from matched heading to next heading" do
+        result = page.text_between_headings(/First Heading/, :next)
+        expect(result).to eq("Content in first section")
+      end
+
+      it "works across different heading levels" do
+        result = page.text_between_headings(/Second Heading/, :next)
+        expect(result).to eq("Content in second section")
+      end
+
+      context "when matched heading is the last heading" do
+        it "returns empty string" do
+          result = page.text_between_headings(/Third Heading/, :next)
+          expect(result).to eq("")
+        end
+      end
+
+      context "when matched heading is not found" do
+        it "returns empty string" do
+          result = page.text_between_headings(/Nonexistent/, :next)
+          expect(result).to eq("")
+        end
+      end
+    end
+
+    context "with :previous relative matcher" do
+      let(:body) do
+        <<~HTML
+          <h1>First Heading</h1>
+          <p>Content in first section</p>
+          <h2>Second Heading</h2>
+          <p>Content in second section</p>
+          <h3>Third Heading</h3>
+        HTML
+      end
+
+      it "returns text from previous heading to matched heading" do
+        result = page.text_between_headings(:previous, /Second Heading/)
+        expect(result).to eq("Content in first section")
+      end
+
+      it "works across different heading levels" do
+        result = page.text_between_headings(:previous, /Third Heading/)
+        expect(result).to eq("Content in second section")
+      end
+
+      context "when matched heading is the first heading" do
+        it "returns empty string" do
+          result = page.text_between_headings(:previous, /First Heading/)
+          expect(result).to eq("")
+        end
+      end
+
+      context "when matched heading is not found" do
+        it "returns empty string" do
+          result = page.text_between_headings(:previous, /Nonexistent/)
+          expect(result).to eq("")
+        end
+      end
+    end
+
+    context "with both :next and :previous matchers" do
+      let(:body) do
+        <<~HTML
+          <h1>First</h1>
+          <h2>Second</h2>
+        HTML
+      end
+
+      it "returns empty string as there is no anchor heading" do
+        result = page.text_between_headings(:previous, :next)
+        expect(result).to eq("")
+      end
+    end
+
+    context "with relative matchers on complex page structure" do
+      let(:body) do
+        <<~HTML
+          <h1>Introduction</h1>
+          <p>Introduction text</p>
+          <h2>Overview</h2>
+          <p>Overview content with <strong>bold text</strong></p>
+          <ul>
+            <li>Item 1</li>
+            <li>Item 2</li>
+          </ul>
+          <h2>Details</h2>
+          <p>Details section</p>
+          <h1>Conclusion</h1>
+        HTML
+      end
+
+      it "extracts content between heading and next with nested elements" do
+        result = page.text_between_headings(/Overview/, :next)
+        expect(result).to include("Overview content with bold text")
+        expect(result).to include("Item 1 Item 2")
+        expect(result).not_to include("Details section")
+      end
+
+      it "extracts content from previous to heading" do
+        result = page.text_between_headings(:previous, /Details/)
+        expect(result).to include("Overview content with bold text")
+        expect(result).to include("Item 1 Item 2")
+      end
+    end
   end
 end
