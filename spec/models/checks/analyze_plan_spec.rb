@@ -41,7 +41,7 @@ RSpec.describe Checks::AnalyzePlan do
         HTML
         page = build(:page, html: page_html)
         allow(check).to receive(:page).and_return(page)
-        allow(Browser).to receive(:exists?).with(link.href).and_return(true)
+        allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
         expect(analyze).to include(
           link_url: link.href,

@@ -23,8 +23,8 @@ RSpec.describe Browser do
     WebMock.disable_net_connect!
   end
 
-  describe ".exists?" do
-    subject(:exists?) { described_class.exists?(url) }
+  describe ".reachable?" do
+    subject(:reachable?) { described_class.reachable?(url) }
 
     before do
       allow(described_class).to receive(:head).and_return(head_response)
@@ -35,11 +35,11 @@ RSpec.describe Browser do
       let(:head_response) { { status: 200 } }
 
       it "returns false" do
-        expect(exists?).to be_falsey
+        expect(reachable?).to be_falsey
       end
 
       it "does not make a HEAD request" do
-        exists?
+        reachable?
         expect(described_class).not_to have_received(:head)
       end
     end
@@ -48,11 +48,11 @@ RSpec.describe Browser do
       let(:head_response) { { status: 200 } }
 
       it "returns true" do
-        expect(exists?).to be(true)
+        expect(reachable?).to be(true)
       end
 
       it "makes a HEAD request with the URL" do
-        exists?
+        reachable?
         expect(described_class).to have_received(:head).with(url)
       end
     end
@@ -62,7 +62,7 @@ RSpec.describe Browser do
         let(:head_response) { { status: } }
 
         it "returns false" do
-          expect(exists?).to be(false)
+          expect(reachable?).to be(false)
         end
       end
     end

@@ -75,7 +75,7 @@ module Checks
         link_url: link&.href,
         link_text: link&.text,
         valid_year: validate_year(years.last),
-        reachable: Browser.exists?(link&.href),
+        reachable: Browser.reachable?(link&.href),
         page_heading:
       }
     end

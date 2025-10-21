@@ -85,7 +85,7 @@ class Browser
   class << self
     delegate_missing_to :new
 
-    def exists?(url) = url && head(url)[:status] == SUCCESS_CODE
+    def reachable?(url) = url && head(url)[:status] == SUCCESS_CODE
 
     def head(url)
       response = HTTP

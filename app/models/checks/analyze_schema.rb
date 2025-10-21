@@ -68,7 +68,7 @@ module Checks
         link_url: link.href,
         link_text: link.text,
         valid_years: validate_years(years),
-        reachable: Browser.exists?(link.href)
+        reachable: Browser.reachable?(link.href)
       }
     end
 
