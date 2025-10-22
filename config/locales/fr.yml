@@ -172,6 +172,8 @@ fr:
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
         invalid_years: Années invalides
+        page_heading: Titre de page
+        schema_in_page_heading: Schéma trouvé dans un titre de page
       checks/analyze_plan:
         type: Plan d'action
         table_header: Plan d'action
