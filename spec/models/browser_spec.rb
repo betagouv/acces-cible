@@ -74,11 +74,12 @@ RSpec.describe Browser do
     let(:response) { instance_double(HTTP::Response) }
     let(:uri) { instance_double(Addressable::URI) }
     let(:http_chain) { instance_double(HTTP::Client) }
+    let(:ssl) { { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 
     before do
       allow(HTTP).to receive(:headers).and_return(http_chain)
       allow(http_chain).to receive_messages(timeout: http_chain, follow: http_chain)
-      allow(http_chain).to receive(:head).with(url).and_return(response)
+      allow(http_chain).to receive(:head).with(url, ssl:).and_return(response)
       allow(response).to receive(:uri).and_return(uri)
       allow(uri).to receive(:to_s).and_return(url)
       allow(Link).to receive(:normalize).and_return(url)
@@ -95,7 +96,7 @@ RSpec.describe Browser do
         expect(HTTP).to have_received(:headers)
         expect(http_chain).to have_received(:timeout).with(connect: 3, read: 3)
         expect(http_chain).to have_received(:follow).with(max_hops: 3)
-        expect(http_chain).to have_received(:head).with(url)
+        expect(http_chain).to have_received(:head).with(url, ssl:)
       end
 
       it "returns hash with status and normalized current_url" do
@@ -125,7 +126,7 @@ RSpec.describe Browser do
 
     context "when request times out" do
       before do
-        allow(http_chain).to receive(:head).with(url).and_raise(HTTP::Error)
+        allow(http_chain).to receive(:head).with(url, ssl:).and_raise(HTTP::Error)
       end
 
       it "returns status 0" do
