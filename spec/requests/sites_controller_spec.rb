@@ -6,6 +6,51 @@ RSpec.describe "Sites" do
 
   before { login_as(user) }
 
+  describe "GET /sites" do
+    subject(:get_sites) { get sites_path }
+
+    it "returns success" do
+      get_sites
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "GET /sites/:id" do
+    subject(:get_site) { get site_path(site) }
+
+    let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+
+    it "returns success" do
+      get_site
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    context "when accessing with old slug" do
+      it "redirects to current slug with moved_permanently status" do
+        old_slug = site.slug
+        site.update!(url: "https://newexample.com")
+
+        get "/sites/#{old_slug}"
+
+        expect(response).to redirect_to(site_path(site))
+        expect(response).to have_http_status(:moved_permanently)
+      end
+    end
+
+    context "when site belongs to another team" do
+      let(:other_team) { create(:team) }
+      let(:site) { create(:site, team: other_team) }
+
+      it "returns not found status" do
+        get_site
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "POST /sites" do
     subject(:post_site) { post sites_path, params: { site: { url: } } }
 
