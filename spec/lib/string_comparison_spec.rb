@@ -47,24 +47,14 @@ RSpec.describe StringComparison do
   end
 
   describe ".match?" do
-    it "calls similarity_ratio with the same strings and options" do
-      expect(described_class).to receive(:similarity_ratio).with("foo", "foobar", { fuzzy: 0.8 }).and_return(0.0)
-      described_class.match?("foo", "foobar", fuzzy: 0.8)
-    end
-
-    it "uses default fuzzy threshold of 1.0 when not specified" do
-      expect(described_class).to receive(:similarity_ratio).with("foo", "foobar", {}).and_return(0.0)
+    it "calls similarity_ratio without options" do
+      expect(described_class).to receive(:similarity_ratio).with("foo", "foobar", {}).and_call_original
       described_class.match?("foo", "foobar")
     end
 
-    it "uses custom fuzzy threshold when specified" do
-      expect(described_class).to receive(:similarity_ratio).with("foo", "foobar", { fuzzy: 0.7 }).and_return(0.5)
-      described_class.match?("foo", "foobar", fuzzy: 0.7)
-    end
-
-    it "preserves other options when calling similarity_ratio" do
-      expect(described_class).to receive(:similarity_ratio).with("FOO", "foo", { ignore_case: true, fuzzy: 0.9 }).and_return(1.0)
-      described_class.match?("FOO", "foo", ignore_case: true, fuzzy: 0.9)
+    it "calls similarity_ratio with options" do
+      expect(described_class).to receive(:similarity_ratio).with("foo", "foobar", { ignore_case: true, fuzzy: 0.9 }).and_call_original
+      described_class.match?("foo", "foobar", ignore_case: true, fuzzy: 0.9)
     end
   end
 end
