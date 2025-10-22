@@ -74,6 +74,7 @@ RSpec.configure do |config|
   # Feature-specific config
   config.include Capybara::DSL, type: :feature
   config.include Capybara::RSpecMatchers, type: :feature
+  config.include ActionView::RecordIdentifier, type: :feature
   config.before(type: :feature) do
     require "axe-rspec"
   end
