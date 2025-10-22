@@ -34,7 +34,7 @@ module Checks
     def success_count = comparison.empty? ? 0 : total - failures.count
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
     def human_success_rate = comparison.empty? ? "" : "#{success_count}/#{total}"
-    def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first.message)
+    def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first&.message)
     alias custom_badge_text human_success_rate
 
     def custom_badge_status
