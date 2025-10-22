@@ -43,16 +43,18 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#filter_queue" do
-    let(:declaration_url_link) { build(:link, text: "Page", href: '"declaration-accessibilite"') }
+    let(:declaration_url_link) { build(:link, text: "Page", href: "/declaration-accessibilite") }
+    let(:declaration_daccessibilite_link) { build(:link, text: "Page", href: "/declaration-daccessibilite") }
     let(:declaration_text_link) { build(:link, text: "Déclaration d'accessibilité", href: "/other") }
     let(:accessibility_mention_link) { build(:link, text: "Accessibilité : totalement conforme", href: "/handicap") }
+    let(:rgaa_link) { build(:link, text: "Audit RGAA", href: "/rgaa") }
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
-    let(:queue) { LinkList.new(declaration_url_link, declaration_text_link, accessibility_mention_link, unrelated_link) }
+    let(:queue) { LinkList.new(declaration_url_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, rgaa_link, unrelated_link) }
 
     it "only keeps links matching DECLARATION, DECLARATION_URL, or MENTION pattern" do
       filtered_queue = check.send(:filter_queue, queue).to_a
 
-      expect(filtered_queue).to contain_exactly(declaration_url_link, declaration_text_link, accessibility_mention_link)
+      expect(filtered_queue).to contain_exactly(declaration_url_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, rgaa_link)
       expect(filtered_queue).not_to include(unrelated_link)
     end
   end

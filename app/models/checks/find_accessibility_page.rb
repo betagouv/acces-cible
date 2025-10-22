@@ -3,7 +3,7 @@ module Checks
     SLOW = true
     PRIORITY = 20
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
-    DECLARATION_URL = /(declaration-)?accessibilit[e|y]/i
+    DECLARATION_URL = /(declaration-)?d?accessibilit[e|y]|rgaa/i
     REQUIRED_DECLARATION_HEADINGS = 3
 
     store_accessor :data, :url, :title
