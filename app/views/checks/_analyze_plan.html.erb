@@ -13,9 +13,9 @@
         <%= link_to check.link_url, check.link_url, target: :_blank %>
       </li>
       <li>
-        <strong><%= Checks::AnalyzePlan.human(:year) %> :</strong>
-        <% if check.year %>
-          <%= check.year %>
+        <strong><%= Checks::AnalyzePlan.human(:years) %> :</strong>
+        <% if check.years %>
+          <%= check.years.join("-") %>
         <% else %>
           <%= Checks::AnalyzePlan.human(:year_not_found) %>
         <% end %>
