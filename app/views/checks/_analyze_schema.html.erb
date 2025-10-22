@@ -14,7 +14,7 @@
       </li>
       <li>
         <strong><%= Checks::AnalyzeSchema.human(:years) %> :</strong>
-        <% if check.years %>
+        <% if check.years.present? %>
           <%= check.years.join("-") %>
         <% else %>
           <%= Checks::AnalyzeSchema.human(:year_not_found) %>
