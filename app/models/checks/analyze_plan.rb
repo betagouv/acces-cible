@@ -10,9 +10,17 @@ module Checks
       )
     /xi
 
-    store_accessor :data, :link_url, :link_text, :years, :reachable, :valid_year, :page_heading
+    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_year, :page_heading
 
     def find_link
+      return unless page
+
+      page.links(skip_files: false, scope: :main)
+        .select { |link| link.text.match? PLAN_PATTERN }
+        .max_by { |link| extract_years(link.text) }
+    end
+
+    def link_between_headings?
       return unless page
 
       page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
@@ -71,6 +79,7 @@ module Checks
         years:,
         link_url: link&.href,
         link_text: link&.text,
+        link_misplaced: link ? !link_between_headings? : nil,
         valid_year: validate_year(years.last),
         reachable: Browser.reachable?(link&.href),
         page_heading:

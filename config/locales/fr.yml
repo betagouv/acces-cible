@@ -169,6 +169,7 @@ fr:
         year_not_found: non détectées
         link_text: Intitulé du lien
         link_url: Adresse du lien
+        link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
         invalid_years: Années invalides
@@ -181,6 +182,7 @@ fr:
         year_not_found: non détectée
         link_text: Intitulé du lien
         link_url: Adresse du lien
+        link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
         invalid_year: Année(s) invalide(s)
