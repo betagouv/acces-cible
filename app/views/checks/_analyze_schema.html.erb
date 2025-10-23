@@ -12,12 +12,13 @@
         <li>
           <strong><%= Checks::AnalyzeSchema.human(:link_url) %> :</strong>
           <%= link_to check.link_url, check.link_url, target: :_blank %>
+          <% if check.link_misplaced %>
+            <p><strong><%= Checks::AnalyzePlan.human(:link_misplaced) %></strong></p>
+          <% end %>
+          <% if !check.reachable %>
+            <p><strong><%= Checks::AnalyzePlan.human(:link_unreachable) %> :</strong></p>
+          <% end %>
         </li>
-        <% if check.link_misplaced %>
-          <li>
-            <strong><%= Checks::AnalyzePlan.human(:link_misplaced) %></strong>
-          </li>
-        <% end %>
       <% elsif check.page_heading %>
         <li>
           <strong><%= Checks::AnalyzeSchema.human(:schema_in_page_heading) %> :</strong>

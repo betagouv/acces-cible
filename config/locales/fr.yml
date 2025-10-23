@@ -171,6 +171,7 @@ fr:
         link_url: Adresse du lien
         link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
+        link_unreachable: Le lien pointe vers une page ou un fichier introuvable
         all_passed: Lien trouvé et valide
         invalid_years: Années invalides
         page_heading: Titre de page
@@ -185,6 +186,7 @@ fr:
         link_url: Adresse du lien
         link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
+        link_unreachable: Le lien pointe vers une page ou un fichier introuvable
         all_passed: Lien trouvé et valide
         invalid_year: Année(s) invalide(s)
         page_heading: Titre de page
