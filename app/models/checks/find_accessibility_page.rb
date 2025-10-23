@@ -5,7 +5,6 @@ module Checks
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
     DECLARATION_URL = /(declaration-)?accessibilit[e|y]/i
     REQUIRED_DECLARATION_HEADINGS = 3
-    ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
 
     store_accessor :data, :url, :title
 
@@ -25,7 +24,7 @@ module Checks
 
     def find_page
       crawler.find do |current_page, queue|
-        if mentions_article?(current_page) && required_headings_present?(current_page)
+        if required_headings_present?(current_page)
           true
         else
           filter_queue(queue)
@@ -33,8 +32,6 @@ module Checks
         end
       end
     end
-
-    def mentions_article?(current_page) = current_page.text.match?(ARTICLE)
 
     def required_headings_present?(current_page)
       matching_headings = current_page.headings.select do |heading|

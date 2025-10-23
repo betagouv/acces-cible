@@ -8,6 +8,8 @@ fr:
   shared:
     actions: Actions
     confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+    "yes": Oui
+    "no": Non
     cancel: Annuler
     apply: Appliquer
     applying: Appliquer…
@@ -159,6 +161,7 @@ fr:
         compliance_rate: Taux de conformité
         standard: Référentiel
         auditor: Audit réalisé par
+        mentions_article: Mentionne l'article de loi
       checks/analyze_schema:
         type: Schéma pluriannuel d'accessibilité
         table_header: Schéma
