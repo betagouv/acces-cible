@@ -65,13 +65,61 @@ RSpec.describe Checks::AccessibilityPageHeading do
     end
   end
 
+  describe "#heading_statuses" do
+    subject(:heading_statuses) { check.heading_statuses }
+
+    before { check.data = comparison_data }
+
+    context "when comparison is empty" do
+      let(:comparison_data) { { comparison: [] } }
+
+      it "returns empty array" do
+        expect(heading_statuses).to eq []
+      end
+    end
+
+    context "when comparison has data" do
+      let(:comparison_data) do
+        {
+          comparison: [
+            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
+            ["État de conformité", 2, :incorrect_level, "État de conformité"]
+          ]
+        }
+      end
+
+      it "returns array of PageHeadingStatus objects" do
+        expect(heading_statuses).to all(be_a(PageHeadingStatus))
+        expect(heading_statuses.length).to eq 2
+      end
+
+      it "correctly maps comparison data to PageHeadingStatus objects" do
+        heading_status = heading_statuses[0]
+        expect(heading_status.expected_heading).to eq "Déclaration d'accessibilité"
+        expect(heading_status.expected_level).to eq 1
+        expect(heading_status.status).to eq "ok"
+        expect(heading_status.actual_heading).to eq "Déclaration d'accessibilité"
+        expect(heading_status.ok?).to be true
+        expect(heading_status.error?).to be false
+
+        heading_status = heading_statuses[1]
+        expect(heading_status.expected_heading).to eq "État de conformité"
+        expect(heading_status.expected_level).to eq 2
+        expect(heading_status.status).to eq "incorrect_level"
+        expect(heading_status.actual_heading).to eq "État de conformité"
+        expect(heading_status.ok?).to be false
+        expect(heading_status.error?).to be true
+      end
+    end
+  end
+
   describe "#success_count" do
     subject(:success_count) { check.success_count }
 
     before { check.data = comparison_data }
 
     context "when comparison is empty" do
-      let(:comparison_data) { {} }
+      let(:comparison_data) { { comparison: [] } }
 
       it "returns 0" do
         expect(success_count).to eq 0
@@ -90,6 +138,10 @@ RSpec.describe Checks::AccessibilityPageHeading do
       it "returns total count" do
         expect(success_count).to eq 14
       end
+
+      it "has no failures" do
+        expect(check.failures.count).to eq 0
+      end
     end
 
     context "when some headings have errors" do
@@ -106,6 +158,10 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "returns total minus failures count" do
         expect(success_count).to eq 2
+      end
+
+      it "counts failures correctly" do
+        expect(check.failures.count).to eq 12
       end
     end
   end

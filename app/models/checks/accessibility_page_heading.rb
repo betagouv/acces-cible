@@ -28,10 +28,10 @@ module Checks
 
     store_accessor :data, :page_headings, :comparison
 
-    def tooltip? = audit.pending? && comparison.empty?
-    def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
+    def tooltip? = audit.pending? && heading_statuses.empty?
+    def heading_statuses = @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
     def total = expected_headings.count
-    def failures = comparison.filter { it.error? }
+    def failures = heading_statuses.filter { it.error? }
     def success_count = comparison.empty? ? 0 : total - failures.count
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
     def human_success_rate = comparison.empty? ? "" : "#{success_count}/#{total}"

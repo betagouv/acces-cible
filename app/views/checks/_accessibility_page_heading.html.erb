@@ -13,7 +13,7 @@
   </p>
   <ul class="fr-raw-list fr-mt-2w">
     <% if check.completed? && check.comparison.present? %>
-      <% check.comparison.each do |heading_status| %>
+      <% check.heading_statuses.each do |heading_status| %>
         <li class="fr-mb-2w">
           <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v fr-label--success") : icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
           <strong>
