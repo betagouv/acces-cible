@@ -175,6 +175,7 @@ fr:
         invalid_years: Années invalides
         page_heading: Titre de page
         schema_in_page_heading: Schéma trouvé dans un titre de page
+        nothing_found: Schéma non trouvé
       checks/analyze_plan:
         type: Plan d'action
         table_header: Plan d'action
@@ -188,6 +189,7 @@ fr:
         invalid_year: Année(s) invalide(s)
         page_heading: Titre de page
         plan_in_page_heading: Plan trouvé dans un titre de page
+        nothing_found: Plan non trouvé
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
         table_header: Déclaration
