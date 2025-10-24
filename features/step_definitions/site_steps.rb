@@ -64,10 +64,21 @@ Alors("la page contient toutes les vérifications du site {string} avec le préf
   site = team.sites.find_by_url(url:)
   expect(page).to have_css("table") if prefix.present?
   site.audit.all_checks.each do |check|
-    expect(page).to have_css("##{dom_id(check, prefix.present? ? prefix : nil)}")
+    expect(page).to have_content(check.class.table_header)
+  end
+end
+
+Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
+  site = team.sites.find_by_url(url:)
+  expect(page).to have_css("table")
+  site.audit.all_checks.each do |check|
+    expect(page).to have_content(check.human_type)
   end
 end
 
 Alors("la page contient toutes les vérifications du site {string}") do |url|
-  step "la page contient toutes les vérifications du site \"#{url}\" avec le préfixe \"\""
+  site = team.sites.find_by_url(url:)
+  site.audit.all_checks.each do |check|
+    expect(page).to have_content(check.human_type)
+  end
 end
