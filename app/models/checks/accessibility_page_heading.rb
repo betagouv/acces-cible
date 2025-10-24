@@ -27,7 +27,7 @@ module Checks
 
     store_accessor :data, :page_headings, :comparison
 
-    def tooltip? = audit.pending? && heading_statuses.empty?
+    def tooltip? = audit.pending? || heading_statuses.empty?
     def heading_statuses = @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
     def total = expected_headings.count
     def failures = heading_statuses.filter { it.error? }
