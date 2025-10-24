@@ -15,7 +15,13 @@
     <% if check.completed? && check.comparison.present? %>
       <% check.heading_statuses.each do |heading_status| %>
         <li class="fr-mb-2w">
-          <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v fr-label--success") : icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
+          <% if heading_status.ok? %>
+            <%= icon(:checkbox, class: "fr-mr-1v fr-label--success") %>
+          <% elsif heading_status.warning? %>
+            <%= icon(:warning, class: "fr-mr-1v fr-label--error") %>
+          <% else %>
+            <%= icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
+          <% end %>
           <strong>
             <code>&lt;h<%= heading_status.expected_level %>&gt;</code>
             <%= heading_status.expected_heading %>
