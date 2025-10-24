@@ -28,7 +28,7 @@ Link = Data.define(:href, :text) do
       unless path == "/"
         path = File.expand_path(uri.path, "/")
         path = path[1..-1] if path.start_with?("/")
-        path += "/" if uri.path.end_with?("/") || File.extname(path).empty?
+        path += "/" if uri.path.end_with?("/")
       end
       query = uri.query.nil? ? "" : "?#{uri.query}"
       Addressable::URI.join(uri.origin, path, query).display_uri.to_s

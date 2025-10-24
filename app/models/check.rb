@@ -12,7 +12,7 @@ class Check < ApplicationRecord
         self,
         transition_class: CheckTransition,
         association_name: :check_transitions,
-        initial_transition: true
+        initial_transition: persisted?
       )
     end
   end
@@ -40,6 +40,8 @@ class Check < ApplicationRecord
     :accessibility_mention,
     :find_accessibility_page,
     :analyze_accessibility_page,
+    :analyze_schema,
+    :analyze_plan,
     :accessibility_page_heading,
     :run_axe_on_homepage,
   ].freeze

@@ -8,20 +8,20 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     let(:text) do
       <<~HTML
         <p>… s’engage à rendre ses sites internet accessibles conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
+        <h2>Résultats des tests</h2>
         <p>Audit réalisé le 15 mars 2024 par la Société ABC, qui révèle que le site est à 75% conforme au RGAA version 4.1.</p>
+        <h2>Contenus non accessibles</h2>
       HTML
     end
 
     it "returns complete accessibility information" do
-      # rubocop:disable RSpec/MessageChain
-      allow(check).to receive_message_chain(:audit, :find_accessibility_page, :url).and_return("https://example.com/accessibility")
-      # rubocop:enable RSpec/MessageChain
       allow(check).to receive(:page).and_return(build(:page, body: text))
       expect(check.send(:analyze!)).to include(
         audit_date: Date.new(2024, 3, 15),
         compliance_rate: 75,
         standard: "RGAA version 4.1",
-        auditor: "ABC"
+        auditor: "ABC",
+        mentions_article: true
       )
     end
   end
@@ -69,7 +69,12 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "taux de conformité globale est de 95 pour cent" => 95
     }.each do |text, expected_rate|
       it "extracts '#{expected_rate}%' from '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: text))
+        body = <<~HTML
+          <h2>Résultats des tests</h2>
+          <p>#{text}</p>
+          <h2>Contenus non accessibles</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
         expect(check.find_compliance_rate).to eq(expected_rate)
       end
     end
@@ -101,6 +106,22 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       it "extracts '#{expected_auditor}' from '#{text}'" do
         allow(check).to receive(:page).and_return(build(:page, body: text))
         expect(check.find_auditor).to eq(expected_auditor)
+      end
+    end
+  end
+
+  describe "#find_article_mention" do
+    subject { check.send(:mentions_article) }
+
+    {
+      "article 47 loi n°2005-102 du 11 février 2005" => true,
+      "art. 47 de la loi numéro 2005-102 du 11 fevrier 2005" => true,
+      "Contactez-nous pour plus d'informations" => false,
+      "" => false
+    }.each do |text, expectation|
+      it "returns '#{expectation}' for '#{text}'" do
+        allow(check).to receive(:page).and_return(build(:page, body: text))
+        expect(check.find_article_mention).to eq(expectation)
       end
     end
   end

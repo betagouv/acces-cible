@@ -21,6 +21,16 @@ class Audit < ApplicationRecord
     end
   end
 
+  def page(kind)
+    page_url = case kind.to_s.to_sym
+    when :home then url
+    when :accessibility then find_accessibility_page&.url
+    else
+      raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
+    end
+    Page.new(url: page_url, root: url) if page_url
+  end
+
   def schedule = ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
 
   def all_checks

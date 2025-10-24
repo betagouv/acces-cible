@@ -80,3 +80,25 @@ Fonctionnalité:
       | alpha.gouv.fr |
       | beta.gouv.fr  |
       | delta.gouv.fr |
+
+  Scénario: Un agent peut voir les sites avec leurs liens et étiquettes
+    Sachant que je possède un site "https://example1.gouv.fr"
+    Et que je possède un site "https://example2.gouv.fr"
+    Et que le site "https://example1.gouv.fr" a les étiquettes "production, public"
+    Quand je clique sur "Tous les sites"
+    Alors la page contient un tableau
+    Et la page contient un lien vers "https://example1.gouv.fr"
+    Et la page contient un lien vers "https://example2.gouv.fr"
+    Et la page contient "production"
+    Et la page contient "public"
+
+  Scénario: Un agent peut voir les statuts de vérification pour chaque site
+    Sachant que je possède un site "https://example.gouv.fr" avec des données
+    Quand je clique sur "Tous les sites"
+    Alors la page contient un tableau
+    Et la page contient toutes les vérifications du site "https://example.gouv.fr" avec le préfixe "sites_table"
+
+  Scénario: Un agent voit un message quand aucun site n'existe
+    Quand je clique sur "Tous les sites"
+    Alors la page contient un tableau
+    Et la page contient "Aucun site"

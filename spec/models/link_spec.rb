@@ -84,10 +84,11 @@ RSpec.describe Link do
       expect(normalized.to_s).to eq("http://example.com/%C3%A9t%C3%A9.html")
     end
 
-    it "treats URLs as equal if they refer to the same document" do
-      url1 = described_class.normalize("http://example.com/path/page")
-      url2 = described_class.normalize("http://example.com/path/page/")
-      expect(url1.to_s).to eq(url2.to_s)
+    it "preserves trailing slashes in paths" do
+      url_without_slash = described_class.normalize("http://example.com/path/page")
+      url_with_slash = described_class.normalize("http://example.com/path/page/")
+      expect(url_without_slash.to_s).to eq("http://example.com/path/page")
+      expect(url_with_slash.to_s).to eq("http://example.com/path/page/")
     end
 
     it "preserves the original scheme" do
@@ -250,9 +251,9 @@ RSpec.describe Link do
         expect(link1).to eq(link2)
       end
 
-      it "if relative parts resolve to the same href" do
+      it "if relative parts resolve to the same href with matching trailing slash" do
         link1 = described_class.new(href: "https://example.com/path", text: "Example 1")
-        link2 = described_class.new(href: "https://example.com/other/../path/", text: "Example 2")
+        link2 = described_class.new(href: "https://example.com/other/../path", text: "Example 2")
         expect(link1).to eq(link2)
       end
     end

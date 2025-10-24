@@ -21,6 +21,7 @@
       <% end %>
       <li><strong><%= check.human(:standard) %></strong> : <%= check.standard || check.human(:unknown) %></li>
       <li><strong><%= check.human(:auditor) %></strong> : <%= check.auditor || check.human(:unknown) %></li>
+      <li><strong><%= check.human(:mentions_article) %></strong> : <%= check.mentions_article ? t("shared.yes") : t("shared.no") %></li>
     </ul>
   <% end %>
 </div>

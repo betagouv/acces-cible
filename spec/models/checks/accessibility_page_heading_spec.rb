@@ -7,160 +7,109 @@ RSpec.describe Checks::AccessibilityPageHeading do
     subject(:comparison) { check.send(:compare_headings) }
 
     let(:expected_headings) { described_class::EXPECTED_HEADINGS }
-    let(:expected_result) do
-      expected_headings.map do |level, heading|
-        [heading, level, :ok, heading]
-      end
+    let(:page_headings) do
+      html = file_fixture("declarations/#{fixture_file_name}.html").read
+      Page.new(url: "http://example.com", html:).heading_levels
     end
-    let(:page_headings) { expected_headings }
 
     before do
       allow(check).to receive(:page_headings).and_return(page_headings)
     end
 
-    context "when all expectations are met" do
+    context "when the headings are valid" do
+      let(:fixture_file_name) { :valid }
+
       it "returns array of headings with :ok status" do
+        expected_result = expected_headings.map.with_index do |(level, heading), index|
+          # Skip the first page heading since we start at État de conformité (H2)
+          actual_page_heading = page_headings[index + 1].last
+          [heading, level, :ok, actual_page_heading]
+        end
         expect(comparison).to eq expected_result
       end
     end
 
-    context "when all expectations are met, but an extra heading increases the level by 1" do
-      let(:page_headings) do
-        [[1, "Accessibilité"]] + expected_headings.map do |level, heading|
-          [level + 1, heading]
-        end
-      end
+    context "when the headings are valid but shifted by one level" do
+      let(:fixture_file_name) { :valid_with_shift }
 
       it "returns :ok status for all headings (ignores start level difference)" do
-        expect(comparison).to eq expected_result
-      end
-    end
-
-    context "when the first heading doesn't match, but all following do" do
-      let(:page_headings) do
-        expected_headings.each_with_index.map do |(level, heading), index|
-          index.zero? ? [level, "Rien à voir"] : [level, heading]
-        end
-      end
-
-      it "returns :ok status for all headings but the first" do
-        expected_result = expected_headings.each_with_index.map do |(level, heading), index|
-          index.zero? ? [heading, level, :missing, nil] : [heading, level, :ok, heading]
-        end
-        expect(comparison).to eq expected_result
-      end
-    end
-
-    context "when page headings match with slight differences" do
-      let(:page_headings) do
-        [
-          [1, "DECLARATION d'accessibilité"], # Different case
-          [2, "État de conformité"],
-          [3, "Resultat de test"],     # Typos
-          [2, "Contenu non accessible"],  # Singular vs plural
-          [3, "Non conformite"],  # Missing hyphen and accent
-        ]
-      end
-
-      it "returns :ok status for all (ignores case differences, extra text and typos)" do
-        expected_result = expected_headings.each_with_index.map do |(level, heading), index|
-          if index < page_headings.size
-            [heading, level, :ok, page_headings[index][1]]
-          else
-            [heading, level, :missing, nil]
-          end
-        end
-        expect(comparison).to eq expected_result
-      end
-    end
-
-    context "when some headings are missing from the page" do
-      let(:page_headings) do
-        [
-          [1, "Déclaration d'accessibilité"],
-          [2, "État de conformité"],
-          [3, "Résultats des tests"],
-        ]
-      end
-
-      it "returns :missing status for missing headings" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
-          if index < page_headings.size
-            [heading, level, :ok, page_headings[index][1]]
-          else
-            [heading, level, :missing, nil]
-          end
+          # Skip the first page heading since we start at État de conformité (H2)
+          shifted_heading = page_headings[index + 2].last
+          [heading, level, :ok, shifted_heading]
         end
         expect(comparison).to eq expected_result
       end
     end
 
-    context "when headings are swapped" do
-      let(:page_headings) { expected_headings.reverse }
+    context "when the headings are invalid" do
+      let(:fixture_file_name) { :invalid }
 
-      it "returns :incorrect_order status for out-of-order headings" do
-        expected_result = expected_headings.map.with_index do |(level, heading), index|
-          index.zero? ? [heading, level, :ok, heading] : [heading, level, :incorrect_order, heading]
-        end
-        expect(comparison).to eq expected_result
-      end
-    end
-
-    context "when some page headings are incorrectly nested" do
-      let(:page_headings) do
-        [
-          [1, "Déclaration d'accessibilité"],
-          [2, "État de conformité"],
-          [2, "Résultats des tests"],     # instead of 3
-          [4, "Contenus non accessibles"], # instead of 2
-          [3, "Non-conformités"],
-          [3, "Dérogations pour charge disproportionnée"],
-          [3, "Contenus non soumis à l'obligation d'accessibilité "],
-          [2, "Établissement de cette déclaration d'accessibilité"],
-          [3, "Technologies utilisées pour la réalisation du site"],
-          [3, "Environnement de test"],
-          [3, "Outils pour évaluer l'accessibilité"],
-          [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
-          [2, "Retour d'information et contact"],
-          [2, "Voies de recours"],
+      it "detects all errors documented in HTML comments" do
+        expected_result = [
+          ["État de conformité", 2, :ok, "État de conformité du site"],
+          ["Résultats des tests", 3, :incorrect_level, "Resultat de test"],
+          ["Contenus non accessibles", 2, :ok, "Contenu non accessible"],
+          ["Non-conformités", 3, :ok, "Non conformite"],
+          ["Dérogations pour charge disproportionnée", 3, :missing, nil],
+          ["Contenus non soumis à l'obligation d'accessibilité ", 3, :ok, "Contenus non soumis à l'obligation d'accessibilité"],
+          ["Établissement de cette déclaration d'accessibilité", 2, :ok, "Établissement de cette déclaration d'accessibilité"],
+          ["Technologies utilisées pour la réalisation du site", 3, :ok, "Technologies utilisées pour la réalisation de ce service en ligne"],
+          ["Environnement de test", 3, :missing, nil],
+          ["Outils pour évaluer l'accessibilité", 3, :missing, nil],
+          ["Pages du site ayant fait l'objet de la vérification de conformité", 3, :incorrect_level, "Pages du site ayant fait l'objet de la vérification de conformité"],
+          ["Retour d'information et contact", 2, :ok, "Retour d'information et contact"],
+          ["Voies de recours", 2, :missing, nil]
         ]
-      end
-
-      it "returns :incorrect_level status for headings with incorrect nesting" do
-        expected_result = expected_headings.map.with_index do |(level, heading), index|
-          if index == 2 || index == 3
-            [heading, level, :incorrect_level, heading]
-          else
-            [heading, level, :ok, heading]
-          end
-        end
         expect(comparison).to eq expected_result
       end
     end
+  end
 
-    context "with a mix of correct, missing, and incorrectly nested headings" do
-      let(:page_headings) do
-        [
-          [1, "Déclaration d'accessibilité"],
-          [2, "État de conformité"],
-          [2, "Résultats des tests"],           # incorrect level
-          [3, "Technologies de test"],           # incorrect text, this won't match any expected heading
-          # Missing remaining headings
-        ]
+  describe "#heading_statuses" do
+    subject(:heading_statuses) { check.heading_statuses }
+
+    before { check.data = comparison_data }
+
+    context "when comparison is empty" do
+      let(:comparison_data) { { comparison: [] } }
+
+      it "returns empty array" do
+        expect(heading_statuses).to eq []
+      end
+    end
+
+    context "when comparison has data" do
+      let(:comparison_data) do
+        {
+          comparison: [
+            ["État de conformité", 2, :ok, "État de conformité"],
+            ["Résultats des tests", 3, :incorrect_level, "Resultat de test"]
+          ]
+        }
       end
 
-      it "correctly identifies all types of issues" do
-        expected_result = expected_headings.map.with_index do |(level, heading), index|
-          case index
-          when 0, 1
-            [heading, level, :ok, heading]
-          when 2
-            [heading, level, :incorrect_level, page_headings[index][1]]
-          else
-            [heading, level, :missing, nil]
-          end
-        end
-        expect(comparison).to eq expected_result
+      it "returns array of PageHeadingStatus objects" do
+        expect(heading_statuses).to all(be_a(PageHeadingStatus))
+        expect(heading_statuses.length).to eq 2
+      end
+
+      it "correctly maps comparison data to PageHeadingStatus objects" do
+        heading_status = heading_statuses[0]
+        expect(heading_status.expected_heading).to eq "État de conformité"
+        expect(heading_status.expected_level).to eq 2
+        expect(heading_status.status).to eq "ok"
+        expect(heading_status.actual_heading).to eq "État de conformité"
+        expect(heading_status.ok?).to be true
+        expect(heading_status.error?).to be false
+
+        heading_status = heading_statuses[1]
+        expect(heading_status.expected_heading).to eq "Résultats des tests"
+        expect(heading_status.expected_level).to eq 3
+        expect(heading_status.status).to eq "incorrect_level"
+        expect(heading_status.actual_heading).to eq "Resultat de test"
+        expect(heading_status.ok?).to be false
+        expect(heading_status.error?).to be true
       end
     end
   end
@@ -171,7 +120,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
     before { check.data = comparison_data }
 
     context "when comparison is empty" do
-      let(:comparison_data) { {} }
+      let(:comparison_data) { { comparison: [] } }
 
       it "returns 0" do
         expect(success_count).to eq 0
@@ -188,7 +137,11 @@ RSpec.describe Checks::AccessibilityPageHeading do
       end
 
       it "returns total count" do
-        expect(success_count).to eq 14
+        expect(success_count).to eq described_class::EXPECTED_HEADINGS.size
+      end
+
+      it "has no failures" do
+        expect(check.failures.count).to eq 0
       end
     end
 
@@ -196,16 +149,19 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) do
         {
           comparison: [
-            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
             ["État de conformité", 2, :ok, "État de conformité"],
             ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"], # error
-            *described_class::EXPECTED_HEADINGS[3..-1].map { |level, heading| [heading, level, :missing, nil] }
+            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :missing, nil] }
           ]
         }
       end
 
       it "returns total minus failures count" do
-        expect(success_count).to eq 2
+        expect(success_count).to eq 1
+      end
+
+      it "counts failures correctly" do
+        expect(check.failures.count).to eq 12
       end
     end
   end

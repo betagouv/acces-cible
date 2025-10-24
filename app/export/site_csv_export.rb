@@ -12,6 +12,8 @@ class SiteCsvExport < CsvExport
       Checks::AnalyzeAccessibilityPage.human(:compliance_rate) => [:audit, :analyze_accessibility_page, :human_compliance_rate],
       Checks::AnalyzeAccessibilityPage.human(:audit_date) => [:audit, :analyze_accessibility_page, :audit_date],
       Checks::AnalyzeAccessibilityPage.human(:audit_update_date) => [:audit, :analyze_accessibility_page, :audit_update_date],
+      Checks::AnalyzeSchema.human(:type) => [:audit, :analyze_schema, :link_url],
+      Checks::AnalyzePlan.human(:type) => [:audit, :analyze_plan, :link_url],
       Checks::AccessibilityPageHeading.human(:type) => [:audit, :accessibility_page_heading, :human_success_rate],
       Checks::RunAxeOnHomepage.human(:success_rate) => [:audit, :run_axe_on_homepage, :human_success_rate],
     }

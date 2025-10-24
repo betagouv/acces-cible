@@ -1,0 +1,42 @@
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge to_badge(check) %>
+
+  <% if check.completed? %>
+    <ul>
+      <% if check.link_url %>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:link_text) %> :</strong>
+          <%= check.link_text %>
+        </li>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:link_url) %> :</strong>
+          <%= link_to check.link_url, check.link_url, target: :_blank %>
+          <% if !check.reachable %>
+            <br><%= Checks::AnalyzePlan.human(:link_unreachable) %>
+          <% end %>
+          <% if check.link_misplaced %>
+            <br><%= Checks::AnalyzePlan.human(:link_misplaced) %>
+          <% end %>
+        </li>
+      <% elsif check.page_heading %>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:plan_in_page_heading) %> :</strong>
+          <%= check.page_heading %>
+        </li>
+      <% else %>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:nothing_found) %></strong>
+        </li>
+      <% end %>
+      <li>
+        <strong><%= Checks::AnalyzePlan.human(:years) %> :</strong>
+        <% if check.years.present? %>
+          <%= check.years.join("-") %>
+        <% else %>
+          <%= Checks::AnalyzePlan.human(:year_not_found) %>
+        <% end %>
+      </li>
+    </ul>
+  <% end %>
+</div>
