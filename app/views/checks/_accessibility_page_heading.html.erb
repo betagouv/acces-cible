@@ -27,7 +27,9 @@
             <%= heading_status.expected_heading %>
             <code>&lt;/h<%= heading_status.expected_level %>&gt;</code>
           </strong>
-          (<%= heading_status.message %>)
+          <% unless heading_status.ok? %>
+            (<%= heading_status.message %>)
+          <% end %>
           <% if heading_status.fuzzy_match? %>
             <p class="fr-ml-4w fr-mb-0">
               <%= check.human(:retained) %>
