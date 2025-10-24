@@ -143,7 +143,7 @@ fr:
         expectations: "Voici la hiérarchie attendue :"
         explanation:
           zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
-          one: "Un seul problème relevé sur %{total} titres atendus (%{error})."
+          one: "Un seul problème relevé sur %{total} titres attendus (%{error})."
           other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
       checks/accessibility_page_heading/statuses:
         ok: valide

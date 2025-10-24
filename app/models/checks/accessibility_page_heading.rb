@@ -3,22 +3,21 @@ module Checks
     PRIORITY = 22
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     EXPECTED_HEADINGS = [
-      [1, "Déclaration d'accessibilité"],
-        [2, "État de conformité"],
-          [3, "Résultats des tests"],
-        [2, "Contenus non accessibles"],
-          [3, "Non-conformités"],
-          [3, "Dérogations pour charge disproportionnée"],
-          [3, "Contenus non soumis à l'obligation d'accessibilité "],
-        [2, "Établissement de cette déclaration d'accessibilité"],
-          [3, "Technologies utilisées pour la réalisation du site"],
-          [3, "Environnement de test"],
-          [3, "Outils pour évaluer l'accessibilité"],
-          [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
-        [2, "Retour d'information et contact"],
-        [2, "Voies de recours"],
+      [2, "État de conformité"],
+        [3, "Résultats des tests"],
+      [2, "Contenus non accessibles"],
+        [3, "Non-conformités"],
+        [3, "Dérogations pour charge disproportionnée"],
+        [3, "Contenus non soumis à l'obligation d'accessibilité "],
+      [2, "Établissement de cette déclaration d'accessibilité"],
+        [3, "Technologies utilisées pour la réalisation du site"],
+        [3, "Environnement de test"],
+        [3, "Outils pour évaluer l'accessibilité"],
+        [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
+      [2, "Retour d'information et contact"],
+      [2, "Voies de recours"],
     ].freeze
-    COMPARISON_OPTIONS = { partial: true, fuzzy: 0.65, ignore_case: true }.freeze
+    COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
 
     delegate :expected_headings, to: :class
 
@@ -28,10 +27,10 @@ module Checks
 
     store_accessor :data, :page_headings, :comparison
 
-    def tooltip? = audit.pending? && comparison.empty?
-    def comparison = @comparison ||= super&.map { PageHeadingStatus.new(*it) } || []
+    def tooltip? = audit.pending? || heading_statuses.empty?
+    def heading_statuses = @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
     def total = expected_headings.count
-    def failures = comparison.filter { it.error? }
+    def failures = heading_statuses.filter { it.error? }
     def success_count = comparison.empty? ? 0 : total - failures.count
     def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
     def human_success_rate = comparison.empty? ? "" : "#{success_count}/#{total}"
@@ -71,9 +70,9 @@ module Checks
       # Two-pass approach: first match all headings, then determine status
       expected_to_actual = {}
 
-      # First pass: find best matches for each expected heading without order constraints
+      # First pass: find best matches for each expected heading, avoiding "stealing" exact matches
       indexed_expected_headings.each do |(expected_index, expected_heading, expected_level)|
-        best_match = find_unconstrained_best_match(expected_heading, expected_to_actual.values)
+        best_match = find_unconstrained_best_match(expected_heading, expected_index, expected_to_actual.values)
         expected_to_actual[expected_index] = best_match if best_match
       end
 
@@ -101,7 +100,7 @@ module Checks
       end
     end
 
-    def find_unconstrained_best_match(expected_heading, already_matched)
+    def find_unconstrained_best_match(expected_heading, current_expected_index, already_matched)
       best_match = nil
       best_score = 0
 
@@ -122,35 +121,23 @@ module Checks
       best_match
     end
 
-    def find_best_match(expected_heading, candidates)
-      candidates
-        .map { |index, heading, level| [heading, level, index, similarity_ratio(expected_heading, heading)] }
-        .select { |_, _, _, score| score >= COMPARISON_OPTIONS[:fuzzy] }
-        .max_by { |_, _, _, score| score }
-        &.first(3)
-    end
-
     def first_heading_offset
       @first_heading_offset ||= begin
-        if page_headings.empty?
-          0
-        else
-          matches = []
+        matches = []
 
-          indexed_expected_headings.each do |_, expected_heading, expected_level|
-            indexed_page_headings.each do |_, page_heading, page_level|
-              score = similarity_ratio(expected_heading, page_heading, partial: false)
+        indexed_expected_headings.each do |_, expected_heading, expected_level|
+          indexed_page_headings.each do |_, page_heading, page_level|
+            score = similarity_ratio(expected_heading, page_heading, partial: false)
 
-              if score >= COMPARISON_OPTIONS[:fuzzy]
-                matches << [expected_level, page_level, score]
-              end
+            if score >= COMPARISON_OPTIONS[:fuzzy]
+              matches << [expected_level, page_level, score]
             end
           end
-          return 0 if matches.empty?
-
-          expected_level, page_level, _ = matches.max_by { |_, _, score| score }
-          page_level - expected_level
         end
+        return 0 if matches.empty?
+
+        expected_level, page_level, _ = matches.max_by { |_, _, score| score }
+        page_level - expected_level
       end
     end
 

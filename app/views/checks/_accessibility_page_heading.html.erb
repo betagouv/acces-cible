@@ -13,15 +13,23 @@
   </p>
   <ul class="fr-raw-list fr-mt-2w">
     <% if check.completed? && check.comparison.present? %>
-      <% check.comparison.each do |heading_status| %>
+      <% check.heading_statuses.each do |heading_status| %>
         <li class="fr-mb-2w">
-          <%= heading_status.ok? ? icon(:checkbox, line: true, class: "fr-mr-1v fr-label--success") : icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
+          <% if heading_status.ok? %>
+            <%= icon(:checkbox, class: "fr-mr-1v fr-label--success") %>
+          <% elsif heading_status.warning? %>
+            <%= icon(:warning, class: "fr-mr-1v fr-label--error") %>
+          <% else %>
+            <%= icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
+          <% end %>
           <strong>
             <code>&lt;h<%= heading_status.expected_level %>&gt;</code>
             <%= heading_status.expected_heading %>
             <code>&lt;/h<%= heading_status.expected_level %>&gt;</code>
           </strong>
-          (<%= heading_status.message %>)
+          <% unless heading_status.ok? %>
+            (<%= heading_status.message %>)
+          <% end %>
           <% if heading_status.fuzzy_match? %>
             <p class="fr-ml-4w fr-mb-0">
               <%= check.human(:retained) %>
