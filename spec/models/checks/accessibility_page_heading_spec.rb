@@ -21,7 +21,8 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "returns array of headings with :ok status" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
-          actual_page_heading = page_headings[index].last
+          # Skip the first page heading since we start at État de conformité (H2)
+          actual_page_heading = page_headings[index + 1].last
           [heading, level, :ok, actual_page_heading]
         end
         expect(comparison).to eq expected_result
@@ -33,7 +34,8 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "returns :ok status for all headings (ignores start level difference)" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
-          shifted_heading = page_headings[index + 1].last
+          # Skip the first page heading since we start at État de conformité (H2)
+          shifted_heading = page_headings[index + 2].last
           [heading, level, :ok, shifted_heading]
         end
         expect(comparison).to eq expected_result
@@ -45,7 +47,6 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "detects all errors documented in HTML comments" do
         expected_result = [
-          ["Déclaration d'accessibilité", 1, :ok, "DECLARATION d'accessibilité"],
           ["État de conformité", 2, :ok, "État de conformité du site"],
           ["Résultats des tests", 3, :incorrect_level, "Resultat de test"],
           ["Contenus non accessibles", 2, :ok, "Contenu non accessible"],
@@ -82,8 +83,8 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) do
         {
           comparison: [
-            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
-            ["État de conformité", 2, :incorrect_level, "État de conformité"]
+            ["État de conformité", 2, :ok, "État de conformité"],
+            ["Résultats des tests", 3, :incorrect_level, "Resultat de test"]
           ]
         }
       end
@@ -95,18 +96,18 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
       it "correctly maps comparison data to PageHeadingStatus objects" do
         heading_status = heading_statuses[0]
-        expect(heading_status.expected_heading).to eq "Déclaration d'accessibilité"
-        expect(heading_status.expected_level).to eq 1
+        expect(heading_status.expected_heading).to eq "État de conformité"
+        expect(heading_status.expected_level).to eq 2
         expect(heading_status.status).to eq "ok"
-        expect(heading_status.actual_heading).to eq "Déclaration d'accessibilité"
+        expect(heading_status.actual_heading).to eq "État de conformité"
         expect(heading_status.ok?).to be true
         expect(heading_status.error?).to be false
 
         heading_status = heading_statuses[1]
-        expect(heading_status.expected_heading).to eq "État de conformité"
-        expect(heading_status.expected_level).to eq 2
+        expect(heading_status.expected_heading).to eq "Résultats des tests"
+        expect(heading_status.expected_level).to eq 3
         expect(heading_status.status).to eq "incorrect_level"
-        expect(heading_status.actual_heading).to eq "État de conformité"
+        expect(heading_status.actual_heading).to eq "Resultat de test"
         expect(heading_status.ok?).to be false
         expect(heading_status.error?).to be true
       end
@@ -136,7 +137,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
       end
 
       it "returns total count" do
-        expect(success_count).to eq 14
+        expect(success_count).to eq described_class::EXPECTED_HEADINGS.size
       end
 
       it "has no failures" do
@@ -148,16 +149,15 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) do
         {
           comparison: [
-            ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
             ["État de conformité", 2, :ok, "État de conformité"],
             ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"], # error
-            *described_class::EXPECTED_HEADINGS[3..-1].map { |level, heading| [heading, level, :missing, nil] }
+            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :missing, nil] }
           ]
         }
       end
 
       it "returns total minus failures count" do
-        expect(success_count).to eq 2
+        expect(success_count).to eq 1
       end
 
       it "counts failures correctly" do
