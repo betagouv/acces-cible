@@ -52,7 +52,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
           ["Contenus non accessibles", 2, :ok, "Contenu non accessible"],
           ["Non-conformités", 3, :ok, "Non conformite"],
           ["Dérogations pour charge disproportionnée", 3, :missing, nil],
-          ["Contenus non soumis à l'obligation d'accessibilité ", 3, :ok, "Contenus non soumis à l'obligation d'accessibilité"],
+          ["Contenus non soumis à l'obligation d'accessibilité", 3, :ok, "Contenus non soumis à l'obligation d'accessibilité"],
           ["Établissement de cette déclaration d'accessibilité", 2, :ok, "Établissement de cette déclaration d'accessibilité"],
           ["Technologies utilisées pour la réalisation du site", 3, :ok, "Technologies utilisées pour la réalisation de ce service en ligne"],
           ["Environnement de test", 3, :missing, nil],

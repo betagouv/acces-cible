@@ -8,7 +8,7 @@ module Checks
       [2, "Contenus non accessibles"],
         [3, "Non-conformités"],
         [3, "Dérogations pour charge disproportionnée"],
-        [3, "Contenus non soumis à l'obligation d'accessibilité "],
+        [3, "Contenus non soumis à l'obligation d'accessibilité"],
       [2, "Établissement de cette déclaration d'accessibilité"],
         [3, "Technologies utilisées pour la réalisation du site"],
         [3, "Environnement de test"],
