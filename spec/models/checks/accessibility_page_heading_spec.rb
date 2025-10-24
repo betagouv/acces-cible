@@ -3,6 +3,45 @@ require "rails_helper"
 RSpec.describe Checks::AccessibilityPageHeading do
   let(:check) { described_class.new }
 
+  describe "#analyze!" do
+    subject(:analyze) { check.send(:analyze!) }
+
+    let(:audit) { create(:audit) }
+    let(:page) do
+      html = file_fixture("declarations/valid.html").read
+      Page.new(url: "http://example.com", html:)
+    end
+
+    before do
+      check.audit = audit
+      allow(audit).to receive(:page).with(:accessibility).and_return(page)
+    end
+
+    it "returns page_headings and comparison data" do
+      result = analyze
+
+      expect(result).to be_a(Hash)
+      expect(result[:page_headings]).to be_an(Array)
+      expect(result[:comparison]).to be_an(Array)
+    end
+
+    it "correctly analyzes headings without accessing stored data" do
+      # This test ensures analyze! works on a fresh check with no stored data
+      result = analyze
+
+      # Should detect headings from the page
+      expect(result[:page_headings].count).to be > 0
+
+      # Should have valid comparison results (not all missing)
+      comparison = result[:comparison]
+      matched_count = comparison.count { |(_, _, status, _)| status == :ok }
+
+      # For valid.html, we expect most headings to match
+      expect(matched_count).to be > 0
+      expect(matched_count).to eq described_class::EXPECTED_HEADINGS.size
+    end
+  end
+
   describe "#compare_headings" do
     subject(:comparison) { check.send(:compare_headings) }
 
