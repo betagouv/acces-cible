@@ -13,10 +13,10 @@
           <strong><%= Checks::AnalyzePlan.human(:link_url) %> :</strong>
           <%= link_to check.link_url, check.link_url, target: :_blank %>
           <% if !check.reachable %>
-            <p><strong><%= Checks::AnalyzePlan.human(:link_unreachable) %> :</strong></p>
+            <br><%= Checks::AnalyzePlan.human(:link_unreachable) %>
           <% end %>
           <% if check.link_misplaced %>
-            <p><strong><%= Checks::AnalyzePlan.human(:link_misplaced) %></strong></p>
+            <br><%= Checks::AnalyzePlan.human(:link_misplaced) %>
           <% end %>
         </li>
       <% elsif check.page_heading %>
