@@ -100,10 +100,11 @@ RSpec.describe Checks::FindAccessibilityPage do
 
     let(:page) { build(:page, headings:, body: "") }
     let(:expected_headings) { Checks::AccessibilityPageHeading.expected_headings }
+    let(:unrelated_headings) { ["Contact", "Accueil", "Actualités"] }
 
     [0, 2, 3, 6].each do |i|
       context "when #{i} required headings are present" do
-        let(:headings) { expected_headings.first(i) }
+        let(:headings) { unrelated_headings + expected_headings.first(i) }
 
         it { should eq(i >= described_class::REQUIRED_DECLARATION_HEADINGS) }
       end

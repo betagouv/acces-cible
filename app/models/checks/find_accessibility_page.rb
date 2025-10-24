@@ -35,7 +35,7 @@ module Checks
 
     def required_headings_present?(current_page)
       matching_headings = current_page.headings.select do |heading|
-        AccessibilityPageHeading.expected_headings.each do |required_heading|
+        AccessibilityPageHeading.expected_headings.any? do |required_heading|
           fuzzy_match?(heading, required_heading)
         end
       end
