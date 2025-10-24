@@ -12,9 +12,14 @@
         <strong><%= Checks::AnalyzeSchema.human(:link_url) %> :</strong>
         <%= link_to check.link_url, check.link_url, target: :_blank %>
       </li>
+      <% if check.link_misplaced %>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:link_misplaced) %></strong>
+        </li>
+      <% end %>
       <li>
         <strong><%= Checks::AnalyzeSchema.human(:years) %> :</strong>
-        <% if check.years %>
+        <% if check.years.present? %>
           <%= check.years.join("-") %>
         <% else %>
           <%= Checks::AnalyzeSchema.human(:year_not_found) %>

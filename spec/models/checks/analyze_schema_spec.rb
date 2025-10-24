@@ -14,10 +14,10 @@ RSpec.describe Checks::AnalyzeSchema do
       end
     end
 
-    context "when find_link returns nil" do
+    context "when find_link and find_page_heading both return nil" do
       it "returns nil" do
-        page = build(:page, html: "<html><body></body></html>")
-        allow(check).to receive_messages(page:, find_link: nil)
+        page = build(:page, links: ["invalid link"], headings: [])
+        allow(check).to receive(:page).and_return(page)
 
         expect(analyze).to be_nil
       end
@@ -26,7 +26,7 @@ RSpec.describe Checks::AnalyzeSchema do
     context "when a link is found" do
       let(:year) { Time.current.year }
 
-      it "returns a hash containing link_url, link_text, years, reachable, and valid_years" do
+      it "returns a hash containing link_url, link_text, years, reachable, valid_years, and link_misplaced" do
         page = build(:page, html: "<html><body></body></html>")
         link = Link.new(href: "schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{year - 1}-#{year + 1}")
         allow(check).to receive_messages(page:, find_link: link)
@@ -35,9 +35,30 @@ RSpec.describe Checks::AnalyzeSchema do
         expect(analyze).to include(
           link_url: link.href,
           link_text: link.text,
+          link_misplaced: true,
           years: [year - 1, year + 1],
           reachable: true,
-          valid_years: true
+          valid_years: true,
+          page_heading: nil
+        )
+      end
+    end
+
+    context "when find_link returns nil but find_page_heading matches" do
+      let(:year) { Time.current.year }
+
+      it "returns a hash with page_heading and extracted years" do
+        page = build(:page, links: [], headings: ["Schéma pluriannuel d'accessibilité #{year}"])
+        allow(check).to receive(:page).and_return(page)
+
+        expect(analyze).to include(
+          link_url: nil,
+          link_text: nil,
+          link_misplaced: nil,
+          years: [year],
+          reachable: nil,
+          valid_years: true,
+          page_heading: "Schéma pluriannuel d'accessibilité #{year}"
         )
       end
     end
@@ -125,6 +146,102 @@ RSpec.describe Checks::AnalyzeSchema do
     end
   end
 
+  describe "#link_between_headings?" do
+    subject(:link_between_headings) { check.link_between_headings? }
+
+    context "when link is between the correct headings" do
+      it "returns the link" do
+        link_text = "Schéma pluriannuel d'accessibilité 2024-2026"
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <a href="schema.pdf">#{link_text}</a>
+            <h2>État de conformité</h2>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(check).to receive(:page).and_return(page)
+
+        expect(link_between_headings.text).to eq(link_text)
+      end
+    end
+
+    context "when link is not between the correct headings" do
+      it "returns nil" do
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <h2>État de conformité</h2>
+            <a href="schema.pdf">Schéma pluriannuel d'accessibilité 2024-2026</a>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(check).to receive(:page).and_return(page)
+
+        expect(link_between_headings).to be_nil
+      end
+    end
+
+    context "when there is no page" do
+      it "returns nil" do
+        allow(check).to receive(:page).and_return(nil)
+
+        expect(link_between_headings).to be_nil
+      end
+    end
+
+    context "when multiple links match between headings" do
+      it "returns the link with the highest years" do
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <a href="schema2020.pdf">Schéma pluriannuel d'accessibilité 2020-2022</a>
+            <a href="schema2023.pdf">Schéma pluriannuel d'accessibilité 2023-2025</a>
+            <a href="schema2021.pdf">Schéma pluriannuel d'accessibilité 2021</a>
+            <h2>État de conformité</h2>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(check).to receive(:page).and_return(page)
+
+        expect(link_between_headings.text).to eq("Schéma pluriannuel d'accessibilité 2023-2025")
+      end
+    end
+  end
+
+  describe "#find_page_heading" do
+    subject(:find_page_heading) { check.find_page_heading }
+
+    let(:page) { build(:page, headings: [heading]) }
+
+    before { allow(check).to receive(:page).and_return(page) }
+
+    context "when heading matches pattern" do
+      let(:heading) { "Schéma pluriannuel d'accessibilité" }
+
+      it "finds the heading" do
+        expect(find_page_heading).to eq(heading)
+      end
+    end
+
+    context "when heading does not match pattern" do
+      let(:heading) { "Plan d'accessibilité" }
+
+      it "returns nil" do
+        expect(find_page_heading).to be_nil
+      end
+    end
+  end
+
   describe "#extract_years" do
     {
       "Schéma pluriannuel d'accessibilité" => [],
@@ -181,9 +298,17 @@ RSpec.describe Checks::AnalyzeSchema do
       end
     end
 
-    context "when link is not found" do
+    context "when schema is in page heading" do
+      it "returns warning" do
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, page_heading: "Schéma pluriannuel")
+
+        expect(custom_badge_status).to eq(:warning)
+      end
+    end
+
+    context "when link is not found and page_heading is nil" do
       it "returns error" do
-        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false)
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, page_heading: nil)
 
         expect(custom_badge_status).to eq(:error)
       end
@@ -209,9 +334,17 @@ RSpec.describe Checks::AnalyzeSchema do
       end
     end
 
-    context "when link is not found" do
+    context "when schema is in page heading" do
+      it "returns human(:schema_in_page_heading)" do
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, page_heading: "Schéma pluriannuel")
+
+        expect(custom_badge_text).to eq(check.human(:schema_in_page_heading))
+      end
+    end
+
+    context "when link is not found and page_heading is nil" do
       it "returns human(:link_not_found)" do
-        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false)
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, page_heading: nil)
 
         expect(custom_badge_text).to eq(check.human(:link_not_found))
       end

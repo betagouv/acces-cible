@@ -8,7 +8,7 @@ module Checks
     # - "schéma annuel d'accessibilité"
     # - "schéma d'accessibilité numérique/pluriannuel"
     # - "accessibilité numérique — schéma annuel" (with various dash types)
-    LINK_PATTERN = /
+    SCHEMA_PATTERN = /
       sch[eé]ma\s+
       (?:
         pluri-?annuel\s+(?:de\s+(?:mise\s+en\s+|l['’])?|d['’])accessibilit[eé](?:\s+num[eé]rique)?|
@@ -19,14 +19,30 @@ module Checks
       accessibilit[eé]\s+num[eé]rique\s+[—–-]\s+sch[eé]ma\s+annuel
     /xi
 
-    store_accessor :data, :link_url, :link_text, :years, :reachable, :valid_years
+    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_years, :page_heading
 
     def find_link
       return unless page
 
-      page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
-        .select { |link| link.text.match? LINK_PATTERN }
+      page.links(skip_files: false, scope: :main)
+        .select { |link| link.text.match? SCHEMA_PATTERN }
         .max_by { |link| extract_years(link.text) }
+    end
+
+    def link_between_headings?
+      return unless page
+
+      page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
+        .select { |link| link.text.match? SCHEMA_PATTERN }
+        .max_by { |link| extract_years(link.text) }
+    end
+
+    def find_page_heading
+      return unless page
+
+      page.headings.find do |heading|
+        heading.match? SCHEMA_PATTERN
+      end
     end
 
     def all_passed? = link_url && valid_years && reachable
@@ -35,7 +51,7 @@ module Checks
     def custom_badge_status
       if all_passed?
         :success
-      elsif valid_link?
+      elsif valid_link? || page_heading
         :warning
       else
         :error
@@ -47,6 +63,8 @@ module Checks
         human(:all_passed)
       elsif valid_link?
         human(:invalid_years)
+      elsif page_heading
+        human(:schema_in_page_heading)
       else
         human(:link_not_found)
       end
@@ -57,15 +75,23 @@ module Checks
     private
 
     def analyze!
-      return unless link = find_link
+      link = find_link
+      page_heading = find_page_heading unless link
+      return unless link || page_heading
 
-      years = extract_years(link.text)
+      years = if link
+        extract_years(link.text)
+      else
+        extract_years(page_heading)
+      end
       {
         years:,
-        link_url: link.href,
-        link_text: link.text,
+        link_url: link&.href,
+        link_text: link&.text,
+        link_misplaced: link ? !link_between_headings? : nil,
         valid_years: validate_years(years),
-        reachable: Browser.reachable?(link.href)
+        reachable: Browser.reachable?(link&.href),
+        page_heading:
       }
     end
 

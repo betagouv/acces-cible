@@ -92,7 +92,10 @@ class Browser
         .headers(request_headers)
         .timeout(connect: 3, read: 3)
         .follow(max_hops: 3)
-        .head(url)
+        .head(url, ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE })
+      # Disable SSL because some websites provide CRLs via HTTP,
+      # which OpenSSL ignores, throwing connection failure.
+      # Harmless for head requests.
 
       {
         status: response.code || 0,

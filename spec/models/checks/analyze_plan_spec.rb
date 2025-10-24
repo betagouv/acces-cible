@@ -27,7 +27,7 @@ RSpec.describe Checks::AnalyzePlan do
     context "when a link is found" do
       let(:year) { Time.current.year }
 
-      it "returns a hash containing link_url, link_text, years, reachable, and valid_year" do
+      it "returns a hash containing link_url, link_text, years, reachable, valid_year, and link_misplaced" do
         link = Link.new(href: "https://www.example.com/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
         page_html = <<~HTML
           <!DOCTYPE html>
@@ -46,6 +46,7 @@ RSpec.describe Checks::AnalyzePlan do
         expect(analyze).to include(
           link_url: link.href,
           link_text: link.text,
+          link_misplaced: false,
           years: [year],
           reachable: true,
           valid_year: true,
@@ -64,6 +65,7 @@ RSpec.describe Checks::AnalyzePlan do
         expect(analyze).to include(
           link_url: nil,
           link_text: nil,
+          link_misplaced: nil,
           years: [year],
           reachable: nil,
           valid_year: true,
@@ -147,6 +149,78 @@ RSpec.describe Checks::AnalyzePlan do
 
       it "returns the link with the highest years" do
         expect(find_link.text).to eq("Plan annuel d'accessibilité 2023-2025")
+      end
+    end
+  end
+
+  describe "#link_between_headings?" do
+    subject(:link_between_headings) { check.link_between_headings? }
+
+    context "when link is between the correct headings" do
+      it "returns the link" do
+        link_text = "Plan annuel d'accessibilité 2024"
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <a href="plan.pdf">#{link_text}</a>
+            <h2>État de conformité</h2>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(audit).to receive(:page).with(:accessibility).and_return(page)
+
+        expect(link_between_headings.text).to eq(link_text)
+      end
+    end
+
+    context "when link is not between the correct headings" do
+      it "returns nil" do
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <h2>État de conformité</h2>
+            <a href="plan.pdf">Plan annuel d'accessibilité 2024</a>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(audit).to receive(:page).with(:accessibility).and_return(page)
+
+        expect(link_between_headings).to be_nil
+      end
+    end
+
+    context "when there is no page" do
+      it "returns nil" do
+        allow(audit).to receive(:page).with(:accessibility).and_return(nil)
+
+        expect(link_between_headings).to be_nil
+      end
+    end
+
+    context "when multiple links match between headings" do
+      it "returns the link with the highest years" do
+        page_html = <<~HTML
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Déclaration d'accessibilité</h1>
+            <a href="plan2020.pdf">Plan annuel d'accessibilité 2020</a>
+            <a href="plan2024.pdf">Plan annuel d'accessibilité 2024</a>
+            <a href="plan2021.pdf">Plan annuel d'accessibilité 2021</a>
+            <h2>État de conformité</h2>
+          </body>
+          </html>
+        HTML
+        page = build(:page, html: page_html)
+        allow(audit).to receive(:page).with(:accessibility).and_return(page)
+
+        expect(link_between_headings.text).to eq("Plan annuel d'accessibilité 2024")
       end
     end
   end

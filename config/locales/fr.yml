@@ -169,9 +169,12 @@ fr:
         year_not_found: non détectées
         link_text: Intitulé du lien
         link_url: Adresse du lien
+        link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
         invalid_years: Années invalides
+        page_heading: Titre de page
+        schema_in_page_heading: Schéma trouvé dans un titre de page
       checks/analyze_plan:
         type: Plan d'action
         table_header: Plan d'action
@@ -179,6 +182,7 @@ fr:
         year_not_found: non détectée
         link_text: Intitulé du lien
         link_url: Adresse du lien
+        link_misplaced: Le lien est trouvé, mais il devrait se trouver avant le titre "État de conformité"
         link_not_found: Lien non trouvé
         all_passed: Lien trouvé et valide
         invalid_year: Année(s) invalide(s)

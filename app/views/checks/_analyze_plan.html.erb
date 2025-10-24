@@ -12,10 +12,15 @@
         <strong><%= Checks::AnalyzePlan.human(:link_url) %> :</strong>
         <%= link_to check.link_url, check.link_url, target: :_blank %>
       </li>
+      <% if check.link_misplaced %>
+        <li>
+          <strong><%= Checks::AnalyzePlan.human(:link_misplaced) %></strong>
+        </li>
+      <% end %>
       <li>
-        <strong><%= Checks::AnalyzePlan.human(:year) %> :</strong>
-        <% if check.year %>
-          <%= check.year %>
+        <strong><%= Checks::AnalyzePlan.human(:years) %> :</strong>
+        <% if check.years.present? %>
+          <%= check.years.join("-") %>
         <% else %>
           <%= Checks::AnalyzePlan.human(:year_not_found) %>
         <% end %>
