@@ -57,7 +57,7 @@ RSpec.describe Page do
 
   describe "#path" do
     it "returns the path portion of the URL" do
-      expect(page.path).to eq("about/")
+      expect(page.path).to eq("about")
     end
 
     context "when URL is the root URL" do
