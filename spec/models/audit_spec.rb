@@ -207,7 +207,8 @@ RSpec.describe Audit do
   describe "#create_checks" do
     subject(:create_checks) { audit.create_checks }
 
-    let(:audit) { build(:audit) }
+    let!(:site) { create(:site) }
+    let(:audit) { build(:audit, site:) }
 
     it "creates all check types" do
       expect { create_checks }.to change(Check, :count).by(Check.types.size)
@@ -220,7 +221,8 @@ RSpec.describe Audit do
   end
 
   describe "after_create callback" do
-    let(:audit) { build(:audit) }
+    let!(:site) { create(:site) }
+    let(:audit) { build(:audit, site:) }
 
     it "calls create_checks when audit is created" do
       expect(audit).to receive(:create_checks).and_call_original

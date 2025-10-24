@@ -13,15 +13,31 @@ RSpec.describe Site do
 
     it { should have_many(:site_tags).dependent(:destroy) }
     it { should have_many(:tags).through(:site_tags) }
+
+    describe "destroying site with many audits" do
+      it "successfully destroys site and associated audits and checks" do
+        site = create(:site)
+        create(:audit, site:)
+        site.reload
+        checks_count = site.audits.collect { |audit| audit.checks.size }.flatten.sum
+
+        expect { site.destroy }.to change(described_class, :count).by(-1)
+          .and change(Audit, :count).by(-2) # Initial audit + newly-created one
+          .and change(Check, :count).by(-checks_count)
+      end
+    end
   end
 
   describe "delegations" do
     it { should delegate_method(:url).to(:audit) }
 
-    it "delegates to the most recent audit" do
-      site = create(:audit, url: "https://example.com").site
-      new_audit = create(:audit, site:, url: "https://new-example.com")
-      expect(site.reload.url).to eq(new_audit.url)
+    it "delegates to the current or most recent audit" do
+      site = create(:site)
+      old_audit = site.audits.first
+      old_audit.update!(current: false)
+      new_audit = create(:audit, :current, site:, url: "https://new-example.com")
+      site.reload
+      expect(site.url).to eq(new_audit.url)
     end
   end
 
