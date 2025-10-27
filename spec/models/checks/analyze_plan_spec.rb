@@ -15,9 +15,9 @@ RSpec.describe Checks::AnalyzePlan do
       end
     end
 
-    context "when find_link and find_page_heading both return nil" do
+    context "when find_link and find_text_in_main both return nil" do
       it "returns nil" do
-        page = build(:page, links: ["invalid link"], headings: [])
+        page = build(:page, body: "<p>Text that doesn't match</p>")
         allow(audit).to receive(:page).with(:accessibility).and_return(page)
 
         expect(analyze).to be_nil
@@ -50,16 +50,16 @@ RSpec.describe Checks::AnalyzePlan do
           years: [year],
           reachable: true,
           valid_year: true,
-          page_heading: nil
+          text: nil
         )
       end
     end
 
-    context "when find_link returns nil but find_page_heading matches" do
+    context "when find_link returns nil but find_text_in_main matches" do
       let(:year) { Time.current.year }
 
-      it "returns a hash with page_heading and extracted years" do
-        page = build(:page, links: [], headings: ["Plan annuel d'accessibilité #{year}"])
+      it "returns a hash with text and extracted years" do
+        page = build(:page, body: "<p>Plan annuel d'accessibilité #{year}</p>")
         allow(audit).to receive(:page).with(:accessibility).and_return(page)
 
         expect(analyze).to include(
@@ -69,7 +69,7 @@ RSpec.describe Checks::AnalyzePlan do
           years: [year],
           reachable: nil,
           valid_year: true,
-          page_heading: "Plan annuel d'accessibilité #{year}"
+          text: "Plan annuel d'accessibilité #{year}"
         )
       end
     end
@@ -108,6 +108,8 @@ RSpec.describe Checks::AnalyzePlan do
         "Plan d'actions",
         "PLAN D'ACTION 2025",
         "PLAN D'ACTIONS 2025",
+        "Plan 2025 d'action",
+        "Plan 2025 d'actions",
       ].each do |text|
         context "with '#{text}'" do
           let(:links) { [text] }
@@ -258,7 +260,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when all passed" do
       it "returns :success" do
-        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, page_heading: nil)
+        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, text: nil)
 
         expect(custom_badge_status).to eq(:success)
       end
@@ -266,23 +268,23 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when link is valid but year is invalid" do
       it "returns :warning" do
-        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, page_heading: nil)
+        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, text: nil)
 
         expect(custom_badge_status).to eq(:warning)
       end
     end
 
-    context "when plan is in page heading" do
+    context "when plan is in main text" do
       it "returns :warning" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, page_heading: "Plan annuel")
+        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: "Plan annuel")
 
         expect(custom_badge_status).to eq(:warning)
       end
     end
 
-    context "when link_url is nil found and page_heading too" do
+    context "when link_url is nil found and text too" do
       it "returns :error" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, page_heading: nil)
+        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: nil)
 
         expect(custom_badge_status).to eq(:error)
       end
@@ -294,7 +296,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when all passed" do
       it "returns human(:all_passed)" do
-        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, page_heading: nil)
+        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, text: nil)
 
         expect(custom_badge_text).to eq(check.human(:all_passed))
       end
@@ -302,23 +304,23 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when link is valid but year is invalid" do
       it "returns human(:invalid_year)" do
-        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, page_heading: nil)
+        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, text: nil)
 
         expect(custom_badge_text).to eq(check.human(:invalid_year))
       end
     end
 
-    context "when plan is in page heading" do
-      it "returns human(:plan_in_page_heading)" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, page_heading: "Plan annuel")
+    context "when plan is in main text" do
+      it "returns human(:plan_in_main_text)" do
+        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: "Plan annuel")
 
-        expect(custom_badge_text).to eq(check.human(:plan_in_page_heading))
+        expect(custom_badge_text).to eq(check.human(:plan_in_main_text))
       end
     end
 
-    context "when link_url is nil found and page_heading too" do
+    context "when link_url is nil found and text too" do
       it "returns human(:link_not_found)" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, page_heading: nil)
+        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: nil)
 
         expect(custom_badge_text).to eq(check.human(:link_not_found))
       end
