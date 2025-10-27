@@ -32,8 +32,24 @@ module Checks
     def total = expected_headings.count
     def failures = heading_statuses.filter { it.error? }
     def success_count = comparison.empty? ? 0 : total - failures.count
-    def score = comparison.empty? ? 0 : (total - failures.count) / total.to_f * 100
-    def human_success_rate = comparison.empty? ? "" : "#{success_count}/#{total}"
+
+    def score
+      return 0 unless comparison.present?
+
+      points = heading_statuses.sum do |heading_status|
+        if heading_status.ok?
+          1
+        elsif heading_status.warning?
+          0.5
+        else
+          0
+        end
+      end
+
+      (points / total.to_f * 100).round(2)
+    end
+
+    def human_success_rate = comparison.present? ? to_percent(score, precision: 0) : ""
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first&.message)
     alias custom_badge_text human_success_rate
 

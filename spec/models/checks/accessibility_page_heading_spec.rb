@@ -125,8 +125,8 @@ RSpec.describe Checks::AccessibilityPageHeading do
     end
   end
 
-  describe "#success_count" do
-    subject(:success_count) { check.success_count }
+  describe "#score" do
+    subject(:score) { check.score }
 
     before { check.data = comparison_data }
 
@@ -134,11 +134,11 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) { { comparison: [] } }
 
       it "returns 0" do
-        expect(success_count).to eq 0
+        expect(score).to eq 0
       end
     end
 
-    context "when all headings are correct" do
+    context "when all headings are :ok" do
       let(:comparison_data) do
         {
           comparison: described_class::EXPECTED_HEADINGS.map do |level, heading|
@@ -147,32 +147,95 @@ RSpec.describe Checks::AccessibilityPageHeading do
         }
       end
 
-      it "returns total count" do
-        expect(success_count).to eq described_class::EXPECTED_HEADINGS.size
-      end
-
-      it "has no failures" do
-        expect(check.failures.count).to eq 0
+      it "returns 100" do
+        expect(score).to eq 100
       end
     end
 
-    context "when some headings have errors" do
+    context "when all headings are :missing" do
+      let(:comparison_data) do
+        {
+          comparison: described_class::EXPECTED_HEADINGS.map do |level, heading|
+            [heading, level, :missing, nil]
+          end
+        }
+      end
+
+      it "returns 0" do
+        expect(score).to eq 0
+      end
+    end
+
+    context "when headings have :incorrect_level" do
       let(:comparison_data) do
         {
           comparison: [
             ["État de conformité", 2, :ok, "État de conformité"],
-            ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"], # error
-            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :missing, nil] }
+            ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"],
+            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :ok, heading] }
           ]
         }
       end
 
-      it "returns total minus failures count" do
-        expect(success_count).to eq 1
+      it "applies 50% penalty for incorrect_level (1 ok + 1 incorrect_level + 11 ok = 12.5/13 = 96.15%)" do
+        expect(score).to eq 96.15
+      end
+    end
+
+    context "when headings have :incorrect_order" do
+      let(:comparison_data) do
+        {
+          comparison: [
+            ["État de conformité", 2, :ok, "État de conformité"],
+            ["Résultats des tests", 3, :incorrect_order, "Résultats des tests"],
+            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :ok, heading] }
+          ]
+        }
       end
 
-      it "counts failures correctly" do
-        expect(check.failures.count).to eq 12
+      it "applies 50% penalty for incorrect_order (1 ok + 1 incorrect_order + 11 ok = 12.5/13 = 96.15%)" do
+        expect(score).to eq 96.15
+      end
+    end
+
+    context "when headings have mixed errors" do
+      let(:comparison_data) do
+        {
+          comparison: [
+            ["État de conformité", 2, :ok, "État de conformité"],
+            ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"],
+            ["Contenus non accessibles", 2, :ok, "Contenus non accessibles"],
+            ["Non-conformités", 3, :ok, "Non-conformités"],
+            ["Dérogations pour charge disproportionnée", 3, :missing, nil],
+            ["Contenus non soumis à l'obligation d'accessibilité", 3, :ok, "Contenus non soumis à l'obligation d'accessibilité"],
+            ["Établissement de cette déclaration d'accessibilité", 2, :ok, "Établissement de cette déclaration d'accessibilité"],
+            ["Technologies utilisées pour la réalisation du site", 3, :ok, "Technologies utilisées pour la réalisation du site"],
+            ["Environnement de test", 3, :missing, nil],
+            ["Outils pour évaluer l'accessibilité", 3, :missing, nil],
+            ["Pages du site ayant fait l'objet de la vérification de conformité", 3, :incorrect_level, "Pages du site ayant fait l'objet de la vérification de conformité"],
+            ["Retour d'information et contact", 2, :ok, "Retour d'information et contact"],
+            ["Voies de recours", 2, :missing, nil]
+          ]
+        }
+      end
+
+      it "calculates weighted score (7 ok + 2 incorrect_level + 4 missing = 8/13 = 61.54%)" do
+        expect(score).to eq 61.54
+      end
+    end
+
+    context "when half headings are :ok and half are :incorrect_level" do
+      let(:comparison_data) do
+        {
+          comparison: described_class::EXPECTED_HEADINGS.map.with_index do |(level, heading), index|
+            status = index.even? ? :ok : :incorrect_level
+            [heading, level, status, heading]
+          end
+        }
+      end
+
+      it "returns 75% (7 ok + 6 incorrect_level = 7 + 3 = 10/13 = 76.92%)" do
+        expect(score).to eq 76.92
       end
     end
   end
