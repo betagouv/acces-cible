@@ -77,7 +77,7 @@ module Checks
     def analyze!
       link = find_link
       page_heading = find_page_heading unless link
-      source_text = link&.text || page_heading
+      source_text = link&.text || link&.href || page_heading
       return unless source_text
 
       years = extract_years(source_text)
