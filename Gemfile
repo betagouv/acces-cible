@@ -137,7 +137,7 @@ group :test do
   gem "webmock"
 
   # Allow testing accessibility using Axe-core. Only available in JS feature tests
-  gem "axe-core-capybara", "~> 4.9"
+  gem "axe-core-capybara", "~> 4.11"
   gem "axe-core-rspec", "~> 4.8"
-  gem "selenium-webdriver", "~> 4.35"
+  gem "selenium-webdriver", "~> 4.38"
 end
