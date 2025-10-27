@@ -55,6 +55,52 @@ RSpec.describe Page do
     allow(ferrum_browser).to receive(:quit)
   end
 
+  describe "#initialize" do
+    let(:root) { nil }
+    let(:page) { build(:page, url:, root:, html: "<html></html>") }
+
+    context "when path is empty" do
+      let(:url) { "https://example.com" }
+
+      it "sets root to domain and slash" do
+        expect(page.root).to eq("https://example.com/")
+      end
+    end
+
+    context "when url contains a file" do
+      let(:url) { "https://example.com/sitemap.xml" }
+
+      it "sets root to everything up to the last slash" do
+        expect(page.root).to eq("https://example.com/")
+      end
+    end
+
+    context "when url contains a file in a nested path" do
+      let(:url) { "https://example.com/path/to/file.pdf" }
+
+      it "sets root to the file directory path" do
+        expect(page.root).to eq("https://example.com/path/to/")
+      end
+    end
+
+    context "when url is a page without extension" do
+      let(:url) { "https://example.com/about" }
+
+      it "sets root to the path" do
+        expect(page.root).to eq("https://example.com/")
+      end
+    end
+
+    context "when root is explicitly provided" do
+      let(:url) { "https://example.com/path/to/file.pdf" }
+      let(:root) { "https://example.com/path/" }
+
+      it "uses the provided root" do
+        expect(page.root).to eq(root)
+      end
+    end
+  end
+
   describe "#path" do
     it "returns the path portion of the URL" do
       expect(page.path).to eq("about")

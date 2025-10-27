@@ -46,6 +46,15 @@ Link = Data.define(:href, :text) do
     rescue Link::InvalidUriError
       ""
     end
+
+    def with_path(href)
+      uri = parse(href)
+      return normalize(href) unless uri.path
+
+      # Keep everything up to and including the last slash
+      uri.path = uri.path[0..uri.path.rindex("/")] || "/"
+      normalize(uri)
+    end
   end
 
   delegate :normalize, to: :class

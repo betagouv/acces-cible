@@ -24,7 +24,7 @@ class Page
 
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
-    @root = Link.normalize(root || url)
+    @root = root ? Link.normalize(root) : Link.with_path(url)
     @html = html || fetch&.last
   end
 
