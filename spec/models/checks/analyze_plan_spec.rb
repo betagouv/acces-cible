@@ -26,20 +26,16 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when a link is found" do
       let(:year) { Time.current.year }
+      let(:root) { "https://www.example.com" }
 
       it "returns a hash containing link_url, link_text, years, reachable, valid_year, and link_misplaced" do
-        link = Link.new(href: "https://www.example.com/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
-        page_html = <<~HTML
-          <!DOCTYPE html>
-          <html>
-          <body>
+        link = Link.new(href: "#{root}/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
+        body = <<~HTML
             <h1>Déclaration d'accessibilité</h1>
             <a href="#{link.href}">#{link.text}</a>
             <h2>État de conformité</h2>
-          </body>
-          </html>
         HTML
-        page = build(:page, html: page_html)
+        page = build(:page, body:)
         allow(check).to receive(:page).and_return(page)
         allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
@@ -52,6 +48,36 @@ RSpec.describe Checks::AnalyzePlan do
           valid_year: true,
           text: nil
         )
+      end
+
+      context "and years are in link.href instead of link.text" do
+        it "extracts years from href" do
+          years = [year]
+          link = Link.new(href: "#{root}/plan-annuel-#{years.join("-")}.pdf", text: "Plan annuel d'accessibilité")
+          page = build(:page, links: [link])
+          allow(check).to receive_messages(page:)
+          allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
+
+          expect(analyze).to include(
+            link_url: link.href,
+            link_text: link.text,
+            years:,
+            reachable: true,
+            valid_year: true
+          )
+        end
+      end
+
+      context "and years are in both link.text and link.href" do
+        it "prefers years from link.text" do
+          years = [year]
+          link = Link.new(href: "#{root}/plan-#{year + 10}.pdf", text: "Plan annuel d'accessibilité #{year}")
+          page = build(:page, links: [link])
+          allow(check).to receive_messages(page:)
+          allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
+
+          expect(analyze).to include(years:)
+        end
       end
     end
 

@@ -25,11 +25,12 @@ RSpec.describe Checks::AnalyzeSchema do
 
     context "when a link is found" do
       let(:year) { Time.current.year }
+      let(:root) { "https://www.example.com" }
 
       it "returns a hash containing link_url, link_text, years, reachable, valid_years, and link_misplaced" do
-        page = build(:page, html: "<html><body></body></html>")
-        link = Link.new(href: "schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{year - 1}-#{year + 1}")
-        allow(check).to receive_messages(page:, find_link: link)
+        link = Link.new(href: "#{root}/schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{year - 1}-#{year + 1}")
+        page = build(:page, links: [link])
+        allow(check).to receive_messages(page:)
         allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
         expect(analyze).to include(
@@ -41,6 +42,36 @@ RSpec.describe Checks::AnalyzeSchema do
           valid_years: true,
           text: nil
         )
+      end
+
+      context "and years are in link.href instead of link.text" do
+        it "extracts years from href" do
+          years = [year - 1, year + 1]
+          link = Link.new(href: "#{root}/schema-#{years.join("-")}.pdf", text: "Schéma pluriannuel d'accessibilité")
+          page = build(:page, links: [link])
+          allow(check).to receive_messages(page:)
+          allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
+
+          expect(analyze).to include(
+            link_url: link.href,
+            link_text: link.text,
+            years:,
+            reachable: true,
+            valid_years: true
+          )
+        end
+      end
+
+      context "and years are in both link.text and link.href" do
+        it "prefers years from link.text" do
+          years = [year - 1, year + 1]
+          link = Link.new(href: "#{root}/schema-2020-2022.pdf", text: "Schéma pluriannuel d'accessibilité #{years.join("-")}")
+          page = build(:page, links: [link])
+          allow(check).to receive_messages(page:)
+          allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
+
+          expect(analyze).to include(years:)
+        end
       end
     end
 

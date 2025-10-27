@@ -76,10 +76,11 @@ module Checks
 
     def analyze!
       link = find_link
-      source_text = link&.text || link&.href || find_text_in_main
-      return unless source_text
+      text_in_main = find_text_in_main
+      return unless link || text_in_main
 
-      years = extract_years(source_text)
+      years = extract_years(link&.text, link&.href, text_in_main)
+
       {
         years:,
         link_url: link&.href,
@@ -87,12 +88,20 @@ module Checks
         link_misplaced: link ? !link_between_headings? : nil,
         valid_years: validate_years(years),
         reachable: Browser.reachable?(link&.href),
-        text: link ? nil : source_text
+        text: link ? nil : text_in_main
       }
     end
 
     def page = @page ||= audit.page(:accessibility)
-    def extract_years(string) = string.to_s.scan(/\d{4}/).map(&:to_i).sort
+
+    def extract_years(*sources)
+      sources.compact.each do |source|
+        years = source.to_s.scan(/\d{4}/).map(&:to_i).sort
+        return years if years.present?
+      end
+      []
+    end
+
     def validate_years(years) = years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
   end
 end
