@@ -31,7 +31,6 @@ module Checks
     def heading_statuses = @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
     def total = expected_headings.count
     def failures = heading_statuses.filter { it.error? }
-    def success_count = comparison.empty? ? 0 : total - failures.count
 
     def score
       return 0 unless comparison.present?
@@ -160,10 +159,6 @@ module Checks
 
     def similarity_ratio(a, b, options = {})
       StringComparison.similarity_ratio(a, b, **COMPARISON_OPTIONS.merge(options))
-    end
-
-    def match?(a, b, options = {})
-      StringComparison.match?(a, b, **COMPARISON_OPTIONS)
     end
   end
 end
