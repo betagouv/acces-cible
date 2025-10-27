@@ -68,13 +68,10 @@ module Checks
     def analyze!
       link = find_link
       page_heading = find_page_heading unless link
-      return unless link || page_heading
+      source_text = link&.text || link&.href || page_heading
+      return unless source_text
 
-      years = if link
-        extract_years(link.text) || extract_years(link.href)
-      else
-        extract_years(page_heading)
-      end
+      years = extract_years(source_text)
       {
         years:,
         link_url: link&.href,
