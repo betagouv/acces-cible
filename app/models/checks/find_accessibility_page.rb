@@ -5,6 +5,7 @@ module Checks
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
     DECLARATION_URL = /(declaration-)?d?accessibilit[e|y]|rgaa/i
     REQUIRED_DECLARATION_HEADINGS = 3
+    MAX_CRAWLED_PAGES = 10
 
     store_accessor :data, :url, :title
 
@@ -23,11 +24,11 @@ module Checks
     end
 
     def find_page
-      crawler.find do |current_page, queue|
+      crawler(crawl_up_to: MAX_CRAWLED_PAGES).find do |current_page, queue|
         if required_headings_present?(current_page)
           true
         else
-          filter_queue(queue)
+          prioritize(queue)
           false
         end
       end
@@ -44,12 +45,13 @@ module Checks
 
     def fuzzy_match?(a, b) = StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
 
-    def filter_queue(queue)
+    def prioritize(queue)
       queue.filter! do |link|
-        link.href.match?(DECLARATION_URL) ||
+        link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) ||
         link.text.match?(DECLARATION) ||
-        link.text.match?(Checks::AccessibilityMention::MENTION_REGEX)
+        link.href.match?(DECLARATION_URL)
       end
+      queue.sort_by! { |link| link.href.length }
     end
   end
 end
