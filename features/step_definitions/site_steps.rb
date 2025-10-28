@@ -72,7 +72,7 @@ Alors("la page contient un tableau avec toutes les vérifications du site {strin
   site = team.sites.find_by_url(url:)
   expect(page).to have_css("table")
   site.audit.all_checks.each do |check|
-    expect(page).to have_content(check.human_type)
+    expect(page).to have_content(check.table_header)
   end
 end
 
