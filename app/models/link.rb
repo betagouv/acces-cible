@@ -49,6 +49,7 @@ Link = Data.define(:href, :text) do
 
     def with_path(href)
       uri = parse(href)
+      uri.query = nil
       return normalize(href) unless uri.path
 
       # Keep everything up to and including the last slash

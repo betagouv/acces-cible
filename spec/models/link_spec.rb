@@ -140,6 +140,11 @@ RSpec.describe Link do
       url = described_class.with_path("http://example.com/path/to/page")
       expect(url).to eq("http://example.com/path/to/")
     end
+
+    it "returns path without query" do
+      url = described_class.root_from("http://example.com/path/with?a-query-string")
+      expect(url).to eq("http://example.com/path/")
+    end
   end
 
   describe ".url_without_scheme_and_www" do
