@@ -13,7 +13,7 @@ Fonctionnalité: Page du site
     Quand je clique sur "Ajouter"
     Alors la page contient "Site ajouté"
     Et la page contient "https://beta.gouv.fr"
-    Et la page contient "Informations sur l'audit"
+    Et la page contient "Analyse de la déclaration"
 
   Scénario: Un agent peut demander une nouvelle vérification d'un site
     Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr"
