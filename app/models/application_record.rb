@@ -10,7 +10,7 @@ class ApplicationRecord < ActiveRecord::Base
 
     alias human human_attribute_name
     def human_count(attr = :count, count: nil) = human(attr, count: count || send(attr))
-    def to_percent(number, **options) = helpers.number_to_percentage(number, options.merge(precision: 2, strip_insignificant_zeros: true))
+    def to_percent(number, **options) = helpers.number_to_percentage(number, options.with_defaults(precision: 0, strip_insignificant_zeros: true))
 
     def bulk_reset_counter(association, counter: nil)
       counter ||= "#{association}_count"
