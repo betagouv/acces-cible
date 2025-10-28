@@ -21,6 +21,8 @@ module Checks
       return unless (page = find_page)
 
       { url: page.url, title: page.title }
+    rescue Crawler::CrawlLimitReachedError
+      nil
     end
 
     def find_page
