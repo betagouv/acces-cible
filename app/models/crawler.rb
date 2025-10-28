@@ -3,8 +3,8 @@ class Crawler
   MAX_CRAWLED_PAGES = 5
 
   class CrawlLimitReachedError < StandardError
-    def initialize(root, crawl_up_to)
-      super("Stopping after crawling #{crawl_up_to} pages starting from #{root.href}.")
+    def initialize(root, crawl_up_to = MAX_CRAWLED_PAGES)
+      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
     end
   end
 
@@ -26,7 +26,7 @@ class Crawler
 
   def each
     while queue.any?
-      raise CrawlLimitReachedError.new(root, crawl_up_to) if crawled.size >= crawl_up_to
+      raise CrawlLimitReachedError.new(root.href, crawl_up_to) if crawled.size >= crawl_up_to
 
       next unless page = get_page
 
