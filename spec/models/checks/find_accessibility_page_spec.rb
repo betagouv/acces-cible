@@ -42,23 +42,6 @@ RSpec.describe Checks::FindAccessibilityPage do
     end
   end
 
-  describe "#filter_queue" do
-    let(:declaration_url_link) { build(:link, text: "Page", href: "/declaration-accessibilite") }
-    let(:declaration_daccessibilite_link) { build(:link, text: "Page", href: "/declaration-daccessibilite") }
-    let(:declaration_text_link) { build(:link, text: "Déclaration d'accessibilité", href: "/other") }
-    let(:accessibility_mention_link) { build(:link, text: "Accessibilité : totalement conforme", href: "/handicap") }
-    let(:rgaa_link) { build(:link, text: "Audit RGAA", href: "/rgaa") }
-    let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
-    let(:queue) { LinkList.new(declaration_url_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, rgaa_link, unrelated_link) }
-
-    it "only keeps links matching DECLARATION, DECLARATION_URL, or MENTION pattern" do
-      filtered_queue = check.send(:filter_queue, queue).to_a
-
-      expect(filtered_queue).to contain_exactly(declaration_url_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, rgaa_link)
-      expect(filtered_queue).not_to include(unrelated_link)
-    end
-  end
-
   describe "#find_page" do
     let(:non_matching_page) { build(:page, url: "https://example.com", links: [build(:link, href: matching_page_url)]) }
     let(:matching_page) { build(:page, url: matching_page_url, title: "Accessibility") }
@@ -69,7 +52,7 @@ RSpec.describe Checks::FindAccessibilityPage do
       allow(check).to receive(:crawler).and_return(crawler)
       allow(check).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
       allow(check).to receive(:required_headings_present?).with(matching_page).and_return(true)
-      allow(check).to receive(:filter_queue)
+      allow(check).to receive(:prioritize)
     end
 
     it "finds a matching page through crawling links" do
@@ -108,6 +91,44 @@ RSpec.describe Checks::FindAccessibilityPage do
 
         it { should eq(i >= described_class::REQUIRED_DECLARATION_HEADINGS) }
       end
+    end
+  end
+
+  describe "#prioritize" do
+    let(:short_rgaa_link) { build(:link, text: "RGAA", href: "/rgaa") }
+    let(:long_declaration_link) { build(:link, text: "Page", href: "/declaration-accessibilite") }
+    let(:declaration_daccessibilite_link) { build(:link, text: "Page", href: "/declaration-daccessibilite") }
+    let(:declaration_text_link) { build(:link, text: "Déclaration d'accessibilité", href: "/other") }
+    let(:accessibility_mention_link) { build(:link, text: "Accessibilité : totalement conforme", href: "/handicap") }
+    let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
+    let(:queue) { LinkList.new(long_declaration_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, short_rgaa_link, unrelated_link) }
+
+    it "filters queue and sorts links by href length" do
+      check.send(:prioritize, queue)
+
+      expect(queue.to_a).to eq ["/rgaa", "/other", "/handicap", "/declaration-accessibilite", "/declaration-daccessibilite"]
+      expect(queue.to_a).not_to include("/contact")
+    end
+
+    it "keeps links matching DECLARATION pattern in text" do
+      queue = LinkList.new(declaration_text_link, unrelated_link)
+      check.send(:prioritize, queue)
+
+      expect(queue.to_a).to contain_exactly("/other")
+    end
+
+    it "keeps links matching DECLARATION_URL pattern in href" do
+      queue = LinkList.new(long_declaration_link, short_rgaa_link, unrelated_link)
+      check.send(:prioritize, queue)
+
+      expect(queue.to_a).to contain_exactly("/declaration-accessibilite", "/rgaa")
+    end
+
+    it "keeps links matching MENTION_REGEX pattern in text" do
+      queue = LinkList.new(accessibility_mention_link, unrelated_link)
+      check.send(:prioritize, queue)
+
+      expect(queue.to_a).to contain_exactly("/handicap")
     end
   end
 end

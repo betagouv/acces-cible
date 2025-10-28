@@ -28,7 +28,7 @@ module Checks
         if required_headings_present?(current_page)
           true
         else
-          filter_queue(queue)
+          prioritize(queue)
           false
         end
       end
@@ -45,12 +45,13 @@ module Checks
 
     def fuzzy_match?(a, b) = StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
 
-    def filter_queue(queue)
+    def prioritize(queue)
       queue.filter! do |link|
-        link.href.match?(DECLARATION_URL) ||
+        link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) ||
         link.text.match?(DECLARATION) ||
-        link.text.match?(Checks::AccessibilityMention::MENTION_REGEX)
+        link.href.match?(DECLARATION_URL)
       end
+      queue.sort_by! { |link| link.href.length }
     end
   end
 end
