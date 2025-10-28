@@ -59,7 +59,7 @@ module Checks
     private
 
     def analyze!
-      return unless page = audit.page(:accessibility)
+      return unless page
 
       self.page_headings = page.heading_levels
       {
@@ -156,5 +156,7 @@ module Checks
     def similarity_ratio(a, b, options = {})
       StringComparison.similarity_ratio(a, b, **COMPARISON_OPTIONS.merge(options))
     end
+
+    def page = @page ||= audit.page(:accessibility)
   end
 end
