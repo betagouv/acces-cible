@@ -23,14 +23,6 @@ RSpec.describe Checks::FindAccessibilityPage do
         expect(analyze).to be_nil
       end
     end
-
-    context "when find_page raises Crawler::CrawlLimitReachedError" do
-      before { allow(check).to receive(:find_page).and_raise(Crawler::CrawlLimitReachedError.new(root_url)) }
-
-      it "returns nil" do
-        expect(analyze).to be_nil
-      end
-    end
   end
 
   describe "#found?" do

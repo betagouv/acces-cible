@@ -2,12 +2,6 @@ class Crawler
   include Enumerable
   MAX_CRAWLED_PAGES = 5
 
-  class CrawlLimitReachedError < StandardError
-    def initialize(root, crawl_up_to = MAX_CRAWLED_PAGES)
-      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
-    end
-  end
-
   def initialize(root, crawl_up_to: nil)
     @root = Link.from(root)
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
@@ -26,7 +20,7 @@ class Crawler
 
   def each
     while queue.any?
-      raise CrawlLimitReachedError.new(root.href, crawl_up_to) if crawled.size >= crawl_up_to
+      return if crawled.size >= crawl_up_to
 
       next unless page = get_page
 
