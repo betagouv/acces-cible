@@ -30,4 +30,22 @@ RSpec.describe Session do
       end
     end
   end
+
+  describe "#touch?" do
+    context "when session was updated more than 1 day ago" do
+      it "returns true" do
+        session = build(:session, updated_at: 2.days.ago)
+
+        expect(session.touch?).to be true
+      end
+    end
+
+    context "when session was updated less than 1 day ago" do
+      it "returns false" do
+        session = build(:session, updated_at: 1.hour.ago)
+
+        expect(session.touch?).to be false
+      end
+    end
+  end
 end
