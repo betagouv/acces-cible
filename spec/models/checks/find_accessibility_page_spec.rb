@@ -5,6 +5,34 @@ RSpec.describe Checks::FindAccessibilityPage do
   let(:audit) { build(:audit) }
   let(:check) { described_class.new(audit:) }
 
+  describe "#analyze!" do
+    subject(:analyze) { check.send(:analyze!) }
+
+    let(:page) { build(:page, url: root_url, title: "Page title", body: "Page body") }
+
+    before { allow(check).to receive(:find_page).and_return(page) }
+
+    it "returns a hash with :url and :title" do
+      expect(analyze).to eq({ url: page.url, title: page.title })
+    end
+
+    context "when find_page returns nil" do
+      let(:page) { nil }
+
+      it "returns nil when find_page returns nil" do
+        expect(analyze).to be_nil
+      end
+    end
+
+    context "when find_page raises Crawler::CrawlLimitReachedError" do
+      before { allow(check).to receive(:find_page).and_raise(Crawler::CrawlLimitReachedError.new(root_url)) }
+
+      it "returns nil" do
+        expect(analyze).to be_nil
+      end
+    end
+  end
+
   describe "#found?" do
     it "returns true when url is present" do
       check.url = "#{root_url}/accessibility"
