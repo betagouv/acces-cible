@@ -9,7 +9,7 @@ class Crawler
   end
 
   def initialize(root, crawl_up_to: nil)
-    @root = Link.from(Link.with_path(root))
+    @root = Link.from(Link.root_from(root))
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
     @queue = LinkList.new(root)
     @crawled = LinkList.new

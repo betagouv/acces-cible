@@ -47,12 +47,13 @@ Link = Data.define(:href, :text) do
       ""
     end
 
-    def with_path(href)
+    # Extract the domain and path up to the last slash
+    # Eg: https://example.com/folder/page.html -> https://example.com/folder/
+    def root_from(href)
       uri = parse(href)
       uri.query = nil
       return normalize(href) unless uri.path
 
-      # Keep everything up to and including the last slash
       uri.path = uri.path[0..uri.path.rindex("/")] || "/"
       normalize(uri)
     end

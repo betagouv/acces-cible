@@ -120,24 +120,24 @@ RSpec.describe Link do
     end
   end
 
-  describe ".with_path" do
+  describe ".root_from" do
     it "returns path for root URL" do
-      url = described_class.with_path("http://example.com")
+      url = described_class.root_from("http://example.com")
       expect(url).to eq("http://example.com/")
     end
 
     it "preserves trailing slash" do
-      url = described_class.with_path("http://example.com/path/")
+      url = described_class.root_from("http://example.com/path/")
       expect(url).to eq("http://example.com/path/")
     end
 
     it "returns path for nested file" do
-      url = described_class.with_path("http://example.com/path/to/file.pdf")
+      url = described_class.root_from("http://example.com/path/to/file.pdf")
       expect(url).to eq("http://example.com/path/to/")
     end
 
     it "returns path for nested page" do
-      url = described_class.with_path("http://example.com/path/to/page")
+      url = described_class.root_from("http://example.com/path/to/page")
       expect(url).to eq("http://example.com/path/to/")
     end
 
