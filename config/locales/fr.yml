@@ -150,6 +150,7 @@ fr:
         missing: non trouvé
         incorrect_order: ordre incorrect
         incorrect_level: niveau de titre incorrect
+        plain_text: pas un titre
       checks/analyze_accessibility_page:
         type: Analyse de la déclaration
         table_header: Taux de conformité

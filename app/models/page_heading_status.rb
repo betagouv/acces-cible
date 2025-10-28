@@ -5,9 +5,9 @@ class PageHeadingStatus < Data.define(:expected_heading, :expected_level, :statu
 
   delegate :human, to: "Checks::AccessibilityPageHeading"
   delegate :inquiry, to: :status, prefix: true
-  delegate :ok?, :missing?, :incorrect_order?, :incorrect_level?, to: :status_inquiry
+  delegate :ok?, :missing?, :incorrect_order?, :incorrect_level?, :plain_text?, to: :status_inquiry
 
-  def warning? = incorrect_order? || incorrect_level?
+  def warning? = incorrect_order? || incorrect_level? || plain_text?
   def error? = !ok?
   def message = human("statuses.#{status}")
   def fuzzy_match?

@@ -66,7 +66,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
           ["Contenus non soumis à l'obligation d'accessibilité", 3, :ok, "Contenus non soumis à l'obligation d'accessibilité"],
           ["Établissement de cette déclaration d'accessibilité", 2, :ok, "Établissement de cette déclaration d'accessibilité"],
           ["Technologies utilisées pour la réalisation du site", 3, :ok, "Technologies utilisées pour la réalisation de ce service en ligne"],
-          ["Environnement de test", 3, :missing, nil],
+          ["Environnement de test", 3, :plain_text, "Environnement de test"],
           ["Outils pour évaluer l'accessibilité", 3, :missing, nil],
           ["Pages du site ayant fait l'objet de la vérification de conformité", 3, :incorrect_level, "Pages du site ayant fait l'objet de la vérification de conformité"],
           ["Retour d'information et contact", 2, :ok, "Retour d'information et contact"],

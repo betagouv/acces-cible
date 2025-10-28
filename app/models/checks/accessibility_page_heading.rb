@@ -106,6 +106,8 @@ module Checks
           last_matched_index = original_index
 
           [expected_heading, expected_level, status, page_heading]
+        elsif plain_text_heading?(expected_heading)
+          [expected_heading, expected_level, :plain_text, expected_heading]
         else
           [expected_heading, expected_level, :missing, nil]
         end
@@ -158,5 +160,7 @@ module Checks
     end
 
     def page = @page ||= audit.page(:accessibility)
+    def page_text = @page_text ||= page.text(scope: :main)
+    def plain_text_heading?(heading) = page_text.downcase.include?(heading.downcase)
   end
 end
