@@ -48,7 +48,7 @@ module Checks
       (points / total.to_f * 100).round(2)
     end
 
-    def human_success_rate = comparison.present? ? to_percent(score, precision: 0) : ""
+    def human_success_rate = comparison.present? ? to_percent(score) : ""
     def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first&.message)
     alias custom_badge_text human_success_rate
 
