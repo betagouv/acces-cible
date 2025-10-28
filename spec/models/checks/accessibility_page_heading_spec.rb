@@ -3,17 +3,28 @@ require "rails_helper"
 RSpec.describe Checks::AccessibilityPageHeading do
   let(:check) { described_class.new }
 
-  describe "#compare_headings" do
-    subject(:comparison) { check.send(:compare_headings) }
+  describe "#analyze!" do
+    subject(:analyze) { check.send(:analyze!) }
 
-    let(:expected_headings) { described_class::EXPECTED_HEADINGS }
-    let(:page_headings) do
+    let(:audit) { create(:audit) }
+    let(:fixture_file_name) { :valid }
+    let(:page) do
       html = file_fixture("declarations/#{fixture_file_name}.html").read
-      Page.new(url: "http://example.com", html:).heading_levels
+      Page.new(url: "http://example.com", html:)
     end
 
+    let(:page_headings) { analyze[:page_headings] }
+    let(:comparison) { analyze[:comparison] }
+    let(:expected_headings) { described_class::EXPECTED_HEADINGS }
+
     before do
-      allow(check).to receive(:page_headings).and_return(page_headings)
+      check.audit = audit
+      allow(audit).to receive(:page).with(:accessibility).and_return(page)
+    end
+
+    it "returns page_headings and comparison data" do
+      expect(page_headings).to eq page.heading_levels
+      expect(comparison).to be_an(Array)
     end
 
     context "when the headings are valid" do
@@ -22,7 +33,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
       it "returns array of headings with :ok status" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
           # Skip the first page heading since we start at État de conformité (H2)
-          actual_page_heading = page_headings[index + 1].last
+          actual_page_heading = page.heading_levels[index + 1].last
           [heading, level, :ok, actual_page_heading]
         end
         expect(comparison).to eq expected_result
@@ -35,7 +46,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
       it "returns :ok status for all headings (ignores start level difference)" do
         expected_result = expected_headings.map.with_index do |(level, heading), index|
           # Skip the first page heading since we start at État de conformité (H2)
-          shifted_heading = page_headings[index + 2].last
+          shifted_heading = page.heading_levels[index + 2].last
           [heading, level, :ok, shifted_heading]
         end
         expect(comparison).to eq expected_result
