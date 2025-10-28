@@ -5,12 +5,12 @@ module Checks
     PLAN_PATTERN = /
       plan\s+
       (?:
-        annuel(?:\s+d['’]accessibilit[eé](?:\s+num[eé]rique)?|\s+\d{4})|
-        d['’]action(?:s)?
+        annuel\s+(?:d['’]accessibilit[eé](?:\s+num[eé]rique)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|\d{4}(?:\s*[-–]\s*\d{4})?)|
+        (?:\d{4}\s+)?d['’]action(?:s)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?
       )
     /xi
 
-    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_year, :page_heading
+    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_year, :text
 
     def find_link
       return unless page
@@ -28,12 +28,10 @@ module Checks
         .max_by { |link| extract_years(link.text) }
     end
 
-    def find_page_heading
+    def find_text_in_main
       return unless page
 
-      page.headings.find do |heading|
-        heading.match? PLAN_PATTERN
-      end
+      page.text(scope: :main).match(PLAN_PATTERN)&.to_s
     end
 
     def all_passed? = link_url && valid_year && reachable
@@ -42,7 +40,7 @@ module Checks
     def custom_badge_status
       if all_passed?
         :success
-      elsif valid_link? || page_heading
+      elsif valid_link? || text
         :warning
       else
         :error
@@ -54,8 +52,8 @@ module Checks
         human(:all_passed)
       elsif valid_link?
         human(:invalid_year)
-      elsif page_heading
-        human(:plan_in_page_heading)
+      elsif text
+        human(:plan_in_main_text)
       else
         human(:link_not_found)
       end
@@ -67,14 +65,11 @@ module Checks
 
     def analyze!
       link = find_link
-      page_heading = find_page_heading unless link
-      return unless link || page_heading
+      text_in_main = find_text_in_main
+      return unless link || text_in_main
 
-      years = if link
-        extract_years(link.text) || extract_years(link.href)
-      else
-        extract_years(page_heading)
-      end
+      years = extract_years(link&.text, link&.href, text_in_main)
+
       {
         years:,
         link_url: link&.href,
@@ -82,12 +77,19 @@ module Checks
         link_misplaced: link ? !link_between_headings? : nil,
         valid_year: validate_year(years.last),
         reachable: Browser.reachable?(link&.href),
-        page_heading:
+        text: link ? nil : text_in_main
       }
     end
 
     def page = @page ||= audit.page(:accessibility)
-    def extract_years(string) = string.to_s.scan(/\d{4}/).map(&:to_i).sort
+
+    def extract_years(*sources)
+      sources.compact.each do |source|
+        years = source.to_s.scan(/\d{4}/).map(&:to_i).sort
+        return years if years.present?
+      end
+      []
+    end
 
     def validate_year(year)
       valid_years = Date.current.year.then { |current_year| (current_year - 1)..(current_year + 1) }

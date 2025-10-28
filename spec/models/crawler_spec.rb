@@ -46,11 +46,10 @@ RSpec.describe Crawler do
       expect(queues).not_to be_empty
     end
 
-    it "raises CrawlLimitReachedError when crawl_up_to is reached" do
+    it "returns nil when crawl_up_to is reached" do
       limited_crawler = described_class.new(root_url, crawl_up_to: 1)
-      expect {
-        limited_crawler.find { |page, _queue| page.title == "Target" }
-      }.to raise_error(Crawler::CrawlLimitReachedError)
+      crawl_results = limited_crawler.find { |page, _queue| page.title == "Target" }
+      expect(crawl_results).to be_nil
     end
 
     context "when matching page exists" do
