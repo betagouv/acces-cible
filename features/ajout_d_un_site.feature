@@ -7,7 +7,10 @@ Fonctionnalité: Ajout d'un site
     Et que je clique sur "Ajouter un site"
 
   Scénario: Un agent peut ajouter un site manuellement
-    Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr"
+    Sachant que je remplis "Adresse du site" avec "beta.gouv.fr"
+    Quand je clique sur "Ajouter"
+    Alors la page contient "Adresse du site n'est pas valide"
+    Quand je remplis "Adresse du site" avec "https://beta.gouv.fr/"
     Et que je remplis "Nom du site" avec "beta.gouv.fr"
     Quand je clique sur "Ajouter"
     Alors la page contient "Site ajouté"
