@@ -170,14 +170,13 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) do
         {
           comparison: [
-            ["État de conformité", 2, :ok, "État de conformité"],
-            ["Résultats des tests", 3, :incorrect_level, "Résultats des tests"],
-            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :ok, heading] }
+            ["État de conformité", 2, :incorrect_level, "État de conformité"],
+            *described_class::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
           ]
         }
       end
 
-      it "applies 50% penalty for incorrect_level (1 ok + 1 incorrect_level + 11 ok = 12.5/13 = 96.15%)" do
+      it "applies 50% penalty for incorrect_level (1 incorrect_level + 12 ok = 12.5/13 = 96.15%)" do
         expect(score).to eq 96.15
       end
     end
@@ -186,14 +185,13 @@ RSpec.describe Checks::AccessibilityPageHeading do
       let(:comparison_data) do
         {
           comparison: [
-            ["État de conformité", 2, :ok, "État de conformité"],
-            ["Résultats des tests", 3, :incorrect_order, "Résultats des tests"],
-            *described_class::EXPECTED_HEADINGS[2..-1].map { |level, heading| [heading, level, :ok, heading] }
+            ["État de conformité", 2, :incorrect_order, "État de conformité"],
+            *described_class::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
           ]
         }
       end
 
-      it "applies 50% penalty for incorrect_order (1 ok + 1 incorrect_order + 11 ok = 12.5/13 = 96.15%)" do
+      it "applies 50% penalty for incorrect_order (1 incorrect_order + 12 ok = 12.5/13 = 96.15%)" do
         expect(score).to eq 96.15
       end
     end
