@@ -5,6 +5,7 @@ module Checks
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
     DECLARATION_URL = /(declaration-)?d?accessibilit[e|y]|rgaa/i
     REQUIRED_DECLARATION_HEADINGS = 3
+    MAX_CRAWLED_PAGES = 10
 
     store_accessor :data, :url, :title
 
@@ -23,7 +24,7 @@ module Checks
     end
 
     def find_page
-      crawler.find do |current_page, queue|
+      crawler(crawl_up_to: MAX_CRAWLED_PAGES).find do |current_page, queue|
         if required_headings_present?(current_page)
           true
         else
