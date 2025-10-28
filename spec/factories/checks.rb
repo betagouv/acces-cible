@@ -77,7 +77,7 @@ FactoryBot.define do
             years: [current_year],
             reachable: true,
             valid_year: true,
-            page_heading: nil
+            text: nil
           }
         when Checks::RunAxeOnHomepage
           {

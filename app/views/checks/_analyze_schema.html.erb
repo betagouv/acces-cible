@@ -19,10 +19,10 @@
             <br><%= Checks::AnalyzePlan.human(:link_unreachable) %>
           <% end %>
         </li>
-      <% elsif check.page_heading %>
+      <% elsif check.text %>
         <li>
-          <strong><%= Checks::AnalyzeSchema.human(:schema_in_page_heading) %> :</strong>
-          <%= check.page_heading %>
+          <strong><%= Checks::AnalyzeSchema.human(:schema_in_main_text) %> :</strong>
+          <%= check.text %>
         </li>
       <% else %>
         <li>

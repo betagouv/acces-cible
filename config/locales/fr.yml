@@ -174,8 +174,7 @@ fr:
         link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
         all_passed: Lien trouvé et valide
         invalid_years: Années invalides
-        page_heading: Titre de page
-        schema_in_page_heading: Schéma trouvé dans un titre de page
+        schema_in_main_text: Schéma trouvé dans le texte principal
         nothing_found: Schéma non trouvé
       checks/analyze_plan:
         type: Plan d'action
@@ -189,8 +188,7 @@ fr:
         link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
         all_passed: Lien trouvé et valide
         invalid_year: Année(s) invalide(s)
-        page_heading: Titre de page
-        plan_in_page_heading: Plan trouvé dans un titre de page
+        plan_in_main_text: Plan trouvé dans le texte principal
         nothing_found: Plan non trouvé
       checks/find_accessibility_page:
         type: Déclaration d'accessibilité
