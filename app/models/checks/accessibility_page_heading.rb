@@ -33,15 +33,11 @@ module Checks
     def failures = heading_statuses.filter { it.error? }
 
     def score
-      return 0 unless comparison.present?
-
       points = heading_statuses.sum do |heading_status|
-        if heading_status.ok?
-          1
-        elsif heading_status.warning?
-          0.5
-        else
-          0
+        case
+        when heading_status.ok? then 1
+        when heading_status.warning? then 0.5
+        else 0
         end
       end
 
