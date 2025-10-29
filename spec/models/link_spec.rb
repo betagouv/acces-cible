@@ -120,6 +120,33 @@ RSpec.describe Link do
     end
   end
 
+  describe ".root_from" do
+    it "returns path for root URL" do
+      url = described_class.root_from("http://example.com")
+      expect(url).to eq("http://example.com/")
+    end
+
+    it "preserves trailing slash" do
+      url = described_class.root_from("http://example.com/path/")
+      expect(url).to eq("http://example.com/path/")
+    end
+
+    it "returns path for nested file" do
+      url = described_class.root_from("http://example.com/path/to/file.pdf")
+      expect(url).to eq("http://example.com/path/to/")
+    end
+
+    it "returns path for nested page" do
+      url = described_class.root_from("http://example.com/path/to/page")
+      expect(url).to eq("http://example.com/path/to/")
+    end
+
+    it "returns path without query" do
+      url = described_class.root_from("http://example.com/path/with?a-query-string")
+      expect(url).to eq("http://example.com/path/")
+    end
+  end
+
   describe ".url_without_scheme_and_www" do
     subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
 

@@ -46,6 +46,17 @@ Link = Data.define(:href, :text) do
     rescue Link::InvalidUriError
       ""
     end
+
+    # Extract the domain and path up to the last slash
+    # Eg: https://example.com/folder/page.html -> https://example.com/folder/
+    def root_from(href)
+      uri = parse(href)
+      uri.query = nil
+      return normalize(href) unless uri.path
+
+      uri.path = uri.path[0..uri.path.rindex("/")] || "/"
+      normalize(uri)
+    end
   end
 
   delegate :normalize, to: :class
