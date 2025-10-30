@@ -253,10 +253,41 @@ RSpec.describe Checks::AnalyzePlan do
     end
   end
 
+  describe "#find_text_in_main" do
+    subject { check.find_text_in_main }
+
+    let(:page) { build(:page, body:) }
+
+    before { allow(check).to receive(:page).and_return(page) }
+
+    context "when main text does not match pattern" do
+      let(:body) { "<main><p>Plan directeur</p></main>" }
+
+      it { should be_nil }
+    end
+
+    context "when main text matches pattern" do
+      let(:body) { "Plan annuel d'accessibilité 2024" }
+
+      it { should eq(body) }
+    end
+
+    context "when multiple matches exist in main text" do
+      let(:body) do
+        "<p>Plan annuel d'accessibilité 2020</p>
+        <p>Plan annuel d'accessibilité 2023-2025</p>
+        <p>Plan annuel d'accessibilité 2021-2022</p>"
+      end
+
+      it { should eq("Plan annuel d'accessibilité 2023-2025") }
+    end
+  end
+
   describe "#extract_years" do
     {
       "Plan annuel d'accessibilité" => [],
       "Plan annuel d'accessibilité 2024" => [2024],
+      "uploads/2025/plan-annuel-202502.pdf" => [2025],
       "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
       "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
     }.each do |text, expected_result|
