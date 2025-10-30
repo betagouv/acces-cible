@@ -255,6 +255,11 @@ RSpec.describe Link do
       link = described_class.new(href: "https://example.com", text: nil)
       expect(link.text).to eq("")
     end
+
+    it "handles //" do
+      link = described_class.new(href: "https://example.com//", text: nil)
+      expect(link.href).to eq("https://example.com/")
+    end
   end
 
   describe "#to_str" do

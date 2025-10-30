@@ -13,6 +13,7 @@ Link = Data.define(:href, :text) do
     end
 
     def parse(href)
+      href = "/" if href == "//" # Addressable considers // to be an absolute url instead of a path
       Addressable::URI.parse(href.to_s.strip)
     rescue Addressable::URI::InvalidURIError
       raise Link::InvalidUriError.new(href)
