@@ -20,18 +20,23 @@ class Page
     end
   end
 
-  attr_reader :url, :root, :status, :html, :headers, :actual_url
+  attr_reader :url, :root
 
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
     @root = root ? Link.normalize(root) : Link.root_from(url)
-    @html = html || fetch&.last
+    @html = html
   end
 
   def root? = url == root
   def parsed_root = @parsed_root ||= Link.parse(root)
   def path = url.to_s.delete_prefix(root.to_s)
   def redirected? = actual_url.present? && actual_url != url
+
+  def html = @html || fetch[:html]
+  def status = fetch[:status]
+  def headers = fetch[:headers]
+  def actual_url = fetch[:actual_url]
   def css(selector) = dom.css(selector)
   def title = dom.title.to_s.squish
   def text(scope: nil, between_headings: nil) = source_for(scope:, between_headings:).text&.squish
@@ -39,12 +44,14 @@ class Page
   def headings = dom_headings.collect(&:text).collect(&:squish)
   def internal_links = links.select { |link| link.href.start_with?(root) }
   def external_links = links - internal_links
-  def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
+  def inspect = "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   def error? = status > 399
 
   def refresh
-    fetch(clear: true)
+    @dom = @html = @fetch = nil
+    Rails.cache.clear(url)
+    fetch
     self
   end
 
@@ -76,15 +83,19 @@ class Page
 
   private
 
-  def fetch(clear: false)
-    Rails.cache.clear(url) if clear
-    Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-      @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
-      content_type = headers["Content-Type"]
+  def fetch
+    @fetch ||= Rails.cache.fetch(url, expires_in: CACHE_TTL) do
+      response = Browser.get(url.to_s)
+      content_type = response[:headers]["Content-Type"]
       if content_type && !content_type.include?("text/html")
         raise InvalidTypeError.new url, content_type
       end
-      [@actual_url, @status, @headers, @html]
+      {
+        actual_url: response[:current_url],
+        status: response[:status],
+        headers: response[:headers],
+        html: response[:body]
+      }
     end
   end
 

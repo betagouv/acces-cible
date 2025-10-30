@@ -163,8 +163,9 @@ RSpec.describe Page do
     it "attempts to use the cache" do
       allow(Rails.cache).to receive(:fetch)
         .with(normalized_url, expires_in: described_class::CACHE_TTL)
+        .and_call_original
 
-      page
+      page.html
       expect(Rails.cache).to have_received(:fetch)
         .with(normalized_url, expires_in: described_class::CACHE_TTL)
     end
@@ -173,7 +174,7 @@ RSpec.describe Page do
       let(:headers) { { "Content-Type" => "application/pdf" } }
 
       it "raises InvalidTypeError" do
-        expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
+        expect { page.html }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
   end
