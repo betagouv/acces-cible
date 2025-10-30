@@ -283,6 +283,7 @@ RSpec.describe Checks::AnalyzeSchema do
     {
       "Schéma pluriannuel d'accessibilité" => [],
       "Schéma pluriannuel d'accessibilité 2024" => [2024],
+      "uploads/2025/schema-pluri-annuel-202502.pdf" => [2025],
       "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
       "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
     }.each do |text, expected_result|

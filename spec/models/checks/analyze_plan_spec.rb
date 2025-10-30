@@ -287,6 +287,7 @@ RSpec.describe Checks::AnalyzePlan do
     {
       "Plan annuel d'accessibilité" => [],
       "Plan annuel d'accessibilité 2024" => [2024],
+      "uploads/2025/plan-annuel-202502.pdf" => [2025],
       "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
       "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
     }.each do |text, expected_result|
