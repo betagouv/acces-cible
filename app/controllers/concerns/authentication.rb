@@ -30,7 +30,7 @@ module Authentication
   end
 
   def resume_session
-    Current.session ||= find_session_by_cookie&.tap { |session| session.touch if session.touch? }
+    Current.session ||= find_session_by_cookie&.tap { |session| session.touch if session.should_touch? }
   end
 
   def find_session_by_cookie
