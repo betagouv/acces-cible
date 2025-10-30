@@ -42,7 +42,11 @@ module Checks
     def find_text_in_main
       return unless page
 
-      page.text(scope: :main).match(SCHEMA_PATTERN)&.to_s
+      page.text(scope: :main)
+        .scan(SCHEMA_PATTERN)
+        .flatten
+        .compact
+        .max_by { |match| extract_years(match) }
     end
 
     def all_passed? = link_url && valid_years && reachable
