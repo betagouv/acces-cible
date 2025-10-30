@@ -1,8 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Crawler do
+  subject(:crawler) { described_class.new(root_url) }
+
   let(:root_url) { "https://example.com/" }
-  let(:crawler) { described_class.new(root_url) }
   let(:page) { instance_double(Page, internal_links: []) }
 
   before do
@@ -18,6 +19,14 @@ RSpec.describe Crawler do
     it "allows custom max pages" do
       custom_crawler = described_class.new(root_url, crawl_up_to: 50)
       expect(custom_crawler.send(:crawl_up_to)).to eq(50)
+    end
+
+    context "when root doesn't end with a slash" do
+      let(:root_url) { "https://example.com/home" }
+
+      it "returns path up to the last slash" do
+        expect(crawler.send(:root).href).to eq("https://example.com/")
+      end
     end
   end
 

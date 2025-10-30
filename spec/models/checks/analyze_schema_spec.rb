@@ -250,26 +250,32 @@ RSpec.describe Checks::AnalyzeSchema do
   end
 
   describe "#find_text_in_main" do
-    subject(:find_text_in_main) { check.find_text_in_main }
+    subject { check.find_text_in_main }
+
+    let(:page) { build(:page, body:) }
 
     before { allow(check).to receive(:page).and_return(page) }
 
-    context "when main text matches pattern" do
-      let(:body)  { "<main><p>Schéma pluriannuel d'accessibilité</p></main>" }
-      let(:page) { build(:page, body:) }
+    context "when main text does not match pattern" do
+      let(:body) { "<main><p>Schéma explicatif</p></main>" }
 
-      it "finds the text" do
-        expect(find_text_in_main).to eq("Schéma pluriannuel d'accessibilité")
-      end
+      it { should be_nil }
     end
 
-    context "when main text does not match pattern" do
-      let(:body)  { "<main><p>Schéma explicatif</p></main>" }
-      let(:page) { build(:page, body:) }
+    context "when main text matches pattern" do
+      let(:body) { "Schéma pluriannuel d'accessibilité" }
 
-      it "returns nil" do
-        expect(find_text_in_main).to be_nil
+      it { should eq(body) }
+    end
+
+    context "when multiple matches exist in main text" do
+      let(:body) do
+        "<p>Schéma pluriannuel d'accessibilité 2020</p>
+        <p>Schéma pluriannuel d'accessibilité 2023-2025</p>
+        <p>Schéma pluriannuel d'accessibilité 2021-2022</p>"
       end
+
+      it { should eq("Schéma pluriannuel d'accessibilité 2023-2025") }
     end
   end
 
@@ -277,6 +283,7 @@ RSpec.describe Checks::AnalyzeSchema do
     {
       "Schéma pluriannuel d'accessibilité" => [],
       "Schéma pluriannuel d'accessibilité 2024" => [2024],
+      "uploads/2025/schema-pluri-annuel-202502.pdf" => [2025],
       "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
       "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
     }.each do |text, expected_result|

@@ -16,6 +16,8 @@ class Site < ApplicationRecord
 
   delegate :url, to: :audit, allow_nil: true
 
+  validates :url, presence: true, url: true
+
   broadcasts_refreshes
 
   class << self

@@ -13,6 +13,7 @@ Link = Data.define(:href, :text) do
     end
 
     def parse(href)
+      href = "/" if href == "//" # Addressable considers // to be an absolute url instead of a path
       Addressable::URI.parse(href.to_s.strip)
     rescue Addressable::URI::InvalidURIError
       raise Link::InvalidUriError.new(href)
@@ -45,6 +46,17 @@ Link = Data.define(:href, :text) do
       [hostname, path].compact.join(nil)
     rescue Link::InvalidUriError
       ""
+    end
+
+    # Extract the domain and path up to the last slash
+    # Eg: https://example.com/folder/page.html -> https://example.com/folder/
+    def root_from(href)
+      uri = parse(href)
+      uri.query = nil
+      return normalize(href) unless uri.path
+
+      uri.path = uri.path[0..uri.path.rindex("/")] || "/"
+      normalize(uri)
     end
   end
 

@@ -42,7 +42,11 @@ module Checks
     def find_text_in_main
       return unless page
 
-      page.text(scope: :main).match(SCHEMA_PATTERN)&.to_s
+      page.text(scope: :main)
+        .scan(SCHEMA_PATTERN)
+        .flatten
+        .compact
+        .max_by { |match| extract_years(match) }
     end
 
     def all_passed? = link_url && valid_years && reachable
@@ -96,7 +100,7 @@ module Checks
 
     def extract_years(*sources)
       sources.compact.each do |source|
-        years = source.to_s.scan(/\d{4}/).map(&:to_i).sort
+        years = source.to_s.scan(/\d{4}/).map(&:to_i).uniq.sort
         return years if years.present?
       end
       []

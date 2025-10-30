@@ -88,4 +88,6 @@ Rails.application.configure do
 
   # Disable HTTP Basic Auth for mission control jobs
   config.mission_control.jobs.http_basic_auth_enabled = false
+
+  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 end

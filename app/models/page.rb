@@ -24,7 +24,7 @@ class Page
 
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
-    @root = Link.normalize(root || url)
+    @root = root ? Link.normalize(root) : Link.root_from(url)
     @html = html || fetch&.last
   end
 
@@ -66,7 +66,7 @@ class Page
       next if uri.path && File.extname(uri.path).match?(FILES_EXTENSIONS)
       next if skip_files && uri.path && File.extname(uri.path).match?(DOCUMENT_EXTENSIONS)
 
-      href = parsed_root.join(href) unless uri.absolute?
+      href = parsed_root.join(uri) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
     rescue Link::InvalidUriError
