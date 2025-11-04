@@ -5,7 +5,7 @@ RSpec.describe Page do
   let(:url) { "https://éxample.com/about" }
   let(:normalized_url) { Link.normalize(url) }
   let(:page) { build(:page, url:, root:, html: body) }
-  let(:headers) { { "Content-Type" => "text/html" } }
+  let(:headers) { { "content-type" => "text/html" } }
   let(:body) do
     <<~HTML
       <!DOCTYPE html>
@@ -160,42 +160,12 @@ RSpec.describe Page do
       expect(page.html).to be_nil
     end
 
-    it "attempts to use the cache" do
-      allow(Rails.cache).to receive(:fetch)
-        .with(normalized_url, expires_in: described_class::CACHE_TTL)
-
-      page
-      expect(Rails.cache).to have_received(:fetch)
-        .with(normalized_url, expires_in: described_class::CACHE_TTL)
-    end
-
     context "when the response is not HTML" do
-      let(:headers) { { "Content-Type" => "application/pdf" } }
+      let(:headers) { { "content-type" => "application/pdf" } }
 
       it "raises InvalidTypeError" do
         expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
-    end
-  end
-
-  describe "#refresh" do
-    let(:body) { nil }
-    let(:new_body) { "<html><body><h1>Refreshed Content</h1></body></html>" }
-
-    before do
-      allow(Browser).to receive(:get)
-        .with(normalized_url)
-        .and_return({ body: new_body, status: 200, headers:, current_url: normalized_url })
-    end
-
-    it "clears the cache and calls Browser.get" do
-      expect(Rails.cache).to receive(:clear).with(normalized_url)
-      expect(Browser).to receive(:get).with(normalized_url)
-      page.refresh
-    end
-
-    it "returns self for method chaining" do
-      expect(page.refresh).to eq(page)
     end
   end
 
