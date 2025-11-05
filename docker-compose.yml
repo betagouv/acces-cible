@@ -24,6 +24,7 @@ services:
   jobs:
     <<: *server
     command: "bin/jobs"
+    entrypoint: ''
     ports: []
     environment:
       DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
