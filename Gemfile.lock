@@ -116,7 +116,7 @@ GEM
       debug_inspector (>= 1.2.0)
     bootsnap (1.18.6)
       msgpack (~> 1.2)
-    brakeman (7.1.0)
+    brakeman (7.1.1)
       racc
     builder (3.3.0)
     capybara (3.40.0)
@@ -686,7 +686,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootsnap
-  brakeman
+  brakeman (~> 7.1)
   capybara
   cld
   csv
