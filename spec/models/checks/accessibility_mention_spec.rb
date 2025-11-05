@@ -11,14 +11,35 @@ RSpec.describe Checks::AccessibilityMention do
     end
 
     {
-      "" => nil,
-      "ACCESSIBILITE : NON CONFORME" => "non",
-      "Accessibilité : partiellement conforme" => "partiellement",
+      # Basic formats
+      "accessibilité : non conforme" => "non",
+      "accessibilité : partiellement conforme" => "partiellement",
       "accessibilité : totalement conforme" => "totalement",
+      "accessibilité:totalement conforme" => "totalement",
       "accessibilité (non conforme)" => "non",
-      "accessibilité du site : totalement conforme" => nil,
+      "accessibilité (partiellement conforme)" => "partiellement",
+
+      # With "site"
+      "accessibilité du site : non conforme" => "non",
+
+      # No punctuation
+      "accessibilité partiellement conforme" => "partiellement",
+
+      # Case variations
+      "ACCESSIBILITE : NON CONFORME" => "non",
+      "Accessibilité : Partiellement Conforme" => "partiellement",
+
+      # Extra spacing
+      "accessibilité  :  totalement conforme" => "totalement",
+      "accessibilité ( partiellement conforme )" => "partiellement",
+
+      # Invalid formats
+      "" => nil,
+      "Accessibillité (non conforme)" => nil,
+      "accessibilité de n'importe quoi : totalement conforme" => nil,
       "accessibilité : totalement non conforme" => nil,
-      "accessibilité : pas vraiment vraiment conforme" => nil,
+      "accessibilité : pas vraiment conforme" => nil,
+      "accessibilité conforme" => nil
     }.each do |text, expectation|
       context "when page contains '#{text}'" do
         let(:text) { text }
