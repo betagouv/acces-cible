@@ -128,6 +128,7 @@ RSpec.describe Checks::AnalyzePlan do
         "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE",
         "Plan annuel d'accessibilité 2024",
         "Plan annuel d'accessibilité numérique 2024-2025",
+        "Plan annuel de mise en accessibilité 2025",
         "Plan annuel 2024",
         "PLAN ANNUEL 2024",
         "Plan d’action",

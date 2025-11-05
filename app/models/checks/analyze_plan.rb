@@ -5,7 +5,8 @@ module Checks
     PLAN_PATTERN = /
       plan\s+
       (?:
-        annuel\s+(?:d['’]accessibilit[eé](?:\s+num[eé]rique)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|\d{4}(?:\s*[-–]\s*\d{4})?)|
+        annuel\s+(?:de\s+mise\s+en\s+|d['’])?accessibilit[eé](?:\s+num[eé]rique)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
+        annuel\s+\d{4}(?:\s*[-–]\s*\d{4})?|
         (?:\d{4}\s+)?d['’]action(?:s)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?
       )
     /xi
