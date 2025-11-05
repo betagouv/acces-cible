@@ -1,5 +1,4 @@
 class Page
-  CACHE_TTL = 30.minutes
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
   DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
   FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
@@ -25,8 +24,10 @@ class Page
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
     @root = root ? Link.normalize(root) : Link.root_from(url)
-    @html = html || fetch&.last
-  end
+    @html = html
+
+    html.present? ? setup_page_data : fetch_page_data
+ end
 
   def root? = url == root
   def parsed_root = @parsed_root ||= Link.parse(root)
@@ -42,11 +43,6 @@ class Page
   def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
   def error? = status > 399
-
-  def refresh
-    fetch(clear: true)
-    self
-  end
 
   def dom
     @dom ||= Nokogiri::HTML(html).tap do |document|
@@ -76,16 +72,21 @@ class Page
 
   private
 
-  def fetch(clear: false)
-    Rails.cache.clear(url) if clear
-    Rails.cache.fetch(url, expires_in: CACHE_TTL) do
-      @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
-      content_type = headers["Content-Type"]
-      if content_type && !content_type.include?("text/html")
-        raise InvalidTypeError.new url, content_type
-      end
-      [@actual_url, @status, @headers, @html]
-    end
+  def setup_page_data
+    @actual_url = @url
+    @status = 200
+    @headers = { "content-type" => "text/html" }
+  end
+
+  def is_html_page?
+    content_type = @headers["content-type"]
+    content_type && content_type.include?("text/html")
+  end
+
+  def fetch_page_data
+    @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
+
+    raise InvalidTypeError.new(url, @headers["content-type"]) unless is_html_page?
   end
 
   def dom_headings
