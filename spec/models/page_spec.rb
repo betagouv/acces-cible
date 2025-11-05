@@ -5,7 +5,7 @@ RSpec.describe Page do
   let(:url) { "https://éxample.com/about" }
   let(:normalized_url) { Link.normalize(url) }
   let(:page) { build(:page, url:, root:, html: body) }
-  let(:headers) { { "content-type" => "text/html" } }
+  let(:content_type) { "text/html" }
   let(:body) do
     <<~HTML
       <!DOCTYPE html>
@@ -42,7 +42,7 @@ RSpec.describe Page do
   end
 
   before do
-    stub_request(:get, url).to_return(body:, headers:)
+    stub_request(:get, url).to_return(body:, headers: { "content-type": content_type })
 
     # Mock Browser to prevent real Ferrum::Browser instantiation
     ferrum_browser = instance_double(Ferrum::Browser)
@@ -153,7 +153,7 @@ RSpec.describe Page do
     before do
       allow(Browser).to receive(:get)
         .with(normalized_url)
-        .and_return({ body:, status: 200, headers:, current_url: normalized_url })
+        .and_return({ body:, status: 200, content_type:, current_url: normalized_url })
     end
 
     it "fetches the page content" do
@@ -161,7 +161,7 @@ RSpec.describe Page do
     end
 
     context "when the response is not HTML" do
-      let(:headers) { { "content-type" => "application/pdf" } }
+      let(:content_type) { "application/pdf" }
 
       it "raises InvalidTypeError" do
         expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)

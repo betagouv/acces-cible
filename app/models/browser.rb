@@ -127,8 +127,8 @@ class Browser
       page.go_to(url)
       {
         body: page.body,
-        status: page.network.status || 200,
-        headers: page.network.response&.headers || {},
+        status: page.network.status,
+        content_type: page.network.response.content_type,
         current_url: Link.normalize(page.current_url)
       }
     end

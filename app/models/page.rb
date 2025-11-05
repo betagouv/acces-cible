@@ -19,7 +19,7 @@ class Page
     end
   end
 
-  attr_reader :url, :root, :status, :html, :headers, :actual_url
+  attr_reader :url, :root, :status, :html, :actual_url
 
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
@@ -75,18 +75,17 @@ class Page
   def setup_page_data
     @actual_url = @url
     @status = 200
-    @headers = { "content-type" => "text/html" }
+    @content_type =  "text/html"
   end
 
   def is_html_page?
-    content_type = @headers["content-type"]
-    content_type && content_type.include?("text/html")
+    @content_type && @content_type.include?("text/html")
   end
 
   def fetch_page_data
-    @actual_url, @status, @headers, @html = Browser.get(url.to_s).values_at(:current_url, :status, :headers, :body)
+    @actual_url, @status, @content_type, @html = Browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body)
 
-    raise InvalidTypeError.new(url, @headers["content-type"]) unless is_html_page?
+    raise InvalidTypeError.new(url, @content_type) unless is_html_page?
   end
 
   def dom_headings
