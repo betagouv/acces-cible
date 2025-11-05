@@ -31,7 +31,7 @@ services:
       RUBY_DEBUG_PORT: 3500
       RUBY_DEBUG_PORT_RANGE: 10
   db:
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_PASSWORD: 'dummy'
       PGPORT: 5433
