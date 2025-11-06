@@ -2,7 +2,7 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
-  after_create_commit :create_checks
+  after_create :create_checks
   after_create_commit :schedule
 
   validates :url, presence: true, url: true
