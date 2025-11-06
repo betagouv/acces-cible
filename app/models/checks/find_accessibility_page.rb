@@ -51,7 +51,6 @@ module Checks
         link.text.match?(DECLARATION) ||
         link.href.match?(DECLARATION_URL)
       end
-      queue.sort_by! { |link| link.href.length }
     end
   end
 end

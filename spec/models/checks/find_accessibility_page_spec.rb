@@ -123,13 +123,6 @@ RSpec.describe Checks::FindAccessibilityPage do
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
     let(:queue) { LinkList.new(long_declaration_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, short_rgaa_link, unrelated_link) }
 
-    it "filters queue and sorts links by href length" do
-      check.send(:prioritize, queue)
-
-      expect(queue.to_a).to eq ["/rgaa", "/other", "/handicap", "/declaration-accessibilite", "/declaration-daccessibilite"]
-      expect(queue.to_a).not_to include("/contact")
-    end
-
     it "keeps links matching DECLARATION pattern in text" do
       queue = LinkList.new(declaration_text_link, unrelated_link)
       check.send(:prioritize, queue)
