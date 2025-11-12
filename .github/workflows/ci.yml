@@ -121,15 +121,17 @@ jobs:
 
     needs: [test, lint, scan_ruby]
 
-    if: ${{ (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
+    if: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
 
     steps:
       - name: Install Scalingo CLI
         run: curl -O https://cli-dl.scalingo.com/install && bash install
 
-      - run: scalingo login --api-token ${{ secrets.SCALINGO_TOKEN }}
+      - name: Login to Scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_ACCESS_TOKEN }}
+
       - name: Déploiement sur staging
-        if: ${{ github.ref == 'refs/heads/staging' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
 
       - name: Déploiement en production
