@@ -21,10 +21,11 @@ class Page
 
   attr_reader :url, :root, :status, :html, :actual_url
 
-  def initialize(url:, root: nil, html: nil)
+  def initialize(url:, root: nil, html: nil, browser: nil)
     @url = Link.normalize(url)
     @root = root ? Link.normalize(root) : Link.root_from(url)
     @html = html
+    @browser = browser || Browser.new
 
     html.present? ? setup_page_data : fetch_page_data
  end
@@ -83,7 +84,7 @@ class Page
   end
 
   def fetch_page_data
-    @actual_url, @status, @content_type, @html = Browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body)
+    @actual_url, @status, @content_type, @html = @browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body)
 
     raise InvalidTypeError.new(url, @content_type) unless is_html_page?
   end
