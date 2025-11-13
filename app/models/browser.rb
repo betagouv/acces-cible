@@ -83,8 +83,6 @@ class Browser
   delegate :request_headers, to: :class
 
   class << self
-    delegate_missing_to :new
-
     def reachable?(url) = url && head(url)[:status] == SUCCESS_CODE
 
     def head(url)
@@ -147,15 +145,6 @@ class Browser
     end
   end
 
-  private
-
-  def browser
-    cleanup! if crashed?
-    @browser ||= Ferrum::Browser.new(settings).tap do |browser|
-      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-    end
-  end
-
   def cleanup!
     if @browser
       @browser.reset
@@ -166,6 +155,15 @@ class Browser
   ensure
     FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
     @browser = nil
+  end
+
+  private
+
+  def browser
+    cleanup! if crashed?
+    @browser ||= Ferrum::Browser.new(settings).tap do |browser|
+      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
+    end
   end
 
   def pid = @browser&.process&.pid
@@ -190,7 +188,6 @@ class Browser
       raise error
     ensure
       page&.close
-      cleanup!
     end
   end
 

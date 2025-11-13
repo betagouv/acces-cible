@@ -2,11 +2,12 @@ class Crawler
   include Enumerable
   MAX_CRAWLED_PAGES = 5
 
-  def initialize(root, crawl_up_to: nil)
+  def initialize(root, crawl_up_to: nil, browser: nil)
     @root = Link.from(Link.root_from(root))
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
     @queue = LinkList.new(root)
     @crawled = LinkList.new
+    @browser = browser
   end
 
   def find(&block)
@@ -33,7 +34,7 @@ class Crawler
   def get_page
     crawled << link = queue.shift
     Rails.logger.info { "#{crawled.size}: Crawling #{link.href}" }
-    Page.new(url: link.href, root: root.href)
+    Page.new(url: link.href, root: root.href, browser: @browser)
   rescue StandardError => e
     case e
     when Page::InvalidTypeError
