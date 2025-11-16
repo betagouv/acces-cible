@@ -1,14 +1,3 @@
-GIT
-  remote: https://github.com/freesteph/omniauth.git
-  revision: 6ecc52c674e02c84adba3e9b23e1b12c8b435a6d
-  branch: fix/dont-call-setup-phase-in-test-mode
-  specs:
-    omniauth (2.1.3)
-      hashie (>= 3.4.6)
-      logger
-      rack (>= 2.2.3)
-      rack-protection
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -397,6 +386,11 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    omniauth (2.1.3)
+      hashie (>= 3.4.6)
+      logger
+      rack (>= 2.2.3)
+      rack-protection
     omniauth-proconnect (0.5)
       faraday (~> 2)
       json-jwt (~> 1)
@@ -428,8 +422,6 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-rails (0.3.11)
-      pry (>= 0.13.0)
     psych (5.2.6)
       date
       stringio
@@ -710,13 +702,12 @@ DEPENDENCIES
   markdown_views
   memory_profiler
   mission_control-jobs (~> 1.1)
-  omniauth!
+  omniauth
   omniauth-proconnect
   omniauth-rails_csrf_protection
   pagy
   pg (~> 1.6)
   propshaft
-  pry-rails
   puma (>= 5.0)
   rack-mini-profiler
   rails (~> 8.0.4)
