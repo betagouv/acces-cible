@@ -13,9 +13,10 @@ class ApplicationRecord < ActiveRecord::Base
     def to_percent(number, **options) = helpers.number_to_percentage(number, options.with_defaults(precision: 0, strip_insignificant_zeros: true))
 
     def bulk_reset_counter(association, counter: nil)
-      counter ||= "#{association}_count"
       reflection = reflect_on_association(association)
       raise ArgumentError, "Association #{association} not found in #{self.name} model" unless reflection
+
+      counter ||= "#{reflection.name}_count"
 
       unless [:has_many, :has_and_belongs_to_many].include?(reflection.macro)
         raise ArgumentError, "Association #{association} must be has_many or has_and_belongs_to_many"
@@ -31,7 +32,7 @@ class ApplicationRecord < ActiveRecord::Base
         foreign_key = reflection.association_foreign_key
       end
 
-      update_all("#{counter} = (SELECT count(*) FROM #{table} WHERE #{table}.#{foreign_key} = #{table_name}.#{primary_key})")
+      update_all(counter: "(SELECT count(*) FROM #{table} WHERE #{table}.#{foreign_key} = #{table_name}.#{primary_key})")
     end
   end
 
