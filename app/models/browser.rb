@@ -190,7 +190,6 @@ class Browser
       raise error
     ensure
       page&.close
-      cleanup!
     end
   end
 
