@@ -8,13 +8,13 @@ class SiteQuery < SimpleDelegator
       sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
       subquery = model.with_current_audit
                       .select("sites.*, #{sortable_url} as sortable_url")
-                      .order(Arel.sql("sortable_url #{direction}"))
-      from(subquery, :sites).order(Arel.sql("sortable_url #{direction}"))
+                      .order(sortable_url: direction)
+      from(subquery, :sites).order("sortable_url #{direction}")
     else
       subquery = model.with_current_audit
                       .select("sites.*, audits.checked_at AS last_checked_at")
-                      .order(Arel.sql("last_checked_at #{direction} NULLS LAST"))
-      from(subquery, :sites).order(Arel.sql("last_checked_at #{direction} NULLS LAST, sites.created_at #{direction}"))
+                      .order("last_checked_at #{direction} NULLS LAST")
+      from(subquery, :sites).order("last_checked_at #{direction} NULLS LAST, sites.created_at #{direction}")
     end
   end
 
