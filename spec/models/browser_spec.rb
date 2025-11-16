@@ -355,7 +355,7 @@ RSpec.describe Browser do
         instance.send(:with_page) { |p| "result" }
 
         expect(Rails.logger).to have_received(:warn)
-        expect(instance).to have_received(:cleanup!).twice
+        expect(instance).to have_received(:cleanup!).once
       end
 
       it "retries and succeeds on second attempt" do
@@ -377,7 +377,7 @@ RSpec.describe Browser do
 
           expect(result).to eq("success")
           expect(Rails.logger).to have_received(:warn)
-          expect(instance).to have_received(:cleanup!).twice
+          expect(instance).to have_received(:cleanup!).once
           expect(instance).to have_received(:create_page).twice
         end
       end
