@@ -22,9 +22,15 @@ ActiveSupport.on_load(:active_record) do
     end
 
     def extract_sort_from(params)
-      directions = [:asc, :desc]
-      key, direction = params[:sort]&.to_unsafe_h&.first
-      direction = direction.to_s.downcase.to_sym.presence_in(directions) || directions.first
+      sort_params = params.dig(:sort)&.to_unsafe_h || {}
+
+      allowed_keys = %i[url checked_at]
+      key = sort_params.keys.first&.to_sym
+      key = allowed_keys.include?(key) ? key : nil
+
+      direction = sort_params.values.first&.to_s&.downcase&.to_sym
+      direction = %i[asc desc].include?(direction) ? direction : :asc
+
       [key, direction]
     end
   end
