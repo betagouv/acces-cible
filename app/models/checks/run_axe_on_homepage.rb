@@ -28,7 +28,7 @@ module Checks
     private
 
     def analyze!
-      return unless (results = Browser.axe_check(audit.url))
+      return unless (results = browser.axe_check(audit.url))
 
       {
         passes: results["passes"]&.count || 0,
