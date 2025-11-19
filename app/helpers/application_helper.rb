@@ -57,8 +57,8 @@ module ApplicationHelper
 
   def root? = request.path == "/"
 
-  def current_git_commit
-    ENV["CONTAINER_VERSION"] || `git show -s --format=%H`
+  def current_version
+    ENV["CONTAINER_VERSION"] || "local"
   end
 
   def flatten_params(*keys)
