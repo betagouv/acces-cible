@@ -44,7 +44,11 @@ class Browser
     "twitter.com",
     "linkedin.com",
     "doubleclick.net",
-    "adservice.google.com"
+    "adservice.google.com",
+    "youtube.com",
+    "play.google.com",
+    "sites.statistiques.online",
+    "googleapis.com",
   ].then { |domains| Regexp.union(domains) }
 
   AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
@@ -151,9 +155,8 @@ class Browser
 
   def browser
     cleanup! if crashed?
-    @browser ||= Ferrum::Browser.new(settings).tap do |browser|
-      browser.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-    end
+
+    @browser ||= Ferrum::Browser.new(settings)
   end
 
   def cleanup!
@@ -197,6 +200,7 @@ class Browser
   def create_page
     browser.create_page.tap do |page|
       page.headers.set(request_headers)
+      page.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
       page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
     end
   end
