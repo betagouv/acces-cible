@@ -292,18 +292,12 @@ RSpec.describe Browser do
       # Always mock Ferrum::Browser to prevent real instances
       allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
       allow(ferrum_browser).to receive_messages(network: network, process: instance_double(MockProcess, pid: 12345))
-      allow(network).to receive(:blocklist=)
       allow(Process).to receive(:kill).with(0, 12345).and_return(1)
     end
 
     it "creates a new Ferrum::Browser instance during initialization" do
       browser_instance = described_class.new
       expect(browser_instance.send(:browser)).to eq(ferrum_browser)
-    end
-
-    it "sets network blocklist with extensions and domains during initialization" do
-      expect(network).to receive(:blocklist=).with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
-      described_class.new.send(:browser)
     end
   end
 
@@ -571,6 +565,7 @@ RSpec.describe Browser do
       allow(network).to receive_messages("blocklist=": nil, wait_for_idle: nil)
       allow(ferrum_browser).to receive(:create_page).and_return(page)
       allow(page).to receive_messages(headers:, network:)
+      allow(page).to receive(:network).and_return(network)
       allow(headers).to receive_messages(set: nil, add: nil)
       allow(Process).to receive(:kill).with(0, 12345).and_return(1)
     end
@@ -580,6 +575,14 @@ RSpec.describe Browser do
 
       expect(ferrum_browser).to have_received(:create_page)
       expect(result).to eq(page)
+    end
+
+    it "sets the blocklist on the page's context" do
+      expect(network)
+        .to receive(:blocklist=)
+        .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
+
+      instance.send(:create_page)
     end
 
     it "sets all headers including user agent on the page" do
