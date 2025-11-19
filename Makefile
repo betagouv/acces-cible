@@ -1,6 +1,10 @@
 DOCKER-RUN = docker compose run -e TERM --rm --entrypoint=""
 BUNDLE-EXEC = bundle exec
 
+DATABASE_URL = postgresql://postgres:dummy@db:5433
+
+.PHONY: db
+
 build:
 	docker compose build
 
@@ -27,3 +31,6 @@ guard:
 
 debug:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rdbg -nA web 12345
+
+db:
+	$(DOCKER-RUN) -e PAGER= db psql $(DATABASE_URL)
