@@ -47,7 +47,7 @@
           <%= link_to "Gestion des cookies", cookies_path, class: "fr-footer__bottom-link" %>
         </li>
         <li class="fr-footer__bottom-item">
-          <%= link_to "Code source (version #{current_git_commit.first(10)})", commit_url(current_git_commit), class: "fr-footer__bottom-link", target: :_blank %>
+          <%= link_to "Code source (version #{current_version.first(10)})", commit_url(current_version), class: "fr-footer__bottom-link", target: :_blank %>
         </li>
       </ul>
       <div class="fr-footer__bottom-copy">
