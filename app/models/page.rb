@@ -139,7 +139,7 @@ class Page
       if matcher.is_a?(Regexp)
         matcher.match?(heading.text.squish)
       else
-        StringComparison.match?(matcher, heading.text.squish, ignore_case: true, fuzzy: 0.85)
+        StringComparison.match?(matcher, heading.text.squish, ignore_case: true, fuzzy: 0.65)
       end
     end
   end
