@@ -17,12 +17,12 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     it "returns complete accessibility information" do
       allow(check).to receive(:page).and_return(build(:page, body: text))
       expect(check.send(:analyze!)).to include(
-        audit_date: Date.new(2024, 3, 15),
-        compliance_rate: 75,
-        standard: "RGAA version 4.1",
-        auditor: "ABC",
-        mentions_article: true
-      )
+                                         audit_date: Date.new(2024, 3, 15),
+                                         compliance_rate: 75,
+                                         standard: "RGAA version 4.1",
+                                         auditor: "ABC",
+                                         mentions_article: true
+                                       )
     end
   end
 
@@ -33,29 +33,52 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "en mars 2024" => Date.new(2024, 3, 1),
       "loi n° 2005-102 du 11 février 2005… audit réalisé le 11 février 2025" => Date.new(2025, 2, 11),
       "du 15 février 2024" => Date.new(2024, 2, 15),
-      "du 35 mai 2024" => nil
+      "Cette déclaration a été établie le 1er janvier 2024, et mise à jour le 10 avril 2024" => Date.new(2024, 1, 1),
+      "Cette déclaration a été établie le 3 juin 2020. Elle a été mise à jour le 4 novembre 2024." => Date.new(2020, 6, 3),
+      "du 35 mai 2024" => nil,
+      "Cette déclaration d'accessibilité s'applique au site ac-amiens.fr. Elle a été réalisée le 23 septembre 2020, sur la base des contenus disponibles à cette date." => Date.new(2020, 9, 23)
     }.each do |text, expected_date|
       it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}' from '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: text))
-        expect(check.find_audit_date).to eq(expected_date)
+        allow(check).to receive(:page).and_return(build(:page, body: "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>"))
+        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(expected_date)
       end
+    end
+
+    it "search for dates with headers" do
+      body = <<~HTML
+        <p>Conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
+        <h2>État de conformité</h2>
+        <p>La déclaration a été réalisée le 23 septembre 2020.</p>
+        <h2>Autre</h2>
+        <p>Informations diverses du 11 février 2005.</p>
+      HTML
+      allow(check).to receive(:page).and_return(build(:page, body:))
+      expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2020, 9, 23))
+    end
+
+    it "ignores the law's date" do
+      body = <<~HTML
+        <h2>État de conformité</h2>
+        <p>Conformément à la loi n° 2005-102 du 11 février 2005.</p>
+        <p>La déclaration a été réalisée le 1er mars 2024</p>
+        <h2>Autre</h2>
+      HTML
+      allow(check).to receive(:page).and_return(build(:page, body:))
+      expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2024, 3, 1))
     end
   end
 
   describe "#find_audit_update_date" do
     {
-      "Au 6 décembre 2024, La DILA indique qu'aucune modification n'a été réalisée sur le téléservice. Par conséquent le taux de conformité est inchangé depuis le précédent audit." => Date.new(2024, 12, 6),
-      "Suite à un audit de recette effectué en interne par l'Expert Accessibilité de la DILA réalisé le 16 juin 2023, le taux de conformité au RGAA v 4.1 est dorénavant de 88,52 %." => Date.new(2023, 6, 16),
-      "Audit réalisé le 1er décembre 2024. Suite à un audit de recette effectué en interne par l'Expert Accessibilité de la DILA réalisé le 16 août 2024, le taux de conformité au RGAA v 4.1 est dorénavant de 88,52 %." => nil, # audit_date est postérieure
+      "Suite à un audit de recette effectué en interne par l'Expert Accessibilité de la DILA réalisé le 16 juin 2023, le taux de conformité au RGAA v 4.1 est dorénavant de 88,52 %." => nil,
       "Mise à jour le 7 mars 2024 suite à la correction de plusieurs non-conformités." => Date.new(2024, 3, 7),
-      "Au 31 janvier 2024, une nouvelle évaluation a été effectuée." => Date.new(2024, 1, 31),
-      "Audit initial réalisé en mai 2023. Actualisation réalisée le 4 avril 2024." => Date.new(2024, 4, 4),
+      "Cette déclaration a été établie le 1er janvier 2024, et mise à jour le 10 avril 2024" => Date.new(2024, 4, 10),
       "Une mention de date qui n'a pas de mots-clés le 15 septembre 2024." => nil,
       "Une date invalide du 35 mai 2024 pour une mise à jour." => nil
     }.each do |text, expected_date|
       it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}' from '#{text}'" do
-        allow(check).to receive_messages(page: build(:page, body: text), audit_date: expected_date ? expected_date - 1.year : nil)
-        expect(check.find_audit_update_date).to eq(expected_date)
+        allow(check).to receive_messages(page: build(:page, body: "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>"), audit_date: expected_date ? expected_date - 1.year : nil)
+        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_UPDATE_DATE_PATTERN)).to eq(expected_date)
       end
     end
   end

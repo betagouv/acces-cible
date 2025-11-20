@@ -152,8 +152,8 @@ RSpec.describe Page do
 
     before do
       allow(Browser).to receive(:get)
-        .with(normalized_url)
-        .and_return({ body:, status: 200, content_type:, current_url: normalized_url })
+                          .with(normalized_url)
+                          .and_return({ body:, status: 200, content_type:, current_url: normalized_url })
     end
 
     it "fetches the page content" do
@@ -356,8 +356,8 @@ RSpec.describe Page do
 
           page.text(between_headings: ["Section 1", "Section 2"])
 
-          expect(StringComparison).to have_received(:match?).with("Section 1", "Section 1: Introduction", ignore_case: true, fuzzy: 0.85)
-          expect(StringComparison).to have_received(:match?).with("Section 2", "Section 2: Conclusion", ignore_case: true, fuzzy: 0.85)
+          expect(StringComparison).to have_received(:match?).with("Section 1", "Section 1: Introduction", ignore_case: true, fuzzy: 0.65)
+          expect(StringComparison).to have_received(:match?).with("Section 2", "Section 2: Conclusion", ignore_case: true, fuzzy: 0.65)
         end
 
         it "matches headings with fuzzy case-insensitive matching" do
@@ -869,8 +869,8 @@ RSpec.describe Page do
 
           page.links(between_headings: ["Start", "End"])
 
-          expect(StringComparison).to have_received(:match?).with("Start", "Start Section", ignore_case: true, fuzzy: 0.85)
-          expect(StringComparison).to have_received(:match?).with("End", "End Section", ignore_case: true, fuzzy: 0.85)
+          expect(StringComparison).to have_received(:match?).with("Start", "Start Section", ignore_case: true, fuzzy: 0.65)
+          expect(StringComparison).to have_received(:match?).with("End", "End Section", ignore_case: true, fuzzy: 0.65)
         end
 
         it "matches headings with fuzzy case-insensitive matching" do
