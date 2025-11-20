@@ -77,7 +77,7 @@ RSpec.describe Audit do
     subject(:page) { audit.page(kind) }
 
     let(:audit) { create(:audit, :without_checks, url: "https://example.com") }
-    let(:mock_page) { instance_double(Page) }
+    let(:mock_page) { instance_double(Page, html: nil) }
 
     before do
       allow(Page).to receive(:new).and_return(mock_page)
@@ -87,7 +87,7 @@ RSpec.describe Audit do
       let(:kind) { :home }
 
       it "creates a Page with the audit url" do
-        expect(Page).to receive(:new).with(url: audit.url, root: audit.url)
+        expect(Page).to receive(:new).with(url: audit.url, root: audit.url, html: nil)
         page
       end
 
@@ -107,7 +107,7 @@ RSpec.describe Audit do
         end
 
         it "creates a Page with the accessibility page url" do
-          expect(Page).to receive(:new).with(url: "#{audit.url}/accessibilite", root: audit.url)
+          expect(Page).to receive(:new).with(url: "#{audit.url}/accessibilite", root: audit.url, html: nil)
           page
         end
 

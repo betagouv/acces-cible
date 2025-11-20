@@ -30,6 +30,8 @@ module Checks
     def analyze!
       return unless (page = find_page)
 
+      audit.update(accessibility_page_html: page.html)
+
       { url: page.url, title: page.title }
     end
 

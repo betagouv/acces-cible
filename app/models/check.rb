@@ -101,11 +101,11 @@ class Check < ApplicationRecord
   end
 
   def root_page
-    @root_page ||= Page.new(url: audit.url)
+    @root_page ||= audit.page(:home)
   end
 
   def crawler(crawl_up_to: nil)
-    Crawler.new(audit.url, crawl_up_to:)
+    Crawler.new(audit.url, crawl_up_to:, root_page_html: audit.home_page_html)
   end
 
   def requirements
