@@ -111,26 +111,3 @@ jobs:
 
       - name: Run feature tests
         run: bundle exec cucumber
-
-  deploy:
-    name: Déploiement sur Scalingo
-    runs-on: ubuntu-latest
-
-    needs: [test, lint, scan_ruby]
-
-    if: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
-
-    steps:
-      - name: Install Scalingo CLI
-        run: curl -O https://cli-dl.scalingo.com/install && bash install
-
-      - name: Login to Scalingo
-        run: scalingo login --api-token ${{ secrets.SCALINGO_ACCESS_TOKEN }}
-
-      - name: Déploiement sur staging
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
-
-      - name: Déploiement en production
-        if: ${{ github.ref == 'refs/heads/production' }}
-        run: scalingo --app acces-cible-prod --region osc-secnum-fr1 integration-link-manual-deploy production
