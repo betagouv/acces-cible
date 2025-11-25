@@ -24,10 +24,21 @@ module Checks
 
     store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article
 
-    def tooltip? = !(completed? && found_required?)
-    def audit_date = super&.to_date
-    def audit_update_date = super&.to_date
-    def human_compliance_rate = to_percent(compliance_rate)
+    def tooltip?
+      !(completed? && found_required?)
+    end
+
+    def audit_date
+      super&.to_date
+    end
+
+    def audit_update_date
+      super&.to_date
+    end
+
+    def human_compliance_rate
+      to_percent(compliance_rate)
+    end
 
     def find_audit_date
       date_matches = page.text.scan(AUDIT_DATE_PATTERN).map do |full_date, day_str, month_str, year_str, day_num, month_num, year_num|
@@ -111,16 +122,31 @@ module Checks
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
-    def find_article_mention = page.text.match?(ARTICLE)
+    def find_article_mention
+      page.text.match?(ARTICLE)
+    end
 
-    def custom_badge_status = found_required? ? :success : :warning
-    def custom_badge_text = found_required? ? human_compliance_rate : human(:missing_data)
+    def custom_badge_status
+      found_required? ? :success : :warning
+    end
+
+    def custom_badge_text
+      found_required? ? human_compliance_rate : human(:missing_data)
+    end
 
     private
 
-    def page = @page ||= audit.page(:accessibility)
-    def found_required? = [:audit_date, :compliance_rate, :mentions_article].all? { send(it).present? }
-    def found_all? = found_required? && [:standard, :auditor].all? { send(it).present? }
+    def page
+      @page ||= audit.page(:accessibility)
+    end
+
+    def found_required?
+      [:audit_date, :compliance_rate, :mentions_article].all? { send(it).present? }
+    end
+
+    def found_all?
+      found_required? && [:standard, :auditor].all? { send(it).present? }
+    end
 
     def analyze!
       return unless page

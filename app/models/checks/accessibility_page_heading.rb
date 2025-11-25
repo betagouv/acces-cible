@@ -4,16 +4,16 @@ module Checks
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     EXPECTED_HEADINGS = [
       [2, "État de conformité"],
-        [3, "Résultats des tests"],
+      [3, "Résultats des tests"],
       [2, "Contenus non accessibles"],
-        [3, "Non-conformités"],
-        [3, "Dérogations pour charge disproportionnée"],
-        [3, "Contenus non soumis à l'obligation d'accessibilité"],
+      [3, "Non-conformités"],
+      [3, "Dérogations pour charge disproportionnée"],
+      [3, "Contenus non soumis à l'obligation d'accessibilité"],
       [2, "Établissement de cette déclaration d'accessibilité"],
-        [3, "Technologies utilisées pour la réalisation du site"],
-        [3, "Environnement de test"],
-        [3, "Outils pour évaluer l'accessibilité"],
-        [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
+      [3, "Technologies utilisées pour la réalisation du site"],
+      [3, "Environnement de test"],
+      [3, "Outils pour évaluer l'accessibilité"],
+      [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
       [2, "Retour d'information et contact"],
       [2, "Voies de recours"],
     ].freeze
@@ -22,15 +22,28 @@ module Checks
     delegate :expected_headings, to: :class
 
     class << self
-      def expected_headings = EXPECTED_HEADINGS.collect(&:last)
+      def expected_headings
+        EXPECTED_HEADINGS.collect(&:last)
+      end
     end
 
     store_accessor :data, :page_headings, :comparison
 
-    def tooltip? = audit.pending? || heading_statuses.empty?
-    def heading_statuses = @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
-    def total = expected_headings.count
-    def failures = heading_statuses.filter { it.error? }
+    def tooltip?
+      audit.pending? || heading_statuses.empty?
+    end
+
+    def heading_statuses
+      @heading_statuses ||= comparison&.map { PageHeadingStatus.new(*it) } || []
+    end
+
+    def total
+      expected_headings.count
+    end
+
+    def failures
+      heading_statuses.filter { it.error? }
+    end
 
     def score
       points = heading_statuses.sum do |heading_status|
@@ -44,15 +57,21 @@ module Checks
       (points / total.to_f * 100).round(2)
     end
 
-    def human_success_rate = comparison.present? ? to_percent(score) : ""
-    def human_explanation = human(:explanation, total:, count: failures.count, error: failures.first&.message)
+    def human_success_rate
+      comparison.present? ? to_percent(score) : ""
+    end
+
+    def human_explanation
+      human(:explanation, total:, count: failures.count, error: failures.first&.message)
+    end
+
     alias custom_badge_text human_success_rate
 
     def custom_badge_status
       case score
       when 90..100 then :success
-      when 60..90  then :warning
-      else              :error
+      when 60..90 then :warning
+      else :error
       end
     end
 

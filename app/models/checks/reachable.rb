@@ -6,10 +6,17 @@ module Checks
 
     store_accessor :data, :original_url, :redirect_url
 
-    def redirected? = original_url && redirect_url && normalize(original_url) != normalize(redirect_url)
+    def redirected?
+      original_url && redirect_url && normalize(original_url) != normalize(redirect_url)
+    end
 
-    def custom_badge_text = redirected? ? human(:redirected) : human(:reachable)
-    def custom_badge_status = redirected? ? :info : :success
+    def custom_badge_text
+      redirected? ? human(:redirected) : human(:reachable)
+    end
+
+    def custom_badge_status
+      redirected? ? :info : :success
+    end
 
     private
 

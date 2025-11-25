@@ -89,7 +89,9 @@ class Browser
   class << self
     delegate_missing_to :new
 
-    def reachable?(url) = url && head(url)[:status] == SUCCESS_CODE
+    def reachable?(url)
+      url && head(url)[:status] == SUCCESS_CODE
+    end
 
     def head(url)
       response = HTTP
@@ -171,7 +173,9 @@ class Browser
     @browser = nil
   end
 
-  def pid = @browser&.process&.pid
+  def pid
+    @browser&.process&.pid
+  end
 
   def crashed?
     pid.nil? || Process.kill(0, pid).zero? # kill 0 only checks that the process is alive and reachable

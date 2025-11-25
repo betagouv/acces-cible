@@ -11,14 +11,19 @@ module Checks
                     (?<level>non|partiellement|totalement)  # Capture the level
                     \s+                   # Required whitespace
                     conforme              # Match "conforme"
-                    /iux                  # Case insensitive, Unicode, allow comments and whitespace
+                    /iux # Case insensitive, Unicode, allow comments and whitespace
 
     store_accessor :data, :mention
     delegate :text, to: :root_page, prefix: true
 
-    def mention_text = completed? ? human("mentions.#{mention || 'none'}") : ""
+    def mention_text
+      completed? ? human("mentions.#{mention || 'none'}") : ""
+    end
 
-    def custom_badge_text = mention_text
+    def custom_badge_text
+      mention_text
+    end
+
     def custom_badge_status
       { nil => :error,
         non: :warning,

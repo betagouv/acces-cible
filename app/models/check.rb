@@ -67,24 +67,59 @@ class Check < ApplicationRecord
   broadcasts_refreshes_to ->(check) { "sites" }
 
   class << self
-    def human_type = human("checks.#{model_name.element}.type")
-    def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
+    def human_type
+      human("checks.#{model_name.element}.type")
+    end
+
+    def table_header
+      human("checks.#{model_name.element}.table_header", default: human_type)
+    end
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }.sort_by { |_name, klass| klass.priority }.to_h
     end
-    def names = types.keys
-    def classes = types.values
-    def priority = self::PRIORITY
+
+    def names
+      types.keys
+    end
+
+    def classes
+      types.values
+    end
+
+    def priority
+      self::PRIORITY
+    end
   end
 
-  def human_status = Check.human("status.#{state_machine.current_state}")
-  def to_partial_path = model_name.i18n_key.to_s
-  def root_page = @root_page ||= Page.new(url: audit.url)
-  def crawler(crawl_up_to: nil) = Crawler.new(audit.url, crawl_up_to:)
-  def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
-  def tooltip? = true
-  def slow? = self.class::SLOW
+  def human_status
+    Check.human("status.#{state_machine.current_state}")
+  end
+
+  def to_partial_path
+    model_name.i18n_key.to_s
+  end
+
+  def root_page
+    @root_page ||= Page.new(url: audit.url)
+  end
+
+  def crawler(crawl_up_to: nil)
+    Crawler.new(audit.url, crawl_up_to:)
+  end
+
+  def requirements
+    self.class::REQUIREMENTS
+  end
+
+  # Returns subclass constant value, defaults to parent class
+  def tooltip?
+    true
+  end
+
+  def slow?
+    self.class::SLOW
+  end
 
   def run!
     self.data = analyze!
@@ -120,7 +155,11 @@ class Check < ApplicationRecord
 
   private
 
-  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+  def analyze!
+    raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+  end
 
-  def set_priority = self.priority = self.class.priority
+  def set_priority
+    self.priority = self.class.priority
+  end
 end

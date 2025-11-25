@@ -9,11 +9,21 @@ module Checks
 
     store_accessor :data, :url, :title
 
-    def found? = url.present?
+    def found?
+      url.present?
+    end
 
-    def custom_badge_text = found? ? human(:link_to_page) : human(:not_found)
-    def custom_badge_status = found? ? :success : :error
-    def custom_badge_link = url
+    def custom_badge_text
+      found? ? human(:link_to_page) : human(:not_found)
+    end
+
+    def custom_badge_status
+      found? ? :success : :error
+    end
+
+    def custom_badge_link
+      url
+    end
 
     private
 
@@ -43,13 +53,15 @@ module Checks
       matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
     end
 
-    def fuzzy_match?(a, b) = StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
+    def fuzzy_match?(a, b)
+      StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.6)
+    end
 
     def prioritize(queue)
       queue.filter! do |link|
         link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) ||
-        link.text.match?(DECLARATION) ||
-        link.href.match?(DECLARATION_URL)
+          link.text.match?(DECLARATION) ||
+          link.href.match?(DECLARATION_URL)
       end
     end
   end

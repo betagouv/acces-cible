@@ -5,17 +5,34 @@ module Checks
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
 
-    def tooltip? = !completed?
-    def applicable_total = completed? ? passes + incomplete + violations : nil
-    def checks_total = completed? ? applicable_total + inapplicable : nil
-    def success_rate = completed? ? (passes + incomplete) / applicable_total.to_f * 100 : nil
-    def human_success_rate = to_percent(success_rate)
+    def tooltip?
+      !completed?
+    end
+
+    def applicable_total
+      completed? ? passes + incomplete + violations : nil
+    end
+
+    def checks_total
+      completed? ? applicable_total + inapplicable : nil
+    end
+
+    def success_rate
+      completed? ? (passes + incomplete) / applicable_total.to_f * 100 : nil
+    end
+
+    def human_success_rate
+      to_percent(success_rate)
+    end
 
     def violation_data
       (super || []).map { |data| AxeViolation.new(**data) }
     end
 
-    def custom_badge_text = human_success_rate
+    def custom_badge_text
+      human_success_rate
+    end
+
     def custom_badge_status
       case success_rate
       when 100 then :success

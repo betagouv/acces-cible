@@ -4,7 +4,9 @@ module Checks
 
     store_accessor :data, :indication, :detected_code
 
-    def custom_badge_text = indication || human(:empty)
+    def custom_badge_text
+      indication || human(:empty)
+    end
 
     def custom_badge_status
       if indication.blank?

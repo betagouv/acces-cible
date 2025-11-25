@@ -67,8 +67,19 @@ Link = Data.define(:href, :text) do
     super(href: normalize(href).to_s, text: text&.squish || "")
   end
 
-  def to_str = href
-  def ==(other) = href == other.to_str
-  def <=>(other) = other.is_a?(Link) ? href <=> other.href : nil
-  def eql?(other) = other.is_a?(Link) && href == other.href
+  def to_str
+    href
+  end
+
+  def ==(other)
+    href == other.to_str
+  end
+
+  def <=>(other)
+    other.is_a?(Link) ? href <=> other.href : nil
+  end
+
+  def eql?(other)
+    other.is_a?(Link) && href == other.href
+  end
 end

@@ -16,7 +16,9 @@ module Dsfr
 
     attr_reader :text, :title
 
-    def button? = @type == :button
+    def button?
+      @type == :button
+    end
 
     def link
       content_tag :a, text, tabindex: 0, class: "fr-link", id: element_id, "aria-describedby": tooltip_id, "data-turbo": false

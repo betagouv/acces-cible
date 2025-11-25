@@ -46,10 +46,21 @@ class TagsController < ApplicationController
 
   private
 
-  def upload? = params.key?(:site_upload)
-  def template_object_klass = upload? ? SiteUpload : Site
-  def tag_params = params.expect(tag: [:name])
-  def set_tag = @tag = current_user.team.tags.friendly.find(params[:id])
+  def upload?
+    params.key?(:site_upload)
+  end
+
+  def template_object_klass
+    upload? ? SiteUpload : Site
+  end
+
+  def tag_params
+    params.expect(tag: [:name])
+  end
+
+  def set_tag
+    @tag = current_user.team.tags.friendly.find(params[:id])
+  end
 
   def redirect_old_slugs
     redirect_to(@tag, status: :moved_permanently) unless @tag.slug == params[:id]

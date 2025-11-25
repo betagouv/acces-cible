@@ -1,6 +1,8 @@
 ActiveSupport.on_load(:active_record) do
   module QueryExtensions
-    def query_object_class = "#{model.name}Query".safe_constantize
+    def query_object_class
+      "#{model.name}Query".safe_constantize
+    end
 
     def filter_by(params)
       if query_object_class
@@ -31,7 +33,9 @@ ActiveSupport.on_load(:active_record) do
   ActiveRecord::Relation.include(QueryExtensions)
 
   module CsvExportExtensions
-    def export_object_class = "#{model.name}CsvExport".constantize
+    def export_object_class
+      "#{model.name}CsvExport".constantize
+    end
 
     def to_csv
       export_object_class.new(self).to_csv

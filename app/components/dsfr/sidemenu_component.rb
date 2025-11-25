@@ -25,6 +25,8 @@ module Dsfr
       )
     end
 
-    def render? = items.any?
+    def render?
+      items.any?
+    end
   end
 end

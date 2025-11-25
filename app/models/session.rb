@@ -6,5 +6,7 @@ class Session < ApplicationRecord
   scope :active, -> { where(updated_at: MAX_IDLE_TIME.ago..) }
   scope :inactive, -> { where(updated_at: ...MAX_IDLE_TIME.ago) }
 
-  def should_touch? = updated_at.before?(1.day.ago)
+  def should_touch?
+    updated_at.before?(1.day.ago)
+  end
 end
