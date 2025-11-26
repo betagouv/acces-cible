@@ -31,7 +31,9 @@ class Audit < ApplicationRecord
     Page.new(url: page_url, root: url) if page_url
   end
 
-  def schedule = ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
+  def schedule
+    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
+  end
 
   def all_checks
     Check.names.map { |name| public_send(name) }

@@ -11,14 +11,14 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
     @title = t("errors.not_found.title")
     respond_to do |format|
-      format.any  { head :not_found }
+      format.any { head :not_found }
       format.html { render "errors/not_found", status: :not_found }
     end
   end
   rescue_from ActiveRecord::NotNullViolation do |exception|
     @title = t("errors.internal_server_error.title")
     respond_to do |format|
-      format.any  { head :internal_server_error }
+      format.any { head :internal_server_error }
       format.html { render "errors/internal_server_error", status: :internal_server_error }
     end
   end
@@ -45,6 +45,11 @@ class ApplicationController < ActionController::Base
     "modal" if turbo_frame_request_id == "modal" # => link with "data-turbo-frame": :modal
   end
 
-  def get_request? = request.request_method_symbol == :get
-  def pagy_limit = Integer(params[:limit], 10, exception: false).then { it&.nonzero? }
+  def get_request?
+    request.request_method_symbol == :get
+  end
+
+  def pagy_limit
+    Integer(params[:limit], 10, exception: false).then { it&.nonzero? }
+  end
 end

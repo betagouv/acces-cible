@@ -7,9 +7,18 @@ class PageHeadingStatus < Data.define(:expected_heading, :expected_level, :statu
   delegate :inquiry, to: :status, prefix: true
   delegate :ok?, :missing?, :incorrect_order?, :incorrect_level?, to: :status_inquiry
 
-  def warning? = incorrect_order? || incorrect_level?
-  def error? = !ok?
-  def message = human("statuses.#{status}")
+  def warning?
+    incorrect_order? || incorrect_level?
+  end
+
+  def error?
+    !ok?
+  end
+
+  def message
+    human("statuses.#{status}")
+  end
+
   def fuzzy_match?
     actual_heading &&
       StringComparison.similarity_ratio(expected_heading, actual_heading, ignore_case: true) < SIMILARITY_THRESHOLD

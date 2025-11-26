@@ -14,7 +14,11 @@ class Tag < ApplicationRecord
   scope :orphaned, -> { where.missing(:site_tags) }
   scope :not_recently_used, -> { where(updated_at: ..1.day.ago) }
 
-  def to_s = name
+  def to_s
+    name
+  end
 
-  def should_generate_new_friendly_id? = name_changed? || super
+  def should_generate_new_friendly_id?
+    name_changed? || super
+  end
 end

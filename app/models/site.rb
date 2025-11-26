@@ -42,9 +42,14 @@ class Site < ApplicationRecord
     end
   end
 
-  def url_without_scheme_and_www = Link.url_without_scheme_and_www(audit.url)
+  def url_without_scheme_and_www
+    Link.url_without_scheme_and_www(audit.url)
+  end
 
-  def name_with_fallback = name.presence || url_without_scheme_and_www
+  def name_with_fallback
+    name.presence || url_without_scheme_and_www
+  end
+
   alias to_title name_with_fallback
   alias to_s name_with_fallback
 
@@ -54,9 +59,13 @@ class Site < ApplicationRecord
     tags << team.tags.find_or_create_by(name:)
   end
 
-  def should_generate_new_friendly_id? = new_record? || (slug != url_without_scheme_and_www.parameterize) || super
+  def should_generate_new_friendly_id?
+    new_record? || (slug != url_without_scheme_and_www.parameterize) || super
+  end
 
-  def update_slug! = tap { self.slug = nil; friendly_id }.save!
+  def update_slug!
+    tap { self.slug = nil; friendly_id }.save!
+  end
 
   def audit
     audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)

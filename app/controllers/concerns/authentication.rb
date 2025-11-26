@@ -19,7 +19,9 @@ module Authentication
 
   private
 
-  def current_user = Current.user
+  def current_user
+    Current.user
+  end
 
   def authenticated?
     resume_session

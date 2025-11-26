@@ -10,7 +10,9 @@ module ApplicationHelper
     t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
   end
 
-  def or_separator = tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
+  def or_separator
+    tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
+  end
 
   def badge(status, text = nil, link: nil, tooltip: false, &block)
     status, text, link = *status if status.is_a?(Array)
@@ -55,7 +57,9 @@ module ApplicationHelper
     "aria-sort=#{current_sort == :asc ? :descending : :ascending}"
   end
 
-  def root? = request.path == "/"
+  def root?
+    request.path == "/"
+  end
 
   def current_version
     ENV["CONTAINER_VERSION"] || "local"

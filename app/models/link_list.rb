@@ -29,14 +29,28 @@ class LinkList
   def sort_by!
     return self if size < 2
 
-    list.sort_by! { |a, b|  yield(a, b) }
+    list.sort_by! { |a, b| yield(a, b) }
   end
 
-  def filter! = list.filter! { |link| yield(link) }
-  def include?(link) = to_a.include? Link.from(link).href
-  def shift = empty? ? raise(EmptyListError.new) : list.shift
-  def ==(other) = to_a == other.to_a
-  def to_a = list.collect(&:href)
+  def filter!
+    list.filter! { |link| yield(link) }
+  end
+
+  def include?(link)
+    to_a.include? Link.from(link).href
+  end
+
+  def shift
+    empty? ? raise(EmptyListError.new) : list.shift
+  end
+
+  def ==(other)
+    to_a == other.to_a
+  end
+
+  def to_a
+    list.collect(&:href)
+  end
 
   private
 

@@ -27,30 +27,35 @@ module Checks
       return unless page
 
       page.links(skip_files: false, scope: :main)
-        .select { |link| link.text.match? SCHEMA_PATTERN }
-        .max_by { |link| extract_years(link.text) }
+          .select { |link| link.text.match? SCHEMA_PATTERN }
+          .max_by { |link| extract_years(link.text) }
     end
 
     def link_between_headings?
       return unless page
 
       page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
-        .select { |link| link.text.match? SCHEMA_PATTERN }
-        .max_by { |link| extract_years(link.text) }
+          .select { |link| link.text.match? SCHEMA_PATTERN }
+          .max_by { |link| extract_years(link.text) }
     end
 
     def find_text_in_main
       return unless page
 
       page.text(scope: :main)
-        .scan(SCHEMA_PATTERN)
-        .flatten
-        .compact
-        .max_by { |match| extract_years(match) }
+          .scan(SCHEMA_PATTERN)
+          .flatten
+          .compact
+          .max_by { |match| extract_years(match) }
     end
 
-    def all_passed? = link_url && valid_years && reachable
-    def valid_link? = link_url && reachable
+    def all_passed?
+      link_url && valid_years && reachable
+    end
+
+    def valid_link?
+      link_url && reachable
+    end
 
     def custom_badge_status
       if all_passed?
@@ -96,7 +101,9 @@ module Checks
       }
     end
 
-    def page = @page ||= audit.page(:accessibility)
+    def page
+      @page ||= audit.page(:accessibility)
+    end
 
     def extract_years(*sources)
       sources.compact.each do |source|
@@ -106,6 +113,8 @@ module Checks
       []
     end
 
-    def validate_years(years) = years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
+    def validate_years(years)
+      years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
+    end
   end
 end

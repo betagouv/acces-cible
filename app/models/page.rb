@@ -13,6 +13,7 @@ class Page
       super("Not an HTML page: #{url} (Content-Type: #{content_type})")
     end
   end
+
   class ParseError < StandardError
     def initialize(url, message)
       super("Failed to parse HTML from #{url}: #{message}")
@@ -27,22 +28,63 @@ class Page
     @html = html
 
     html.present? ? setup_page_data : fetch_page_data
- end
+  end
 
-  def root? = url == root
-  def parsed_root = @parsed_root ||= Link.parse(root)
-  def path = url.to_s.delete_prefix(root.to_s)
-  def redirected? = actual_url.present? && actual_url != url
-  def css(selector) = dom.css(selector)
-  def title = dom.title.to_s.squish
-  def text(scope: nil, between_headings: nil) = source_for(scope:, between_headings:).text&.squish
-  def heading_levels = dom_headings.map { |hx| [hx.name[1].to_i, hx.text.squish] }
-  def headings = dom_headings.collect(&:text).collect(&:squish)
-  def internal_links = links.select { |link| link.href.start_with?(root) }
-  def external_links = links - internal_links
-  def inspect =  "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
-  def success? = status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
-  def error? = status > 399
+  def root?
+    url == root
+  end
+
+  def parsed_root
+    @parsed_root ||= Link.parse(root)
+  end
+
+  def path
+    url.to_s.delete_prefix(root.to_s)
+  end
+
+  def redirected?
+    actual_url.present? && actual_url != url
+  end
+
+  def css(selector)
+    dom.css(selector)
+  end
+
+  def title
+    dom.title.to_s.squish
+  end
+
+  def text(scope: nil, between_headings: nil)
+    source_for(scope:, between_headings:).text&.squish
+  end
+
+  def heading_levels
+    dom_headings.map { |hx| [hx.name[1].to_i, hx.text.squish] }
+  end
+
+  def headings
+    dom_headings.collect(&:text).collect(&:squish)
+  end
+
+  def internal_links
+    links.select { |link| link.href.start_with?(root) }
+  end
+
+  def external_links
+    links - internal_links
+  end
+
+  def inspect
+    "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
+  end
+
+  def success?
+    status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
+  end
+
+  def error?
+    status > 399
+  end
 
   def dom
     @dom ||= Nokogiri::HTML(html).tap do |document|
@@ -75,7 +117,7 @@ class Page
   def setup_page_data
     @actual_url = @url
     @status = 200
-    @content_type =  "text/html"
+    @content_type = "text/html"
   end
 
   def is_html_page?

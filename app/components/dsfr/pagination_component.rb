@@ -4,16 +4,26 @@ module Dsfr
     PER_PAGE = [10, 20, 50, 100]
 
     class << self
-      def per_page_label = human(:per_page_label)
-      def per_page_options = PER_PAGE.index_with { |count| human(:per_page, count:) }.invert
+      def per_page_label
+        human(:per_page_label)
+      end
+
+      def per_page_options
+        PER_PAGE.index_with { |count| human(:per_page, count:) }.invert
+      end
     end
 
     def initialize(pagy:)
       @pagy = pagy
     end
 
-    def render? = pagy.last > 1
-    def items = [first_page, previous_page, *series, next_page, last_page]
+    def render?
+      pagy.last > 1
+    end
+
+    def items
+      [first_page, previous_page, *series, next_page, last_page]
+    end
 
     private
 
@@ -62,7 +72,8 @@ module Dsfr
           tag.span "…", class: LINK_CLASS, aria: { hidden: true }
         when String # current page
           page_link(page, title: human(:page, page:), aria: { current: :page })
-        else # regular page link
+        else
+          # regular page link
           page_link(page, page:, title: human(:page, page:))
         end
       end

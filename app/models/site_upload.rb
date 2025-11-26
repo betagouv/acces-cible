@@ -44,7 +44,9 @@ class SiteUpload
     true
   end
 
-  def persisted? = false
+  def persisted?
+    false
+  end
 
   def tags_attributes=(attributes)
     return if (name = attributes[:name]).blank?

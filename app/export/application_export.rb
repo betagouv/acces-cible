@@ -19,9 +19,17 @@ class ApplicationExport
     raise NotImplementedError, "#{self.class} must implement #attributes method"
   end
 
-  def filename = "#{table_name}_#{l Time.zone.now, format: :file}.#{extension}"
-  def records = relation.find_each
-  def headers = attributes.keys
+  def filename
+    "#{table_name}_#{l Time.zone.now, format: :file}.#{extension}"
+  end
+
+  def records
+    relation.find_each
+  end
+
+  def headers
+    attributes.keys
+  end
 
   def serialize(record)
     attributes.values.map do |methods|
