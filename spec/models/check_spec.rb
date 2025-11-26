@@ -137,45 +137,6 @@ RSpec.describe Check do
     end
   end
 
-  describe "#slow?" do
-    context "when subclass defines SLOW as true" do
-      let(:slow_check_class) do
-        Class.new(described_class) do
-          const_set(:SLOW, true)
-        end
-      end
-
-      it "returns true" do
-        check = slow_check_class.new
-        expect(check.slow?).to be true
-      end
-    end
-
-    context "when subclass defines SLOW as false" do
-      let(:fast_check_class) do
-        Class.new(described_class) do
-          const_set(:SLOW, false)
-        end
-      end
-
-      it "returns false" do
-        check = fast_check_class.new
-        expect(check.slow?).to be false
-      end
-    end
-
-    context "when subclass doesn't define SLOW" do
-      let(:default_check_class) do
-        Class.new(described_class)
-      end
-
-      it "defaults to Check::SLOW (false)" do
-        check = default_check_class.new
-        expect(check.slow?).to be false
-      end
-    end
-  end
-
   describe "#error" do
     subject { check.error }
 

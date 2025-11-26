@@ -1,6 +1,5 @@
 module Checks
   class FindAccessibilityPage < Check
-    SLOW = true
     PRIORITY = 20
     DECLARATION = /\A(D[ée]claration d('|’))?accessibilit[ée]?/i
     DECLARATION_URL = /(declaration-)?d?accessibilit[e|y]|rgaa/i

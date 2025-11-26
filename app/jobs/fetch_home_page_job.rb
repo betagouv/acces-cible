@@ -1,5 +1,5 @@
 class FetchHomePageJob < ApplicationJob
-  queue_as :default
+  queue_as :slow
 
   def perform(audit)
     begin
