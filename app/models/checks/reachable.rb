@@ -23,9 +23,11 @@ module Checks
     def analyze!
       return unless root_page.success?
 
+      audit.update!(home_page_html: root_page.html)
+
       site.update(name: root_page.title) if site && site.name.blank?
       if root_page.redirected?
-        audit.update(url: root_page.actual_url)
+        audit.update!(url: root_page.actual_url)
         { original_url: root_page.url, redirect_url: root_page.actual_url }
       else
         {}

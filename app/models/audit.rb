@@ -22,13 +22,12 @@ class Audit < ApplicationRecord
   end
 
   def page(kind)
-    page_url = case kind.to_s.to_sym
-    when :home then url
-    when :accessibility then find_accessibility_page&.url
-    else
-      raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
-    end
-    Page.new(url: page_url, root: url) if page_url
+    kind = kind.to_s.to_sym
+    page_url = page_url_for(kind)
+
+    return if page_url.nil?
+
+    build_page(kind, page_url)
   end
 
   def schedule
@@ -85,5 +84,31 @@ class Audit < ApplicationRecord
       .remaining
       .filter { |other_check| other_check.depends_on?(check.to_requirement) }
       .each { |other_check| other_check.transition_to!(:aborted) }
+  end
+
+  private
+
+  def build_page(kind, page_url)
+    snapshot_html = html_for(kind)
+
+    Page.new(url: page_url, root: url, html: snapshot_html.presence)
+  end
+
+  def page_url_for(kind)
+    case kind
+    when :home
+      url
+    when :accessibility
+      find_accessibility_page&.url
+    else
+      raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
+    end
+  end
+
+  def html_for(kind)
+    case kind
+    when :home then home_page_html
+    when :accessibility then accessibility_page_html
+    end
   end
 end

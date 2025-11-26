@@ -37,7 +37,7 @@ RSpec.describe Crawler do
 
     before do
       allow(Page).to receive(:new)
-        .with(url: root_url, root: root_url)
+        .with(url: root_url, root: root_url, html: nil)
         .and_return(root_page)
     end
 
@@ -66,7 +66,7 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(url: link1.href, root: root_url)
+          .with(url: link1.href, root: root_url, html: nil)
           .and_return(target_page)
       end
 

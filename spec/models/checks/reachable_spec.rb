@@ -4,8 +4,8 @@ RSpec.describe Checks::Reachable do
   let(:check) { described_class.new }
   let(:original_url) { "https://example.com" }
   let(:redirect_url) { "https://example.org" }
-  let(:audit) { instance_double(Audit, url: original_url, update: true) }
-  let(:root_page) { instance_double(Page) }
+  let(:audit) { instance_double(Audit, url: original_url, update!: true) }
+  let(:root_page) { instance_double(Page, html: nil) }
   let(:site) { build(:site) }
 
   before do
@@ -73,7 +73,7 @@ RSpec.describe Checks::Reachable do
         end
 
         it "updates the audit with the new URL" do
-          expect(audit).to receive(:update).with(url: redirect_url)
+          expect(audit).to receive(:update!).with(url: redirect_url)
           check.send(:analyze!)
         end
 
