@@ -2,8 +2,7 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
-  after_create_commit :create_checks
-  after_create_commit :schedule
+  after_create_commit :fetch_resources!, :create_checks
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -21,6 +20,10 @@ class Audit < ApplicationRecord
     end
   end
 
+  def fetch_resources!
+    FetchHomePageJob.perform_later(self)
+  end
+
   def page(kind)
     kind = kind.to_s.to_sym
     page_url = page_url_for(kind)
@@ -28,10 +31,6 @@ class Audit < ApplicationRecord
     return if page_url.nil?
 
     build_page(kind, page_url)
-  end
-
-  def schedule
-    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
   end
 
   def all_checks
@@ -86,12 +85,16 @@ class Audit < ApplicationRecord
       .each { |other_check| other_check.transition_to!(:aborted) }
   end
 
+  def update_home_page!(response)
+    update!(home_page_html: response[:body])
+  end
+
   private
 
   def build_page(kind, page_url)
     snapshot_html = html_for(kind)
 
-    Page.new(url: page_url, root: url, html: snapshot_html.presence)
+    Page.new(url: page_url, root: url, html: snapshot_html)
   end
 
   def page_url_for(kind)

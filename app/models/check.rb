@@ -32,8 +32,6 @@ class Check < ApplicationRecord
     end
   end
 
-  SLOW = false
-
   TYPES = [
     :reachable,
     :language_indication,
@@ -115,10 +113,6 @@ class Check < ApplicationRecord
   # Returns subclass constant value, defaults to parent class
   def tooltip?
     true
-  end
-
-  def slow?
-    self.class::SLOW
   end
 
   def run!
