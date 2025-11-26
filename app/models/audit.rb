@@ -2,7 +2,7 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
-  after_create_commit :create_checks
+  after_create_commit :fetch_resources!, :create_checks
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -18,6 +18,10 @@ class Audit < ApplicationRecord
       instance_variable_get("@#{name}") ||
         instance_variable_set("@#{name}", checks.to_a.find { |check| klass === check } || checks.build(type: klass))
     end
+  end
+
+  def fetch_resources!
+    FetchHomePageJob.perform_later(self)
   end
 
   def page(kind)

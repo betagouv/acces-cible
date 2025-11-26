@@ -245,6 +245,17 @@ RSpec.describe Audit do
     end
   end
 
+  describe "fetch_resources!" do
+    let(:audit) { create(:audit) }
+
+    it "triggers the home page fetch" do
+      expect { audit.fetch_resources! }
+        .to have_enqueued_job(FetchHomePageJob)
+        .with(audit)
+        .exactly(:once)
+    end
+  end
+
   describe "abort_dependent_checks!" do
     let(:audit) { create(:audit, :without_checks) }
 
