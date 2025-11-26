@@ -3,7 +3,6 @@ class Audit < ApplicationRecord
   has_many :checks, -> { prioritized }, dependent: :destroy
 
   after_create_commit :create_checks
-  after_create_commit :schedule
 
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
@@ -28,10 +27,6 @@ class Audit < ApplicationRecord
     return if page_url.nil?
 
     build_page(kind, page_url)
-  end
-
-  def schedule
-    ProcessAuditJob.set(group: "audit_#{id}").perform_later(self)
   end
 
   def all_checks
@@ -84,6 +79,10 @@ class Audit < ApplicationRecord
       .remaining
       .filter { |other_check| other_check.depends_on?(check.to_requirement) }
       .each { |other_check| other_check.transition_to!(:aborted) }
+  end
+
+  def update_home_page!(response)
+    update!(home_page_html: response[:body])
   end
 
   private
