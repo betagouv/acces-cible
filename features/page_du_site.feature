@@ -35,7 +35,7 @@ Fonctionnalité: Page du site
     Alors la page est titrée "éticouette"
 
   Scénario: Un agent peut voir un lien sur chaque étiquette associée au site
-    Sachant que je possède un site "https://example.gouv.fr"
+    Sachant que je rajoute un site "https://example.gouv.fr"
     Et que le site "https://example.gouv.fr" a les étiquettes "production, public"
     Quand je clique sur "Tous les sites"
     Et que je clique sur "Voir la fiche de example.gouv.fr"
@@ -43,6 +43,9 @@ Fonctionnalité: Page du site
     Et la page contient un lien vers l'étiquette "production"
     Et la page contient un lien vers l'étiquette "public"
 
+  # FIXME: ce scénario trahit le parcours utilisateur en créant
+  # manuellement des données pour chaque vérification
+  @wip
   Scénario: Un agent peut voir les informations et vérifications de l'audit
     Sachant que je possède un site "https://example.gouv.fr" avec des données
     Quand je clique sur "Tous les sites"
@@ -51,14 +54,14 @@ Fonctionnalité: Page du site
     Et la page contient toutes les vérifications du site "https://example.gouv.fr"
 
   Scénario: Un agent peut voir l'historique des audits
-    Sachant que je possède un site "https://example.gouv.fr"
+    Sachant que je rajoute un site "https://example.gouv.fr"
     Et que je demande une nouvelle vérification du site "https://example.gouv.fr"
     Quand je clique sur "Tous les sites"
     Et que je clique sur "Voir la fiche de example.gouv.fr"
     Alors la page contient "Historique des vérifications"
 
   Scénario: Un agent voit un message quand le site n'a pas d'étiquettes
-    Sachant que je possède un site "https://example.gouv.fr"
+    Sachant que je rajoute un site "https://example.gouv.fr"
     Quand je clique sur "Tous les sites"
     Et que je clique sur "Voir la fiche de example.gouv.fr"
     Alors la page contient "Aucune étiquette"
