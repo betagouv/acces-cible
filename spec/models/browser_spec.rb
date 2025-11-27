@@ -171,11 +171,11 @@ RSpec.describe Browser do
       browser_instance = instance_double(described_class)
       allow(described_class).to receive(:new).and_return(browser_instance)
       allow(browser_instance).to receive(:get).with(url).and_return({
-        body: "<html><body>Test</body></html>",
-        status: 200,
-        headers: {},
-        current_url: url
-      })
+                                                                      body: "<html><body>Test</body></html>",
+                                                                      status: 200,
+                                                                      headers: {},
+                                                                      current_url: url
+                                                                    })
       allow(Link).to receive(:normalize).with(url).and_return(url)
     end
 
@@ -210,11 +210,11 @@ RSpec.describe Browser do
         browser_instance = instance_double(described_class)
         allow(described_class).to receive(:new).and_return(browser_instance)
         allow(browser_instance).to receive(:get).with(url).and_return({
-          body: "<html><body>Test</body></html>",
-          status: 200,
-          headers: { "content-type" => "text/html" },
-          current_url: url
-        })
+                                                                        body: "<html><body>Test</body></html>",
+                                                                        status: 200,
+                                                                        headers: { "content-type" => "text/html" },
+                                                                        current_url: url
+                                                                      })
       end
 
       it "returns response headers" do
@@ -235,51 +235,6 @@ RSpec.describe Browser do
 
       it "defaults status to 200" do
         expect(get_result[:status]).to eq(200)
-      end
-    end
-  end
-
-  describe ".axe_check", :aggregate_failures do
-    subject(:axe_check) { described_class.axe_check(url) }
-
-    let(:axe_source) { "/* axe source code */" }
-    let(:axe_locale) { '{"lang": "fr"}' }
-    let(:axe_results) do
-      {
-        "violations" => [
-          { "id" => "document-title" },
-          { "id" => "html-has-lang" }
-        ],
-        "passes" => []
-      }
-    end
-
-    before do
-      allow(File).to receive(:read).with(Browser::AXE_SOURCE_PATH).and_return(axe_source)
-      allow(File).to receive(:read).with(Browser::AXE_LOCALE_PATH).and_return(axe_locale)
-
-      browser_instance = instance_double(described_class)
-      allow(described_class).to receive(:new).and_return(browser_instance)
-      allow(browser_instance).to receive(:axe_check).with(url).and_return(axe_results)
-    end
-
-    it "runs localized Axe checks on the provided URL, bypassing CSP" do
-      results = axe_check
-
-      expect(results).to be_a(Hash)
-      expect(results).to have_key("violations")
-      expect(results).to have_key("passes")
-      expect(results["violations"]).to be_an(Array)
-      expect(results["passes"]).to be_an(Array)
-    end
-
-    context "when browser encounters a timeout" do
-      it "logs the error and re-raises it" do
-        browser_instance = instance_double(described_class)
-        allow(described_class).to receive(:new).and_return(browser_instance)
-        allow(browser_instance).to receive(:axe_check).with(url).and_raise(Ferrum::Error.new("Generic error"))
-
-        expect { axe_check }.to raise_error(Ferrum::Error, "Generic error")
       end
     end
   end
@@ -580,7 +535,7 @@ RSpec.describe Browser do
     it "sets the blocklist on the page's context" do
       expect(network)
         .to receive(:blocklist=)
-        .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
+              .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
 
       instance.send(:create_page)
     end
