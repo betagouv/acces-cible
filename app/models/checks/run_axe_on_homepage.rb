@@ -2,6 +2,38 @@ module Checks
   class RunAxeOnHomepage < Check
     SLOW = true
     PRIORITY = 30
+    AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
+    AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze
+    RGAA_AXE_RULES = [
+      "aria-conditional-attr",
+      "aria-deprecated-role",
+      "aria-hidden-body",
+      "aria-required-attr",
+      "aria-required-parent",
+      "aria-roles",
+      "aria-valid-attr",
+      "avoid-inline-spacing",
+      "blink",
+      "definition-list",
+      "dlitem",
+      "document-title",
+      "html-has-lang",
+      "html-lang-valid",
+      "html-xml-lang-mismatch",
+      "label-content-name-mismatch",
+      "landmark-no-duplicate-banner",
+      "landmark-no-duplicate-contentinfo",
+      "landmark-one-main",
+      "list",
+      "listitem",
+      "marquee",
+      "meta-refresh",
+      "meta-viewport",
+      "scrollable-region-focusable",
+      "table-fake-caption",
+      "td-has-header",
+      "valid-lang"
+    ].to_json.freeze
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
 
@@ -45,7 +77,9 @@ module Checks
     private
 
     def analyze!
-      return unless (results = Browser.axe_check(audit.url))
+      results = run_axe_check
+
+      return if results.blank?
 
       {
         passes: results["passes"]&.count || 0,
@@ -55,6 +89,15 @@ module Checks
         violation_data: format(results["violations"]),
         issues_total: results["violations"]&.sum { |v| v["nodes"]&.count || 0 } || 0,
       }
+    end
+
+    def run_axe_check
+      locale = File.read(AXE_LOCALE_PATH)
+      script_tag = File.read(AXE_SOURCE_PATH)
+      script = "axe.configure({locale: #{locale} }); axe.run(document, \
+                { runOnly: { type: 'rule', values: #{RGAA_AXE_RULES} }, reporter: 'v2'}).then(results => __f(results))"
+
+      Browser.new.run_script_on_html(audit.home_page_html, script, script_tag)
     end
 
     def format(violations)
