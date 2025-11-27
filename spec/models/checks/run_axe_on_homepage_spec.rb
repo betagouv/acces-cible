@@ -3,6 +3,51 @@ require "rails_helper"
 RSpec.describe Checks::RunAxeOnHomepage do
   let(:check) { described_class.new }
 
+  describe ".axe_check", :aggregate_failures do
+    subject(:axe_check) { check.send(:run_axe_check) }
+
+    let(:html_content) { "<html><head><title>Test</title></head><body>Test</body></html>" }
+    let(:axe_results) do
+      {
+        "violations" => [
+          { "id" => "document-title" },
+          { "id" => "html-has-lang" }
+        ],
+        "passes" => [],
+        "incomplete" => [],
+        "inapplicable" => []
+      }
+    end
+
+    let(:browser_instance) { instance_double(Ferrum::Browser) }
+    let(:page_instance) { instance_double(Ferrum::Page) }
+    let(:audit_instance) { instance_double(Audit, home_page_html: html_content) }
+
+    before do
+      allow(check).to receive(:audit).and_return(audit_instance)
+
+      allow(Ferrum::Browser).to receive(:new).and_return(browser_instance)
+      allow(browser_instance).to receive(:create_page).and_return(page_instance)
+      allow(browser_instance).to receive(:quit)
+
+      allow(page_instance).to receive(:content=)
+      allow(page_instance).to receive(:bypass_csp)
+      allow(page_instance).to receive(:add_script_tag)
+      allow(page_instance).to receive(:evaluate_async).and_return(axe_results)
+      allow(page_instance).to receive(:close)
+    end
+
+    it "runs localized Axe checks on the provided URL, bypassing CSP" do
+      results = axe_check
+
+      expect(results).to be_a(Hash)
+      expect(results).to have_key("violations")
+      expect(results).to have_key("passes")
+      expect(results["violations"]).to be_an(Array)
+      expect(results["passes"]).to be_an(Array)
+    end
+  end
+
   describe "#violation_data" do
     subject(:violation_data) { check.violation_data }
 
