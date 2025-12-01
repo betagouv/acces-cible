@@ -15,7 +15,7 @@ class ApplicationRecord < ActiveRecord::Base
     end
 
     def to_percent(number, **options)
-      helpers.number_to_percentage(number, options.with_defaults(precision: 0, strip_insignificant_zeros: true))
+      helpers.number_to_percentage(number, options.with_defaults(precision: 2, strip_insignificant_zeros: true))
     end
 
     def bulk_reset_counter(association, counter: nil)
