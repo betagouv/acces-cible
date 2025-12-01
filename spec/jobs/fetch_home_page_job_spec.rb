@@ -42,10 +42,14 @@ RSpec.describe FetchHomePageJob do
     context "when the ressource does not exist" do
       let(:error) { Ferrum::StatusError.new(audit.url) }
 
+      it "does not crash" do
+        expect { fetch_home_page_job }.not_to raise_error
+      end
+
       it "still calls ProcessAuditJob" do
-        expect { fetch_home_page_job }.to raise_error do |_err|
-          expect(ProcessAuditJob).to have_been_enqueued.exactly(:once).with(audit)
-        end
+        fetch_home_page_job
+
+        expect(ProcessAuditJob).to have_been_enqueued.exactly(:once).with(audit)
       end
     end
   end
