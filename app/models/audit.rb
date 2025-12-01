@@ -22,6 +22,7 @@ class Audit < ApplicationRecord
 
   def fetch_resources!
     FetchHomePageJob.perform_later(self)
+    FetchAccessibilityPageJob.perform_later(self)
   end
 
   def page(kind)
@@ -87,6 +88,13 @@ class Audit < ApplicationRecord
 
   def update_home_page!(response)
     update!(home_page_html: response[:body])
+  end
+
+  def update_accessibility_page!(url, html)
+    update!(
+      accessibility_page_url: url,
+      accessibility_page_html: html
+    )
   end
 
   private
