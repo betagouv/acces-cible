@@ -21,8 +21,7 @@ class Audit < ApplicationRecord
   end
 
   def fetch_resources!
-    FetchHomePageJob.perform_later(self)
-    FetchAccessibilityPageJob.perform_later(self)
+    FetchResourcesJob.perform_later(self)
   end
 
   def page(kind)
@@ -86,8 +85,8 @@ class Audit < ApplicationRecord
       .each { |other_check| other_check.transition_to!(:aborted) }
   end
 
-  def update_home_page!(response)
-    update!(home_page_html: response[:body])
+  def update_home_page!(html)
+    update!(home_page_html: html)
   end
 
   def update_accessibility_page!(url, html)
