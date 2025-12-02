@@ -88,9 +88,6 @@ gem "cld"
 group :development, :test do
   gem "debug"
 
-  # FIXME: ideally we all migrate to Ruby's debug above
-  gem "pry-rails"
-
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", "~> 7.1", require: false
 

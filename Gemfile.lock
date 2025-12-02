@@ -428,8 +428,6 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-rails (0.3.11)
-      pry (>= 0.13.0)
     psych (5.2.6)
       date
       stringio
@@ -716,7 +714,6 @@ DEPENDENCIES
   pagy
   pg (~> 1.6)
   propshaft
-  pry-rails
   puma (>= 5.0)
   rack-mini-profiler
   rails (~> 8.0.4)
