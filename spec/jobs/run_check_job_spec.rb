@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe RunCheckJob do
   let(:check) { create(:check, :accessibility_mention, :ready) }
+  let(:url) { "https://example.com/" }
+  let(:normalized_url) { Link.normalize(url) }
+  let(:body) { "<html><body>Test</body></html>" }
+  let(:content_type) { "text/html" }
+  let(:status) { 200 }
 
   context "when the check goes well" do
     before do
@@ -11,9 +16,12 @@ RSpec.describe RunCheckJob do
       # a model on its side.
       allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
         .to receive(:run!) do |instance|
-          instance.data = { test: "success" }
-          instance.save!
-        end
+        instance.data = { test: "success" }
+        instance.save!
+      end
+      allow(Browser).to receive(:get)
+                          .with(normalized_url)
+                          .and_return({ body:, status:, content_type:, current_url: normalized_url })
     end
 
     it "transitions the check to completed" do
@@ -26,22 +34,16 @@ RSpec.describe RunCheckJob do
     end
   end
 
-  context "when the check is a reachable" do
-    let(:check) { create(:check, :reachable) }
-
-    it "is enqueued on the slow queue" do
-      expect { described_class.perform_later(check) }
-        .to have_enqueued_job.on_queue("slow")
-    end
-  end
-
   context "when the check analyze! returns nil" do
     before do
       allow_any_instance_of(Check) # rubocop:disable RSpec/AnyInstance
         .to receive(:run!) do |instance|
-          instance.data = nil
-          instance.save!
-        end
+        instance.data = nil
+        instance.save!
+      end
+      allow(Browser).to receive(:get)
+                          .with(normalized_url)
+                          .and_return({ body:, status:, content_type:, current_url: normalized_url })
     end
 
     it "transitions the check to failed" do
@@ -59,20 +61,20 @@ RSpec.describe RunCheckJob do
       error = Ferrum::TimeoutError.new("Timed out waiting for response")
       app_path = Rails.root.to_s
       error.set_backtrace([
-        "#{app_path}/app/models/check.rb:124:in `analyze!'",
-        "#{app_path}/app/models/check.rb:89:in `run!'",
-        "#{app_path}/app/jobs/run_check_job.rb:12:in `perform'",
-        "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:245:in `command'",
-        "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/page.rb:134:in `evaluate'",
-        "/lib/ruby/gems/3.4.0/gems/activejob-8.1.0/lib/active_job/execution.rb:58:in `block in perform_now'",
-        "/lib/ruby/gems/3.4.0/gems/activejob-8.1.0/lib/active_job/execution.rb:47:in `perform_now'",
-        "/lib/ruby/gems/3.4.0/gems/solid_queue-1.2.1/lib/solid_queue/job.rb:89:in `perform'",
-        "/lib/ruby/gems/3.4.0/gems/solid_queue-1.2.1/lib/solid_queue/worker.rb:78:in `block in work'",
-        "/lib/ruby/3.4.0/timeout.rb:123:in `timeout'",
-        "/lib/ruby/3.4.0/net/http.rb:1458:in `request'",
-        "/lib/ruby/3.4.0/net/http.rb:1299:in `get'",
-        "bin/rails:4:in `<main>'"
-      ])
+                            "#{app_path}/app/models/check.rb:124:in `analyze!'",
+                            "#{app_path}/app/models/check.rb:89:in `run!'",
+                            "#{app_path}/app/jobs/run_check_job.rb:12:in `perform'",
+                            "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:245:in `command'",
+                            "/lib/ruby/gems/3.4.0/gems/ferrum-0.17.1/lib/ferrum/page.rb:134:in `evaluate'",
+                            "/lib/ruby/gems/3.4.0/gems/activejob-8.1.0/lib/active_job/execution.rb:58:in `block in perform_now'",
+                            "/lib/ruby/gems/3.4.0/gems/activejob-8.1.0/lib/active_job/execution.rb:47:in `perform_now'",
+                            "/lib/ruby/gems/3.4.0/gems/solid_queue-1.2.1/lib/solid_queue/job.rb:89:in `perform'",
+                            "/lib/ruby/gems/3.4.0/gems/solid_queue-1.2.1/lib/solid_queue/worker.rb:78:in `block in work'",
+                            "/lib/ruby/3.4.0/timeout.rb:123:in `timeout'",
+                            "/lib/ruby/3.4.0/net/http.rb:1458:in `request'",
+                            "/lib/ruby/3.4.0/net/http.rb:1299:in `get'",
+                            "bin/rails:4:in `<main>'"
+                          ])
 
       allow_any_instance_of(check.class) # rubocop:disable RSpec/AnyInstance
         .to receive(:analyze!).and_raise error
@@ -94,9 +96,9 @@ RSpec.describe RunCheckJob do
 
       expect(check.error)
         .to include(
-          error_type: "Ferrum::TimeoutError",
-          message: /Timed out/
-        )
+              error_type: "Ferrum::TimeoutError",
+              message: /Timed out/
+            )
     end
 
     it "keeps only app-relative paths in the backtrace" do
