@@ -22,7 +22,7 @@ end
 
 # In the meantime mock our Browser.get method instead but that is NOT
 # NICE and we should do something about it soon.
-Sachantque("le site {string} renvoie une réponse HTML normale") do |url|
+Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'accueil") do |url|
   fake_html = <<~HTML
         <html>
           <head>
@@ -36,6 +36,29 @@ Sachantque("le site {string} renvoie une réponse HTML normale") do |url|
 
   allow(Browser)
     .to receive(:get)
+    .with(url)
+    .and_return(
+      body: fake_html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
+end
+
+Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
+  fake_html = <<~HTML
+        <html>
+          <head>
+            <title>Site title</title>
+          </head>
+          <body>
+            <h1>Hello</h1>
+          </body>
+        </html>
+      HTML
+
+  allow(FindAccessibilityPageService)
+    .to receive(:call)
     .and_return(
       body: fake_html,
       status: 200,

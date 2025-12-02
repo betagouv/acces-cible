@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe FindAccessibilityPageService do
+  subject(:service) { described_class.call(audit) }
+
   let(:root_url) { "https://example.com" }
   let(:audit) { build(:audit, url: root_url) }
-  let(:service) { described_class.new(audit) }
 
   describe "#find_page" do
     let(:matching_page_url) { "https://example.com/accessibility" }
@@ -12,37 +13,41 @@ RSpec.describe FindAccessibilityPageService do
     let(:crawler) { instance_double(Crawler) }
 
     before do
-      allow(service).to receive(:crawler).and_return(crawler)
-      allow(service).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
-      allow(service).to receive(:required_headings_present?).with(matching_page).and_return(true)
-      allow(service).to receive(:prioritize)
+      allow(Crawler).to receive(:new).and_return(crawler)
+      allow(described_class).to receive(:required_headings_present?).with(non_matching_page).and_return(false)
+      allow(described_class).to receive(:required_headings_present?).with(matching_page).and_return(true)
+      allow(described_class).to receive(:prioritize)
     end
 
-    it "finds a matching page through crawling links" do
-      expect(crawler).to receive(:find)
-                           .and_yield(non_matching_page, LinkList.new(non_matching_page.url))
-                           .and_yield(matching_page, LinkList.new(matching_page_url))
-                           .and_return(matching_page)
+    describe "find_page" do
+      subject(:found_page) { described_class.send(:find_page, url: root_url, starting_html: "") }
 
-      expect(service.send(:find_page)).to be(matching_page)
-    end
+      it "finds a matching page through crawling links" do
+        expect(crawler).to receive(:find)
+                             .and_yield(non_matching_page, LinkList.new(non_matching_page.url))
+                             .and_yield(matching_page, LinkList.new(matching_page_url))
+                             .and_return(matching_page)
 
-    it "continues crawling when page has insufficient headings" do
-      page_with_insufficient_headings = build(:page, url: "https://example.com/partial", body: "Some content")
+        expect(found_page).to eq matching_page
+      end
 
-      allow(service).to receive(:required_headings_present?).with(page_with_insufficient_headings).and_return(false)
+      it "continues crawling when page has insufficient headings" do
+        page_with_insufficient_headings = build(:page, url: "https://example.com/partial", body: "Some content")
 
-      expect(crawler).to receive(:find)
-                           .and_yield(page_with_insufficient_headings, LinkList.new("https://example.com/other"))
-                           .and_yield(matching_page, LinkList.new(matching_page_url))
-                           .and_return(matching_page)
+        allow(described_class).to receive(:required_headings_present?).with(page_with_insufficient_headings).and_return(false)
 
-      expect(service.send(:find_page)).to be(matching_page)
+        expect(crawler).to receive(:find)
+                             .and_yield(page_with_insufficient_headings, LinkList.new("https://example.com/other"))
+                             .and_yield(matching_page, LinkList.new(matching_page_url))
+                             .and_return(matching_page)
+
+        expect(found_page).to eq matching_page
+      end
     end
   end
 
   describe "#required_headings_present?" do
-    subject(:headings_check) { service.send(:required_headings_present?, page) }
+    subject(:headings_check) { described_class.send(:required_headings_present?, page) }
 
     let(:page) { build(:page, headings:, body: "") }
     let(:expected_headings) { Checks::AccessibilityPageHeading.expected_headings }
@@ -66,23 +71,26 @@ RSpec.describe FindAccessibilityPageService do
     let(:unrelated_link) { build(:link, text: "Contact", href: "/contact") }
     let(:queue) { LinkList.new(long_declaration_link, declaration_daccessibilite_link, declaration_text_link, accessibility_mention_link, short_rgaa_link, unrelated_link) }
 
-    it "keeps links matching DECLARATION pattern in text" do
+    it "keeps links matching DECLARATION pattern in text"  do
       queue = LinkList.new(declaration_text_link, unrelated_link)
-      service.send(:prioritize, queue)
+
+      described_class.send(:prioritize, queue)
 
       expect(queue.to_a).to contain_exactly("/other")
     end
 
     it "keeps links matching DECLARATION_URL pattern in href" do
       queue = LinkList.new(long_declaration_link, short_rgaa_link, unrelated_link)
-      service.send(:prioritize, queue)
+
+      described_class.send(:prioritize, queue)
 
       expect(queue.to_a).to contain_exactly("/declaration-accessibilite", "/rgaa")
     end
 
     it "keeps links matching MENTION_REGEX pattern in text" do
       queue = LinkList.new(accessibility_mention_link, unrelated_link)
-      service.send(:prioritize, queue)
+
+      described_class.send(:prioritize, queue)
 
       expect(queue.to_a).to contain_exactly("/handicap")
     end

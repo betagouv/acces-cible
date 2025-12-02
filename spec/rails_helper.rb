@@ -51,7 +51,7 @@ RSpec.configure do |config|
   # config.use_active_record = false
 
   require "webmock/rspec"
-  WebMock.disable_net_connect!
+  WebMock.disable_net_connect!(allow_localhost: true)
 
   # Setup Database cleaner to avoid state leaks between tests
   config.before(:suite) do
