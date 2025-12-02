@@ -63,16 +63,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#schedule" do
-    subject(:schedule) { audit.schedule }
-
-    let(:audit) { create(:audit) }
-
-    it "enqueues a ProcessAuditJob" do
-      expect { schedule }.to have_enqueued_job(ProcessAuditJob).with(audit)
-    end
-  end
-
   describe "#page" do
     subject(:page) { audit.page(kind) }
 
@@ -255,6 +245,17 @@ RSpec.describe Audit do
     end
   end
 
+  describe "fetch_resources!" do
+    let(:audit) { create(:audit) }
+
+    it "triggers the home page fetch" do
+      expect { audit.fetch_resources! }
+        .to have_enqueued_job(FetchResourcesJob)
+        .with(audit)
+        .exactly(:once)
+    end
+  end
+
   describe "abort_dependent_checks!" do
     let(:audit) { create(:audit, :without_checks) }
 
@@ -272,6 +273,15 @@ RSpec.describe Audit do
       expect { audit.abort_dependent_checks!(original_check) }
         .to change { dependent_check.reload.current_state }
               .from("pending").to("aborted")
+    end
+  end
+
+  describe "update_home_page!" do
+    let(:html) { "html_content" }
+
+    it "updates the home page HTML" do
+      expect { audit.update_home_page!(html) }
+        .to change(audit, :home_page_html).from(nil).to "html_content"
     end
   end
 end

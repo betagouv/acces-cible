@@ -1,6 +1,5 @@
 module Checks
   class RunAxeOnHomepage < Check
-    SLOW = true
     PRIORITY = 30
     AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
     AXE_LOCALE_PATH = Rails.root.join("vendor/javascript/axe.fr.json").freeze

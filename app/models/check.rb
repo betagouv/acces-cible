@@ -32,8 +32,6 @@ class Check < ApplicationRecord
     end
   end
 
-  SLOW = false
-
   TYPES = [
     :reachable,
     :language_indication,
@@ -104,10 +102,6 @@ class Check < ApplicationRecord
     @root_page ||= audit.page(:home)
   end
 
-  def crawler(crawl_up_to: nil)
-    Crawler.new(audit.url, crawl_up_to:, root_page_html: audit.home_page_html)
-  end
-
   def requirements
     self.class::REQUIREMENTS
   end
@@ -115,10 +109,6 @@ class Check < ApplicationRecord
   # Returns subclass constant value, defaults to parent class
   def tooltip?
     true
-  end
-
-  def slow?
-    self.class::SLOW
   end
 
   def run!
@@ -145,8 +135,6 @@ class Check < ApplicationRecord
   end
 
   def error
-    return unless errored?
-
     error_type, message, backtrace = last_transition.metadata.slice("json_class", "m", "b").values
     app_path = Rails.root.to_s
     backtrace = backtrace.collect { it.sub(app_path, "") }
