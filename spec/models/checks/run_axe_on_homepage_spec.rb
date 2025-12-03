@@ -22,6 +22,8 @@ RSpec.describe Checks::RunAxeOnHomepage do
     let(:browser_instance) { instance_double(Ferrum::Browser) }
     let(:page_instance) { instance_double(Ferrum::Page) }
     let(:audit_instance) { instance_double(Audit, home_page_html: html_content) }
+    let(:headers_double) { instance_double(Ferrum::Headers) }
+    let(:network_double) { instance_double(Ferrum::Network) }
 
     before do
       allow(check).to receive(:audit).and_return(audit_instance)
@@ -30,10 +32,14 @@ RSpec.describe Checks::RunAxeOnHomepage do
       allow(browser_instance).to receive(:create_page).and_return(page_instance)
       allow(browser_instance).to receive(:quit)
 
+      allow(headers_double).to receive(:set)
+      allow(network_double).to receive(:blocklist=)
+      allow(network_double).to receive(:wait_for_idle)
+
       allow(page_instance).to receive(:content=)
       allow(page_instance).to receive(:bypass_csp)
       allow(page_instance).to receive(:add_script_tag)
-      allow(page_instance).to receive(:evaluate_async).and_return(axe_results)
+      allow(page_instance).to receive_messages(headers: headers_double, network: network_double, evaluate_async: axe_results)
       allow(page_instance).to receive(:close)
     end
 
