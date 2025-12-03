@@ -2,7 +2,7 @@
 
 class Browser
   PAGE_TIMEOUT = 1.minute
-  PROCESS_TIMEOUT = 5.minutes
+  PROCESS_TIMEOUT = 30.seconds
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
