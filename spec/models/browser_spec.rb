@@ -2,25 +2,28 @@ require "rails_helper"
 
 RSpec.describe Browser do
   let(:url) { "https://example.com/" }
-  let(:page) { instance_double(Ferrum::Page) }
-  let(:instance) { described_class.new }
+  let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
+  let(:browser_double) { instance_double(Ferrum::Browser) }
+  let(:headers_double) { instance_double(Ferrum::Headers) }
+  let(:page_double) { instance_double(Ferrum::Page) }
+  let(:response_double) { instance_double(Ferrum::Network::Response) }
 
   before do
-    # Stub file reads that happen during browser initialization
-    allow(File).to receive(:read).with(Rails.root.join("vendor/javascript/stealth.min.js")).and_return("/* stealth js */")
+    allow(described_class).to receive(:browser).and_return(browser_double)
+    allow(browser_double).to receive(:create_page).and_return(page_double)
+    allow(browser_double).to receive(:quit)
 
-    # Stub MockProcess constant for verified doubles
-    stub_const("MockProcess", Class.new do
-      def pid
-        12345
-      end
-    end)
-  end
+    allow(headers_double).to receive(:set)
+    allow(network_double).to receive(:blocklist=)
+    allow(network_double).to receive(:wait_for_idle)
+    allow(network_double).to receive_messages(status: 200, response: response_double)
+    allow(response_double).to receive(:content_type).and_return("text/html")
 
-  around do |example|
-    WebMock.disable_net_connect!(allow_localhost: true)
-    example.run
-    WebMock.disable_net_connect!
+    allow(page_double).to receive(:go_to).with(url)
+    allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
+    allow(page_double).to receive(:close)
+
+    allow(Link).to receive(:normalize).with(url).and_return(url)
   end
 
   describe ".reachable?" do
@@ -108,6 +111,7 @@ RSpec.describe Browser do
       end
     end
 
+    # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "when request follows redirects" do
       let(:final_url) { "https://example.com/final" }
       let(:normalized_url) { "https://example.com/final/" }
@@ -123,6 +127,7 @@ RSpec.describe Browser do
         expect(Link).to have_received(:normalize).with(final_url)
       end
     end
+    # rubocop:enable RSpec/MultipleMemoizedHelpers
 
     context "when request times out" do
       before do
@@ -165,20 +170,6 @@ RSpec.describe Browser do
   describe ".get" do
     subject(:get_result) { described_class.get(url) }
 
-    let(:network) { instance_double(Ferrum::Network, status: 200, response: nil) }
-
-    before do
-      browser_instance = instance_double(described_class)
-      allow(described_class).to receive(:new).and_return(browser_instance)
-      allow(browser_instance).to receive(:get).with(url).and_return({
-                                                                      body: "<html><body>Test</body></html>",
-                                                                      status: 200,
-                                                                      headers: {},
-                                                                      current_url: url
-                                                                    })
-      allow(Link).to receive(:normalize).with(url).and_return(url)
-    end
-
     it "creates a new browser instance and calls get" do
       expect(get_result).not_to be_nil
     end
@@ -189,7 +180,7 @@ RSpec.describe Browser do
       expect(result).to be_a(Hash)
       expect(result).to have_key(:body)
       expect(result).to have_key(:status)
-      expect(result).to have_key(:headers)
+      expect(result).to have_key(:content_type)
       expect(result).to have_key(:current_url)
     end
 
@@ -204,196 +195,65 @@ RSpec.describe Browser do
     it "returns normalized current URL" do
       expect(get_result[:current_url]).to eq(url)
     end
-
-    context "when network has response with headers" do
-      before do
-        browser_instance = instance_double(described_class)
-        allow(described_class).to receive(:new).and_return(browser_instance)
-        allow(browser_instance).to receive(:get).with(url).and_return({
-                                                                        body: "<html><body>Test</body></html>",
-                                                                        status: 200,
-                                                                        headers: { "content-type" => "text/html" },
-                                                                        current_url: url
-                                                                      })
-      end
-
-      it "returns response headers" do
-        expect(get_result[:headers]).to eq({ "content-type" => "text/html" })
-      end
-    end
-
-    context "when network has no response" do
-      it "returns empty headers hash" do
-        expect(get_result[:headers]).to eq({})
-      end
-    end
-
-    context "when network status is nil" do
-      before do
-        allow(network).to receive(:status).and_return(nil)
-      end
-
-      it "defaults status to 200" do
-        expect(get_result[:status]).to eq(200)
-      end
-    end
   end
 
   describe "#browser" do
-    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
-    let(:network) { instance_double(Ferrum::Network) }
-
-    before do
-      # Always mock Ferrum::Browser to prevent real instances
-      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive_messages(network: network, process: instance_double(MockProcess, pid: 12345))
-      allow(Process).to receive(:kill).with(0, 12345).and_return(1)
-    end
-
     it "creates a new Ferrum::Browser instance during initialization" do
-      browser_instance = described_class.new
-      expect(browser_instance.send(:browser)).to eq(ferrum_browser)
+      expect(described_class.send(:browser)).to eq(browser_double)
     end
   end
 
   describe "#with_page" do
-    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
-    let(:network) { instance_double(Ferrum::Network) }
-
-    before do
-      # Mock browser creation to prevent real instances
-      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive(:network).and_return(network)
-      allow(network).to receive(:blocklist=)
-
-      # Mock browser cleanup methods
-      allow(ferrum_browser).to receive(:reset)
-      allow(ferrum_browser).to receive(:close)
-      allow(ferrum_browser).to receive(:quit)
-
-      allow(instance).to receive(:create_page).and_return(page)
-      allow(page).to receive(:close)
-      allow(Rails.logger).to receive(:warn)
-    end
-
     it "yields the created page" do
-      expect { |block| instance.send(:with_page, &block) }.to yield_with_args(page)
+      expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
     end
 
     it "closes the page after yielding" do
-      instance.send(:with_page) { |p| "result" }
-      expect(page).to have_received(:close)
+      described_class.send(:with_page) { |p| "result" }
+      expect(page_double).to have_received(:close)
     end
 
     it "returns the result of the yielded block" do
-      result = instance.send(:with_page) { |p| "test_result" }
+      result = described_class.send(:with_page) { |p| "test_result" }
       expect(result).to eq("test_result")
     end
   end
 
   describe "#create_page" do
-    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
-    let(:network) { instance_double(Ferrum::Network) }
-    let(:headers) { instance_double(Ferrum::Headers) }
-
     before do
-      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive_messages(network:, process: instance_double(MockProcess, pid: 12345))
-      allow(network).to receive_messages("blocklist=": nil, wait_for_idle: nil)
-      allow(ferrum_browser).to receive(:create_page).and_return(page)
-      allow(page).to receive_messages(headers:, network:)
-      allow(page).to receive(:network).and_return(network)
-      allow(headers).to receive_messages(set: nil, add: nil)
-      allow(Process).to receive(:kill).with(0, 12345).and_return(1)
+      allow(browser_double).to receive(:create_page).and_return(page_double)
+      allow(headers_double).to receive(:set)
+      allow(page_double).to receive(:headers).and_return(headers_double)
     end
 
     it "creates a page from the browser" do
-      result = instance.send(:create_page)
+      result = described_class.send(:create_page)
 
-      expect(ferrum_browser).to have_received(:create_page)
-      expect(result).to eq(page)
+      expect(browser_double).to have_received(:create_page)
+      expect(result).to eq(page_double)
     end
 
     it "sets the blocklist on the page's context" do
-      expect(network)
+      expect(network_double)
         .to receive(:blocklist=)
               .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
 
-      instance.send(:create_page)
+      described_class.send(:create_page)
     end
 
     it "sets all headers including user agent on the page" do
       request_headers = Browser::HEADERS.merge({ "User-Agent" => "test-agent" })
-      allow(instance).to receive(:request_headers).and_return(request_headers)
+      allow(described_class).to receive(:request_headers).and_return(request_headers)
 
-      instance.send(:create_page)
+      described_class.send(:create_page)
 
-      expect(headers).to have_received(:set).with(request_headers)
+      expect(headers_double).to have_received(:set).with(request_headers)
     end
 
     it "waits for network idle" do
-      instance.send(:create_page)
+      described_class.send(:create_page)
 
-      expect(network).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
-    end
-  end
-
-  describe "#create_page_from_html" do
-    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
-    let(:html) { "<html><body><h1>Test</h1></body></html>" }
-
-    before do
-      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive(:create_page).and_return(page)
-      allow(page).to receive(:content=)
-      allow(page).to receive(:bypass_csp)
-    end
-
-    it "creates a page from the browser" do
-      result = instance.create_page_from_html(html)
-
-      expect(ferrum_browser).to have_received(:create_page)
-      expect(result).to eq(page)
-    end
-  end
-
-  describe "#run_script_on_html" do
-    let(:ferrum_browser) { instance_double(Ferrum::Browser) }
-    let(:html) { "<html><body><h1>Test</h1></body></html>" }
-    let(:script) { "return document.querySelector('h1').textContent;" }
-    let(:script_tag) { "window.testLib = {};" }
-    let(:script_result) { "Test" }
-
-    before do
-      allow(Ferrum::Browser).to receive(:new).and_return(ferrum_browser)
-      allow(ferrum_browser).to receive(:create_page).and_return(page)
-      allow(page).to receive(:content=)
-      allow(page).to receive(:bypass_csp)
-      allow(page).to receive(:add_script_tag)
-      allow(page).to receive(:evaluate_async).and_return(script_result)
-      allow(page).to receive(:close)
-    end
-
-    it "returns the result of the script evaluation" do
-      result = instance.run_script_on_html(html, script, script_tag)
-
-      expect(result).to eq(script_result)
-    end
-  end
-
-  describe "class methods delegation" do
-    it "delegates missing methods to new instance" do
-      expect(described_class).to respond_to(:get)
-    end
-
-    it "creates new instance for each class method call" do
-      browser_instance = instance_double(described_class)
-      allow(described_class).to receive(:new).and_return(browser_instance)
-      allow(browser_instance).to receive(:get).and_return({})
-
-      described_class.get(url)
-
-      expect(described_class).to have_received(:new)
+      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
     end
   end
 end
