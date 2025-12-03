@@ -7,7 +7,9 @@ class FindAccessibilityPageService
   class << self
     def call(audit)
       find_page(url: audit.url, starting_html: audit.home_page_html).then do |page|
-        audit.update_accessibility_page!(page.url, page.html) unless page.nil?
+        Rails.logger.silence do
+          audit.update_accessibility_page!(page.url, page.html) unless page.nil?
+        end
       end
     end
 
