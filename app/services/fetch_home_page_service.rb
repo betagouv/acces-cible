@@ -5,7 +5,11 @@ class FetchHomePageService
     def call(audit)
       Browser
         .get(audit.url)
-        .then { |response| audit.update_home_page!(response[:body]) }
+        .then do |response|
+        Rails.logger.silence do
+          audit.update_home_page!(response[:body])
+        end
+      end
     end
   end
 end
