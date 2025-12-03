@@ -94,16 +94,6 @@ RSpec.describe Checks::Reachable do
           expect(check.send(:analyze!)).to be_nil
         end
       end
-
-      context "when the page has no status (browser/connection error)" do
-        before do
-          allow(check).to receive(:root_page).and_raise(Ferrum::StatusError, original_url)
-        end
-
-        it "returns nil" do
-          expect(check.send(:analyze!)).to be_nil
-        end
-      end
     end
   end
 

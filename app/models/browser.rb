@@ -162,48 +162,17 @@ class Browser
   private
 
   def browser
-    cleanup! if crashed?
-
     @browser ||= Ferrum::Browser.new(settings)
-  end
-
-  def cleanup!
-    if @browser
-      @browser.reset
-      @browser.quit
-    end
-  rescue => error
-    Rails.logger.warn { "Error during browser cleanup: #{error.message}" }
-  ensure
-    FileUtils.rm_rf(@user_data_dir) if @user_data_dir && Dir.exist?(@user_data_dir)
-    @browser = nil
-  end
-
-  def pid
-    @browser&.process&.pid
-  end
-
-  def crashed?
-    pid.nil? || Process.kill(0, pid).zero? # kill 0 only checks that the process is alive and reachable
-  rescue Errno::ESRCH, Errno::EPERM, TypeError
-    true
   end
 
   def with_page
     page = nil
+
     begin
       page = create_page
       yield(page)
-    rescue Ferrum::DeadBrowserError => error
-      Rails.logger.warn { "[#{error.class.name}] Restarting browser" }
-      cleanup!
-      retry
-    rescue Ferrum::Error => error
-      Rails.logger.error { "[#{error.class.name}] #{error.message}" }
-      raise error
     ensure
       page&.close
-      cleanup!
     end
   end
 

@@ -31,8 +31,6 @@ module Checks
       else
         {}
       end
-    rescue Ferrum::StatusError
-      nil
     end
 
     def normalize(url)
