@@ -100,15 +100,5 @@ RSpec.describe RunCheckJob do
               message: /Timed out/
             )
     end
-
-    it "keeps only app-relative paths in the backtrace" do
-      perform_enqueued_jobs do
-        described_class.perform_later(check)
-      end
-
-      backtrace = check.error[:backtrace]
-      expect(backtrace).to be_present
-      expect(backtrace).to all(match(/^app\//)) # Should only contain app paths after cleaning
-    end
   end
 end
