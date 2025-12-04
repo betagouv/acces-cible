@@ -15,11 +15,11 @@ Fonctionnalité: Vérifications d'un site
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
     Alors la vérification "Site joignable" indique "Joignable à l'adresse indiquée"
-    Et la vérification "Indication de la langue" indique "Absente"
-    Et la vérification "Mention du niveau d'accessibilité" indique "Absente"
+    Et la vérification "Indication de la langue" indique "Non trouvée"
+    Et la vérification "Mention du niveau d'accessibilité" indique "Non trouvée"
     Et la vérification "Présence d'une déclaration d'accessibilité" indique "Non trouvée"
-    Et la vérification "Analyse de la déclaration" indique "Échoué"
-    Et la vérification "Titres de la déclaration d'accessibilité" indique "Échoué"
-    Et la vérification "Schéma pluriannuel d'accessibilité" indique "Échoué"
-    Et la vérification "Plan d'action" indique "Échoué"
+    Et la vérification "Analyse de la déclaration" indique "Non trouvé"
+    Et la vérification "Titres de la déclaration d'accessibilité" indique "Non trouvé"
+    Et la vérification "Schéma pluriannuel d'accessibilité" indique "Non trouvé"
+    Et la vérification "Plan d'action" indique "Non trouvé"
     Et la vérification "Contrôles automatiques : page d'accueil" indique "50%"

@@ -120,14 +120,15 @@ fr:
         ready: Prêt
         blocked: Inapplicable
         running: En cours
-        failed: Échoué
+        failed: Non trouvé
         completed: Effectué
         aborted: Annulé
+        errored: Erreur
       checks/accessibility_mention:
         type: Mention du niveau d'accessibilité
         table_header: Mention
       checks/accessibility_mention/mentions:
-        none: Absente
+        none: Non trouvée
         non: Non conforme
         partiellement: Partiellement conforme
         totalement: Totalement conforme
@@ -199,7 +200,7 @@ fr:
       checks/language_indication:
         type: Indication de la langue
         table_header: Langue
-        empty: Absente
+        empty: Non trouvée
         totalement: Totalement conforme
       checks/reachable:
         type: Site joignable

@@ -10,7 +10,10 @@ class SitesController < ApplicationController
     @tags = current_user.team.tags.in_alphabetical_order
     respond_to do |format|
       format.html { @pagy, @sites = pagy sites, limit: pagy_limit }
-      format.csv { send_data sites.to_csv, filename: sites.to_csv_filename }
+      format.csv do
+        csv = SiteCsvExport.generate(sites)
+        send_data csv, filename: SiteCsvExport.filename
+      end
     end
   end
 
@@ -74,11 +77,11 @@ class SitesController < ApplicationController
 
   def set_site
     @site = current_user
-              .team
-              .sites
-              .preloaded
-              .friendly
-              .find(params.expect(:id))
+      .team
+      .sites
+      .preloaded
+      .friendly
+      .find(params.expect(:id))
   end
 
   def set_sites
