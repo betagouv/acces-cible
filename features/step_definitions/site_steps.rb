@@ -4,10 +4,10 @@ def team
   @team ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email]).team
 end
 
-Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
+Quand("le site {string} renvoie des réponses normales") do |url|
   steps %(
-   Sachant que le site "#{url}" renvoie une réponse HTML normale
-   Et que je rajoute un site "#{url}"
+    Sachant que le site "#{url}" renvoie une réponse HTML normale pour la page d'accueil
+    Et que le site "#{url}" renvoie une réponse HTML normale pour la déclaration d'accessibilité
   )
 end
 
