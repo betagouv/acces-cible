@@ -149,3 +149,13 @@ Alors('la vérification {string} indique {string}') do |name, state|
     expect(badge).to have_content state
   end
 end
+
+Quand("je choisis {string} dans le menu principal") do |item|
+  within("nav[aria-label='Menu principal']") do
+    click_link_or_button(item)
+  end
+end
+
+Alors('la page contient un CSV dont une ligne commence par {string}') do |str|
+  expect(page.body.lines.one? { |line| line.start_with?(str) }).to be_truthy
+end
