@@ -32,6 +32,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "réalisée 1er février 2024" => Date.new(2024, 2, 1),
       "en mars 2024" => Date.new(2024, 3, 1),
       "loi n° 2005-102 du 11 février 2005… audit réalisé le 11 février 2025" => Date.new(2025, 2, 11),
+      "loi n° 2005-102 du 11 février 2005…" => nil,
       "du 15 février 2024" => Date.new(2024, 2, 15),
       "Cette déclaration a été établie le 1er janvier 2024, et mise à jour le 10 avril 2024" => Date.new(2024, 1, 1),
       "Cette déclaration a été établie le 3 juin 2020. Elle a été mise à jour le 4 novembre 2024." => Date.new(2020, 6, 3),
