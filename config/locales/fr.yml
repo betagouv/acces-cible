@@ -329,6 +329,7 @@ fr:
       new_audit: Site existant, nouvel audit programmé
     upload:
       title: Importer des sites
+      started: Import démarré
       uploaded:
         zero: Aucun site ajouté
         one: Un site ajouté
