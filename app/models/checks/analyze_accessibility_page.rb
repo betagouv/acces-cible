@@ -7,9 +7,9 @@ module Checks
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|établi(?:e)?(?:\s+le)?|en|du|le|au)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_UPDATE_DATE_PATTERN = /(?<full_date>(?:mis(?:e)?\s+à\s+jour(?:\s+le)?|actualisé(?:e)?(?:\s+le)?|modifié(?:e)?(?:\s+le)?)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
-    COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité|conforme à|révèle que).*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)/i
+    COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité (?!moyen)|conforme à|révèle que|des critères)[^.]*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,2}(?:[.,]\d+)?)\s*%\s*(?:des critères(?: RGAA)?|au RGAA)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
-    AUDITOR_PATTERN = /(?:par(?:\s+la)?(?:\s+société)?|par)\s+([^,]+?)(?:,| révèle| sur)/i
+    AUDITOR_PATTERN = /(?:réalisé(?:e)? par|par(?:\s+la)?(?:\s+société)?|par)\s+([^,]+?)(?:,| révèle| sur)/i
     UPDATE_AUDIT_PATTERNS = [
       /Au\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4}).*(?:indique|mentionne).*(?:depuis|après).*(?:précédent|dernier)\s+audit/i,
       /Suite\s+à.*(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})).*(?:dorénavant|désormais|maintenant|actuellement)/i,
@@ -80,10 +80,14 @@ module Checks
 
     def find_compliance_rate
       test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+      matches = test_results_section.scan(COMPLIANCE_PATTERN)
 
-      return unless (match = test_results_section.match(COMPLIANCE_PATTERN))
+      return if matches.empty?
 
-      rate = match[1].tr(",", ".").to_f
+      most_recent_match = matches.last
+      rate_string = most_recent_match.compact.first
+      rate = rate_string.tr(",", ".").to_f
+
       rate % 1 == 0 ? rate.to_i : rate
     end
 
@@ -92,7 +96,9 @@ module Checks
     end
 
     def find_auditor
-      match = page.text.match(AUDITOR_PATTERN)&.[](1)&.strip
+      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+
+      match = test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
