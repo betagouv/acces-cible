@@ -89,7 +89,14 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "taux de conformité de 75%" => 75,
       "conforme à 80,5%" => 80.5,
       "révèle que 90.5%" => 90.5,
-      "taux de conformité globale est de 95 pour cent" => 95
+      "82 % des critères RGAA sont respectés [...] à 93 %" => 82,
+      "le taux de conformité global était de 60,8% [...] le taux de conformité global est de 70,9%." => 70.9,
+      "94,03% des critères RGAA sont respectés. Le taux moyen de conformité du service en ligne s’élève à 99%" => 94.03,
+      "taux de conformité globale est de 95 pour cent" => 95,
+      "Le taux de conformité global est de 74,6 %.
+      Le taux de conformité moyen est de 87,4 %.
+      Le taux de conformité global est de 83,1 %.
+      Le taux de conformité moyen est de 89 %." => 83.1
     }.each do |text, expected_rate|
       it "extracts '#{expected_rate}%' from '#{text}'" do
         body = <<~HTML
@@ -124,10 +131,16 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "par XYZ (cabinet d'audit assermenté)," => "XYZ (cabinet d'audit assermenté)",
       "par Test Corp révèle" => "Test Corp",
       "par AXS Consulting sur un échantillon…" => "AXS Consulting",
+      "L’audit de conformité réalisé par Koena révèle que :" => "Koena",
       "par ailleurs vous pouvez toujours compter sur nous" => nil
     }.each do |text, expected_auditor|
       it "extracts '#{expected_auditor}' from '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: text))
+        body = <<~HTML
+          <h2>Résultats des tests</h2>
+          <p>#{text}</p>
+          <h2>Contenus non accessibles</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
         expect(check.find_auditor).to eq(expected_auditor)
       end
     end
