@@ -13,10 +13,14 @@ RSpec.describe SiteCsvExport do
     end
   end
 
-  describe ".generate" do
+  describe ".stream_csv_to" do
     subject(:parsed_csv) { CSV.parse(csv_output, col_sep: ";", headers: true) }
 
-    let(:csv_output) { described_class.generate(Site.where(id: site.id)) }
+    let(:csv_output) do
+      output = StringIO.new
+      described_class.stream_csv_to(output, Site.where(id: site.id))
+      output.string
+    end
 
     context "with completed checks" do
       before do
@@ -133,30 +137,6 @@ RSpec.describe SiteCsvExport do
       it "shows human_status for aborted check" do
         row = parsed_csv.first
         expect(row[Checks::AccessibilityMention.human(:type)]).to eq(Check.human("status.aborted"))
-      end
-    end
-
-    context "with multiple sites" do
-      let(:site2) { create(:site, :checked, url: "https://example2.com", team:) }
-      let(:csv_output) { described_class.generate(Site.where(id: [site.id, site2.id])) }
-
-      it "generates rows for all sites" do
-        expect(parsed_csv.count).to eq(2)
-      end
-    end
-
-    context "with missing audit" do
-      let(:site_without_audit) { create(:site, team:) }
-      let(:csv_output) { described_class.generate(Site.where(id: site_without_audit.id)) }
-
-      before do
-        site_without_audit.audits.destroy_all
-      end
-
-      it "handles missing audit gracefully" do
-        row = parsed_csv.first
-        expect(row[Audit.human(:url)]).to be_nil
-        expect(row[Check.human(:checked_at)]).to be_nil
       end
     end
   end

@@ -7,8 +7,8 @@ class Site < ApplicationRecord
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
   accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  scope :with_current_audit, -> { joins(:audits).merge(Audit.current.with_check_transitions) }
-  scope :preloaded, -> { with_current_audit.includes(:tags, audits: :checks) }
+  scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
+  scope :preloaded, -> { with_current_audit.includes(:tags, audits: { checks: :check_transitions }) }
 
   after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
 
