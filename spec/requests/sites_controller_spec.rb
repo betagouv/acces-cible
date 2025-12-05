@@ -14,6 +14,29 @@ RSpec.describe "Sites" do
 
       expect(response).to have_http_status(:ok)
     end
+
+    context "when requesting CSV format" do
+      subject(:get_csv) { get sites_path(format: :csv) }
+
+      let!(:site) { create(:site, :checked, team:) }
+
+      it "returns CSV content" do
+        get_csv
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to include("text/csv")
+        expect(response.headers["Content-Disposition"]).to include("attachment")
+        expect(response.headers["Content-Disposition"]).to include("sites_")
+      end
+
+      it "includes site data in CSV" do
+        get_csv
+
+        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        expect(csv.count).to eq(1)
+        expect(csv.first[Audit.human(:site_url_address)]).to eq(site.url_without_scheme_and_www)
+      end
+    end
   end
 
   describe "GET /sites/:id" do

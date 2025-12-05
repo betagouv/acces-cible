@@ -1,4 +1,5 @@
 class SitesController < ApplicationController
+  include ActionController::Live
   before_action :set_site, only: [:show, :edit, :update, :destroy]
   before_action :set_sites, only: :destroy_all
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
@@ -6,13 +7,15 @@ class SitesController < ApplicationController
   # GET /sites
   def index
     params[:sort] ||= { checked_at: :desc }
-    sites = current_user.sites.preloaded.filter_by(params).order_by(params)
+    @sites = current_user.sites.preloaded.filter_by(params).order_by(params)
     @tags = current_user.team.tags.in_alphabetical_order
     respond_to do |format|
-      format.html { @pagy, @sites = pagy sites, limit: pagy_limit }
+      format.html do
+        @pagy, @sites = pagy @sites, limit: pagy_limit
+      end
       format.csv do
-        csv = SiteCsvExport.generate(sites)
-        send_data csv, filename: SiteCsvExport.filename
+        set_csv_headers
+        stream_csv
       end
     end
   end
@@ -74,6 +77,19 @@ class SitesController < ApplicationController
   end
 
   private
+
+  def set_csv_headers
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    response.headers["Content-Disposition"] = "attachment; filename=#{SiteCsvExport.filename}"
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Last-Modified"] = Time.now.httpdate
+  end
+
+  def stream_csv
+    SiteCsvExport.stream_csv_to(response.stream, @sites)
+  ensure
+    response.stream.close
+  end
 
   def set_site
     @site = current_user

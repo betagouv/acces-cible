@@ -23,41 +23,41 @@ class SiteCsvExport
     "sites_#{I18n.l(Time.zone.now, format: :file)}.csv"
   end
 
-  def self.generate(sites)
-    CSV.generate(col_sep: COL_SEP, headers: true) do |csv|
-      csv << HEADERS
+  def self.stream_csv_to(output_stream, sites)
+    output_stream.write CSV.generate_line(HEADERS, col_sep: COL_SEP)
 
-      sites.find_each do |site|
-        audit = site.audit
+    sites.find_each(batch_size: 500) do |site|
+      audit = site.audit
 
-        reachable = audit&.reachable
-        language = audit&.language_indication
-        mention = audit&.accessibility_mention
-        find_accessibility = audit&.find_accessibility_page
-        analyze_accessibility = audit&.analyze_accessibility_page
-        schema = audit&.analyze_schema
-        plan = audit&.analyze_plan
-        heading = audit&.accessibility_page_heading
-        axe = audit&.run_axe_on_homepage
+      reachable = audit&.reachable
+      language = audit&.language_indication
+      mention = audit&.accessibility_mention
+      find_accessibility = audit&.find_accessibility_page
+      analyze_accessibility = audit&.analyze_accessibility_page
+      schema = audit&.analyze_schema
+      plan = audit&.analyze_plan
+      heading = audit&.accessibility_page_heading
+      axe = audit&.run_axe_on_homepage
 
-        csv << [
-          site.url_without_scheme_and_www,
-          site.url,
-          site.tags_list,
-          audit&.checked_at,
-          reachable&.completed?.to_s,
-          extract_value(language, language&.indication),
-          extract_value(mention, mention&.mention_text),
-          extract_value(find_accessibility, find_accessibility&.url),
-          extract_value(analyze_accessibility, analyze_accessibility&.human_compliance_rate),
-          extract_value(analyze_accessibility, analyze_accessibility&.audit_date),
-          extract_value(analyze_accessibility, analyze_accessibility&.audit_update_date),
-          extract_value(schema, link_or_found(schema, "analyze_schema.schema_in_main_text")),
-          extract_value(plan, link_or_found(plan, "analyze_plan.plan_in_main_text")),
-          extract_value(heading, heading&.human_success_rate),
-          extract_value(axe, axe&.human_success_rate),
-        ]
-      end
+      row = [
+        site.url_without_scheme_and_www,
+        site.url,
+        site.tags_list,
+        audit&.checked_at,
+        reachable&.completed?.to_s,
+        extract_value(language, language&.indication),
+        extract_value(mention, mention&.mention_text),
+        extract_value(find_accessibility, find_accessibility&.url),
+        extract_value(analyze_accessibility, analyze_accessibility&.human_compliance_rate),
+        extract_value(analyze_accessibility, analyze_accessibility&.audit_date),
+        extract_value(analyze_accessibility, analyze_accessibility&.audit_update_date),
+        extract_value(schema, link_or_found(schema, "analyze_schema.schema_in_main_text")),
+        extract_value(plan, link_or_found(plan, "analyze_plan.plan_in_main_text")),
+        extract_value(heading, heading&.human_success_rate),
+        extract_value(axe, axe&.human_success_rate),
+      ]
+
+      output_stream.write CSV.generate_line(row, col_sep: COL_SEP)
     end
   end
 
