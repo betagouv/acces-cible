@@ -58,6 +58,8 @@ module Checks
 
         return date
       end
+
+      nil
     end
 
     def find_audit_date(pattern)
@@ -70,12 +72,11 @@ module Checks
       extracted_text << page.text(between_headings: [:previous, "État de conformité"])
 
       extracted_text = extracted_text.compact.join(" ")
-      matches = extracted_text.scan(pattern).presence
-      date = extract_date(matches)
+      matches = extracted_text.scan(pattern)
 
-      return date if date
+      return nil if matches.blank?
 
-      nil
+      extract_date(matches)
     end
 
     def find_compliance_rate
