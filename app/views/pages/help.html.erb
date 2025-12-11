@@ -1,0 +1,18 @@
+<div class="fr-grid-row">
+  <div class="fr-col-12 fr-col-md-4">
+    <%= dsfr_sidemenu(title: t(".checks_documentation_title"), sticky: true) do |sidemenu| %>
+      <% @check_pages.each do |page| %>
+        <% sidemenu.with_item text: page[:title], href: help_check_path(page[:file_name]), active: @check == page[:file_name] %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="fr-col-12 fr-col-md-8">
+    <% if @check %>
+      <%= render template: "pages/checks/#{@check}" %>
+    <% else %>
+      <h3><%= t(".need_help_title") %></h3>
+      <p><%= t(".need_help_description") %></p>
+    <% end %>
+  </div>
+</div>

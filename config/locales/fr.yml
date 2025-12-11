@@ -23,6 +23,8 @@ fr:
     time_ago: "il y a %{time}"
     time_until: "dans %{time}"
     back_to_list: "Revenir à la liste"
+    see_help: "Voir la page d'aide"
+    help: Aide
     back_to_home: "Revenir à la page d'accueil"
     new_window: " (nouvelle fenêtre)"
     sort_by: "Trier par %{column} %{direction}"
@@ -314,6 +316,11 @@ fr:
       light: Thème clair
       system: Système
       system_hint: Utilise les paramètres système
+    help:
+      title: Aide
+      need_help_title: Besoin d’aide ?
+      need_help_description: Sélectionnez une section dans le menu de gauche pour en savoir plus.
+      checks_documentation_title: Documentation des vérifications
   sessions:
     new:
       title: Connexion à Accès Cible

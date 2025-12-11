@@ -32,6 +32,8 @@ Rails.application.routes.draw do
     get "cookies", as: :cookies
     get "donnees-personnelles", as: :donnees_personnelles
     get "display-mode", as: :display_mode
+    get "help", as: :help
+    get "help/:check", action: :help, as: :help_check
   end
 
   # Error pages
