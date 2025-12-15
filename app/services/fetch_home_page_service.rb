@@ -7,7 +7,7 @@ class FetchHomePageService
         .get(audit.url)
         .then do |response|
         Rails.logger.silence do
-          audit.update_home_page!(response[:body])
+          audit.update_home_page!(response[:current_url], response[:body])
         end
       end
     end

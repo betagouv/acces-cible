@@ -6,7 +6,9 @@ module Checks
     store_accessor :data, :original_url, :redirect_url
 
     def redirected?
-      original_url && redirect_url && normalize(original_url) != normalize(redirect_url)
+      return if audit.home_page_url.blank?
+
+      normalize(audit.home_page_url) != normalize(audit.url)
     end
 
     def custom_badge_text
@@ -22,12 +24,10 @@ module Checks
     def analyze!
       return unless root_page.success?
 
-      audit.update!(home_page_html: root_page.html)
-
       site.update(name: root_page.title) if site && site.name.blank?
-      if root_page.redirected?
-        audit.update!(url: root_page.actual_url)
-        { original_url: root_page.url, redirect_url: root_page.actual_url }
+
+      if redirected?
+        { original_url: audit.url, redirect_url: audit.home_page_url }
       else
         {}
       end

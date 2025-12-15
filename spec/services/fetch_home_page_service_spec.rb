@@ -8,7 +8,7 @@ RSpec.describe FetchHomePageService do
   let(:audit) { create(:audit) }
 
   before do
-    allow(Browser).to receive(:get).and_return({ body: "foobar" })
+    allow(Browser).to receive(:get).and_return({ current_url: "www.example.com", body: "foobar" })
     allow(Audit).to receive(:find).with(audit.id.to_s).and_return(audit)
     allow(audit).to receive(:update_home_page!)
   end
@@ -22,6 +22,6 @@ RSpec.describe FetchHomePageService do
   it "stores the home page on the audit" do
     fetch!
 
-    expect(audit).to have_received(:update_home_page!).with("foobar")
+    expect(audit).to have_received(:update_home_page!).with("www.example.com", "foobar")
   end
 end

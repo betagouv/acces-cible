@@ -251,8 +251,8 @@ RSpec.describe Audit do
     it "triggers the home page fetch" do
       expect { audit.fetch_resources! }
         .to have_enqueued_job(FetchResourcesJob)
-        .with(audit)
-        .exactly(:once)
+              .with(audit)
+              .exactly(:once)
     end
   end
 
@@ -277,11 +277,13 @@ RSpec.describe Audit do
   end
 
   describe "update_home_page!" do
+    let(:url) { "https://example.com" }
     let(:html) { "html_content" }
 
     it "updates the home page HTML" do
-      expect { audit.update_home_page!(html) }
-        .to change(audit, :home_page_html).from(nil).to "html_content"
+      expect { audit.update_home_page!(url, html) }
+        .to change(audit, :home_page_html).from(nil).to(html)
+                                          .and change(audit, :home_page_url).from(nil).to(url)
     end
   end
 end
