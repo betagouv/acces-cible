@@ -34,13 +34,14 @@ RSpec.describe SiteCsvExport do
         create(:check, :analyze_accessibility_page, audit:, data: {
           compliance_rate: 85.5,
           audit_date: Date.new(2023, 6, 15),
-          audit_update_date: Date.new(2025, 8, 20)
+          audit_update_date: Date.new(2025, 8, 20),
+          auditor: "Bear & Bee"
         })
         create(:check, :analyze_schema, audit:, data: {
-          link_url: "https://example.com/schema.pdf"
+          link_url: "https://example.com/schema.pdf", years: [2023, 2024]
         })
         create(:check, :analyze_plan, audit:, data: {
-          link_url: "https://example.com/plan.pdf"
+          link_url: "https://example.com/plan.pdf", years: [2025]
         })
         create(:check, :run_axe_on_homepage, :completed, audit:, data: {
           passes: 45,
@@ -62,19 +63,23 @@ RSpec.describe SiteCsvExport do
         expect(parsed_csv.headers).to eq([
                                            Audit.human(:site_url_address),
                                            Audit.human(:url),
+                                           Audit.human(:redirected_url),
                                            Tag.human(:all),
                                            Check.human(:checked_at),
                                            Checks::Reachable.human(:type),
                                            Checks::LanguageIndication.human(:type),
                                            Checks::AccessibilityMention.human(:type),
                                            Checks::FindAccessibilityPage.human(:type),
+                                           Checks::AnalyzeAccessibilityPage.human(:auditor),
                                            Checks::AnalyzeAccessibilityPage.human(:compliance_rate),
                                            Checks::AnalyzeAccessibilityPage.human(:audit_date),
                                            Checks::AnalyzeAccessibilityPage.human(:audit_update_date),
                                            Checks::AnalyzeSchema.human(:type),
+                                           Checks::AnalyzeSchema.human(:years),
                                            Checks::AnalyzePlan.human(:type),
+                                           Checks::AnalyzePlan.human(:years),
                                            Checks::AccessibilityPageHeading.human(:type),
-                                           Checks::RunAxeOnHomepage.human(:success_rate)
+                                           Checks::RunAxeOnHomepage.human(:success_rate),
                                          ])
       end
 
@@ -84,17 +89,21 @@ RSpec.describe SiteCsvExport do
 
         expect(row[Audit.human(:site_url_address)]).to eq(site.url_without_scheme_and_www)
         expect(row[Audit.human(:url)]).to eq(audit.url)
+        expect(row[Audit.human(:redirected_url)]).to be_nil
         expect(row[Tag.human(:all)]).to eq(tags.collect(&:name).join(", "))
         expect(row[Check.human(:checked_at)]).to eq(audit.checked_at.to_s)
         expect(row[Checks::Reachable.human(:type)]).to eq("true")
         expect(row[Checks::LanguageIndication.human(:type)]).to eq("Non trouvé")
         expect(row[Checks::AccessibilityMention.human(:type)]).to eq("Totalement conforme")
         expect(row[Checks::FindAccessibilityPage.human(:type)]).to eq("https://example.com/accessibilite")
+        expect(row[Checks::AnalyzeAccessibilityPage.human(:auditor)]).to eq("Bear & Bee")
         expect(row[Checks::AnalyzeAccessibilityPage.human(:compliance_rate)]).to eq("85,5%")
         expect(row[Checks::AnalyzeAccessibilityPage.human(:audit_date)]).to eq("2023-06-15")
         expect(row[Checks::AnalyzeAccessibilityPage.human(:audit_update_date)]).to eq("2025-08-20")
         expect(row[Checks::AnalyzeSchema.human(:type)]).to eq("https://example.com/schema.pdf")
+        expect(row[Checks::AnalyzeSchema.human(:years)]).to eq("2023-2024")
         expect(row[Checks::AnalyzePlan.human(:type)]).to eq("https://example.com/plan.pdf")
+        expect(row[Checks::AnalyzePlan.human(:years)]).to eq("2025")
       end
     end
 

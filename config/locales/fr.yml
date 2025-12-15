@@ -96,6 +96,7 @@ fr:
         new: "Nouvelle vérification"
         url: URL
         site_url_address: Adresse du site
+        redirected_url: URL de redirection
         count:
           zero: Aucune vérification
           one: Une vérification

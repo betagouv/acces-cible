@@ -7,11 +7,11 @@ class SitesController < ApplicationController
   # GET /sites
   def index
     params[:sort] ||= { checked_at: :desc }
-    @sites = current_user.sites.preloaded.filter_by(params).order_by(params)
+    @sites = current_user.sites.preloaded
     @tags = current_user.team.tags.in_alphabetical_order
     respond_to do |format|
       format.html do
-        @pagy, @sites = pagy @sites, limit: pagy_limit
+        @pagy, @sites = pagy @sites.filter_by(params).order_by(params), limit: pagy_limit
       end
       format.csv do
         set_csv_headers
