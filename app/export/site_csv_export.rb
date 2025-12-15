@@ -2,25 +2,25 @@ class SiteCsvExport
   COL_SEP = ";"
 
   HEADERS = [
-    Audit.human(:site_url_address),
-    Audit.human(:url),
-    Audit.human(:redirected_url),
-    Tag.human(:all),
-    Check.human(:checked_at),
-    Checks::Reachable.human(:type),
-    Checks::LanguageIndication.human(:type),
-    Checks::AccessibilityMention.human(:type),
-    Checks::FindAccessibilityPage.human(:type),
-    Checks::AnalyzeAccessibilityPage.human(:auditor),
-    Checks::AnalyzeAccessibilityPage.human(:compliance_rate),
-    Checks::AnalyzeAccessibilityPage.human(:audit_date),
-    Checks::AnalyzeAccessibilityPage.human(:audit_update_date),
-    Checks::AnalyzeSchema.human(:type),
-    Checks::AnalyzeSchema.human(:years),
-    Checks::AnalyzePlan.human(:type),
-    Checks::AnalyzePlan.human(:years),
-    Checks::AccessibilityPageHeading.human(:type),
-    Checks::RunAxeOnHomepage.human(:success_rate),
+    I18n.t("audit.site_url_address"),
+    I18n.t("audit.url"),
+    I18n.t("audit.redirect_url"),
+    I18n.t("tags.all"),
+    I18n.t("check.checked_at"),
+    I18n.t("checks.reachable.type"),
+    I18n.t("checks.language_indication.type"),
+    I18n.t("checks.accessibility_mention.type"),
+    I18n.t("checks.find_accessibility_page.type"),
+    I18n.t("checks.analyze_accessibility_page.auditor"),
+    I18n.t("checks.analyze_accessibility_page.compliance_rate"),
+    I18n.t("checks.analyze_accessibility_page.audit_date"),
+    I18n.t("checks.analyze_accessibility_page.audit_update_date"),
+    I18n.t("checks.analyze_schema.type"),
+    I18n.t("checks.analyze_schema.years"),
+    I18n.t("checks.analyze_plan.type"),
+    I18n.t("checks.analyze_plan.years"),
+    I18n.t("checks.accessibility_page_heading.type"),
+    I18n.t("checks.run_axe_on_homepage.success_rate"),
   ].freeze
 
   def self.filename
@@ -72,12 +72,12 @@ class SiteCsvExport
   end
 
   def self.extract_value(check, data)
-    return Check.human("status.failed") if check.nil?
+    return I18n.t("check.status.failed") if check.nil?
 
     if check.aborted? || check.errored? || check.failed?
       check.human_status
     elsif data.blank?
-      Check.human("status.failed")
+      I18n.t("check.status.failed")
     else
       data
     end
@@ -87,7 +87,7 @@ class SiteCsvExport
     return nil if check.nil?
 
     if check.text.present?
-      Check.human("checks.#{translation_key}")
+      I18n.t("checks.#{translation_key}")
     else
       check.link_url
     end

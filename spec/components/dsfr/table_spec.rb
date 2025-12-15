@@ -9,7 +9,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
   let(:rendered_component) { render_inline(component) }
 
   before do
-    allow_any_instance_of(described_class).to receive(:url_for).and_return("/things") # rubocop:disable RSpec/AnyInstance
+    allow_any_instance_of(Dsfr::PaginationComponent).to receive(:url_for).and_return("/things") # rubocop:disable RSpec/AnyInstance
   end
 
   it "renders the DSFR table structure" do
@@ -122,33 +122,6 @@ RSpec.describe Dsfr::TableComponent, type: :component do
       end
 
       expect(rendered_component).to have_css("tbody tr td", text: "Data")
-    end
-  end
-
-  describe "total_lines" do
-    before do
-      allow(component).to receive(:human).with(:lines, count: 10).and_return("100 lines") # rubocop:disable RSpec/SubjectStub
-    end
-
-    it "displays the correct number of total lines" do
-      expect(rendered_component).to have_css("div.fr-table__footer--start p.fr-table__detail", text: "100 lines")
-    end
-  end
-
-  describe "multipage?" do
-    let(:pagination_component) { instance_double(Dsfr::PaginationComponent) }
-
-    [true, false].each do |value|
-      context "when pagination_component returns #{value}" do
-        before do
-          allow(Dsfr::PaginationComponent).to receive(:new).with(pagy:).and_return(pagination_component)
-          allow(pagination_component).to receive_messages(render?: value)
-        end
-
-        it "returns #{value}" do
-          expect(component.send(:multipage?)).to be value
-        end
-      end
     end
   end
 

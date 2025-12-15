@@ -112,7 +112,7 @@ module Checks
     end
 
     def custom_badge_text
-      found_required? ? human_compliance_rate : human(:missing_data)
+      found_required? ? human_compliance_rate : t("checks.analyze_accessibility_page.missing_data")
     end
 
     private
@@ -144,7 +144,7 @@ module Checks
 
     def month_names
       @month_names ||= begin
-        names = I18n.t("date.month_names")[1..] + I18n.t("date.abbr_month_names")[1..]
+        names = t("date.month_names")[1..] + t("date.abbr_month_names")[1..]
         names.each_with_object({}) do |name, hash|
           next if name.blank?
 

@@ -3,37 +3,37 @@
 <div class="fr-grid-row">
   <div class="fr-col-12 fr-col-md-8">
     <p>
-      <strong><%= Site.human :url %> :</strong>
+      <strong><%= t(".url") %> :</strong>
       <%= link_to @site.url, @site.url, target: :_blank %>
     </p>
     <p>
-      <strong><%= Tag.human(:all) %> :</strong>
+      <strong><%= t("tags.all") %> :</strong>
       <% if @site.tags.load.any? %>
         <% @site.tags.each do |tag| %>
-          <%= dsfr_tag(title: tag.name.truncate(35), url: tag_path(tag), size: :sm, html_attributes: { title: Tag.human(:tag, name: tag.name) }) %>
+          <%= dsfr_tag(title: tag.name.truncate(35), url: tag_path(tag), size: :sm, html_attributes: { title: t(".tag", name: tag.name) }) %>
         <% end %>
       <% else %>
-        <%= Tag.human_count(count: 0) %>
+        <%= t(".no_tag") %>
       <% end %>
     </p>
     <% if @audit.checked_at %>
       <p>
-        <strong><%= Audit.human :checked_at %> :</strong>
+        <strong><%= t("audit.checked_at") %> :</strong>
         <% checked_at = @audit.checked_at %>
         <%= time_tag checked_at, l(checked_at, format: :long) %>
         (<%= time_ago checked_at %>).
       </p>
     <% else %>
       <p>
-        <strong><%= Audit.human(:status) %> :</strong>
-        <%= Audit.human("audit/status.#{@audit.status_from_checks}") %>
+        <strong><%= t("audit.state") %> :</strong>
+        <%= t("audit.status.#{@audit.status_from_checks}") %>
       </p>
     <% end %>
     <%= render(partial: @audit.all_checks, as: :check) %>
   </div>
   <div class="fr-col-12 fr-col-md-4">
     <% audits = @site.audits.sort_by_newest.load %>
-    <%= dsfr_sidemenu(button: Site.human(:audits), title: Site.human(:audit_history, total: audits.count), right: true) do |sidemenu| %>
+    <%= dsfr_sidemenu(button: t(".audits"), title: t(".audit_history", total: audits.count), right: true) do |sidemenu| %>
       <% audits.each do |audit| %>
         <% sidemenu.with_item text: l(audit.created_at.in_time_zone, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
       <% end %>
@@ -44,9 +44,9 @@
 <br>
 
 <%= page_actions do %>
-  <%= button_to Audit.human(:new), [@site, :audits], method: :post, class: "fr-btn" %>
-  <%= link_to Site.human(:edit), [:edit, @site], class: "fr-btn fr-btn--secondary" %>
-  <%= button_to Site.human(:delete), @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= button_to t(".new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
+  <%= link_to t(".edit"), [:edit, @site], class: "fr-btn fr-btn--secondary" %>
+  <%= button_to t(".delete"), @site, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
   <%= link_to t("shared.see_help"), help_path, class: "fr-btn fr-btn--tertiary-no-outline" %>
   <%= link_to t("shared.back_to_list"), { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>

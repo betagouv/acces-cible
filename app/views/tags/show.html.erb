@@ -1,8 +1,8 @@
 <% if @sites.load.any? %>
-  <%= dsfr_table(caption: Site.human(:all)) do |t| %>
+  <%= dsfr_table(caption: t('tags.all', default: t('sites.index.caption'))) do |t| %>
     <% t.with_head do %>
       <tr>
-        <th scope="col" aria-sort="ascending"><%= Site.human(:name) %></th>
+        <th scope="col" aria-sort="ascending"><%= t('.name', default: t('site.name')) %></th>
       </tr>
     <% end %>
     <% t.with_body do %>
@@ -14,12 +14,12 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= dsfr_alert(type: :info, title: Site.human_count(count: @tag.sites_count), html_attributes: { class: "fr-mb-4w" }) %>
+  <%= dsfr_alert(type: :info, title: t('sites.index.uploaded.other', count: @tag.sites_count, default: t('sites.index.title')), html_attributes: { class: "fr-mb-4w" }) %>
 <% end %>
 
 <%= page_actions do %>
-  <%= dsfr_link_to Tag.human(:edit), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
-  <%= button_to Tag.human(:delete), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
-  <%= dsfr_link_to Tag.human(:see_sites, tag: @tag.name, count: @tag.sites_count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
+  <%= dsfr_link_to t('.edit'), [:edit, @tag], class: "fr-btn fr-btn--secondary" %>
+  <%= button_to t('.delete'), @tag, method: :delete, class: "fr-btn fr-btn--tertiary", form: { data: { turbo_confirm: t("shared.confirm") } } %>
+  <%= dsfr_link_to t('.see_sites', tag: @tag.name, count: @tag.sites_count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
   <%= dsfr_link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>

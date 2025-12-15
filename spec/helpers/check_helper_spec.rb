@@ -23,9 +23,9 @@ RSpec.describe CheckHelper do
       let(:state) { :pending }
 
       before do
-        allow(Check)
-          .to receive(:human)
-                .with("status.pending")
+        allow(I18n)
+          .to receive(:t)
+                .with("check.status.pending")
                 .and_return "state"
       end
 

@@ -1,4 +1,4 @@
-## <%= Check.human("checks.find_accessibility_page.type") %>
+## <%= t("checks.find_accessibility_page.type") %>
 
 ### Objectif
 
@@ -25,7 +25,7 @@ D'abord depuis le lien de la mention, si existante, puis dans les liens présent
         <td><p>Réussi - Déclaration trouvée</p></td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--error"><%= Check.human("checks.find_accessibility_page.not_found") %></p></td>
+        <td><p class="fr-badge fr-badge--error"><%= t("checks.find_accessibility_page.not_found") %></p></td>
         <td> <p>Échec - Aucun lien vers la page d’accessibilité n’a été détecté </p></td>
       </tr>
     </tbody>

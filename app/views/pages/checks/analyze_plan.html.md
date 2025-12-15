@@ -1,4 +1,4 @@
-## <%= Check.human("checks.analyze_plan.type")%>
+## <%= t("checks.analyze_plan.type")%>
 
 ### Objectif
 
@@ -22,19 +22,19 @@ Un simple texte sans lien dans la déclaration est relevé en tant qu'avertissem
     </thead>
     <tbody>
       <tr>
-        <td><p class="fr-badge fr-badge--success"><%= Check.human("checks.analyze_plan.all_passed") %></p></td>
+        <td><p class="fr-badge fr-badge--success"><%= t("checks.analyze_plan.all_passed") %></p></td>
         <td>Réussi - Lien trouvé et valide</td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.analyze_plan.invalid_year") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.invalid_year") %></p></td>
         <td>Avertissement - Lien trouvé et valide, mais les années précisées sont invalides (anciennes/incohérentes) </td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.analyze_plan.plan_in_main_text") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.plan_in_main_text") %></p></td>
         <td>Avertissement - Plan trouvé, mais seulement mentionné dans le texte</td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--error"><%= Check.human("checks.analyze_plan.nothing_found") %></p></td>
+        <td><p class="fr-badge fr-badge--error"><%= t("checks.analyze_plan.nothing_found") %></p></td>
         <td> Erreur - Aucun lien ni mention de plan n'a été trouvé </td>
       </tr>
     </tbody>

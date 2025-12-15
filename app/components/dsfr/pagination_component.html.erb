@@ -1,7 +1,25 @@
-<nav role="navigation" class="fr-pagination" aria-label="<%= human(:label) %>">
-  <ul class="fr-pagination__list">
-    <% items.each do |item, attributes| %>
-      <li <%= tag.attributes attributes %>><%= item %></li>
+<div class="fr-table__footer--start">
+  <p class="fr-table__detail"><%= t("shared.lines", count: pagy.count) %></p>
+  <%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
+    <% helpers.flatten_params(:sort, :filter).each do |name, value| %>
+      <%= f.hidden_field name, value: value, id: nil %>
     <% end %>
-  </ul>
-</nav>
+    <div class="fr-select-group">
+      <%= f.dsfr_label_with_hint :limit, label: t(".per_page_label"), class: "fr-sr-only" %>
+      <%= f.dsfr_select_tag :limit, per_page_options, required: true, include_blank: t(".per_page_label"), selected: pagy.limit.to_s %>
+    </div>
+    <%= f.dsfr_submit t("shared.apply"), name: nil, class: helpers.icon_class(:refresh, fill: true, class: "fr-sr-only"), title: t("shared.apply"), data: { turbo_submit_with: t("shared.applying") } %>
+  <% end %>
+</div>
+
+<% if multipage? -%>
+  <div class="fr-table__footer--middle">
+    <nav role="navigation" class="fr-pagination" aria-label="<%= t('.label') %>">
+      <ul class="fr-pagination__list">
+        <% items.each do |item| %>
+          <li class="fr-pagination__item"><%= item %></li>
+        <% end %>
+      </ul>
+    </nav>
+  </div>
+<%- end %>

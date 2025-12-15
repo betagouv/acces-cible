@@ -69,13 +69,13 @@ module Checks
 
     def custom_badge_text
       if all_passed?
-        human(:all_passed)
+        t("checks.analyze_schema.all_passed")
       elsif valid_link?
-        human(:invalid_years)
+        t("checks.analyze_schema.invalid_years")
       elsif text
-        human(:schema_in_main_text)
+        t("checks.analyze_schema.schema_in_main_text")
       else
-        human(:link_not_found)
+        t("checks.analyze_schema.link_not_found")
       end
     end
 

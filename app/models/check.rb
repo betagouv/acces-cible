@@ -66,11 +66,11 @@ class Check < ApplicationRecord
 
   class << self
     def human_type
-      human("checks.#{model_name.element}.type")
+      I18n.t("checks.#{model_name.element}.type")
     end
 
     def table_header
-      human("checks.#{model_name.element}.table_header", default: human_type)
+      I18n.t("checks.#{model_name.element}.table_header", default: human_type)
     end
 
     def types
@@ -91,7 +91,7 @@ class Check < ApplicationRecord
   end
 
   def human_status
-    Check.human("status.#{state_machine.current_state}")
+    t("check.status.#{state_machine.current_state}")
   end
 
   def to_partial_path

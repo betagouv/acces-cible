@@ -1,4 +1,4 @@
-## <%= Check.human("checks.reachable.type")%>
+## <%= t("checks.reachable.type")%>
 
 ### Objectif
 
@@ -22,11 +22,11 @@ Le site est considéré comme joignable et nous pouvons l'analyser.
     </thead>
     <tbody>
       <tr>
-        <td><p class="fr-badge fr-badge--success"><%= Check.human("checks.reachable.reachable") %></p></td>
+        <td><p class="fr-badge fr-badge--success"><%= t("checks.reachable.reachable") %></p></td>
         <td> Réussi - Le site est joignable </td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--info"><%= Check.human("checks.reachable.redirected") %></p></td>
+        <td><p class="fr-badge fr-badge--info"><%= t("checks.reachable.redirected") %></p></td>
         <td> Réussi - La redirection est signalée </td>
       </tr>
       <tr>

@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
 
   def new
     if request.path == auth_failure_path
-      flash.now.alert = Session.human(:login_failed)
+      flash.now.alert = t("sessions.new.login_failed")
       report(message: params[:message] || "Omniauth error")
     end
   end
