@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe Checks::Reachable do
   let(:check) { described_class.new }
   let(:original_url) { "https://example.com" }
-  let(:redirect_url) { "https://example.org" }
-  let(:audit) { instance_double(Audit, url: original_url, update!: true) }
+  let(:home_page_url) { original_url }
+  let(:audit) { instance_double(Audit, url: original_url, home_page_url:, update!: true) }
   let(:root_page) { instance_double(Page, html: nil) }
   let(:site) { build(:site) }
 
@@ -19,15 +19,15 @@ RSpec.describe Checks::Reachable do
   end
 
   describe "#custom_badge_status" do
-    subject(:status) { described_class.new(data: { original_url:, redirect_url: }).send(:custom_badge_status) }
+    subject(:status) { check.send(:custom_badge_status) }
 
-    context "when there is a redirect_url" do
+    context "when the page redirects" do
+      let(:home_page_url) { "https://www.redirection.org/" }
+
       it { should eq(:info) }
     end
 
-    context "when there is no redirect_url" do
-      let(:redirect_url) { nil }
-
+    context "when the page does not redirect" do
       it { should eq(:success) }
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe Checks::Reachable do
       end
 
       context "when the page does not redirect" do
-        let(:redirects) { false }
+        let(:home_page_url) { original_url }
 
         it "returns an empty hash" do
           expect(check.send(:analyze!)).to eq({})
@@ -68,18 +68,11 @@ RSpec.describe Checks::Reachable do
       end
 
       context "when the page redirects" do
-        before do
-          allow(root_page).to receive_messages(redirected?: true, url: original_url, actual_url: redirect_url)
-        end
-
-        it "updates the audit with the new URL" do
-          expect(audit).to receive(:update!).with(url: redirect_url)
-          check.send(:analyze!)
-        end
+        let(:home_page_url) { "https://www.redirection.org/" }
 
         it "returns a hash with the original and redirect URLs" do
           result = check.send(:analyze!)
-          expect(result).to eq({ original_url:, redirect_url: })
+          expect(result).to eq({ original_url:, redirect_url: home_page_url })
         end
       end
     end
@@ -98,48 +91,48 @@ RSpec.describe Checks::Reachable do
   end
 
   describe "#redirected?" do
-    subject(:redirected) { described_class.new(data: { original_url:, redirect_url: }).redirected? }
+    subject(:redirected) { check.redirected? }
 
     context "when going from https to http" do
       let(:original_url) { "https://www.example.com/" }
-      let(:redirect_url) { "http://www.example.com/" }
+      let(:home_page_url) { "http://www.example.com/" }
 
-      it { should be false }
+      it { should be_falsey }
     end
 
     context "when going from http to https" do
       let(:original_url) { "http://www.example.com/" }
-      let(:redirect_url) { "https://www.example.com/" }
+      let(:home_page_url) { "https://www.example.com/" }
 
-      it { should be false }
+      it { should be_falsey }
     end
 
     context "when going from naked domain to www" do
       let(:original_url) { "https://example.com/" }
-      let(:redirect_url) { "https://www.example.com/" }
+      let(:home_page_url) { "https://www.example.com/" }
 
-      it { should be false }
+      it { should be_falsey }
     end
 
     context "when going from www to naked domain" do
       let(:original_url) { "https://www.example.com/" }
-      let(:redirect_url) { "https://example.com/" }
+      let(:home_page_url) { "https://example.com/" }
 
-      it { should be false }
+      it { should be_falsey }
     end
 
     context "when going from one domain to another" do
       let(:original_url) { "https://www.example.com/" }
-      let(:redirect_url) { "https://www.foo.bar/" }
+      let(:home_page_url) { "https://www.foo.bar/" }
 
-      it { should be true }
+      it { should be_truthy }
     end
 
     context "when going from root to a folder" do
       let(:original_url) { "https://www.example.com/" }
-      let(:redirect_url) { "https://www.example.com/foo/" }
+      let(:home_page_url) { "https://www.example.com/foo/" }
 
-      it { should be true }
+      it { should be_truthy }
     end
   end
 end

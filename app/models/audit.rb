@@ -85,8 +85,11 @@ class Audit < ApplicationRecord
       .each { |other_check| other_check.transition_to!(:aborted) }
   end
 
-  def update_home_page!(html)
-    update!(home_page_html: html)
+  def update_home_page!(url, html)
+    update!(
+      home_page_url: url,
+      home_page_html: html
+    )
   end
 
   def update_accessibility_page!(url, html)
