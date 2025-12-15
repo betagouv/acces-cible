@@ -31,23 +31,23 @@ RSpec.describe Checks::AnalyzePlan do
       it "returns a hash containing link_url, link_text, years, reachable, valid_year, and link_misplaced" do
         link = Link.new(href: "#{root}/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
         body = <<~HTML
-            <h1>Déclaration d'accessibilité</h1>
-            <a href="#{link.href}">#{link.text}</a>
-            <h2>État de conformité</h2>
+          <h1>Déclaration d'accessibilité</h1>
+          <a href="#{link.href}">#{link.text}</a>
+          <h2>État de conformité</h2>
         HTML
         page = build(:page, body:)
         allow(check).to receive(:page).and_return(page)
         allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
         expect(analyze).to include(
-          link_url: link.href,
-          link_text: link.text,
-          link_misplaced: false,
-          years: [year],
-          reachable: true,
-          valid_year: true,
-          text: nil
-        )
+                             link_url: link.href,
+                             link_text: link.text,
+                             link_misplaced: false,
+                             years: [year],
+                             reachable: true,
+                             valid_year: true,
+                             text: nil
+                           )
       end
 
       context "and years are in link.href instead of link.text" do
@@ -59,12 +59,12 @@ RSpec.describe Checks::AnalyzePlan do
           allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
           expect(analyze).to include(
-            link_url: link.href,
-            link_text: link.text,
-            years:,
-            reachable: true,
-            valid_year: true
-          )
+                               link_url: link.href,
+                               link_text: link.text,
+                               years:,
+                               reachable: true,
+                               valid_year: true
+                             )
         end
       end
 
@@ -89,14 +89,14 @@ RSpec.describe Checks::AnalyzePlan do
         allow(audit).to receive(:page).with(:accessibility).and_return(page)
 
         expect(analyze).to include(
-          link_url: nil,
-          link_text: nil,
-          link_misplaced: nil,
-          years: [year],
-          reachable: nil,
-          valid_year: true,
-          text: "Plan annuel d'accessibilité #{year}"
-        )
+                             link_url: nil,
+                             link_text: nil,
+                             link_misplaced: nil,
+                             years: [year],
+                             reachable: nil,
+                             valid_year: true,
+                             text: "Plan annuel d'accessibilité #{year}"
+                           )
       end
     end
   end
@@ -303,7 +303,7 @@ RSpec.describe Checks::AnalyzePlan do
     {
       current_year + 2 => false,
       current_year + 1 => true,
-      current_year     => true,
+      current_year => true,
       current_year - 1 => true,
       current_year - 2 => false
     }.each do |year, expected_result|
@@ -353,34 +353,34 @@ RSpec.describe Checks::AnalyzePlan do
     subject(:custom_badge_text) { check.custom_badge_text }
 
     context "when all passed" do
-      it "returns human(:all_passed)" do
+      it "returns all passed" do
         allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, text: nil)
 
-        expect(custom_badge_text).to eq(check.human(:all_passed))
+        expect(custom_badge_text).to eq("Lien trouvé et valide")
       end
     end
 
     context "when link is valid but year is invalid" do
-      it "returns human(:invalid_year)" do
+      it "returns invalid years" do
         allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, text: nil)
 
-        expect(custom_badge_text).to eq(check.human(:invalid_year))
+        expect(custom_badge_text).to eq("Année(s) invalide(s)")
       end
     end
 
     context "when plan is in main text" do
-      it "returns human(:plan_in_main_text)" do
+      it "returns plan found in main text" do
         allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: "Plan annuel")
 
-        expect(custom_badge_text).to eq(check.human(:plan_in_main_text))
+        expect(custom_badge_text).to eq("Plan trouvé dans le texte principal")
       end
     end
 
     context "when link_url is nil found and text too" do
-      it "returns human(:link_not_found)" do
+      it "returns not found" do
         allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: nil)
 
-        expect(custom_badge_text).to eq(check.human(:link_not_found))
+        expect(custom_badge_text).to eq("Lien non trouvé")
       end
     end
   end

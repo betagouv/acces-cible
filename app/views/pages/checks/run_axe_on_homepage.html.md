@@ -1,4 +1,4 @@
-## <%= Check.human("checks.run_axe_on_homepage.type")%>
+## <%= t("checks.run_axe_on_homepage.type")%>
 
 ### Objectif
 

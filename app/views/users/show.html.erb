@@ -1,11 +1,11 @@
 <% use_centered_layout boxed: false %>
 
-<%= dsfr_table(caption: User.human(:profile), border: true) do |t| %>
+<%= dsfr_table(caption: t('.profile'), border: true) do |t| %>
   <% t.with_head do %>
     <tr>
-      <th><%= User.human :email %></th>
-      <th><%= User.human :team %></th>
-      <th><%= User.human :siret %></th>
+      <th><%= t('.email') %></th>
+      <th><%= t('.team') %></th>
+      <th><%= t('.siret') %></th>
     </tr>
   <% end %>
   <% t.with_body do %>

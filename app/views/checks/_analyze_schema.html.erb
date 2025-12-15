@@ -6,35 +6,35 @@
     <ul>
       <% if check.link_url %>
         <li>
-          <strong><%= Checks::AnalyzeSchema.human(:link_text) %> :</strong>
+          <strong><%= t('.link_text') %> :</strong>
           <%= check.link_text %>
         </li>
         <li>
-          <strong><%= Checks::AnalyzeSchema.human(:link_url) %> :</strong>
+          <strong><%= t('.link_url') %> :</strong>
           <%= link_to check.link_url, check.link_url, target: :_blank %>
           <% if check.link_misplaced %>
-            <br><%= Checks::AnalyzePlan.human(:link_misplaced) %>
+            <br><%= t('.link_misplaced') %>
           <% end %>
           <% if !check.reachable %>
-            <br><%= Checks::AnalyzePlan.human(:link_unreachable) %>
+            <br><%= t('.link_unreachable') %>
           <% end %>
         </li>
       <% elsif check.text %>
         <li>
-          <strong><%= Checks::AnalyzeSchema.human(:schema_in_main_text) %> :</strong>
+          <strong><%= t('.schema_in_main_text') %> :</strong>
           <%= check.text %>
         </li>
       <% else %>
         <li>
-          <strong><%= Checks::AnalyzeSchema.human(:nothing_found) %></strong>
+          <strong><%= t('.nothing_found') %></strong>
         </li>
       <% end %>
       <li>
-        <strong><%= Checks::AnalyzeSchema.human(:years) %> :</strong>
+        <strong><%= t('.years') %> :</strong>
         <% if check.years.present? %>
           <%= check.years.join("-") %>
         <% else %>
-          <%= Checks::AnalyzeSchema.human(:year_not_found) %>
+          <%= t('.year_not_found') %>
         <% end %>
       </li>
     </ul>

@@ -4,7 +4,7 @@
 
   <% if check.completed? %>
     <p>
-      <strong><%= check.human(:success_rate) %></strong> :
+      <strong><%= t('.success_rate') %></strong> :
       <%= check.human_success_rate %>
       (<%= check.passes + check.incomplete %>/<%= check.applicable_total %>)
     </p>
@@ -14,7 +14,7 @@
     <% check.violation_data.each do |violation| %>
       <% accordion.with_section title: "#{violation.help} (#{violation.human_impact})" do %>
         <p><%= dsfr_link_to violation.description, violation.help_url, target: :_blank, rel: :noopener %></p>
-        <p><strong><%= check.human_count(:elements_count, count: violation.nodes_count) %></strong></p>
+        <p><strong><%= t('.elements_count', count: violation.nodes_count) %></strong></p>
         <% if violation.nodes %>
           <ol>
             <% violation.nodes_html.each do |html| %>

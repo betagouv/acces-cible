@@ -1,18 +1,12 @@
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
-  delegate :l, to: :I18n
-  delegate :human, :to_percent, :helpers, to: :class
+  delegate :l, :t, to: :I18n
+  delegate :to_percent, :helpers, to: :class
   delegate :report, to: ErrorHelper
 
   class << self
     delegate :helpers, to: ApplicationController
-
-    alias human human_attribute_name
-
-    def human_count(attr = :count, count: nil)
-      human(attr, count: count || send(attr))
-    end
 
     def to_percent(number, **options)
       helpers.number_to_percentage(number, options.with_defaults(precision: 2, strip_insignificant_zeros: true))
@@ -39,13 +33,14 @@ class ApplicationRecord < ActiveRecord::Base
 
       update_all("#{counter} = (SELECT count(*) FROM #{table} WHERE #{table}.#{foreign_key} = #{table_name}.#{primary_key})")
     end
+
+    def human_count(count = nil)
+      count ||= self.count
+      "#{count} #{model_name.human(count:).downcase}"
+    end
   end
 
   def to_title
     respond_to?(:name) ? name : to_s
-  end
-
-  def human_count(attr, count: nil)
-    human(attr, count: count || send(attr))
   end
 end

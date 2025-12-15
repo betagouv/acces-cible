@@ -3,6 +3,6 @@
   <%= badge to_badge(check) %>
 
   <% if check.redirected? %>
-    <p><%= check.human(:redirect_message, original: check.original_url, redirected: check.redirect_url).html_safe %></p>
+    <p><%= t('.redirect_message', original: check.original_url, redirected: check.redirect_url).html_safe %></p>
   <% end %>
 </div>

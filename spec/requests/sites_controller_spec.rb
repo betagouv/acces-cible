@@ -34,7 +34,7 @@ RSpec.describe "Sites" do
 
         csv = CSV.parse(response.body, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first[Audit.human(:site_url_address)]).to eq(site.url_without_scheme_and_www)
+        expect(csv.first["Adresse du site"]).to eq(site.url_without_scheme_and_www)
       end
     end
   end
@@ -81,8 +81,8 @@ RSpec.describe "Sites" do
 
     it "creates a site and schedules checks automatically" do
       expect { post_site }.to change(Site, :count).by(1)
-        .and change(Audit, :count).by(1)
-        .and change(Check, :count).by(Check.names.count)
+                                                  .and change(Audit, :count).by(1)
+                                                                            .and change(Check, :count).by(Check.names.count)
 
       site = Site.last
       audit = site.audit

@@ -26,12 +26,12 @@
 <h2>Pages nécessitant de se connecter</h2>
 <ul>
   <li>
-    <%= link_to Site.human(:all), sites_path %>
+    <%= link_to t("sites.all"), sites_path %>
   </li>
   <li>
-    <%= link_to Site.human(:add), new_site_path %>
+    <%= link_to t("sites.add"), new_site_path %>
   </li>
   <li>
-    <%= link_to Tag.human(:all), tags_path %>
+    <%= link_to t("tags.all"), tags_path %>
   </li>
 </ul>

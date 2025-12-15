@@ -3,21 +3,15 @@ module Dsfr
     LINK_CLASS = "fr-pagination__link".freeze
     PER_PAGE = [10, 20, 50, 100]
 
-    class << self
-      def per_page_label
-        human(:per_page_label)
-      end
-
-      def per_page_options
-        PER_PAGE.index_with { |count| human(:per_page, count:) }.invert
-      end
+    def per_page_options
+      PER_PAGE.index_with { |count| t(".per_page", count:) }.invert
     end
 
     def initialize(pagy:)
       @pagy = pagy
     end
 
-    def render?
+    def multipage?
       pagy.last > 1
     end
 
@@ -31,7 +25,7 @@ module Dsfr
 
     def first_page
       page_link(
-        human(:first),
+        t(".first"),
         page: 1,
         modifier: :first,
         disabled: pagy.page == 1
@@ -40,7 +34,7 @@ module Dsfr
 
     def previous_page
       page_link(
-        human(:prev),
+        t(".prev"),
         page: pagy.prev,
         modifier: :prev,
         disabled: !pagy.prev
@@ -49,7 +43,7 @@ module Dsfr
 
     def next_page
       page_link(
-        human(:next),
+        t(".next"),
         page: pagy.next,
         modifier: :next,
         disabled: !pagy.next
@@ -58,7 +52,7 @@ module Dsfr
 
     def last_page
       page_link(
-        human(:last),
+        t(".last"),
         page: pagy.last,
         modifier: :last,
         disabled: pagy.page == pagy.last
@@ -71,10 +65,10 @@ module Dsfr
         when :gap
           tag.span "…", class: LINK_CLASS, aria: { hidden: true }
         when String # current page
-          page_link(page, title: human(:page, page:), aria: { current: :page })
+          page_link(page, title: t(".page", page:), aria: { current: :page })
         else
           # regular page link
-          page_link(page, page:, title: human(:page, page:))
+          page_link(page, page:, title: t(".page", page:))
         end
       end
     end

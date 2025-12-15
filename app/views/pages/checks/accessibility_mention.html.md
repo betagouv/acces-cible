@@ -1,4 +1,4 @@
-## <%= Check.human("checks.accessibility_mention.type")%>
+## <%= t("checks.accessibility_mention.type")%>
 
 ### Objectif
 
@@ -25,20 +25,20 @@ Le système cherche, dans la page d'accueil, une mention d’accessibilité du t
     </thead>
     <tbody>
       <tr>
-        <td><p class="fr-badge fr-badge--success"><%= Check.human("checks.accessibility_mention.mentions.totalement") %></p></td>
-        <td>Trouvée - <%= Check.human("checks.accessibility_mention.mentions.totalement") %></td>
+        <td><p class="fr-badge fr-badge--success"><%= t("checks.accessibility_mention.mentions.totalement") %></p></td>
+        <td>Trouvée - <%= t("checks.accessibility_mention.mentions.totalement") %></td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--new"><%= Check.human("checks.accessibility_mention.mentions.partiellement") %></p></td>
-        <td>Trouvée - <%= Check.human("checks.accessibility_mention.mentions.partiellement") %></td>
+        <td><p class="fr-badge fr-badge--new"><%= t("checks.accessibility_mention.mentions.partiellement") %></p></td>
+        <td>Trouvée - <%= t("checks.accessibility_mention.mentions.partiellement") %></td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.accessibility_mention.mentions.non") %></p></td>
-        <td>Trouvée - <%= Check.human("checks.accessibility_mention.mentions.non") %></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.accessibility_mention.mentions.non") %></p></td>
+        <td>Trouvée - <%= t("checks.accessibility_mention.mentions.non") %></td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--error"><%= Check.human("checks.accessibility_mention.mentions.none") %></p></td>
-        <td><%= Check.human("checks.accessibility_mention.mentions.none") %></td>
+        <td><p class="fr-badge fr-badge--error"><%= t("checks.accessibility_mention.mentions.none") %></p></td>
+        <td><%= t("checks.accessibility_mention.mentions.none") %></td>
       </tr>
     </tbody>
   </table>
