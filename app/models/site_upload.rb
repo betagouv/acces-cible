@@ -23,7 +23,7 @@ class SiteUpload
   validates :file, :team, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
 
-  delegate :create!, :transaction, :human, to: :Site
+  delegate :create!, :transaction, to: :Site
 
   def initialize(attributes = {})
     super

@@ -5,7 +5,7 @@ module Checks
     store_accessor :data, :indication, :detected_code
 
     def custom_badge_text
-      indication || human(:empty)
+      indication || t("checks.language_indication.empty")
     end
 
     def custom_badge_status

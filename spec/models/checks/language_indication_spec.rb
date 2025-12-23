@@ -109,7 +109,7 @@ RSpec.describe Checks::LanguageIndication do
     {
       "fr-FR" => "fr-FR",
       "" => "",
-      nil => described_class.human(:empty)
+      nil => "Non trouvée"
     }.each do |indication, text|
       context "when indication is #{indication.inspect}" do
         it "returns #{text.inspect}" do

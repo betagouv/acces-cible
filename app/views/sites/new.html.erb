@@ -6,9 +6,9 @@
 
 <%= or_separator %>
 
-<h2><%= Site.human(:import) %></h2>
+<h2><%= t('.import') %></h2>
 <%= form_with(model: @upload || SiteUpload.new, url: upload_sites_url) do |f| %>
-  <%= f.dsfr_file_field :file, label: Site.human(:file), required: true, hint: Site.human(:file_hint), class: "fr-mb-4w", accept: ".csv", data: { controller: "dragover", action: "dragover->dragover#enter dragleave->dragover#leave drop->dragover#drop" } %>
+  <%= f.dsfr_file_field :file, label: t('.file'), required: true, hint: t('.file_hint'), class: "fr-mb-4w", accept: ".csv", data: { controller: "dragover", action: "dragover->dragover#enter dragleave->dragover#leave drop->dragover#drop" } %>
 
   <%= render "tags_form", object: f.object %>
 

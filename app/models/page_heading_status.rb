@@ -3,7 +3,6 @@ require_relative "../libs/string_comparison" # Autoload seems to fail from withi
 class PageHeadingStatus < Data.define(:expected_heading, :expected_level, :status, :actual_heading)
   SIMILARITY_THRESHOLD = 0.9
 
-  delegate :human, to: "Checks::AccessibilityPageHeading"
   delegate :inquiry, to: :status, prefix: true
   delegate :ok?, :missing?, :incorrect_order?, :incorrect_level?, to: :status_inquiry
 
@@ -16,7 +15,7 @@ class PageHeadingStatus < Data.define(:expected_heading, :expected_level, :statu
   end
 
   def message
-    human("statuses.#{status}")
+    I18n.t("checks.accessibility_page_heading.statuses.#{status}")
   end
 
   def fuzzy_match?

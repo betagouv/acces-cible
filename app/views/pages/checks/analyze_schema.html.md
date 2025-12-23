@@ -1,4 +1,4 @@
-## <%= Check.human("checks.analyze_schema.type")%>
+## <%= t("checks.analyze_schema.type")%>
 
 ### Objectif
 
@@ -22,19 +22,19 @@ Un simple texte sans lien dans la déclaration est relevé en tant qu'avertissem
     </thead>
     <tbody>
       <tr>
-        <td><p class="fr-badge fr-badge--success"><%= Check.human("checks.analyze_schema.all_passed") %></p></td>
+        <td><p class="fr-badge fr-badge--success"><%= t("checks.analyze_schema.all_passed") %></p></td>
         <td>Réussi - Lien trouvé et valide (sur une plage de 3 ans incluant l'année en cours)</td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.analyze_schema.invalid_years") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_schema.invalid_years") %></p></td>
         <td>Avertissement - Lien trouvé et valide, mais les années précisées sont invalides (anciennes/incohérentes) </td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.analyze_schema.schema_in_main_text") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_schema.schema_in_main_text") %></p></td>
         <td>Avertissement - Schéma trouvé, mais seulement mentionné dans le texte</td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--error"><%= Check.human("checks.analyze_schema.nothing_found") %></p></td>
+        <td><p class="fr-badge fr-badge--error"><%= t("checks.analyze_schema.nothing_found") %></p></td>
         <td> Erreur - Aucun lien ni mention de schéma n'a été trouvé </td>
       </tr>
     </tbody>

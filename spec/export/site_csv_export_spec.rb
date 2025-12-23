@@ -61,25 +61,25 @@ RSpec.describe SiteCsvExport do
 
       it "includes headers" do
         expect(parsed_csv.headers).to eq([
-                                           Audit.human(:site_url_address),
-                                           Audit.human(:url),
-                                           Audit.human(:redirected_url),
-                                           Tag.human(:all),
-                                           Check.human(:checked_at),
-                                           Checks::Reachable.human(:type),
-                                           Checks::LanguageIndication.human(:type),
-                                           Checks::AccessibilityMention.human(:type),
-                                           Checks::FindAccessibilityPage.human(:type),
-                                           Checks::AnalyzeAccessibilityPage.human(:auditor),
-                                           Checks::AnalyzeAccessibilityPage.human(:compliance_rate),
-                                           Checks::AnalyzeAccessibilityPage.human(:audit_date),
-                                           Checks::AnalyzeAccessibilityPage.human(:audit_update_date),
-                                           Checks::AnalyzeSchema.human(:type),
-                                           Checks::AnalyzeSchema.human(:years),
-                                           Checks::AnalyzePlan.human(:type),
-                                           Checks::AnalyzePlan.human(:years),
-                                           Checks::AccessibilityPageHeading.human(:type),
-                                           Checks::RunAxeOnHomepage.human(:success_rate),
+                                           "Adresse du site",
+                                           "URL",
+                                           "URL de redirection",
+                                           "Toutes les étiquettes",
+                                           "Vérification effectuée le",
+                                           "Site joignable",
+                                           "Indication de la langue",
+                                           "Mention du niveau d'accessibilité",
+                                           "Présence d'une déclaration d'accessibilité",
+                                           "Audit réalisé par",
+                                           "Taux de conformité",
+                                           "Date de la déclaration",
+                                           "Déclaration mise à jour le",
+                                           "Schéma pluriannuel d'accessibilité",
+                                           "Années de validité du schéma",
+                                           "Plan d'action",
+                                           "Année(s) du plan",
+                                           "Titres de la déclaration d'accessibilité",
+                                           "Taux de réussite"
                                          ])
       end
 
@@ -87,23 +87,23 @@ RSpec.describe SiteCsvExport do
         row = parsed_csv.first
         audit = site.audit.reload
 
-        expect(row[Audit.human(:site_url_address)]).to eq(site.url_without_scheme_and_www)
-        expect(row[Audit.human(:url)]).to eq(audit.url)
-        expect(row[Audit.human(:redirected_url)]).to be_nil
-        expect(row[Tag.human(:all)]).to eq(tags.collect(&:name).join(", "))
-        expect(row[Check.human(:checked_at)]).to eq(audit.checked_at.to_s)
-        expect(row[Checks::Reachable.human(:type)]).to eq("true")
-        expect(row[Checks::LanguageIndication.human(:type)]).to eq("Non trouvé")
-        expect(row[Checks::AccessibilityMention.human(:type)]).to eq("Totalement conforme")
-        expect(row[Checks::FindAccessibilityPage.human(:type)]).to eq("https://example.com/accessibilite")
-        expect(row[Checks::AnalyzeAccessibilityPage.human(:auditor)]).to eq("Bear & Bee")
-        expect(row[Checks::AnalyzeAccessibilityPage.human(:compliance_rate)]).to eq("85,5%")
-        expect(row[Checks::AnalyzeAccessibilityPage.human(:audit_date)]).to eq("2023-06-15")
-        expect(row[Checks::AnalyzeAccessibilityPage.human(:audit_update_date)]).to eq("2025-08-20")
-        expect(row[Checks::AnalyzeSchema.human(:type)]).to eq("https://example.com/schema.pdf")
-        expect(row[Checks::AnalyzeSchema.human(:years)]).to eq("2023-2024")
-        expect(row[Checks::AnalyzePlan.human(:type)]).to eq("https://example.com/plan.pdf")
-        expect(row[Checks::AnalyzePlan.human(:years)]).to eq("2025")
+        expect(row["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+        expect(row["URL"]).to eq(audit.url)
+        expect(row["URL de redirection"]).to be_nil
+        expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
+        expect(row["Vérification effectuée le"]).to eq(audit.checked_at.to_s)
+        expect(row["Site joignable"]).to eq("true")
+        expect(row["Indication de la langue"]).to eq("Non trouvé")
+        expect(row["Mention du niveau d'accessibilité"]).to eq("Totalement conforme")
+        expect(row["Présence d'une déclaration d'accessibilité"]).to eq("https://example.com/accessibilite")
+        expect(row["Audit réalisé par"]).to eq("Bear & Bee")
+        expect(row["Taux de conformité"]).to eq("85,5%")
+        expect(row["Date de la déclaration"]).to eq("2023-06-15")
+        expect(row["Déclaration mise à jour le"]).to eq("2025-08-20")
+        expect(row["Schéma pluriannuel d'accessibilité"]).to eq("https://example.com/schema.pdf")
+        expect(row["Années de validité du schéma"]).to eq("2023-2024")
+        expect(row["Plan d'action"]).to eq("https://example.com/plan.pdf")
+        expect(row["Année(s) du plan"]).to eq("2025")
       end
     end
 
@@ -117,7 +117,7 @@ RSpec.describe SiteCsvExport do
 
       it "shows human_status for failed check" do
         row = parsed_csv.first
-        expect(row[Checks::LanguageIndication.human(:type)]).to eq(Check.human("status.failed"))
+        expect(row["Indication de la langue"]).to eq("Non trouvé")
       end
     end
 
@@ -131,7 +131,7 @@ RSpec.describe SiteCsvExport do
 
       it "shows human_status for errored check" do
         row = parsed_csv.first
-        expect(row[Checks::AccessibilityMention.human(:type)]).to eq(Check.human("status.errored"))
+        expect(row["Mention du niveau d'accessibilité"]).to eq("Erreur")
       end
     end
 
@@ -145,7 +145,7 @@ RSpec.describe SiteCsvExport do
 
       it "shows human_status for aborted check" do
         row = parsed_csv.first
-        expect(row[Checks::AccessibilityMention.human(:type)]).to eq(Check.human("status.aborted"))
+        expect(row["Mention du niveau d'accessibilité"]).to eq("Annulé")
       end
     end
   end

@@ -3,17 +3,23 @@ require "rails_helper"
 RSpec.describe Dsfr::PaginationComponent, type: :component do
   subject(:component) { render_inline(described_class.new(pagy:)) }
 
+  before do
+    allow_any_instance_of(described_class).to receive(:url_for).and_return("/things") # rubocop:disable RSpec/AnyInstance
+  end
+
   describe "render" do
     context "when there is only one page" do
-      let(:pagy) { instance_double(Pagy, last: 1, page: 1, series: []) }
+      let(:pagy) { instance_double(Pagy, last: 1, page: 1, series: [], limit: 10, count: 0, vars: {}) }
 
-      it "returns no content" do
-        expect(component.to_html).to be_empty
+      it "renders footer without navigation" do
+        expect(component).to have_css(".fr-table__footer--start")
+        expect(component).to have_css("p.fr-table__detail")
+        expect(component).not_to have_css("nav.fr-pagination")
       end
     end
 
     context "when on the first page" do
-      let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, series: ["1", 2, 3, :gap, 10], vars: {}) }
+      let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, series: ["1", 2, 3, :gap, 10], vars: {}, count: 100, limit: 10) }
 
       it "renders the expected html" do
         expect(component).to have_css("nav.fr-pagination") do |wrapper|
@@ -29,7 +35,7 @@ RSpec.describe Dsfr::PaginationComponent, type: :component do
     end
 
     context "when in the middle of a series" do
-      let(:pagy) { instance_double(Pagy, last: 10, page: 5, prev: 4, next: 6, series: [1, :gap, 4, "5", 6, :gap, 10], vars: {}) }
+      let(:pagy) { instance_double(Pagy, last: 10, page: 5, prev: 4, next: 6, series: [1, :gap, 4, "5", 6, :gap, 10], vars: {}, count: 100, limit: 10) }
 
       it "renders the expected items" do
         expect(component).to have_css("a.fr-pagination__link--first:not([aria-disabled])")
@@ -43,7 +49,7 @@ RSpec.describe Dsfr::PaginationComponent, type: :component do
     end
 
     context "when on the last page" do
-      let(:pagy) { instance_double(Pagy, last: 10, page: 10, prev: 9, next: nil, series: [1, :gap, 8, 9, "10"], vars: {}) }
+      let(:pagy) { instance_double(Pagy, last: 10, page: 10, prev: 9, next: nil, series: [1, :gap, 8, 9, "10"], vars: {}, count: 100, limit: 10) }
 
       it "renders the expected items" do
         expect(component).to have_css("a.fr-pagination__link--first:not([aria-disabled])")

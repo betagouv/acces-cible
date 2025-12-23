@@ -10,8 +10,6 @@ module Dsfr
 
     SIZES = [:sm, :md, :lg].freeze
 
-    delegate :per_page_options, :per_page_label, to: "Dsfr::PaginationComponent"
-
     def initialize(caption:, pagy: nil, html_attributes: {}, **options)
       @caption = caption
       @pagy = pagy
@@ -48,24 +46,8 @@ module Dsfr
       pagy.present?
     end
 
-    def multipage?
-      pagination&.render?
-    end
-
     def pagination
       (PaginationComponent.new(pagy:) if pagy)
-    end
-
-    def lines
-      pagy.count
-    end
-
-    def per_page
-      pagy.limit.to_s
-    end
-
-    def total_lines
-      human(:lines, count: lines)
     end
 
     def header_actions?

@@ -62,7 +62,7 @@ module Checks
     end
 
     def human_explanation
-      human(:explanation, total:, count: failures.count, error: failures.first&.message)
+      t("checks.accessibility_page_heading.explanation", total:, count: failures.count, error: failures.first&.message)
     end
 
     alias custom_badge_text human_success_rate

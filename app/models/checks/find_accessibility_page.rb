@@ -9,7 +9,7 @@ module Checks
     end
 
     def custom_badge_text
-      found? ? human(:link_to_page) : human(:not_found)
+      t(found? ? "link_to_page" : "not_found", scope: "checks.find_accessibility_page")
     end
 
     def custom_badge_status

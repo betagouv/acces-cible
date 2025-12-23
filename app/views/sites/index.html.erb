@@ -1,15 +1,15 @@
 <div class="fr-col-6">
   <%= render "shared/filter",
              attribute: :tag_id,
-             label: Tag.human(:filter),
+             label: t('.tag_filter'),
              params_key: :filter,
-             include_blank: Tag.human(:all),
+             include_blank: t('tags.index.caption'),
              options: options_from_collection_for_select(@tags, :id, :name, params.dig(:filter, :tag_id)) %>
 </div>
 
 <% form_id = :table_form %>
 <%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
-<%= dsfr_table(caption: Site.human(:all), border: true) do |t| %>
+<%= dsfr_table(caption: t('.caption'), border: true) do |t| %>
   <% hidden_fields = flatten_params(:sort, :filter, :limit).except("filter[q]") %>
   <% t.with_search(url: url_for, name: "filter[q]", value: params.dig(:filter, :q), hidden_fields:) %>
   <% t.with_header_action do %>
@@ -18,13 +18,13 @@
   <% t.with_head do %>
     <tr>
       <%= dsfr_row_check_all %>
-      <th scope="col"><%= Site.human(:detail) %></th>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header Site.human(:url), :url %></th>
+      <th scope="col"><%= t('.detail') %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header t('.url'), :url %></th>
       <% Check.classes.each do |klass| %>
         <th scope="col" class="fr-cell--center" title="<%= klass.human_type %>"><%= klass.table_header %></th>
       <% end %>
-      <th scope="col"><%= Tag.human(:all) %></th>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header Site.human(:last_audit_at), :checked_at %></th>
+      <th scope="col"><%= t('.tags') %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:checked_at) %>><%= sortable_header t('.last_audit_at'), :checked_at %></th>
     </tr>
   <% end %>
   <% t.with_body do %>
@@ -33,12 +33,12 @@
     <% else %>
       <tr>
         <td colspan="<%= 5 + Check.classes.size %>">
-          <%= Site.human(params.dig(:filter, :q).present? ? :no_search_results : :no_results) %>
+          <%= t(params.dig(:filter, :q).present? ? '.no_search_results' : '.no_results') %>
         </td>
       </tr>
     <% end %>
   <% end %>
   <% t.with_footer_action do %>
-    <%= link_icon "file-download", Site.human(:export_to_csv), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } unless @sites.empty? %>
+    <%= link_icon "file-download", t('.export_to_csv'), url_for(format: :csv), btn: :secondary, data: { "turbo-prefetch": false } unless @sites.empty? %>
   <% end %>
 <% end %>

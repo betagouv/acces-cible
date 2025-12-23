@@ -34,14 +34,14 @@ RSpec.describe Checks::AnalyzeSchema do
         allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
         expect(analyze).to include(
-          link_url: link.href,
-          link_text: link.text,
-          link_misplaced: true,
-          years: [year - 1, year + 1],
-          reachable: true,
-          valid_years: true,
-          text: nil
-        )
+                             link_url: link.href,
+                             link_text: link.text,
+                             link_misplaced: true,
+                             years: [year - 1, year + 1],
+                             reachable: true,
+                             valid_years: true,
+                             text: nil
+                           )
       end
 
       context "and years are in link.href instead of link.text" do
@@ -53,12 +53,12 @@ RSpec.describe Checks::AnalyzeSchema do
           allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
           expect(analyze).to include(
-            link_url: link.href,
-            link_text: link.text,
-            years:,
-            reachable: true,
-            valid_years: true
-          )
+                               link_url: link.href,
+                               link_text: link.text,
+                               years:,
+                               reachable: true,
+                               valid_years: true
+                             )
         end
       end
 
@@ -83,14 +83,14 @@ RSpec.describe Checks::AnalyzeSchema do
         allow(check).to receive(:page).and_return(page)
 
         expect(analyze).to include(
-          link_url: nil,
-          link_text: nil,
-          link_misplaced: nil,
-          years: [year],
-          reachable: nil,
-          valid_years: true,
-          text: "Schéma pluriannuel d'accessibilité #{year}"
-        )
+                             link_url: nil,
+                             link_text: nil,
+                             link_misplaced: nil,
+                             years: [year],
+                             reachable: nil,
+                             valid_years: true,
+                             text: "Schéma pluriannuel d'accessibilité #{year}"
+                           )
       end
     end
   end
@@ -357,34 +357,34 @@ RSpec.describe Checks::AnalyzeSchema do
     subject(:custom_badge_text) { check.custom_badge_text }
 
     context "when all passed" do
-      it "returns human(:all_passed)" do
+      it "returns all passed" do
         allow(check).to receive_messages(link_url: "url", valid_years: true, reachable: true)
 
-        expect(custom_badge_text).to eq(check.human(:all_passed))
+        expect(custom_badge_text).to eq("Lien trouvé et valide")
       end
     end
 
     context "when link is valid but years are invalid" do
-      it "returns human(:invalid_years)" do
+      it "returns invalid years" do
         allow(check).to receive_messages(link_url: "url", valid_years: false, reachable: true)
 
-        expect(custom_badge_text).to eq(check.human(:invalid_years))
+        expect(custom_badge_text).to eq("Années invalides")
       end
     end
 
     context "when schema is in main text" do
-      it "returns human(:schema_in_main_text)" do
+      it "returns found in main text" do
         allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: "Schéma pluriannuel")
 
-        expect(custom_badge_text).to eq(check.human(:schema_in_main_text))
+        expect(custom_badge_text).to eq("Schéma trouvé dans le texte principal")
       end
     end
 
     context "when link is not found and text is nil" do
-      it "returns human(:link_not_found)" do
+      it "returns not found" do
         allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: nil)
 
-        expect(custom_badge_text).to eq(check.human(:link_not_found))
+        expect(custom_badge_text).to eq("Lien non trouvé")
       end
     end
   end

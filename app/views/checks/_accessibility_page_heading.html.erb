@@ -3,12 +3,12 @@
   <%= badge to_badge(check) %>
 
   <p>
-    <%= check.human(:allowed_level_differences) %>
+    <%= t('.allowed_level_differences') %>
     <br>
     <% if check.completed? && check.comparison.present? %>
     <%= check.human_explanation %>
     <% else %>
-      <%= check.human(:expectations) %>
+      <%= t('.expectations') %>
     <% end %>
   </p>
   <ul class="fr-raw-list fr-mt-2w">
@@ -32,7 +32,7 @@
           <% end %>
           <% if heading_status.fuzzy_match? %>
             <p class="fr-ml-4w fr-mb-0">
-              <%= check.human(:retained) %>
+              <%= t('.retained') %>
               <cite><%= heading_status.actual_heading %></cite>
             </p>
           <% end %>
