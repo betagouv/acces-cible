@@ -1,20 +1,20 @@
 <div <%= tag.attributes wrapper_attributes %>>
   <% if header? -%>
-  <div class="fr-table__header">
-    <%= search if search? %>
-    <% if header_actions? %>
-      <div class="fr-table__detail fr-hidden" data-table-target="detail">
-        <span data-table-target="counter"></span>
-        <span data-table-target="counterOne"><%= t("shared.selected_lines", count: 1) %></span>
-        <span data-table-target="counterMany"><%= t("shared.selected_lines", count: 2) %></span>
-      </div>
-      <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
-        <% header_actions.each do |header_action| %>
-          <li><%= header_action %></li>
-        <% end %>
-      </ul>
-    <% end %>
-  </div>
+    <div class="fr-table__header">
+      <%= search if search? %>
+      <% if header_actions? %>
+        <div class="fr-table__detail fr-hidden" data-table-target="detail">
+          <span data-table-target="counter"></span>
+          <span data-table-target="counterOne"><%= t("shared.selected_lines", count: 1) %></span>
+          <span data-table-target="counterMany"><%= t("shared.selected_lines", count: 2) %></span>
+        </div>
+        <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
+          <% header_actions.each do |header_action| %>
+            <li><%= header_action %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
   <% end -%>
   <div class="fr-table__wrapper">
     <div class="fr-table__container">
@@ -24,10 +24,10 @@
             <%= caption %>
           </caption>
           <thead>
-            <%= head %>
+          <%= head %>
           </thead>
           <tbody>
-            <%= body %>
+          <%= body %>
           </tbody>
         </table>
       </div>
@@ -35,26 +35,7 @@
   </div>
   <div class="fr-table__footer">
     <% if paginated? -%>
-      <div class="fr-table__footer--start">
-        <p class="fr-table__detail"><%= total_lines %></p>
-        <% if lines.positive? -%>
-          <%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
-            <% helpers.flatten_params(:sort, :filter).each do |name, value| %>
-              <%= f.hidden_field name, value:, id: nil %>
-            <% end %>
-            <div class="fr-select-group">
-              <%= f.dsfr_label_with_hint :limit, label: per_page_label, class: "fr-sr-only" %>
-              <%= f.dsfr_select_tag :limit, per_page_options, required: true, include_blank: per_page_label, selected: per_page %>
-            </div>
-            <%= f.dsfr_submit t("shared.apply"), name: nil, class: helpers.icon_class(:refresh, fill: true, class: "fr-sr-only"), title: t("shared.apply"), data: { turbo_submit_with: t("shared.applying") } %>
-          <% end %>
-        <%- end %>
-      </div>
-    <%- end %>
-    <% if multipage? -%>
-      <div class="fr-table__footer--middle">
-        <%= render pagination %>
-      </div>
+      <%= render pagination %>
     <%- end %>
     <% if footer_actions? -%>
       <div class="fr-table__footer--end">

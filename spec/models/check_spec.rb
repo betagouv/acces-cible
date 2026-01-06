@@ -40,9 +40,7 @@ RSpec.describe Check do
     let(:check) { create(:check, :accessibility_mention, :pending) }
 
     it "returns the humanized status" do
-      expect(described_class).to receive(:human).with("status.pending")
-
-      check.human_status
+      expect(check.human_status).to eq("Planifié")
     end
   end
 

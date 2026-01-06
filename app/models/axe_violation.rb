@@ -12,7 +12,7 @@ class AxeViolation < Data.define(:id, :impact, :description, :help, :help_url, :
   end
 
   def human_impact
-    Checks::RunAxeOnHomepage.human("impacts.#{impact}")
+    I18n.t("checks.run_axe_on_homepage.impacts.#{impact}")
   end
 
   def badge_level

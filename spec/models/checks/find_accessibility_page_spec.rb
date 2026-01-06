@@ -27,14 +27,13 @@ RSpec.describe Checks::FindAccessibilityPage do
 
   describe "#custom_badge_text" do
     it "returns :link_to_page when url is present" do
-      expect(check).to receive(:human).with(:link_to_page)
       check.url = "#{root_url}/accessibility"
-      check.send(:custom_badge_text)
+      expect(check.send(:custom_badge_text)).to eq("Déclaration d'accessibilité")
     end
 
     it "returns :not_found when url is blank" do
       check.url = nil
-      expect(check.send(:custom_badge_text)).to eq(check.human(:not_found))
+      expect(check.send(:custom_badge_text)).to eq("Non trouvée")
     end
   end
 

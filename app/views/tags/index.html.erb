@@ -1,21 +1,21 @@
 <% if @tags.load.any? %>
 
-  <%= dsfr_table(caption: Tag.human(:all), size: :lg) do |t| %>
+  <%= dsfr_table(caption: t('.caption'), size: :lg) do |t| %>
     <% t.with_head do %>
       <tr>
-        <th scope="col" aria-sort="ascending"><%= Tag.human(:name) %></th>
-        <th scope="col"><%= Tag.human(:sites) %></th>
+        <th scope="col" aria-sort="ascending"><%= t('.name') %></th>
+        <th scope="col"><%= t('.sites') %></th>
       </tr>
     <% end %>
     <% t.with_body do %>
       <% @tags.each do |tag| %>
         <tr>
           <td><%= dsfr_link_to tag.name, tag %></td>
-          <td><%= dsfr_link_to Tag.human(:see_sites, tag: tag.name, count: tag.sites_count), sites_path(filter: { tag_id: tag.id }) %></td>
+          <td><%= dsfr_link_to t('.see_sites', tag: tag.name, count: tag.sites_count), sites_path(filter: { tag_id: tag.id }) %></td>
         </tr>
       <% end %>
     <% end %>
   <% end %>
 <% else %>
-  <%= dsfr_alert(type: :info, title: Tag.human_count(count: 0)) %>
+  <%= dsfr_alert(type: :info, title: t('.empty')) %>
 <% end %>

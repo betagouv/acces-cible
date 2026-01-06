@@ -14,7 +14,7 @@ class PagesController < ApplicationController
 
     @check_pages = files.map do |file_path|
       file_name = File.basename(file_path, ".html.md")
-      { file_name:, title: Check.human("checks.#{file_name}.type") }
+      { file_name:, title: t("checks.#{file_name}.type") }
     end.sort_by { |page| page[:title] }
   end
 end

@@ -1,4 +1,4 @@
-## <%= Check.human("checks.analyze_accessibility_page.type")%>
+## <%= t("checks.analyze_accessibility_page.type")%>
 
 ### Objectif
 
@@ -46,7 +46,7 @@ La référence au standard peut-être « RGAA » ou « WCAG ».
         <td> <p>Réussi - Déclaration complète (la date d’audit, le taux de conformité et la mention de l’article 47 sont présents). Le badge affiche le taux (ex : « 78% »)</p></td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= Check.human("checks.analyze_accessibility_page.missing_data") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_accessibility_page.missing_data") %></p></td>
         <td> <p>Avertissement - Déclaration incomplète (des informations clés manquent : date de l'audit, taux de conformité, mention de l’article 47) </p></td>
       </tr>
     </tbody>

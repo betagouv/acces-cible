@@ -1,4 +1,4 @@
-## <%= Check.human("checks.accessibility_page_heading.type")%></h2>
+## <%= t("checks.accessibility_page_heading.type")%></h2>
 
 ### Objectif
 

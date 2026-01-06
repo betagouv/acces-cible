@@ -4,12 +4,12 @@
 
 ## Contrôles effectués
 
-L'outil effectue différents contrôles sur les sites qui lui sont indiqués :
+L'outil effectue différents contrôles sur les sites qui lui sont indiqués:
 
--   présence d'une mention « Accessibilité : totalement conforme/partiellement conforme/non conforme » ;
--   une page d'accessibilité conforme avec le modèle officiel ;
--   un schéma pluriannuel d'amélioration de l'accessibilité, un plan d'actions et un bilan annuel ;
--   ainsi que d'autres contrôles complémentaires.
+- présence d'une mention « Accessibilité : totalement conforme/partiellement conforme/non conforme » ;
+- une page d'accessibilité conforme avec le modèle officiel ;
+- un schéma pluriannuel d'amélioration de l'accessibilité, un plan d'actions et un bilan annuel ;
+- ainsi que d'autres contrôles complémentaires.
 
 ## Ajout de sites
 
@@ -25,7 +25,8 @@ Un tableau donne une vision synthétique des différents sites ajoutés, pour fa
 
 **Arcom**
 
-L’[ordonnance de transposition du 6 septembre 2023](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000048049674) a défini de nouvelles missions de l’Arcom en créant l’[article 47-1 de la loi n°2005-102](https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000048050174) qui précise : Afin de faciliter le contrôle de ces obligations, elle peut mettre en œuvre des méthodes proportionnées de **collecte automatisée** de données publiquement accessibles.
+L’[ordonnance de transposition du 6 septembre 2023](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000048049674) a défini de nouvelles missions de l’Arcom en créant l’[article 47-1 de la loi n°2005-102](https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000048050174) qui précise :
+Afin de faciliter le contrôle de ces obligations, elle peut mettre en œuvre des méthodes proportionnées de **collecte automatisée** de données publiquement accessibles.
 Cette plateforme vise à doter l'Arcom d’un service automatisé de contrôle afin de remplir cette mission.
 
 **Administrations**
@@ -38,10 +39,11 @@ Les organisations délégataires d’une mission de service public ou sous contr
 
 **Entreprises**
 
-Les entreprises dont le chiffre d’affaires en France est supérieur à 250 millions d’euros doivent également respecter le <abbr>RGAA</abbr>.
+Les entreprises dont le chiffre d’affaires en France est supérieur à 250 millions d’euros doivent également respecter le <abbr>RGAA</abbr>.
 
 La connexion utilisateur s'effectue grâce à [ProConnect](https://www.proconnect.gouv.fr/), qui peut être utilisé par tous les professionnels du public comme du privé.
-Vérifiez votre éligibilité en cliquant sur le bouton **S'identifier avec ProConnect**. Les personnes de votre équipe (selon les informations fournies par ProConnect) ont accès aux sites et aux résultats des contrôles effectués.
+Vérifiez votre éligibilité en cliquant sur le bouton **S'identifier avec ProConnect**.
+Les personnes de votre équipe (selon les informations fournies par ProConnect) ont accès aux sites et aux résultats des contrôles effectués.
 
 ## Statistiques
 

@@ -1,4 +1,4 @@
-## <%= Check.human("checks.language_indication.type")%>
+## <%= t("checks.language_indication.type")%>
 
 ### Objectif
 
@@ -29,7 +29,7 @@ Nous analysons l’indication de langue de la page et nous comparons avec la lan
         <td> Avertissement - Une langue est indiquée, mais ne correspond pas à la langue de la page </td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--error"><%= Check.human("checks.language_indication.empty") %></p></td>
+        <td><p class="fr-badge fr-badge--error"><%= t("checks.language_indication.empty") %></p></td>
         <td>Échec - Aucune indication n'a été trouvée </td>
       </tr>
     </tbody>
