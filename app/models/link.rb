@@ -48,6 +48,10 @@ Link = Data.define(:href, :text) do
       ""
     end
 
+    def internal?(href, root)
+      url_without_scheme_and_www(href).start_with?(url_without_scheme_and_www(root))
+    end
+
     # Extract the domain and path up to the last slash
     # Eg: https://example.com/folder/page.html -> https://example.com/folder/
     def root_from(href)

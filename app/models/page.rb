@@ -67,7 +67,7 @@ class Page
   end
 
   def internal_links
-    links.select { |link| link.href.start_with?(root) }
+    links.select { |link| Link.internal?(link.href, root) }
   end
 
   def external_links
