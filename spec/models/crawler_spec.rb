@@ -30,34 +30,31 @@ RSpec.describe Crawler do
     end
   end
 
-  describe "#find" do
+  describe "#find_page" do
     let(:link1) { Link.new(href: "https://example.com/page1") }
     let(:link2) { Link.new(href: "https://example.com/page2") }
     let(:root_page) { instance_double(Page, internal_links: [link1, link2], title: "Root") }
 
     before do
       allow(Page).to receive(:new)
-        .with(url: root_url, root: root_url, html: nil)
-        .and_return(root_page)
+                       .with(url: root_url, root: root_url, html: nil)
+                       .and_return(root_page)
     end
 
-    it "yields page and queue to the block" do
+    it "yields page to the block" do
       pages = []
-      queues = []
 
-      crawler.find do |page, queue|
+      crawler.find_page do |page|
         pages << page
-        queues << queue
         break # Stop after first page to avoid full crawl
       end
 
       expect(pages).to include(root_page)
-      expect(queues).not_to be_empty
     end
 
     it "returns nil when crawl_up_to is reached" do
       limited_crawler = described_class.new(root_url, crawl_up_to: 1)
-      crawl_results = limited_crawler.find { |page, _queue| page.title == "Target" }
+      crawl_results = limited_crawler.find_page { |page| page.title == "Target" }
       expect(crawl_results).to be_nil
     end
 
@@ -66,13 +63,13 @@ RSpec.describe Crawler do
 
       before do
         allow(Page).to receive(:new)
-          .with(url: link1.href, root: root_url, html: nil)
-          .and_return(target_page)
+                         .with(url: link1.href, root: root_url, html: nil)
+                         .and_return(target_page)
       end
 
       it "returns the first matching page and logs progress" do
-        expect(Rails.logger).to receive(:info).twice # root + matching page
-        page = crawler.find { |page, _queue| page.title == "Target" }
+        crawler = described_class.new(root_url, queue: LinkList.new([root_url, link1.href]))
+        page = crawler.find_page { |page| page.title == "Target" }
         expect(page).to eq(target_page)
       end
     end
@@ -80,16 +77,17 @@ RSpec.describe Crawler do
     context "when no matching page exists" do
       before do
         allow(Page).to receive(:new)
-          .with(url: anything, root: root_url)
-          .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
+                         .with(url: anything, root: root_url, html: nil)
+                         .and_return(instance_double(Page, internal_links: [], title: "Wrong"))
       end
 
       it "returns nil and crawls unique pages only" do
+        crawler = described_class.new(root_url, queue: LinkList.new([root_url, link1.href, link2.href]))
         expect(Page).to receive(:new)
-          .exactly(3).times # root + 2 unique links
-          .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
+                          .exactly(3).times # root + 2 unique links
+                          .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
 
-        result = crawler.find { |page, _queue| page.title == "Target" }
+        result = crawler.find_page { |page| page.title == "Target" }
         expect(result).to be_nil
       end
     end
