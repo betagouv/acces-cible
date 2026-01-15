@@ -45,6 +45,12 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'ac
     )
 end
 
+Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
+  allow(FindAccessibilityPageService)
+    .to receive(:find_page)
+    .and_return(Page.new(url: "#{url}/accessibilité", root: "#{url}/accessibilité", html: str))
+end
+
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
   fake_html = <<~HTML
         <html>
@@ -57,14 +63,7 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la déclarat
         </html>
       HTML
 
-  allow(FindAccessibilityPageService)
-    .to receive(:call)
-    .and_return(
-      body: fake_html,
-      status: 200,
-      content_type: "text/html",
-      current_url: url
-    )
+  step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end
 
 Quand("je filtre par étiquette {string}") do |tag|
@@ -141,6 +140,12 @@ Alors("la page contient toutes les vérifications du site {string}") do |url|
   site = team.sites.find_by_url(url:)
   site.audit.all_checks.each do |check|
     expect(page).to have_content(check.human_type)
+  end
+end
+
+Alors('la section {string} indique {string}') do |name, str|
+  within(find('h2', text: name).ancestor('div', id: /checks_/)) do |section|
+    expect(section).to have_content(str)
   end
 end
 
