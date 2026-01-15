@@ -133,7 +133,9 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "par Test Corp révèle" => "Test Corp",
       "par AXS Consulting sur un échantillon…" => "AXS Consulting",
       "L’audit de conformité réalisé par Koena révèle que :" => "Koena",
-      "par ailleurs vous pouvez toujours compter sur nous" => nil
+      "par ailleurs vous pouvez toujours compter sur nous" => nil,
+      "réalisé par la société Empreinte Digitale" => "Empreinte Digitale",
+      " l’ Agence Cosiweb" => "Cosiweb"
     }.each do |text, expected_auditor|
       it "extracts '#{expected_auditor}' from '#{text}'" do
         body = <<~HTML

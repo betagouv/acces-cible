@@ -1,17 +1,16 @@
 class Crawler
-  include Enumerable
   MAX_CRAWLED_PAGES = 5
 
-  def initialize(root, crawl_up_to: nil, root_page_html: nil)
+  def initialize(root, crawl_up_to: nil, root_page_html: nil, queue: nil)
     @root = Link.from(Link.root_from(root))
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
     @root_page_html = root_page_html
-    @queue = LinkList.new(root)
+    @queue = queue || LinkList.new(root)
     @crawled = LinkList.new
   end
 
-  def find(&block)
-    detect { |page, queue| break page if block.call(page, queue) }
+  def find_page(&block)
+    each_page { |page| return page if block.call(page) }
   end
 
   private
@@ -19,14 +18,14 @@ class Crawler
   attr_accessor :queue
   attr_reader :root, :crawled, :crawl_up_to, :root_page_html
 
-  def each
+  def each_page
     while queue.any?
       return if crawled.size >= crawl_up_to
+      page = get_page
 
-      next unless page = get_page
+      next unless page
 
-      enqueue page.internal_links
-      yield page, queue
+      yield page
       break if queue.empty?
     end
   end
@@ -42,7 +41,10 @@ class Crawler
   end
 
   def get_page
-    crawled << link = queue.shift
+    link = queue.shift
+    return nil unless link
+
+    crawled << link
     Rails.logger.info { "#{crawled.size}: Crawling #{link.href}" }
 
     create_page!(link)
@@ -56,9 +58,5 @@ class Crawler
       Rails.logger.error { "Unexpected error crawling #{link.href}: #{e.message}" }
     end
     nil
-  end
-
-  def enqueue(links)
-    queue.add(*links.reject { |link| crawled.include?(link) })
   end
 end
