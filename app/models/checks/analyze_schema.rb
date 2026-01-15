@@ -3,6 +3,7 @@ module Checks
     PRIORITY = 23
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     MAX_YEARS_VALIDITY = 3
+    YEAR_PATTERN = /\d{4}/
     # Matches various forms of "schéma/schema" accessibility links:
     # - "schéma pluriannuel de/d' accessibilité (numérique)" or "schéma pluriannuel RGAA"
     # - "schéma annuel d'accessibilité"
@@ -28,7 +29,7 @@ module Checks
 
       page.links(skip_files: false, scope: :main)
           .select { |link| link.text.match? SCHEMA_PATTERN }
-          .max_by { |link| extract_years(link.text) }
+          .max_by { |link| extract_valid_years(link.text) }
     end
 
     def link_between_headings?
@@ -36,7 +37,7 @@ module Checks
 
       page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
           .select { |link| link.text.match? SCHEMA_PATTERN }
-          .max_by { |link| extract_years(link.text) }
+          .max_by { |link| extract_valid_years(link.text) }
     end
 
     def find_text_in_main
@@ -46,7 +47,7 @@ module Checks
           .scan(SCHEMA_PATTERN)
           .flatten
           .compact
-          .max_by { |match| extract_years(match) }
+          .max_by { |match| extract_valid_years(match) }
     end
 
     def all_passed?
@@ -71,7 +72,7 @@ module Checks
       if all_passed?
         t("checks.analyze_schema.all_passed")
       elsif valid_link?
-        t("checks.analyze_schema.invalid_years")
+        years.present? ? t("checks.analyze_schema.invalid_years") : t("checks.analyze_schema.years_not_found")
       elsif text
         t("checks.analyze_schema.schema_in_main_text")
       else
@@ -88,14 +89,14 @@ module Checks
       text_in_main = find_text_in_main
       return unless link || text_in_main
 
-      years = extract_years(link&.text, link&.href, text_in_main)
+      years = extract_valid_years(link&.text, link&.href, text_in_main)
 
       {
         years:,
         link_url: link&.href,
         link_text: link&.text,
         link_misplaced: link ? !link_between_headings? : nil,
-        valid_years: validate_years(years),
+        valid_years: within_three_years?(years),
         reachable: Browser.reachable?(link&.href),
         text: link ? nil : text_in_main
       }
@@ -105,16 +106,23 @@ module Checks
       @page ||= audit.page(:accessibility)
     end
 
-    def extract_years(*sources)
-      sources.compact.each do |source|
-        years = source.to_s.scan(/\d{4}/).map(&:to_i).uniq.sort
-        return years if years.present?
+    def extract_valid_years(*sources)
+      result = sources
+        .compact
+        .find do |source|
+        years = source.to_s.scan(YEAR_PATTERN).map(&:to_i).uniq.sort
+
+        return years if within_three_years?(years)
       end
-      []
+
+      result || []
     end
 
-    def validate_years(years)
-      years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
+    def within_three_years?(years)
+      return false if years.blank?
+      return false if years.last - years.first > MAX_YEARS_VALIDITY
+
+      Date.current.year.between?(years.first, years.last)
     end
   end
 end

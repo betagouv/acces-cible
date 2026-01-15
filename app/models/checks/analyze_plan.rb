@@ -2,6 +2,7 @@ module Checks
   class AnalyzePlan < Check
     PRIORITY = 24
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
+    YEAR_REGEX = /\d{4}/
     PLAN_PATTERN = /
       plan\s+
       (?:
@@ -18,7 +19,7 @@ module Checks
 
       page.links(skip_files: false, scope: :main)
           .select { |link| link.text.match? PLAN_PATTERN }
-          .max_by { |link| extract_years(link.text) }
+          .max_by { |link| extract_valid_years(link.text) }
     end
 
     def link_between_headings?
@@ -26,7 +27,7 @@ module Checks
 
       page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
           .select { |link| link.text.match? PLAN_PATTERN }
-          .max_by { |link| extract_years(link.text) }
+          .max_by { |link| extract_valid_years(link.text) }
     end
 
     def find_text_in_main
@@ -36,7 +37,7 @@ module Checks
           .scan(PLAN_PATTERN)
           .flatten
           .compact
-          .max_by { |match| extract_years(match) }
+          .max_by { |match| extract_valid_years(match) }
     end
 
     def all_passed?
@@ -61,7 +62,7 @@ module Checks
       if all_passed?
         t("checks.analyze_plan.all_passed")
       elsif valid_link?
-        t("checks.analyze_plan.invalid_year")
+        years.present? ? t("checks.analyze_plan.invalid_year") : t("checks.analyze_plan.years_not_found")
       elsif text
         t("checks.analyze_plan.plan_in_main_text")
       else
@@ -78,14 +79,14 @@ module Checks
       text_in_main = find_text_in_main
       return unless link || text_in_main
 
-      years = extract_years(link&.text, link&.href, text_in_main)
+      years = extract_valid_years(link&.text, link&.href, text_in_main)
 
       {
         years:,
         link_url: link&.href,
         link_text: link&.text,
         link_misplaced: link ? !link_between_headings? : nil,
-        valid_year: validate_year(years.last),
+        valid_year: within_three_years?(years),
         reachable: Browser.reachable?(link&.href),
         text: link ? nil : text_in_main
       }
@@ -95,17 +96,22 @@ module Checks
       @page ||= audit.page(:accessibility)
     end
 
-    def extract_years(*sources)
-      sources.compact.each do |source|
-        years = source.to_s.scan(/\d{4}/).map(&:to_i).uniq.sort
-        return years if years.present?
+    def extract_valid_years(*sources)
+      result = sources
+        .compact
+        .find do |source|
+        years = source.to_s.scan(YEAR_REGEX).map(&:to_i).uniq.sort
+
+        return years if within_three_years?(years)
       end
-      []
+
+      result || []
     end
 
-    def validate_year(year)
-      valid_years = Date.current.year.then { |current_year| (current_year - 1)..(current_year + 1) }
-      valid_years.include?(year)
+    def within_three_years?(years)
+      return false if years.blank?
+
+      years.last.between?(Date.current.year - 1, Date.current.year + 1)
     end
   end
 end
