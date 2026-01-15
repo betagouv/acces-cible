@@ -30,7 +30,7 @@ Un simple texte sans lien dans la déclaration est relevé en tant qu'avertissem
         <td>Avertissement - Lien trouvé et valide, mais les années précisées sont invalides (anciennes/incohérentes) </td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.plan_in_main_text") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.in_main_text") %></p></td>
         <td>Avertissement - Plan trouvé, mais seulement mentionné dans le texte</td>
       </tr>
       <tr>

@@ -109,18 +109,19 @@ fr:
       unknown: Non détecté
     analyze_plan:
       all_passed: Lien trouvé et valide
-      invalid_year: Année(s) invalide(s)
+      invalid_years: Année(s) invalide(s)
       link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien
       link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
       link_url: Adresse du lien
       nothing_found: Plan non trouvé
-      plan_in_main_text: Plan trouvé dans le texte principal
+      in_main_text: Plan trouvé dans le texte principal
       table_header: Plan d'action
       type: Plan d'action
       year_not_found: non détectée
       years: Année(s) du plan
+      years_not_found: Année(s) valides non trouvée(s)
     analyze_schema:
       all_passed: Lien trouvé et valide
       invalid_years: Années invalides
@@ -130,11 +131,12 @@ fr:
       link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
       link_url: Adresse du lien
       nothing_found: Schéma non trouvé
-      schema_in_main_text: Schéma trouvé dans le texte principal
+      in_main_text: Schéma trouvé dans le texte principal
       table_header: Schéma
       type: Schéma pluriannuel d'accessibilité
       year_not_found: non détectées
       years: Années de validité du schéma
+      years_not_found: Années valides non trouvées
     find_accessibility_page:
       link_to_page: "Déclaration d'accessibilité"
       not_found: Non trouvée

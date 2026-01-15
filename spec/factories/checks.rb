@@ -76,7 +76,7 @@ FactoryBot.define do
             link_text: "Plan annuel #{current_year}",
             years: [current_year],
             reachable: true,
-            valid_year: true,
+            valid_years: true,
             text: nil
           }
         when Checks::RunAxeOnHomepage

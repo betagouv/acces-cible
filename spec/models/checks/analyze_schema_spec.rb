@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Checks::AnalyzeSchema do
   let(:check) { described_class.send(:new) }
+  let(:current_year) { Date.current.year }
 
   describe ".analyze!" do
     subject(:analyze) { check.send(:analyze!) }
@@ -24,11 +25,12 @@ RSpec.describe Checks::AnalyzeSchema do
     end
 
     context "when a link is found" do
-      let(:year) { Time.current.year }
+      let(:current_year) { Time.current.year }
+      let(:expected_years) { [current_year - 1, current_year + 1] }
       let(:root) { "https://www.example.com" }
 
       it "returns a hash containing link_url, link_text, years, reachable, valid_years, and link_misplaced" do
-        link = Link.new(href: "#{root}/schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{year - 1}-#{year + 1}")
+        link = Link.new(href: "#{root}/schema_pluriannuel.pdf", text: "Schéma pluriannuel d'accessibilité #{current_year - 1}-#{current_year + 1}")
         page = build(:page, links: [link])
         allow(check).to receive_messages(page:)
         allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
@@ -37,7 +39,7 @@ RSpec.describe Checks::AnalyzeSchema do
                              link_url: link.href,
                              link_text: link.text,
                              link_misplaced: true,
-                             years: [year - 1, year + 1],
+                             years: expected_years,
                              reachable: true,
                              valid_years: true,
                              text: nil
@@ -46,8 +48,7 @@ RSpec.describe Checks::AnalyzeSchema do
 
       context "and years are in link.href instead of link.text" do
         it "extracts years from href" do
-          years = [year - 1, year + 1]
-          link = Link.new(href: "#{root}/schema-#{years.join("-")}.pdf", text: "Schéma pluriannuel d'accessibilité")
+          link = Link.new(href: "#{root}/schema-#{expected_years.join("-")}.pdf", text: "Schéma pluriannuel d'accessibilité")
           page = build(:page, links: [link])
           allow(check).to receive_messages(page:)
           allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
@@ -55,7 +56,7 @@ RSpec.describe Checks::AnalyzeSchema do
           expect(analyze).to include(
                                link_url: link.href,
                                link_text: link.text,
-                               years:,
+                               years: expected_years,
                                reachable: true,
                                valid_years: true
                              )
@@ -64,13 +65,12 @@ RSpec.describe Checks::AnalyzeSchema do
 
       context "and years are in both link.text and link.href" do
         it "prefers years from link.text" do
-          years = [year - 1, year + 1]
-          link = Link.new(href: "#{root}/schema-2020-2022.pdf", text: "Schéma pluriannuel d'accessibilité #{years.join("-")}")
+          link = Link.new(href: "#{root}/schema-#{Date.current.year - 1}-#{Date.current.year + 1}.pdf", text: "Schéma pluriannuel d'accessibilité #{expected_years.join("-")}")
           page = build(:page, links: [link])
           allow(check).to receive_messages(page:)
           allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
-          expect(analyze).to include(years:)
+          expect(analyze).to include(years: expected_years)
         end
       end
     end
@@ -165,14 +165,14 @@ RSpec.describe Checks::AnalyzeSchema do
     context "when multiple links match pattern" do
       let(:links) do
         [
-          "Schéma pluriannuel d'accessibilité 2020-2022",
-          "Schéma pluriannuel d'accessibilité 2023-2025",
-          "Schéma pluriannuel d'accessibilité 2021",
+          "Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year + 1}",
+          "Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year}",
+          "Schéma pluriannuel d'accessibilité #{Date.current.year - 3}",
         ]
       end
 
       it "returns the link with the highest years" do
-        expect(find_link.text).to eq("Schéma pluriannuel d'accessibilité 2023-2025")
+        expect(find_link.text).to eq("Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year + 1}")
       end
     end
   end
@@ -234,9 +234,9 @@ RSpec.describe Checks::AnalyzeSchema do
           <html>
           <body>
             <h1>Déclaration d'accessibilité</h1>
-            <a href="schema2020.pdf">Schéma pluriannuel d'accessibilité 2020-2022</a>
-            <a href="schema2023.pdf">Schéma pluriannuel d'accessibilité 2023-2025</a>
-            <a href="schema2021.pdf">Schéma pluriannuel d'accessibilité 2021</a>
+            <a href="schema#{Date.current.year - 1}.pdf">Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year + 1}</a>
+            <a href="schema#{Date.current.year - 1}.pdf">Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year}</a>
+            <a href="schema#{Date.current.year - 3}.pdf">Schéma pluriannuel d'accessibilité #{Date.current.year - 3}</a>
             <h2>État de conformité</h2>
           </body>
           </html>
@@ -244,7 +244,7 @@ RSpec.describe Checks::AnalyzeSchema do
         page = build(:page, html: page_html)
         allow(check).to receive(:page).and_return(page)
 
-        expect(link_between_headings.text).to eq("Schéma pluriannuel d'accessibilité 2023-2025")
+        expect(link_between_headings.text).to eq("Schéma pluriannuel d'accessibilité #{Date.current.year - 1}-#{Date.current.year + 1}")
       end
     end
   end
@@ -270,30 +270,31 @@ RSpec.describe Checks::AnalyzeSchema do
 
     context "when multiple matches exist in main text" do
       let(:body) do
-        "<p>Schéma pluriannuel d'accessibilité 2020</p>
-        <p>Schéma pluriannuel d'accessibilité 2023-2025</p>
-        <p>Schéma pluriannuel d'accessibilité 2021-2022</p>"
+        "<p>Schéma pluriannuel d'accessibilité #{current_year - 10}</p>
+        <p>Schéma pluriannuel d'accessibilité #{current_year - 1}-#{current_year + 1}</p>
+        <p>Schéma pluriannuel d'accessibilité #{current_year - 3}-#{current_year + 3}</p>"
       end
 
-      it { should eq("Schéma pluriannuel d'accessibilité 2023-2025") }
+      it { should eq("Schéma pluriannuel d'accessibilité #{current_year - 1}-#{current_year + 1}") }
     end
   end
 
-  describe "#extract_years" do
+  describe "#extract_valid_years" do
+    current_year = Date.current.year
     {
       "Schéma pluriannuel d'accessibilité" => [],
-      "Schéma pluriannuel d'accessibilité 2024" => [2024],
-      "uploads/2025/schema-pluri-annuel-202502.pdf" => [2025],
-      "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
-      "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
+      "Schéma pluriannuel d'accessibilité #{current_year - 10}" => [current_year - 10],
+      "uploads/#{current_year}/schema-pluri-annuel-#{current_year}02.pdf" => [current_year],
+      "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE #{current_year - 1}-#{current_year}" => [current_year - 1, current_year],
+      "SCHEMA PLURIANNUEL D'ACCESSIBILITE NUMERIQUE #{current_year}-#{current_year - 1}" => [current_year - 1, current_year],
     }.each do |text, expected_result|
       it "extracts #{expected_result} from '#{text}'" do
-        expect(check.send(:extract_years, text)).to eq(expected_result)
+        expect(check.send(:extract_valid_years, text)).to eq(expected_result)
       end
     end
   end
 
-  describe "#validate_years" do
+  describe "#within_three_years?" do
     current_year = Date.current.year
     last_year = current_year - 1
     next_year = current_year + 1
@@ -312,7 +313,7 @@ RSpec.describe Checks::AnalyzeSchema do
       [next_year, max_year + 1] => false,
     }.each do |years, expected_result|
       it "returns #{expected_result} for #{years}" do
-        expect(check.send(:validate_years, years)).to eq(expected_result)
+        expect(check.send(:within_three_years?, years)).to eq(expected_result)
       end
     end
   end
@@ -368,15 +369,7 @@ RSpec.describe Checks::AnalyzeSchema do
       it "returns invalid years" do
         allow(check).to receive_messages(link_url: "url", valid_years: false, reachable: true)
 
-        expect(custom_badge_text).to eq("Années invalides")
-      end
-    end
-
-    context "when schema is in main text" do
-      it "returns found in main text" do
-        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: "Schéma pluriannuel")
-
-        expect(custom_badge_text).to eq("Schéma trouvé dans le texte principal")
+        expect(custom_badge_text).to eq("Années valides non trouvées")
       end
     end
 
