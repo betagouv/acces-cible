@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe Checks::AnalyzePlan do
   let(:audit) { build(:audit) }
   let(:check) { described_class.new(audit:) }
+  let(:current_year) { Date.current.year }
 
   describe ".analyze!" do
     subject(:analyze) { check.send(:analyze!) }
@@ -25,11 +26,10 @@ RSpec.describe Checks::AnalyzePlan do
     end
 
     context "when a link is found" do
-      let(:year) { Time.current.year }
       let(:root) { "https://www.example.com" }
 
       it "returns a hash containing link_url, link_text, years, reachable, valid_year, and link_misplaced" do
-        link = Link.new(href: "#{root}/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{year}")
+        link = Link.new(href: "#{root}/plan_annuel.pdf", text: "Plan annuel d'accessibilité #{current_year}")
         body = <<~HTML
           <h1>Déclaration d'accessibilité</h1>
           <a href="#{link.href}">#{link.text}</a>
@@ -43,16 +43,16 @@ RSpec.describe Checks::AnalyzePlan do
                              link_url: link.href,
                              link_text: link.text,
                              link_misplaced: false,
-                             years: [year],
+                             years: [current_year],
                              reachable: true,
-                             valid_year: true,
+                             valid_years: true,
                              text: nil
                            )
       end
 
       context "and years are in link.href instead of link.text" do
         it "extracts years from href" do
-          years = [year]
+          years = [current_year]
           link = Link.new(href: "#{root}/plan-annuel-#{years.join("-")}.pdf", text: "Plan annuel d'accessibilité")
           page = build(:page, links: [link])
           allow(check).to receive_messages(page:)
@@ -61,41 +61,38 @@ RSpec.describe Checks::AnalyzePlan do
           expect(analyze).to include(
                                link_url: link.href,
                                link_text: link.text,
-                               years:,
+                               years: [current_year],
                                reachable: true,
-                               valid_year: true
+                               valid_years: true
                              )
         end
       end
 
       context "and years are in both link.text and link.href" do
         it "prefers years from link.text" do
-          years = [year]
-          link = Link.new(href: "#{root}/plan-#{year + 10}.pdf", text: "Plan annuel d'accessibilité #{year}")
+          link = Link.new(href: "#{root}/plan-#{current_year + 10}.pdf", text: "Plan annuel d'accessibilité #{current_year}")
           page = build(:page, links: [link])
           allow(check).to receive_messages(page:)
           allow(Browser).to receive(:reachable?).with(link.href).and_return(true)
 
-          expect(analyze).to include(years:)
+          expect(analyze).to include(years: [current_year])
         end
       end
     end
 
     context "when find_link returns nil but find_text_in_main matches" do
-      let(:year) { Time.current.year }
-
       it "returns a hash with text and extracted years" do
-        page = build(:page, body: "<p>Plan annuel d'accessibilité #{year}</p>")
+        page = build(:page, body: "<p>Plan annuel d'accessibilité #{current_year}</p>")
         allow(audit).to receive(:page).with(:accessibility).and_return(page)
 
         expect(analyze).to include(
                              link_url: nil,
                              link_text: nil,
                              link_misplaced: nil,
-                             years: [year],
+                             years: [current_year],
                              reachable: nil,
-                             valid_year: true,
-                             text: "Plan annuel d'accessibilité #{year}"
+                             valid_years: true,
+                             text: "Plan annuel d'accessibilité #{current_year}"
                            )
       end
     end
@@ -122,21 +119,22 @@ RSpec.describe Checks::AnalyzePlan do
     before { allow(audit).to receive(:page).with(:accessibility).and_return(page) }
 
     context "when link text matches pattern" do
+      current_year = Date.current.year
       [
         "Plan annuel d'accessibilité",
         "Plan annuel d'accessibilité numérique",
         "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE",
-        "Plan annuel d'accessibilité 2024",
-        "Plan annuel d'accessibilité numérique 2024-2025",
-        "Plan annuel de mise en accessibilité 2025",
-        "Plan annuel 2024",
-        "PLAN ANNUEL 2024",
+        "Plan annuel d'accessibilité #{current_year - 1}",
+        "Plan annuel d'accessibilité numérique #{current_year - 1}-#{current_year}",
+        "Plan annuel de mise en accessibilité #{current_year}",
+        "Plan annuel #{current_year - 1}",
+        "PLAN ANNUEL #{current_year - 1}",
         "Plan d’action",
         "Plan d'actions",
-        "PLAN D'ACTION 2025",
-        "PLAN D'ACTIONS 2025",
-        "Plan 2025 d'action",
-        "Plan 2025 d'actions",
+        "PLAN D'ACTION #{current_year}",
+        "PLAN D'ACTIONS #{current_year}",
+        "Plan #{current_year} d'action",
+        "Plan #{current_year} d'actions",
       ].each do |text|
         context "with '#{text}'" do
           let(:links) { [text] }
@@ -170,14 +168,14 @@ RSpec.describe Checks::AnalyzePlan do
     context "when multiple links match pattern" do
       let(:links) do
         [
-          "Plan annuel d'accessibilité 2020",
-          "Plan annuel d'accessibilité 2023-2025",
-          "Plan annuel d'accessibilité 2021",
+          "Plan annuel d'accessibilité #{current_year - 10}",
+          "Plan annuel d'accessibilité #{current_year - 1}-#{current_year + 1}",
+          "Plan annuel d'accessibilité #{current_year - 3}-#{current_year + 3}",
         ]
       end
 
-      it "returns the link with the highest years" do
-        expect(find_link.text).to eq("Plan annuel d'accessibilité 2023-2025")
+      it "returns the link with the valid years" do
+        expect(find_link.text).to eq("Plan annuel d'accessibilité #{current_year - 1}-#{current_year + 1}")
       end
     end
   end
@@ -187,7 +185,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when link is between the correct headings" do
       it "returns the link" do
-        link_text = "Plan annuel d'accessibilité 2024"
+        link_text = "Plan annuel d'accessibilité #{current_year - 1}"
         page_html = <<~HTML
           <!DOCTYPE html>
           <html>
@@ -213,7 +211,7 @@ RSpec.describe Checks::AnalyzePlan do
           <body>
             <h1>Déclaration d'accessibilité</h1>
             <h2>État de conformité</h2>
-            <a href="plan.pdf">Plan annuel d'accessibilité 2024</a>
+            <a href="plan.pdf">Plan annuel d'accessibilité #{current_year - 1}</a>
           </body>
           </html>
         HTML
@@ -239,9 +237,9 @@ RSpec.describe Checks::AnalyzePlan do
           <html>
           <body>
             <h1>Déclaration d'accessibilité</h1>
-            <a href="plan2020.pdf">Plan annuel d'accessibilité 2020</a>
-            <a href="plan2024.pdf">Plan annuel d'accessibilité 2024</a>
-            <a href="plan2021.pdf">Plan annuel d'accessibilité 2021</a>
+            <a href="plan#{current_year - 3}.pdf">Plan annuel d'accessibilité #{current_year - 3}</a>
+            <a href="plan#{current_year}.pdf">Plan annuel d'accessibilité #{current_year}</a>
+            <a href="plan#{current_year + 3}.pdf">Plan annuel d'accessibilité #{current_year + 3}</a>
             <h2>État de conformité</h2>
           </body>
           </html>
@@ -249,7 +247,7 @@ RSpec.describe Checks::AnalyzePlan do
         page = build(:page, html: page_html)
         allow(audit).to receive(:page).with(:accessibility).and_return(page)
 
-        expect(link_between_headings.text).to eq("Plan annuel d'accessibilité 2024")
+        expect(link_between_headings.text).to eq("Plan annuel d'accessibilité #{current_year + 3}")
       end
     end
   end
@@ -268,47 +266,49 @@ RSpec.describe Checks::AnalyzePlan do
     end
 
     context "when main text matches pattern" do
-      let(:body) { "Plan annuel d'accessibilité 2024" }
+      let(:body) { "Plan annuel d'accessibilité #{current_year - 1}" }
 
       it { should eq(body) }
     end
 
     context "when multiple matches exist in main text" do
       let(:body) do
-        "<p>Plan annuel d'accessibilité 2020</p>
-        <p>Plan annuel d'accessibilité 2023-2025</p>
-        <p>Plan annuel d'accessibilité 2021-2022</p>"
+        "<p>Plan annuel d'accessibilité #{current_year - 10}</p>
+        <p>Plan annuel d'accessibilité #{current_year - 1}-#{current_year + 1}</p>
+        <p>Plan annuel d'accessibilité  #{current_year - 3}-#{current_year + 3}</p>"
       end
 
-      it { should eq("Plan annuel d'accessibilité 2023-2025") }
+      it { should eq("Plan annuel d'accessibilité #{current_year - 1}-#{current_year + 1}") }
     end
   end
 
-  describe "#extract_years" do
-    {
-      "Plan annuel d'accessibilité" => [],
-      "Plan annuel d'accessibilité 2024" => [2024],
-      "uploads/2025/plan-annuel-202502.pdf" => [2025],
-      "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2023-2025" => [2023, 2025],
-      "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE 2025-2023" => [2023, 2025],
-    }.each do |text, expected_result|
-      it "extracts #{expected_result.inspect} from '#{text}'" do
-        expect(check.send(:extract_years, text)).to eq(expected_result)
-      end
-    end
-  end
-
-  describe "#validate_year" do
+  describe "#extract_valid_years" do
     current_year = Date.current.year
     {
-      current_year + 2 => false,
-      current_year + 1 => true,
-      current_year => true,
-      current_year - 1 => true,
-      current_year - 2 => false
+      "Plan annuel d'accessibilité" => [],
+      "Plan annuel d'accessibilité #{current_year - 10}" => [current_year - 10],
+      "Plan annuel d'accessibilité #{current_year - 1}" => [current_year - 1],
+      "uploads/#{current_year}/plan-annuel-#{current_year}02.pdf" => [current_year],
+      "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE #{current_year - 1}-#{current_year}" => [current_year - 1, current_year],
+      "PLAN ANNUEL D'ACCESSIBILITE NUMERIQUE #{current_year}-#{current_year - 1}" => [current_year - 1, current_year],
+    }.each do |text, expected_result|
+      it "extracts #{expected_result.inspect} from '#{text}'" do
+        expect(check.send(:extract_valid_years, text)).to eq(expected_result)
+      end
+    end
+  end
+
+  describe "#within_three_years?" do
+    current_year = Date.current.year
+    {
+      [current_year + 2] => false,
+      [current_year + 1] => true,
+      [current_year] => true,
+      [current_year - 1] => true,
+      [current_year - 2] => false
     }.each do |year, expected_result|
       it "returns #{expected_result} for #{year}" do
-        expect(check.send(:validate_year, year)).to eq(expected_result)
+        expect(check.send(:within_three_years?, year)).to eq(expected_result)
       end
     end
   end
@@ -318,7 +318,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when all passed" do
       it "returns :success" do
-        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, text: nil)
+        allow(check).to receive_messages(link_url: "url", valid_years: true, reachable: true, text: nil)
 
         expect(custom_badge_status).to eq(:success)
       end
@@ -326,7 +326,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when link is valid but year is invalid" do
       it "returns :warning" do
-        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, text: nil)
+        allow(check).to receive_messages(link_url: "url", valid_years: false, reachable: true, text: nil)
 
         expect(custom_badge_status).to eq(:warning)
       end
@@ -334,7 +334,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when plan is in main text" do
       it "returns :warning" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: "Plan annuel")
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: "Plan annuel")
 
         expect(custom_badge_status).to eq(:warning)
       end
@@ -342,7 +342,7 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when link_url is nil found and text too" do
       it "returns :error" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: nil)
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: nil)
 
         expect(custom_badge_status).to eq(:error)
       end
@@ -354,31 +354,31 @@ RSpec.describe Checks::AnalyzePlan do
 
     context "when all passed" do
       it "returns all passed" do
-        allow(check).to receive_messages(link_url: "url", valid_year: true, reachable: true, text: nil)
+        allow(check).to receive_messages(link_url: "url", valid_years: true, reachable: true, text: nil)
 
         expect(custom_badge_text).to eq("Lien trouvé et valide")
       end
     end
 
-    context "when link is valid but year is invalid" do
+    context "when link is valid but year is not within 3 years" do
       it "returns invalid years" do
-        allow(check).to receive_messages(link_url: "url", valid_year: false, reachable: true, text: nil)
+        allow(check).to receive_messages(link_url: "url", valid_years: false, reachable: true, text: nil, years: [2020])
 
         expect(custom_badge_text).to eq("Année(s) invalide(s)")
       end
     end
 
-    context "when plan is in main text" do
-      it "returns plan found in main text" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: "Plan annuel")
+    context "when link is valid but year is invalid" do
+      it "returns invalid years" do
+        allow(check).to receive_messages(link_url: "url", valid_years: false, reachable: true, text: nil, years: [])
 
-        expect(custom_badge_text).to eq("Plan trouvé dans le texte principal")
+        expect(custom_badge_text).to eq("Année(s) valides non trouvée(s)")
       end
     end
 
     context "when link_url is nil found and text too" do
       it "returns not found" do
-        allow(check).to receive_messages(link_url: nil, valid_year: false, reachable: false, text: nil)
+        allow(check).to receive_messages(link_url: nil, valid_years: false, reachable: false, text: nil)
 
         expect(custom_badge_text).to eq("Lien non trouvé")
       end

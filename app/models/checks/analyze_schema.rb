@@ -1,14 +1,16 @@
 module Checks
   class AnalyzeSchema < Check
+    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_years, :text
+    include AccessibilityDocumentAnalyzer
+
     PRIORITY = 23
-    REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     MAX_YEARS_VALIDITY = 3
     # Matches various forms of "schéma/schema" accessibility links:
     # - "schéma pluriannuel de/d' accessibilité (numérique)" or "schéma pluriannuel RGAA"
     # - "schéma annuel d'accessibilité"
     # - "schéma d'accessibilité numérique/pluriannuel"
     # - "accessibilité numérique — schéma annuel" (with various dash types)
-    SCHEMA_PATTERN = /
+    PATTERN = /
       (?:
         sch[eé]ma\s+
         (?:
@@ -21,65 +23,6 @@ module Checks
       )
     /xi
 
-    store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_years, :text
-
-    def find_link
-      return unless page
-
-      page.links(skip_files: false, scope: :main)
-          .select { |link| link.text.match? SCHEMA_PATTERN }
-          .max_by { |link| extract_years(link.text) }
-    end
-
-    def link_between_headings?
-      return unless page
-
-      page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
-          .select { |link| link.text.match? SCHEMA_PATTERN }
-          .max_by { |link| extract_years(link.text) }
-    end
-
-    def find_text_in_main
-      return unless page
-
-      page.text(scope: :main)
-          .scan(SCHEMA_PATTERN)
-          .flatten
-          .compact
-          .max_by { |match| extract_years(match) }
-    end
-
-    def all_passed?
-      link_url && valid_years && reachable
-    end
-
-    def valid_link?
-      link_url && reachable
-    end
-
-    def custom_badge_status
-      if all_passed?
-        :success
-      elsif valid_link? || text
-        :warning
-      else
-        :error
-      end
-    end
-
-    def custom_badge_text
-      if all_passed?
-        t("checks.analyze_schema.all_passed")
-      elsif valid_link?
-        t("checks.analyze_schema.invalid_years")
-      elsif text
-        t("checks.analyze_schema.schema_in_main_text")
-      else
-        t("checks.analyze_schema.link_not_found")
-      end
-    end
-
-    alias custom_badge_link link_url
 
     private
 
@@ -88,33 +31,24 @@ module Checks
       text_in_main = find_text_in_main
       return unless link || text_in_main
 
-      years = extract_years(link&.text, link&.href, text_in_main)
+      years = extract_valid_years(link&.text, link&.href, text_in_main)
 
       {
         years:,
         link_url: link&.href,
         link_text: link&.text,
         link_misplaced: link ? !link_between_headings? : nil,
-        valid_years: validate_years(years),
+        valid_years: within_three_years?(years),
         reachable: Browser.reachable?(link&.href),
         text: link ? nil : text_in_main
       }
     end
 
-    def page
-      @page ||= audit.page(:accessibility)
-    end
+    def within_three_years?(years)
+      return false if years.blank?
+      return false if years.last - years.first > MAX_YEARS_VALIDITY
 
-    def extract_years(*sources)
-      sources.compact.each do |source|
-        years = source.to_s.scan(/\d{4}/).map(&:to_i).uniq.sort
-        return years if years.present?
-      end
-      []
-    end
-
-    def validate_years(years)
-      years.size.in?(1..MAX_YEARS_VALIDITY) && years.first.upto(years.last).include?(Date.current.year)
+      Date.current.year.between?(years.first, years.last)
     end
   end
 end
