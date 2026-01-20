@@ -9,7 +9,7 @@ module Checks
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
     COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité (?!moyen)|conforme à|révèle que|des critères)[^.]*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,2}(?:[.,]\d+)?)\s*%\s*(?:des critères(?: RGAA)?|au RGAA)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
-    AUDITOR_PATTERN = /(?:réalisé(?:e)? par|par(?:\s+la)?(?:\s+société)?|par)\s+([^,]+?)(?:,| révèle| sur)/i
+    AUDITOR_PATTERN = /(?:réalisé(?:e)?\s+par|par|l[’']\s*agence|la\s+société)\s+(?:la\s+société\s+|l[’']\s*agence\s+)?([^,.]+?)(?:,| révèle| sur|\.|$)/i
     UPDATE_AUDIT_PATTERNS = [
       /Au\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4}).*(?:indique|mentionne).*(?:depuis|après).*(?:précédent|dernier)\s+audit/i,
       /Suite\s+à.*(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})).*(?:dorénavant|désormais|maintenant|actuellement)/i,
