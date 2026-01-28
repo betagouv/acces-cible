@@ -16,12 +16,12 @@
         <%= t(".no_tag") %>
       <% end %>
     </p>
-    <% if @audit.checked_at %>
+    <% if @audit.completed_at %>
       <p>
-        <strong><%= t("audit.checked_at") %> :</strong>
-        <% checked_at = @audit.checked_at %>
-        <%= time_tag checked_at, l(checked_at, format: :long) %>
-        (<%= time_ago checked_at %>).
+        <strong><%= t("audit.completed_at") %> :</strong>
+        <% completed_at = @audit.completed_at %>
+        <%= time_tag completed_at, l(completed_at, format: :long) %>
+        (<%= time_ago completed_at %>).
       </p>
     <% else %>
       <p>

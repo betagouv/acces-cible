@@ -9,7 +9,7 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :checked, -> { where.not(checked_at: nil) }
+  scope :completed, -> { where.not(completed_at: nil) }
   scope :current, -> { where(current: true) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
 
@@ -50,7 +50,7 @@ class Audit < ApplicationRecord
   end
 
   def pending?
-    checked_at.nil?
+    completed_at.nil?
   end
 
   def status_from_checks
@@ -71,7 +71,7 @@ class Audit < ApplicationRecord
 
   def after_check_completed
     if complete?
-      update!(checked_at: Time.zone.now)
+      update!(completed_at: Time.zone.now)
       site.set_current_audit!
     else
       ProcessAuditJob.perform_later(self)

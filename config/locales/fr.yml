@@ -29,7 +29,7 @@ fr:
         one: Équipe
         other: Équipes
   audit:
-    checked_at: Executé le
+    completed_at: Executé le
     count:
       one: Une vérification
       other: "%{count} vérifications"
@@ -51,7 +51,7 @@ fr:
       notice: Vérification créée
   check:
     attempts: Tentatives
-    checked_at: Vérification effectuée le
+    completed_at: Vérification effectuée le
     count:
       one: Un contrôle
       other: "%{count} contrôles"

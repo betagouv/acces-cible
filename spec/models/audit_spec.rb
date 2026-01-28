@@ -180,15 +180,15 @@ RSpec.describe Audit do
   describe "#pending?" do
     subject { audit }
 
-    let(:checked_at) { nil }
-    let(:audit) { build(:audit, checked_at: checked_at) }
+    let(:completed_at) { nil }
+    let(:audit) { build(:audit, completed_at: completed_at) }
 
     context "when audit is not completed" do
       it { should be_pending }
     end
 
     context "when audit is completed" do
-      let(:checked_at) { Time.current }
+      let(:completed_at) { Time.current }
 
       it { should_not be_pending }
     end
@@ -234,10 +234,10 @@ RSpec.describe Audit do
         expect { audit.after_check_completed }.not_to enqueue_job(ProcessAuditJob)
       end
 
-      it "updates its checked_at timestamp" do
+      it "updates its completed_at timestamp" do
         freeze_time do
           expect { audit.after_check_completed }
-            .to change(audit, :checked_at)
+            .to change(audit, :completed_at)
                   .from(nil)
                   .to(Time.current)
         end

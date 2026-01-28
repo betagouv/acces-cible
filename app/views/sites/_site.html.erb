@@ -11,8 +11,8 @@
     <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: tags[3..].to_sentence) if tags.size > 3 %>
   </td>
   <td>
-    <% checked_at = site.audit.checked_at || site.audit.updated_at %>
-    <% local_time = checked_at.in_time_zone %>
+    <% completed_at = site.audit.completed_at || site.audit.updated_at %>
+    <% local_time = completed_at.in_time_zone %>
     <%= time_tag local_time, l(local_time, format: :compact), title: l(local_time, format: :long) %>
     <br>
     (<%= time_ago local_time %>)

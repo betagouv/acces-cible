@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_15_140216) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_27_092803) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "audits", force: :cascade do |t|
     t.text "accessibility_page_html"
     t.string "accessibility_page_url"
-    t.datetime "checked_at"
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.boolean "current", default: false, null: false
     t.text "home_page_html"

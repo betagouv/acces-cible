@@ -76,7 +76,7 @@ class Site < ApplicationRecord
   end
 
   def actual_current_audit
-    audits.checked.sort_by_newest.first || audits.sort_by_newest.first
+    audits.completed.sort_by_newest.first || audits.sort_by_newest.first
   end
 
   def set_current_audit!
