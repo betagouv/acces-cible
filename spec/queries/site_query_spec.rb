@@ -52,23 +52,23 @@ RSpec.describe SiteQuery do
       let(:request) { {} }
       let(:expected_ids) { [audit3.site_id, audit2.site_id, audit1.site_id] }
 
-      let!(:audit1) { create(:audit, :current, checked_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, :current, checked_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, :current, checked_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, :current, completed_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, :current, completed_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, :current, completed_at: 3.days.ago) }
 
-      it "sorts by latest audit check date in descending order" do
+      it "sorts by latest audit completion date in descending order" do
         expect(result.ids).to eq(expected_ids)
       end
     end
 
-    context "when sort[checked_at]=desc" do
-      let(:request) { { sort: { checked_at: :desc } } }
+    context "when sort[completed_at]=desc" do
+      let(:request) { { sort: { completed_at: :desc } } }
 
-      let!(:audit1) { create(:audit, :current, checked_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, :current, checked_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, :current, checked_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, :current, completed_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, :current, completed_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, :current, completed_at: 3.days.ago) }
 
-      it "sorts by latest audit check date in descending order" do
+      it "sorts by latest audit completion date in descending order" do
         expect(result.ids).to eq([audit1.site_id, audit2.site_id, audit3.site_id])
       end
 
@@ -76,10 +76,10 @@ RSpec.describe SiteQuery do
         site1 = audit1.site
         site2 = audit2.site
 
-        create(:audit, site: site1, checked_at: 6.hours.ago)
+        create(:audit, site: site1, completed_at: 6.hours.ago)
         site1.set_current_audit!
 
-        create(:audit, site: site2, checked_at: 12.hours.ago)
+        create(:audit, site: site2, completed_at: 12.hours.ago)
         site2.set_current_audit!
 
         result = query.where(id: [site1.id, site2.id]).order_by(params)
@@ -93,10 +93,10 @@ RSpec.describe SiteQuery do
 
     let(:tag) { create(:tag) }
     let(:another_tag) { create(:tag) }
-    let!(:no_match) { create(:site, :checked, url: "https://foo.com/") }
-    let!(:domain_match) { create(:site, :checked, url: "https://www.bar.com/", tags: [tag]) }
-    let!(:path_match) { create(:site, :checked, url: "https://baz.com/bar/", tags: [tag, another_tag]) }
-    let!(:name_match) { create(:site, :checked, url: "https://www.apple.com/", name: "Foo Bar Baz") }
+    let!(:no_match) { create(:site, :completed, url: "https://foo.com/") }
+    let!(:domain_match) { create(:site, :completed, url: "https://www.bar.com/", tags: [tag]) }
+    let!(:path_match) { create(:site, :completed, url: "https://baz.com/bar/", tags: [tag, another_tag]) }
+    let!(:name_match) { create(:site, :completed, url: "https://www.apple.com/", name: "Foo Bar Baz") }
 
     context 'when filtering by site name or url' do
       let(:request) { { filter: { q: "bar" } } }
@@ -125,9 +125,9 @@ RSpec.describe SiteQuery do
     end
 
     it "combines sorting and filtering" do
-      no_match = create(:site, :checked, url: "https://foo.com/")
-      abc_match = create(:site, :checked, url: "https://abc.bar.com/")
-      def_match = create(:site, :checked, url: "https://def.bar.com/")
+      no_match = create(:site, :completed, url: "https://foo.com/")
+      abc_match = create(:site, :completed, url: "https://abc.bar.com/")
+      def_match = create(:site, :completed, url: "https://def.bar.com/")
 
       expect(result.to_a).to eq([def_match, abc_match])
     end

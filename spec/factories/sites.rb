@@ -3,15 +3,15 @@ FactoryBot.define do
     sequence(:url) { |n| "https://www.example-#{n}.com/" }
     team { association :team }
 
-    trait :checked do
+    trait :completed do
       after(:create) do |site|
         audit = site.audits.current.first || create(:audit, :current, site:, url: site.url)
-        audit.update!(checked_at: 1.day.ago)
+        audit.update!(completed_at: 1.day.ago)
       end
     end
 
     trait :with_data do
-      checked
+      completed
       after(:create) do |site|
         audit = site.audit
         Check.names.each do |check_name|

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe SiteCsvExport do
   let(:team) { create(:team) }
   let(:tags) { ["Gouvernment", "Santé publique"].map { |name| create(:tag, name:, team:) } }
-  let(:site) { create(:site, :checked, url: "https://example.com", team:, tags:) }
+  let(:site) { create(:site, :completed, url: "https://example.com", team:, tags:) }
 
   describe ".filename" do
     it "generates filename with current date" do
@@ -91,7 +91,7 @@ RSpec.describe SiteCsvExport do
         expect(row["URL"]).to eq(audit.url)
         expect(row["URL de redirection"]).to be_nil
         expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
-        expect(row["Vérification effectuée le"]).to eq(audit.checked_at.to_s)
+        expect(row["Vérification effectuée le"]).to eq(audit.completed_at.to_s)
         expect(row["Site joignable"]).to eq("true")
         expect(row["Indication de la langue"]).to eq("Non trouvé")
         expect(row["Mention du niveau d'accessibilité"]).to eq("Totalement conforme")

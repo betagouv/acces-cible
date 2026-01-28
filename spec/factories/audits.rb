@@ -13,8 +13,8 @@ FactoryBot.define do
       current { true }
     end
 
-    trait :checked do
-      checked_at { 1.day.ago }
+    trait :completed do
+      completed_at { 1.day.ago }
     end
   end
 end

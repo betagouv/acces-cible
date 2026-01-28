@@ -6,7 +6,7 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    params[:sort] ||= { checked_at: :desc }
+    params[:sort] ||= { completed_at: :desc }
     @sites = current_user.sites
     @tags = current_user.team.tags.in_alphabetical_order
     respond_to do |format|

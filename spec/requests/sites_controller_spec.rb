@@ -18,7 +18,7 @@ RSpec.describe "Sites" do
     context "when requesting CSV format" do
       subject(:get_csv) { get sites_path(format: :csv) }
 
-      let!(:site) { create(:site, :checked, team:) }
+      let!(:site) { create(:site, :completed, team:) }
 
       it "returns CSV content" do
         get_csv
