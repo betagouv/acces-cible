@@ -2,6 +2,7 @@ class Audit < ApplicationRecord
   belongs_to :site, touch: true, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
+  after_create :update_site_slug!
   after_create_commit :fetch_resources!, :create_checks
 
   validates :url, presence: true, url: true
@@ -10,7 +11,6 @@ class Audit < ApplicationRecord
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :completed, -> { where.not(completed_at: nil) }
-  scope :current, -> { where(current: true) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
 
   Check.types.each do |name, klass|
@@ -72,7 +72,6 @@ class Audit < ApplicationRecord
   def after_check_completed
     if complete?
       update!(completed_at: Time.zone.now)
-      site.set_current_audit!
     else
       ProcessAuditJob.perform_later(self)
     end
@@ -123,5 +122,9 @@ class Audit < ApplicationRecord
     when :home then home_page_html
     when :accessibility then accessibility_page_html
     end
+  end
+
+  def update_site_slug!
+    site.update_slug!
   end
 end
