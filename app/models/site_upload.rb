@@ -38,7 +38,11 @@ class SiteUpload
     parse_sites
 
     transaction do
-      create!(new_sites.values) if new_sites.any?
+      new_sites.values.each do |attributes|
+        url = attributes.delete(:url)
+        site = create!(attributes)
+        site.audits.create!(url:)
+      end
       existing_sites.values.each { |site| site.save && site.audit! }
     end
     true
