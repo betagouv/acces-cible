@@ -14,6 +14,7 @@ module Checks
       (?:
         sch[eé]ma\s+
         (?:
+          pluri-?annuel\s+\d{4}(?:\s*[-–]\s*\d{4})?|
           pluri-?annuel\s+(?:de\s+(?:mise\s+en\s+|l[''])?|d['’])accessibilit[eé](?:\s+num[eé]rique)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
           pluri-?annuel\s+rgaa(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
           annuel\s+d['’]accessibilit[eé](?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
