@@ -23,7 +23,6 @@ module Checks
       )
     /xi
 
-
     private
 
     def analyze!
@@ -37,7 +36,7 @@ module Checks
         years:,
         link_url: link&.href,
         link_text: link&.text,
-        link_misplaced: link ? !link_between_headings? : nil,
+        link_misplaced: link ? !link_between_headings : nil,
         valid_years: within_three_years?(years),
         reachable: Browser.reachable?(link&.href),
         text: link ? nil : text_in_main
