@@ -1,49 +1,46 @@
 require "rails_helper"
 
 RSpec.describe Checks::AnalyzeSchema do
-  let(:default_body) { "<p>Texte sans lien ni schema</p>" }
-  let(:link_href) { "#{root}/schema_pluriannuel.pdf" }
-  let(:href_years) { [current_year - 1, current_year + 1] }
-  let(:href_text) { "Schema pluriannuel d'accessibilite" }
-  let(:href_with_years) { "#{root}/schema-#{href_years.join("-")}.pdf" }
-  let(:text_years) { href_years }
-  let(:text_with_years) { "Schema pluriannuel d'accessibilite #{href_years.join("-")}" }
+  context "with common analyzer behaviors" do
+    let(:href_years) { [Date.current.year - 1, Date.current.year + 1] }
+    let(:href_text) { "Schema pluriannuel d'accessibilite" }
+    let(:href_with_years) { "https://www.example.com/schema-#{href_years.join("-")}.pdf" }
+    let(:text_years) { href_years }
+    let(:text_with_years) { "Schema pluriannuel d'accessibilite #{href_years.join("-")}" }
 
-  current_year = Date.current.year
-  max_year_distance = described_class::MAX_YEARS_VALIDITY
-  min_year = current_year - max_year_distance
-  max_year = current_year + max_year_distance
-  last_year = current_year - 1
-  next_year = current_year + 1
+    it_behaves_like "analyzes documents"
+  end
 
-  year_range_validity_cases = {
-    [current_year] => true,
-    [last_year] => false,
-    [next_year] => false,
-    [min_year, current_year] => true,
-    [current_year, max_year] => true,
-    [last_year, next_year] => true,
-    [min_year - 1, last_year] => false,
-    [next_year, max_year + 1] => false,
-  }
+  describe ".analyze!" do
+    context "when looking for pattern" do
+      let(:link_href) { "https://www.example.com/schema_pluriannuel.pdf" }
 
-  non_matching_text_cases = [
-    "schema pluriannuel d'accessibillite numerique #{current_year}",
-    "schema annuel accessibilite #{current_year}",
-    "accessibilite - schema #{current_year}",
-  ]
+      it_behaves_like "matches document text", text: "schema pluriannuel #{Date.current.year - 1}-#{Date.current.year + 10}", expected: { years: [Date.current.year - 1, Date.current.year + 10], valid_years: false }
+      it_behaves_like "matches document text", text: "schema annuel d'accessibilite #{Date.current.year - 5}", expected: { years: [Date.current.year - 5], valid_years: false }
+      it_behaves_like "matches document text", text: "schema pluriannuel #{Date.current.year - 1}-#{Date.current.year + 1}", expected: { years: [Date.current.year - 1, Date.current.year + 1], valid_years: true }
+      it_behaves_like "matches document text", text: "schema pluriannuel d'accessibilite numerique #{Date.current.year}", expected: { years: [Date.current.year], valid_years: true }
+      it_behaves_like "matches document text", text: "schema pluriannuel de mise en accessibilite #{Date.current.year - 1}-#{Date.current.year + 1}", expected: { years: [Date.current.year - 1, Date.current.year + 1], valid_years: true }
+      it_behaves_like "matches document text", text: "schema pluriannuel RGAA #{Date.current.year - 1}-#{Date.current.year + 1}", expected: { years: [Date.current.year - 1, Date.current.year + 1], valid_years: true }
+      it_behaves_like "matches document text", text: "schema d'accessibilite pluriannuel #{Date.current.year - 1}-#{Date.current.year + 1}", expected: { years: [Date.current.year - 1, Date.current.year + 1], valid_years: true }
+      it_behaves_like "matches document text", text: "schema annuel d'accessibilite #{Date.current.year}", expected: { years: [Date.current.year], valid_years: true }
+      it_behaves_like "matches document text", text: "SCHEMA PLURIANNUEL D'ACCESSIBILITE #{Date.current.year}", expected: { years: [Date.current.year], valid_years: true }
+    end
 
-  matching_text_cases = {
-    "schema pluriannuel #{current_year - 1}-#{current_year + 10}" => { years: [current_year - 1, current_year + 10], valid_years: false },
-    "schema annuel d'accessibilite #{current_year - 5}" => { years: [current_year - 5], valid_years: false },
-    "schema pluriannuel #{current_year - 1}-#{current_year + 1}" => { years: [current_year - 1, current_year + 1], valid_years: true },
-    "schema pluriannuel d'accessibilite numerique #{current_year}" => { years: [current_year], valid_years: true },
-    "schema pluriannuel de mise en accessibilite #{current_year - 1}-#{current_year + 1}" => { years: [current_year - 1, current_year + 1], valid_years: true },
-    "schema pluriannuel RGAA #{current_year - 1}-#{current_year + 1}" => { years: [current_year - 1, current_year + 1], valid_years: true },
-    "schema d'accessibilite pluriannuel #{current_year - 1}-#{current_year + 1}" => { years: [current_year - 1, current_year + 1], valid_years: true },
-    "schema annuel d'accessibilite #{current_year}" => { years: [current_year], valid_years: true },
-    "SCHEMA PLURIANNUEL D'ACCESSIBILITE #{current_year}" => { years: [current_year], valid_years: true },
-  }
+    context "when text does not match pattern" do
+      it_behaves_like "does not match document text", text: "schema pluriannuel d'accessibillite numerique #{Date.current.year}"
+      it_behaves_like "does not match document text", text: "schema annuel accessibilite #{Date.current.year}"
+      it_behaves_like "does not match document text", text: "accessibilite - schema #{Date.current.year}"
+    end
+  end
 
-  it_behaves_like "an accessibility document analyzer", matching_text_cases, non_matching_text_cases, year_range_validity_cases
+  describe "#within_three_years?" do
+    it_behaves_like "validates years", years: [Date.current.year], expected: true
+    it_behaves_like "validates years", years: [Date.current.year - 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year + 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year - described_class::MAX_YEARS_VALIDITY, Date.current.year], expected: true
+    it_behaves_like "validates years", years: [Date.current.year, Date.current.year + described_class::MAX_YEARS_VALIDITY], expected: true
+    it_behaves_like "validates years", years: [Date.current.year - 1, Date.current.year + 1], expected: true
+    it_behaves_like "validates years", years: [Date.current.year - described_class::MAX_YEARS_VALIDITY - 1, Date.current.year - 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year + 1, Date.current.year + described_class::MAX_YEARS_VALIDITY + 1], expected: false
+  end
 end
