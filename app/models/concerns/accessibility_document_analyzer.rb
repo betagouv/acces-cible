@@ -13,7 +13,7 @@ module AccessibilityDocumentAnalyzer
           .max_by { |link| extract_valid_years(link.text) }
     end
 
-    def link_between_headings?
+    def link_between_headings
       return unless page
 
       page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])

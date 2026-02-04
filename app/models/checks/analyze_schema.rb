@@ -14,6 +14,7 @@ module Checks
       (?:
         sch[eé]ma\s+
         (?:
+          pluri-?annuel\s+\d{4}(?:\s*[-–]\s*\d{4})?|
           pluri-?annuel\s+(?:de\s+(?:mise\s+en\s+|l[''])?|d['’])accessibilit[eé](?:\s+num[eé]rique)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
           pluri-?annuel\s+rgaa(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
           annuel\s+d['’]accessibilit[eé](?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?|
@@ -22,7 +23,6 @@ module Checks
         accessibilit[eé]\s+num[eé]rique\s+[—–-]\s+sch[eé]ma\s+annuel(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?
       )
     /xi
-
 
     private
 
@@ -37,7 +37,7 @@ module Checks
         years:,
         link_url: link&.href,
         link_text: link&.text,
-        link_misplaced: link ? !link_between_headings? : nil,
+        link_misplaced: link ? !link_between_headings : nil,
         valid_years: within_three_years?(years),
         reachable: Browser.reachable?(link&.href),
         text: link ? nil : text_in_main
