@@ -7,7 +7,7 @@ class FindAccessibilityPageService
     def call(audit)
       queue = prioritize_queue!(url: audit.home_page_url, starting_html: audit.home_page_html)
       crawler = Crawler.new(audit.home_page_url, root_page_html: audit.home_page_html, queue: queue)
-      page = find_page(crawler, queue)
+      page = find_page(crawler, queue, audit)
 
       Rails.logger.silence do
         audit.update_accessibility_page!(page.url, page.html) unless page.nil?
@@ -16,20 +16,29 @@ class FindAccessibilityPageService
 
     private
 
-    def find_page(crawler, queue)
+    def find_page(crawler, queue, audit)
       crawler.find_page do |current_page|
         if required_headings_present?(current_page)
           true
         else
-          enqueue_children(current_page, queue)
+          enqueue_children(current_page, queue, audit)
           false
         end
       end
     end
 
-    def enqueue_children(page, queue)
-      children_links = page.internal_links.select { |link| link.href != page.url }
-      children_links = links_by_priority(children_links)
+    def enqueue_children(page, queue, audit)
+      excluded_targets = [
+        page.url,
+        audit.url,
+        audit.home_page_url
+      ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
+
+      children_links = page.internal_links.reject do |link|
+        excluded_targets.include?(Link.url_without_scheme_and_www(link.href))
+      end
+
+      children_links = links_by_priority(children_links).first(Crawler::MAX_CRAWLED_PAGES)
 
       queue.add(*children_links)
     end
