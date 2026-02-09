@@ -74,4 +74,29 @@ RSpec.describe FindAccessibilityPageService do
       expect(audit).not_to have_received(:update_accessibility_page!)
     end
   end
+
+  describe ".enqueue_children" do
+    let(:audit) { build(:audit, url: "https://example.com", home_page_url: "https://www.example.com/redirection") }
+    let(:queue) { LinkList.new }
+    let(:page) { instance_double(Page, url: "https://example.com/a") }
+    let(:links) do
+      [
+        Link.new(href: "https://example.com/", text: "home url"),
+        Link.new(href: "https://example.com/redirection", text: "redirection url"),
+        Link.new(href: "https://example.com/a11y", text: "a11y"),
+        Link.new(href: "https://example.com/a", text: "ah")
+      ]
+    end
+
+    before do
+      allow(page).to receive(:internal_links).and_return(links)
+      allow(described_class).to receive(:links_by_priority) { |incoming_links| incoming_links }
+    end
+
+    it "does not enqueues home, redirection and page url" do
+      described_class.send(:enqueue_children, page, queue, audit)
+
+      expect(queue.to_a).to eq(["https://example.com/a11y"])
+    end
+  end
 end

@@ -41,6 +41,7 @@ class Crawler
 
   def get_page
     link = queue.shift
+    return if crawled.include?(link.href)
     return nil unless link
 
     crawled << link
