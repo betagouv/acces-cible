@@ -5,7 +5,7 @@ FactoryBot.define do
 
     trait :completed do
       after(:create) do |site|
-        audit = site.audits.current.first || create(:audit, :current, site:, url: site.url)
+        audit = site.audits.first || create(:audit, site:, url: site.url)
         audit.update!(completed_at: 1.day.ago)
       end
     end

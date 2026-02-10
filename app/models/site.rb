@@ -7,10 +7,7 @@ class Site < ApplicationRecord
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
   accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
-  scope :preloaded, -> { with_current_audit.includes(:tags, audits: { checks: :check_transitions }) }
-
-  after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
+  scope :preloaded, -> { includes(:tags, audits: { checks: :check_transitions }) }
 
   friendly_id :url_without_scheme_and_www, use: [:slugged, :history, :scoped], scope: :team_id
 
@@ -68,25 +65,11 @@ class Site < ApplicationRecord
   end
 
   def audit
-    audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
+    audits.sort_by_newest.first || audits.build
   end
 
   def audit!
-    audits.create!(url:, current: audits.current.none? || audits.none?)
-  end
-
-  def actual_current_audit
-    audits.completed.sort_by_newest.first || audits.sort_by_newest.first
-  end
-
-  def set_current_audit!
-    return if actual_current_audit && audit == actual_current_audit
-
-    transaction do
-      audit&.update!(current: false)
-      actual_current_audit&.update!(current: true)
-      update_slug!
-    end
+    audits.create!(url:)
   end
 
   def tags_list

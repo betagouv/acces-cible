@@ -9,11 +9,11 @@ RSpec.describe SiteQuery do
     subject(:result) { query.order_by(params) }
 
     context "when ordering by url" do
-      let!(:apple) { create(:audit, :current, url: "https://apple.com") }
-      let!(:app) { create(:audit, :current, url: "http://www.app.apple.com") }
-      let!(:banana) { create(:audit, :current, url: "https://www.banana.org") }
-      let!(:blog) { create(:audit, :current, url: "http://blog.beta.com") }
-      let!(:carrot) { create(:audit, :current, url: "https://carrot.bio") }
+      let!(:apple) { create(:audit, url: "https://apple.com") }
+      let!(:app) { create(:audit, url: "http://www.app.apple.com") }
+      let!(:banana) { create(:audit, url: "https://www.banana.org") }
+      let!(:blog) { create(:audit, url: "http://blog.beta.com") }
+      let!(:carrot) { create(:audit, url: "https://carrot.bio") }
 
       let(:expected_ids) do
         [
@@ -35,7 +35,7 @@ RSpec.describe SiteQuery do
         it "handles multiple different URLs for the same site" do
           create(:audit, site: apple.site, url: "https://support.apple.com")
 
-          expect(result.ids).to eq(expected_ids)
+          expect(result.ids).to eq([app.site_id, banana.site_id, blog.site_id, carrot.site_id, apple.site_id])
         end
       end
 
@@ -52,9 +52,9 @@ RSpec.describe SiteQuery do
       let(:request) { {} }
       let(:expected_ids) { [audit3.site_id, audit2.site_id, audit1.site_id] }
 
-      let!(:audit1) { create(:audit, :current, completed_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, :current, completed_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, :current, completed_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, completed_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, completed_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, completed_at: 3.days.ago) }
 
       it "sorts by latest audit completion date in descending order" do
         expect(result.ids).to eq(expected_ids)
@@ -64,9 +64,9 @@ RSpec.describe SiteQuery do
     context "when sort[completed_at]=desc" do
       let(:request) { { sort: { completed_at: :desc } } }
 
-      let!(:audit1) { create(:audit, :current, completed_at: 1.day.ago) }
-      let!(:audit2) { create(:audit, :current, completed_at: 2.days.ago) }
-      let!(:audit3) { create(:audit, :current, completed_at: 3.days.ago) }
+      let!(:audit1) { create(:audit, completed_at: 1.day.ago) }
+      let!(:audit2) { create(:audit, completed_at: 2.days.ago) }
+      let!(:audit3) { create(:audit, completed_at: 3.days.ago) }
 
       it "sorts by latest audit completion date in descending order" do
         expect(result.ids).to eq([audit1.site_id, audit2.site_id, audit3.site_id])
@@ -77,10 +77,8 @@ RSpec.describe SiteQuery do
         site2 = audit2.site
 
         create(:audit, site: site1, completed_at: 6.hours.ago)
-        site1.set_current_audit!
 
         create(:audit, site: site2, completed_at: 12.hours.ago)
-        site2.set_current_audit!
 
         result = query.where(id: [site1.id, site2.id]).order_by(params)
         expect(result.ids).to eq([site1.id, site2.id])
