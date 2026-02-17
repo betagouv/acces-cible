@@ -1,14 +1,15 @@
 class SitesController < ApplicationController
   include ActionController::Live
   before_action :set_site, only: [:show, :edit, :update, :destroy]
-  before_action :set_sites, only: :destroy_all
+  before_action :set_sites, only: :index
+  before_action :set_bulk_sites, only: :bulk_destroy
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
 
   # GET /sites
   def index
     params[:sort] ||= { completed_at: :desc }
-    @sites = current_user.sites
     @tags = current_user.team.tags.in_alphabetical_order
+
     respond_to do |format|
       format.html do
         @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params), limit: pagy_limit
@@ -70,10 +71,10 @@ class SitesController < ApplicationController
   end
 
   # DELETE /sites
-  def destroy_all
+  def bulk_destroy
     count = @sites.count
-    @sites.destroy_all
-    redirect_to sites_path, notice: t(".notice", count:), status: :see_other
+    @sites.in_batches(of: 100) { |batch| batch.destroy_all }
+    redirect_back fallback_location: sites_path, notice: t(".notice", count:), status: :see_other
   end
 
   private
@@ -91,18 +92,21 @@ class SitesController < ApplicationController
     response.stream.close
   end
 
+  def sites_scope
+    current_user.team.sites
+  end
   def set_site
-    @site = current_user
-      .team
-      .sites
-      .preloaded
-      .friendly
-      .find(params.expect(:id))
+    @site = sites_scope.preloaded.friendly.find(params.expect(:id))
   end
 
   def set_sites
-    site_ids = params.expect(id: [])
-    @sites = current_user.team.sites.where(id: site_ids)
+    @sites = sites_scope
+  end
+
+
+  def set_bulk_sites
+    ids = params.expect(id: [])
+    @sites = sites_scope.where(id: ids)
   end
 
   def redirect_old_slugs

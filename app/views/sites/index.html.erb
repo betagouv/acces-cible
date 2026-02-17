@@ -8,12 +8,12 @@
 </div>
 
 <% form_id = :table_form %>
-<%= form_with(url: sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
+<%= form_with(url: bulk_destroy_sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
 <%= dsfr_table(caption: t('.caption'), border: true) do |t| %>
   <% hidden_fields = flatten_params(:sort, :filter, :limit).except("filter[q]") %>
   <% t.with_search(url: url_for, name: "filter[q]", value: params.dig(:filter, :q), hidden_fields:) %>
   <% t.with_header_action do %>
-    <%= button_tag t("shared.destroy_all"), form: form_id, data: { table_target: :button, turbo_confirm: t("shared.confirm") }, class: icon_class(:delete, line: true, btn: :secondary, class: "fr-hidden") %>
+    <%= button_tag t("shared.destroy_all"), form: form_id, data: { table_target: :button, turbo_confirm: t("shared.confirm"), turbo_submits_with: t(".deleting") }, class: icon_class(:delete, line: true, btn: :secondary, class: "fr-hidden") %>
   <% end %>
   <% t.with_head do %>
     <tr>
