@@ -116,6 +116,25 @@ RSpec.describe "Sites" do
     end
   end
 
+  describe "DELETE /sites" do
+    subject(:delete_sites) { delete bulk_destroy_sites_path, params: { id: site_ids } }
+
+    let!(:site) { create(:site, team:) }
+    let!(:other_site) { create(:site, team:) }
+    let!(:team_site) { create(:site, team: create(:team)) }
+    let(:site_ids) { [site.id, other_site.id] }
+
+    it "destroys selected sites and redirects to index" do
+      expect { delete_sites }.to change(Site, :count).by(-2)
+
+      expect(Site.exists?(team_site.id)).to be(true)
+      expect(response).to redirect_to(sites_path)
+      expect(response).to have_http_status(:see_other)
+      follow_redirect!
+      expect(flash[:notice]).to be_present
+    end
+  end
+
   describe "POST /sites/upload" do
     subject(:upload_sites) { post upload_sites_path, params: { site_upload: { file: } } }
 

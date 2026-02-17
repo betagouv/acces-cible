@@ -296,7 +296,7 @@ fr:
       new_audit: Site existant, nouvel audit programmé
     destroy:
       notice: Site supprimé
-    destroy_all:
+    bulk_destroy:
       notice:
         one: Un site supprimé
         other: "%{count} sites supprimés"
@@ -310,6 +310,7 @@ fr:
       url_hint: Saisissez une url valide, commençant par https:// ou http://
     index:
       caption: Tous les sites
+      deleting: Suppression…
       detail: Détails
       export_to_csv: Télécharger en CSV
       last_audit_at: Dernière vérification

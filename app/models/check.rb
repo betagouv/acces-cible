@@ -1,5 +1,5 @@
 class Check < ApplicationRecord
-  has_many :check_transitions, autosave: false, dependent: :destroy
+  has_many :check_transitions, autosave: false, dependent: :delete_all
 
   include Statesman::Adapters::ActiveRecordQueries[
             transition_class: CheckTransition,
