@@ -90,6 +90,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "taux de conformité de 75%" => 75,
       "conforme à 80,5%" => 80.5,
       "révèle que 90.5%" => 90.5,
+      "100% des critères RGAA sont respectés" => 100,
       "82 % des critères RGAA sont respectés [...] à 93 %" => 82,
       "le taux de conformité global était de 60,8% [...] le taux de conformité global est de 70,9%." => 70.9,
       "94,03% des critères RGAA sont respectés. Le taux moyen de conformité du service en ligne s’élève à 99%" => 94.03,

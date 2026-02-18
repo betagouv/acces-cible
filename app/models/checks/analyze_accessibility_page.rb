@@ -7,7 +7,7 @@ module Checks
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|établi(?:e)?(?:\s+le)?|en|du|le|au)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_UPDATE_DATE_PATTERN = /(?<full_date>(?:mis(?:e)?\s+à\s+jour(?:\s+le)?|actualisé(?:e)?(?:\s+le)?|modifié(?:e)?(?:\s+le)?)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
-    COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité (?!moyen)|conforme à|révèle que|des critères)[^.]*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,2}(?:[.,]\d+)?)\s*%\s*(?:des critères(?: RGAA)?|au RGAA)/i
+    COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux de conformité (?!moyen)|conforme à|révèle que|des crit(?:è|e)res)[^.]*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,3}(?:[.,]\d+)?)\s*%\s*(?:des crit(?:è|e)res(?: RGAA)?(?:\s+sont\s+respect(?:é|e)s)?|au RGAA)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
     AUDITOR_PATTERN = /(?:réalisé(?:e)?\s+par|par|l[’']\s*agence|la\s+société)\s+(?:la\s+société\s+|l[’']\s*agence\s+)?([^,.]+?)(?:,| révèle| sur|\.|$)/i
     UPDATE_AUDIT_PATTERNS = [
