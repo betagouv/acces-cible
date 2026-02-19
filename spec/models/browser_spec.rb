@@ -14,11 +14,12 @@ RSpec.describe Browser do
     allow(browser_double).to receive(:quit)
 
     allow(headers_double).to receive(:set)
-    allow(network_double).to receive(:blocklist=)
+    allow(network_double).to receive(:blacklist=)
     allow(network_double).to receive(:wait_for_idle)
     allow(network_double).to receive_messages(status: 200, response: response_double)
     allow(response_double).to receive(:content_type).and_return("text/html")
 
+    allow(page_double).to receive(:at_css)
     allow(page_double).to receive(:go_to).with(url)
     allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
     allow(page_double).to receive(:close)
@@ -174,6 +175,12 @@ RSpec.describe Browser do
       expect(get_result).not_to be_nil
     end
 
+    it "waits for network idle" do
+      get_result
+
+      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
+    end
+
     it "returns response data hash" do
       result = get_result
 
@@ -233,9 +240,9 @@ RSpec.describe Browser do
       expect(result).to eq(page_double)
     end
 
-    it "sets the blocklist on the page's context" do
+    it "sets the blacklist on the page's context" do
       expect(network_double)
-        .to receive(:blocklist=)
+        .to receive(:blacklist=)
               .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
 
       described_class.send(:create_page)
@@ -248,12 +255,6 @@ RSpec.describe Browser do
       described_class.send(:create_page)
 
       expect(headers_double).to have_received(:set).with(request_headers)
-    end
-
-    it "waits for network idle" do
-      described_class.send(:create_page)
-
-      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
     end
   end
 end
