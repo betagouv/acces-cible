@@ -13,8 +13,6 @@
   <td>
     <% completed_at = site.audit.completed_at || site.audit.updated_at %>
     <% local_time = completed_at.in_time_zone %>
-    <%= time_tag local_time, l(local_time, format: :compact), title: l(local_time, format: :long) %>
-    <br>
-    (<%= time_ago local_time %>)
+    <%= time_tag local_time, l(local_time, format: :complete), title: l(local_time, format: :long) %>
   </td>
 </tr>

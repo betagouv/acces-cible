@@ -8,7 +8,6 @@
       <li><strong><%= t('.audit_date') %></strong> :
         <% if check.audit_date %>
           <%= l(check.audit_date) %>
-          (<%= time_ago check.audit_date %>)
         <% else %>
           <%= t('.unknown') %>
         <% end %>
@@ -16,12 +15,12 @@
       <% if check.audit_update_date %>
         <li><strong><%= t('.audit_update_date') %></strong> :
           <%= l(check.audit_update_date) %>
-          (<%= time_ago check.audit_update_date %>)
         </li>
       <% end %>
       <li><strong><%= t('.standard') %></strong> : <%= check.standard || t('.unknown') %></li>
       <li><strong><%= t('.auditor') %></strong> : <%= check.auditor || t('.unknown') %></li>
-      <li><strong><%= t('.mentions_article') %></strong> : <%= check.mentions_article ? t("shared.yes") : t("shared.no") %></li>
+      <li><strong><%= t('.mentions_article') %></strong>
+        : <%= check.mentions_article ? t("shared.yes") : t("shared.no") %></li>
     </ul>
   <% end %>
 </div>

@@ -4,11 +4,6 @@ module ApplicationHelper
   include PageHelper
   include IconHelper
 
-  def time_ago(datetime)
-    datetime = datetime.in_time_zone if datetime.respond_to?(:in_time_zone)
-    time = distance_of_time_in_words_to_now(datetime)
-    t("shared.#{ datetime.before?(Time.zone.now) ? :time_ago : :time_until }", time:)
-  end
 
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }

@@ -9,7 +9,7 @@
 
 <% form_id = :table_form %>
 <%= form_with(url: bulk_destroy_sites_path, method: :delete, id: form_id) {} %><%# Form inputs are in every line, associated with the form id %>
-<%= dsfr_table(caption: t('.caption'), border: true) do |t| %>
+<%= dsfr_table(caption: t('.caption'), border: true, size: :lg) do |t| %>
   <% hidden_fields = flatten_params(:sort, :filter, :limit).except("filter[q]") %>
   <% t.with_search(url: url_for, name: "filter[q]", value: params.dig(:filter, :q), hidden_fields:) %>
   <% t.with_header_action do %>
