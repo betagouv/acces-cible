@@ -279,8 +279,6 @@ fr:
       other: lignes sélectionnées
     send: Envoyer
     sort_by: "Trier par %{column} %{direction}"
-    time_ago: "il y a %{time}"
-    time_until: "dans %{time}"
     x_more: Et %{x} de plus…
   site:
     name: "Nom du site"
@@ -400,6 +398,7 @@ fr:
   time:
     formats:
       compact: "%Y/%m/%d"
+      complete: "%d/%m/%Y à %H:%M"
       file: "%Y%m%d-%Hh%M"
   users:
     show:

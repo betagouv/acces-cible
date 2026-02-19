@@ -1,20 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ApplicationHelper do
-  describe "#time_ago" do
-    it "formats past time correctly" do
-      result = helper.time_ago(2.hours.ago)
-
-      expect(result).to include("il y a")
-    end
-
-    it "formats future time correctly" do
-      result = helper.time_ago(2.hours.from_now)
-
-      expect(result).to include("dans")
-    end
-  end
-
   describe "#or_separator" do
     it "generates a separator with classes" do
       result = helper.or_separator
@@ -192,10 +178,10 @@ RSpec.describe ApplicationHelper do
       result = helper.flatten_params(:sort, :filter)
 
       expect(result).to eq({
-        "sort[name]" => :asc,
-        "filter[tag_id]" => 2,
-        "filter[q]" => ".gouv"
-      })
+                             "sort[name]" => :asc,
+                             "filter[tag_id]" => 2,
+                             "filter[q]" => ".gouv"
+                           })
     end
 
     it "handles non-nested params" do

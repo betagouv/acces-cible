@@ -167,7 +167,6 @@ Pour améliorer l'expérience développeur, des raccourcis et des outils ont ét
 - `bulk_reset_counter(association, counter: nil)` fait ce qu'on attend de `reset_counters` : prendre un nom d'association, le nom du compteur s'il diffère du nom par défaut, et met à jour toute la table en une seule requête SQL. TODO : proposer de l'upstreamer dans Rails.
 - `page_title` : récupère ou génère le titre de page. Cherche successivement dans `@title`, `content_for(:title)`, la méthode `to_title` de la ressource courante si on est dans une action de type `:show`, ou dans la configuration I18n du contrôleur courant.
 - `head_title` : concatène le titre de page et le nom du site, et l'insère dans le layout principal.
-- `time_ago` : affiche "il y a X minutes/heures/jours…" ou "dans X minutes/heures/jours…". Bien plus court à taper que `distance_of_time_in_words_to_now`.
 - `page_actions` permet de regrouper les boutons et actions, avec les mêmes styles d'une page à l'autre.
 
 ### Extensions ActiveRecord

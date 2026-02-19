@@ -21,7 +21,6 @@
         <strong><%= t("audit.completed_at") %> :</strong>
         <% completed_at = @audit.completed_at %>
         <%= time_tag completed_at, l(completed_at, format: :long) %>
-        (<%= time_ago completed_at %>).
       </p>
     <% else %>
       <p>
