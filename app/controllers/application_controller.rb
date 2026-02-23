@@ -4,6 +4,9 @@ class ApplicationController < ActionController::Base
   include ErrorHelper
   include ActionView::RecordIdentifier
 
+  DEFAULT_PAGY_LIMIT = 20
+  MAX_PAGY_LIMIT = 100
+
   layout :layout_selector
 
   helper_method :resource, :resource_model
@@ -50,6 +53,9 @@ class ApplicationController < ActionController::Base
   end
 
   def pagy_limit
-    Integer(params[:limit], 10, exception: false).then { it&.nonzero? }
+    limit = params[:limit].to_i
+    limit = DEFAULT_PAGY_LIMIT if limit <= 0
+
+    [limit, MAX_PAGY_LIMIT].min
   end
 end
