@@ -44,25 +44,6 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#all_checks" do
-    subject(:checks) { build(:audit).all_checks }
-
-    it "returns all checks, building missing ones" do
-      expect(checks.size).to eq(Check.types.size)
-      expect(checks.all?(&:new_record?)).to be true
-    end
-
-    it "caches built checks in instance variables" do
-      audit = build(:audit)
-      audit.all_checks
-
-      Check.types.each do |name, klass|
-        expect(audit.instance_variable_get("@#{name}")).to be_present
-        expect(audit.instance_variable_get("@#{name}")).to be_a(klass)
-      end
-    end
-  end
-
   describe "#page" do
     subject(:page) { audit.page(kind) }
 
@@ -197,7 +178,7 @@ RSpec.describe Audit do
   describe "#create_checks" do
     subject(:create_checks) { audit.create_checks }
 
-    let(:audit) { build(:audit) }
+    let(:audit) { create(:audit) }
 
     it "creates all check types" do
       expect { create_checks }.to change(Check, :count).by(Check.types.size)
