@@ -375,9 +375,7 @@ fr:
       new: Nouvelle étiquette
     index:
       caption: Toutes les étiquettes
-      empty:
-        one: Aucune étiquette
-        other: Aucune étiquette
+      empty: Aucune étiquette
       name: Libellé
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
       sites: Sites
