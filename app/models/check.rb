@@ -7,12 +7,14 @@ class Check < ApplicationRecord
           ]
 
   def state_machine
-    @state_machine ||= CheckStateMachine.new(
-      self,
-      transition_class: CheckTransition,
-      association_name: :check_transitions,
-      initial_transition: false
-    )
+    Statesman::Machine.retry_conflicts do
+      @state_machine ||= CheckStateMachine.new(
+        self,
+        transition_class: CheckTransition,
+        association_name: :check_transitions,
+        initial_transition: persisted?
+      )
+    end
   end
 
   delegate :current_state,

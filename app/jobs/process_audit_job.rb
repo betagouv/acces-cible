@@ -7,7 +7,7 @@ class ProcessAuditJob < ApplicationJob
     audit
       .checks
       .remaining
-      .filter { |check| Statesman::Machine.retry_conflicts { check.transition_to(:ready) } }
+      .filter { |check| check.transition_to(:ready) }
       .each { |check| RunCheckJob.set(group: "check_#{check.id}").perform_later(check) }
   end
 end

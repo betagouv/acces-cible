@@ -123,7 +123,7 @@ end
 Alors("la page contient toutes les vérifications du site {string} avec le préfixe {string}") do |url, prefix|
   site = team.sites.find_by_url(url:)
   expect(page).to have_css("table") if prefix.present?
-  site.audit.checks.each do |check|
+  site.audit.all_checks.each do |check|
     expect(page).to have_content(check.class.table_header)
   end
 end
@@ -131,14 +131,14 @@ end
 Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
   site = team.sites.find_by_url(url:)
   expect(page).to have_css("table")
-  site.audit.checks.each do |check|
+  site.audit.all_checks.each do |check|
     expect(page).to have_content(check.table_header)
   end
 end
 
 Alors("la page contient toutes les vérifications du site {string}") do |url|
   site = team.sites.find_by_url(url:)
-  site.audit.checks.each do |check|
+  site.audit.all_checks.each do |check|
     expect(page).to have_content(check.human_type)
   end
 end

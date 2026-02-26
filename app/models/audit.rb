@@ -33,16 +33,20 @@ class Audit < ApplicationRecord
     build_page(kind, page_url)
   end
 
+  def all_checks
+    Check.names.map { |name| public_send(name) }
+  end
+
   def check_completed?(identifier)
     send(identifier).completed?
   end
 
   def create_checks
-    Check.types.each_value { |klass| checks.create_or_find_by!(type: klass.name) }
+    all_checks.select(&:new_record?).each(&:save)
   end
 
   def all_check_states
-    checks.collect(&:current_state)
+    all_checks.collect(&:current_state)
   end
 
   def pending?
