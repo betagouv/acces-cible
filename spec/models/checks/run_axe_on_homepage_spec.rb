@@ -33,7 +33,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
       allow(browser_instance).to receive(:quit)
 
       allow(headers_double).to receive(:set)
-      allow(network_double).to receive(:blocklist=)
+      allow(network_double).to receive(:blacklist=)
       allow(network_double).to receive(:wait_for_idle)
 
       allow(page_instance).to receive(:content=)
