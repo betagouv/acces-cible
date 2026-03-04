@@ -1,9 +1,7 @@
 module ApplicationHelper
-  include Pagy::Frontend
   include DsfrHelper
   include PageHelper
   include IconHelper
-
 
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }

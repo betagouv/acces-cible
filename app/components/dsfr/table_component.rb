@@ -46,10 +46,6 @@ module Dsfr
       pagy.present?
     end
 
-    def pagination
-      (PaginationComponent.new(pagy:) if pagy)
-    end
-
     def header_actions?
       header_actions.any?
     end

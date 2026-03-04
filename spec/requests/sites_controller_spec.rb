@@ -37,6 +37,16 @@ RSpec.describe "Sites" do
         expect(csv.first["Adresse du site"]).to eq(site.url_without_scheme_and_www)
       end
     end
+
+    context "when requesting an empty page" do
+      let!(:paged_sites) { create_list(:site, 10, team:) }
+
+      it "redirects to the first page while keeping other params" do
+        get sites_path(page: 2, limit: 10)
+
+        expect(response).to redirect_to("/sites?page=1")
+      end
+    end
   end
 
   describe "GET /sites/:id" do

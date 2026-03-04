@@ -9,10 +9,6 @@ module DsfrHelper
     render component
   end
 
-  def dsfr_pagination
-    render Dsfr::PaginationComponent.new(pagy: @pagy)
-  end
-
   def dsfr_tooltip(text, title:, type: :button)
     render Dsfr::TooltipComponent.new(text, title:, type:)
   end

@@ -1,0 +1,23 @@
+<% per_page_options = Pagy::OPTIONS[:per_page].index_with { |count| t(".per_page", count:) }.invert %>
+
+<div class="fr-table__footer--start">
+  <%= form_with(url: url_for, method: :get, data: { controller: :autosubmit, action: "input->autosubmit#submit" }) do |f| %>
+    <% flatten_params(:sort, :filter).each do |name, value| %>
+      <%= f.hidden_field name, value: value, id: nil %>
+    <% end %>
+    <div>
+      <%= f.dsfr_label_with_hint :limit, label: t(".per_page_label"), class: "fr-sr-only" %>
+      <%= f.dsfr_select_tag :limit, per_page_options, required: true, include_blank: t(".per_page_label"), selected: @pagy.limit.to_s %>
+    </div>
+
+    <%= f.dsfr_submit t("shared.apply"), name: nil, class: icon_class(:refresh, fill: true, class: "fr-sr-only"), title: t("shared.apply"), data: { turbo_submit_with: t("shared.applying") } %>
+
+    <div class="fr-text--sm">
+      <%== @pagy.info_tag %>
+    </div>
+  <% end %>
+</div>
+
+<div class="fr-table__footer--middle">
+  <%== @pagy.series_nav %>
+</div>
