@@ -174,6 +174,12 @@ RSpec.describe Browser do
       expect(get_result).not_to be_nil
     end
 
+    it "waits for network idle" do
+      get_result
+
+      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
+    end
+
     it "returns response data hash" do
       result = get_result
 
@@ -248,12 +254,6 @@ RSpec.describe Browser do
       described_class.send(:create_page)
 
       expect(headers_double).to have_received(:set).with(request_headers)
-    end
-
-    it "waits for network idle" do
-      described_class.send(:create_page)
-
-      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
     end
   end
 end

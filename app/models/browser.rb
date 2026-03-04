@@ -92,41 +92,43 @@ class Browser
 
     def settings
       @settings ||= begin
-                      {
-                        headless: :new,
-                        timeout: PAGE_TIMEOUT,
-                        window_size: WINDOW_SIZES.sample,
-                        process_timeout: PROCESS_TIMEOUT,
-                        pending_connection_errors: false,
-                        extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
-                        browser_options: {
-                          "disable-blink-features": "AutomationControlled",
-                          "disable-popup-blocking": true,
-                          "disable-notifications": true,
-                          "no-sandbox" => nil,
-                          "disable-gpu" => nil,
-                          "disable-dev-shm-usage" => nil,
-                          "disable-background-timer-throttling" => nil,
-                          "disable-backgrounding-occluded-windows" => nil,
-                          "disable-renderer-backgrounding" => nil,
-                          "disable-features" => "TranslateUI,VizDisplayCompositor",
-                          "disable-extensions" => nil,
-                          "disable-plugins" => nil,
-                          "disable-default-apps" => nil,
-                          "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}"),
-                          "remote-debugging-port" => (9222 + Random.rand(1000)).to_s
-                        }
-                      }.tap do |options|
-                        options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
-                        options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
-                        options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
-                      end.freeze
-                    end
+        {
+          headless: :new,
+          timeout: PAGE_TIMEOUT,
+          window_size: WINDOW_SIZES.sample,
+          process_timeout: PROCESS_TIMEOUT,
+          pending_connection_errors: false,
+          extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
+          browser_options: {
+            "disable-blink-features": "AutomationControlled",
+            "disable-popup-blocking": true,
+            "disable-notifications": true,
+            "no-sandbox" => nil,
+            "disable-gpu" => nil,
+            "disable-dev-shm-usage" => nil,
+            "disable-background-timer-throttling" => nil,
+            "disable-backgrounding-occluded-windows" => nil,
+            "disable-renderer-backgrounding" => nil,
+            "disable-features" => "TranslateUI,VizDisplayCompositor",
+            "disable-extensions" => nil,
+            "disable-plugins" => nil,
+            "disable-default-apps" => nil,
+            "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}"),
+            "remote-debugging-port" => (9222 + Random.rand(1000)).to_s
+          }
+        }.tap do |options|
+          options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
+          options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
+          options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
+        end.freeze
+      end
     end
 
     def get(url)
       with_page do |page|
         page.go_to(url)
+        page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
+
         {
           body: page.body,
           status: page.network.status,
@@ -174,7 +176,6 @@ class Browser
       browser.create_page.tap do |page|
         page.headers.set(request_headers)
         page.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
-        page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
       end
     end
   end
