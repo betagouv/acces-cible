@@ -1,6 +1,7 @@
 # language: fr
 
 Fonctionnalité: Export d'un CSV
+
   Contexte:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
@@ -12,4 +13,4 @@ Fonctionnalité: Export d'un CSV
     Quand toutes les tâches de fond sont terminées
     Et que je choisis "Tous les sites" dans le menu principal
     Et que je clique sur "Télécharger en CSV"
-    Alors la page contient un CSV dont une ligne commence par "foobar.com;https://foobar.com"
+    Alors la page contient un CSV dont une ligne commence par "foobar.com;Site title;https://foobar.com"
