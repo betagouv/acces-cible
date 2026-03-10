@@ -62,6 +62,7 @@ RSpec.describe SiteCsvExport do
       it "includes headers" do
         expect(parsed_csv.headers).to eq([
                                            "Adresse du site",
+                                           "Nom du site",
                                            "URL",
                                            "URL de redirection",
                                            "Toutes les étiquettes",
@@ -88,6 +89,7 @@ RSpec.describe SiteCsvExport do
         audit = site.audit.reload
 
         expect(row["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+        expect(row["Nom du site"]).to eq(site.name)
         expect(row["URL"]).to eq(audit.url)
         expect(row["URL de redirection"]).to be_nil
         expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
