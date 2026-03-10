@@ -1,5 +1,7 @@
 <% use_centered_layout(boxed: false) %>
 
+**Note importante : ce produit en cours de construction est en version beta.**
+
 **Accès cible permet de contrôler la conformité légale des sites Internet par rapport à l'accessibilité.**
 
 ## Contrôles effectués

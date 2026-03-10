@@ -6,7 +6,7 @@ RSpec.describe PageHelper do
       allow(helper).to receive(:root?).and_return(true)
 
       result = helper.head_title
-      expect(result).to eq("Accès cible : Contrôle l'accessibilité et la conformité des sites internet")
+      expect(result).to eq("Accès cible (version beta) : Contrôle l'accessibilité et la conformité des sites internet")
     end
 
     it "returns page title with service name for other pages" do
@@ -16,7 +16,7 @@ RSpec.describe PageHelper do
                        )
 
       result = helper.head_title
-      expect(result).to eq("Test Page - Accès cible")
+      expect(result).to eq("Test Page - Accès cible (version beta)")
     end
 
     it "returns a truncated page title with service name for other pages" do
@@ -26,7 +26,7 @@ RSpec.describe PageHelper do
                        )
 
       result = helper.head_title
-      expect(result).to eq("Test PageTest PageTest PageTest PageTest PageTe... - Accès cible")
+      expect(result).to eq("Test PageTest PageTest PageTest PageTest PageTe... - Accès cible (version beta)")
     end
   end
 

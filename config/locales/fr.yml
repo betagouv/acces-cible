@@ -196,7 +196,7 @@ fr:
       title: "Page non trouvée (erreur 404)"
   global:
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
-    service_name: "Accès cible"
+    service_name: "Accès cible (version beta)"
     sponsor: "Gouvernement"
     sponsor_html: "Gouvernement"
   pages:
