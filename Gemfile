@@ -104,8 +104,6 @@ group :development do
   # Print validation error messages in console
   gem "whiny_validation"
   # Open pry when using rails console
-  gem "better_errors"
-  gem "binding_of_caller"
 
   # Profile app in development
   gem "rack-mini-profiler"
