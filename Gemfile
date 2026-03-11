@@ -52,7 +52,7 @@ gem "sentry-rails"
 gem "addressable", "~> 2.8"
 
 # Pagination
-gem "pagy"
+gem "pagy", "~> 9"
 
 # ViewComponents
 gem "view_component"
