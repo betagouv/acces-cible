@@ -8,7 +8,7 @@ RSpec.describe Audit do
   it { is_expected.to be_valid }
 
   describe "associations" do
-    it { is_expected.to belong_to(:site).touch(true) }
+    it { is_expected.to belong_to(:site) }
     it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 

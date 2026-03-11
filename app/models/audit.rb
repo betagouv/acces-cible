@@ -1,5 +1,5 @@
 class Audit < ApplicationRecord
-  belongs_to :site, touch: true, counter_cache: true
+  belongs_to :site, counter_cache: true
   has_many :checks, -> { prioritized }, dependent: :destroy
 
   after_create_commit :fetch_resources!, :create_checks
