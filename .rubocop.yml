@@ -41,10 +41,6 @@ Naming/VariableNumber:
 # Rspec
 RSpec/ExampleLength:
   Enabled: false
-RSpec/ImplicitExpect:
-  EnforcedStyle: should
-RSpec/ImplicitSubject:
-  Enabled: false
 RSpec/IndexedLet:
   Enabled: false
 RSpec/LetSetup:

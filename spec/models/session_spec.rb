@@ -3,10 +3,10 @@ require "rails_helper"
 RSpec.describe Session do
   subject(:session) { build(:session) }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { should belong_to(:user) }
+    it { is_expected.to belong_to(:user) }
   end
 
   describe "scopes" do

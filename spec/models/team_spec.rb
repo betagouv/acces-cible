@@ -3,18 +3,18 @@ require "rails_helper"
 RSpec.describe Team do
   subject(:team) { build(:team) }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { should have_many(:users) }
-    it { should have_many(:sites) }
-    it { should have_many(:tags) }
+    it { is_expected.to have_many(:users) }
+    it { is_expected.to have_many(:sites) }
+    it { is_expected.to have_many(:tags) }
   end
 
   describe "validations" do
     context "for siret" do
-      it { should allow_value("86043616100852").for(:siret) }
-      it { should_not allow_value("").for(:siret) }
+      it { is_expected.to allow_value("86043616100852").for(:siret) }
+      it { is_expected.not_to allow_value("").for(:siret) }
     end
   end
 end

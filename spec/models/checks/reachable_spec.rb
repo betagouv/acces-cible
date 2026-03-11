@@ -24,11 +24,11 @@ RSpec.describe Checks::Reachable do
     context "when the page redirects" do
       let(:home_page_url) { "https://www.redirection.org/" }
 
-      it { should eq(:info) }
+      it { is_expected.to eq(:info) }
     end
 
     context "when the page does not redirect" do
-      it { should eq(:success) }
+      it { is_expected.to eq(:success) }
     end
   end
 
@@ -97,42 +97,42 @@ RSpec.describe Checks::Reachable do
       let(:original_url) { "https://www.example.com/" }
       let(:home_page_url) { "http://www.example.com/" }
 
-      it { should be_falsey }
+      it { is_expected.to be_falsey }
     end
 
     context "when going from http to https" do
       let(:original_url) { "http://www.example.com/" }
       let(:home_page_url) { "https://www.example.com/" }
 
-      it { should be_falsey }
+      it { is_expected.to be_falsey }
     end
 
     context "when going from naked domain to www" do
       let(:original_url) { "https://example.com/" }
       let(:home_page_url) { "https://www.example.com/" }
 
-      it { should be_falsey }
+      it { is_expected.to be_falsey }
     end
 
     context "when going from www to naked domain" do
       let(:original_url) { "https://www.example.com/" }
       let(:home_page_url) { "https://example.com/" }
 
-      it { should be_falsey }
+      it { is_expected.to be_falsey }
     end
 
     context "when going from one domain to another" do
       let(:original_url) { "https://www.example.com/" }
       let(:home_page_url) { "https://www.foo.bar/" }
 
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
 
     context "when going from root to a folder" do
       let(:original_url) { "https://www.example.com/" }
       let(:home_page_url) { "https://www.example.com/foo/" }
 
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
   end
 end
