@@ -8,8 +8,18 @@ RSpec.describe Checks::FindAccessibilityPage do
   describe "#analyze!" do
     subject(:analyze) { check.send(:analyze!) }
 
-    it "returns a hash with :url and :title" do
-      expect(analyze).to eq({ url: audit.accessibility_page_url })
+    context "when no accessibility page was found" do
+      before do
+        audit.update!(accessibility_page_url: nil)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when the accessibility page was found and its URL stored" do
+      it "returns a hash with the URL" do
+        expect(analyze).to eq(url: "#{root_url}/accessibility")
+      end
     end
   end
 

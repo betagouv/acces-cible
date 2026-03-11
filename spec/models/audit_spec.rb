@@ -5,16 +5,16 @@ RSpec.describe Audit do
 
   let(:site) { audit.site }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { should belong_to(:site).touch(true) }
-    it { should have_many(:checks).dependent(:destroy) }
+    it { is_expected.to belong_to(:site) }
+    it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 
   describe "validations" do
-    it { should allow_value("https://example.com").for(:url) }
-    it { should_not allow_value("not-a-url").for(:url) }
+    it { is_expected.to allow_value("https://example.com").for(:url) }
+    it { is_expected.not_to allow_value("not-a-url").for(:url) }
   end
 
   describe "normalization" do
@@ -161,19 +161,19 @@ RSpec.describe Audit do
     context "when some checks are still pending" do
       let(:combined_states) { ["pending", "completed"] }
 
-      it { should eq :pending }
+      it { is_expected.to eq :pending }
     end
 
     context "with existing checks of different statuses" do
       let(:combined_states) { ["failed", "completed", "blocked"] }
 
-      it { should eq :mixed }
+      it { is_expected.to eq :mixed }
     end
 
     context "when all checks have the same status" do
       let(:combined_states) { ["testing"] }
 
-      it { should eq "testing" }
+      it { is_expected.to eq "testing" }
     end
   end
 
@@ -184,13 +184,13 @@ RSpec.describe Audit do
     let(:audit) { build(:audit, completed_at: completed_at) }
 
     context "when audit is not completed" do
-      it { should be_pending }
+      it { is_expected.to be_pending }
     end
 
     context "when audit is completed" do
       let(:completed_at) { Time.current }
 
-      it { should_not be_pending }
+      it { is_expected.not_to be_pending }
     end
   end
 

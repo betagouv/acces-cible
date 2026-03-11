@@ -3,15 +3,15 @@ require "rails_helper"
 RSpec.describe Check do
   subject(:check) { build(:check, :accessibility_mention) }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { should belong_to(:audit) }
+    it { is_expected.to belong_to(:audit) }
   end
 
   describe "delegations" do
-    it { should delegate_method(:parsed_url).to(:audit) }
-    it { should delegate_method(:human_type).to(:class) }
+    it { is_expected.to delegate_method(:parsed_url).to(:audit) }
+    it { is_expected.to delegate_method(:human_type).to(:class) }
   end
 
   describe "class methods" do
@@ -156,7 +156,7 @@ RSpec.describe Check do
         })
       end
 
-      it { should include(error_type: "StandardError", message: "Test error message") }
+      it { is_expected.to include(error_type: "StandardError", message: "Test error message") }
     end
   end
 end

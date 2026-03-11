@@ -3,27 +3,27 @@ require "rails_helper"
 RSpec.describe User do
   subject(:user) { build(:user) }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "validations" do
     context "for uid" do
-      it { should allow_value("12345678901234").for(:uid) }
-      it { should allow_value("abcdef").for(:uid) }
+      it { is_expected.to allow_value("12345678901234").for(:uid) }
+      it { is_expected.to allow_value("abcdef").for(:uid) }
     end
 
     context "for email" do
-      it { should allow_value("me@mail.com").for(:email) }
-      it { should_not allow_value("not an email, even though there's an @ somewhere").for(:email) }
+      it { is_expected.to allow_value("me@mail.com").for(:email) }
+      it { is_expected.not_to allow_value("not an email, even though there's an @ somewhere").for(:email) }
     end
 
     context "for name" do
-      it { should allow_value("Yan Zhu").for(:name) }
-      it { should_not allow_value("").for(:name) }
+      it { is_expected.to allow_value("Yan Zhu").for(:name) }
+      it { is_expected.not_to allow_value("").for(:name) }
     end
 
     context "for siret" do
-      it { should allow_value("86043616100852").for(:siret) }
-      it { should_not allow_value("").for(:siret) }
+      it { is_expected.to allow_value("86043616100852").for(:siret) }
+      it { is_expected.not_to allow_value("").for(:siret) }
     end
   end
 

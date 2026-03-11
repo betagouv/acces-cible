@@ -15,7 +15,7 @@ RSpec.describe CheckHelper do
           def check.custom_badge_text = "foobar"
         end
 
-        it { should eq "foobar" }
+        it { is_expected.to eq "foobar" }
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe CheckHelper do
                 .and_return "state"
       end
 
-      it { should eq "state" }
+      it { is_expected.to eq "state" }
     end
   end
 
@@ -39,7 +39,7 @@ RSpec.describe CheckHelper do
     context "when then check is not finished" do
       let(:state) { :pending }
 
-      it { should be_nil }
+      it { is_expected.to be_nil }
     end
 
     context "when the check is finished" do
@@ -50,7 +50,7 @@ RSpec.describe CheckHelper do
           def check.custom_badge_link = "link"
         end
 
-        it { should eq "link" }
+        it { is_expected.to eq "link" }
       end
     end
   end
@@ -67,7 +67,7 @@ RSpec.describe CheckHelper do
       context "when the check is in the #{state} state" do
         let(:state) { state }
 
-        it { should eq expected_badge_level }
+        it { is_expected.to eq expected_badge_level }
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe CheckHelper do
           def check.custom_badge_status = :foobar
         end
 
-        it { should eq :foobar }
+        it { is_expected.to eq :foobar }
       end
 
       context "without a custom badge level" do
@@ -90,7 +90,7 @@ RSpec.describe CheckHelper do
                   .and_return false
         end
 
-        it { should eq :success }
+        it { is_expected.to eq :success }
       end
     end
   end

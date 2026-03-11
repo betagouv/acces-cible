@@ -5,18 +5,18 @@ RSpec.describe Site do
 
   let(:url) { "https://example.com/" }
 
-  it { should be_valid }
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { should belong_to(:team).touch(true) }
-    it { should have_many(:audits).dependent(:destroy) }
+    it { is_expected.to belong_to(:team).touch(true) }
+    it { is_expected.to have_many(:audits).dependent(:destroy) }
 
-    it { should have_many(:site_tags).dependent(:destroy) }
-    it { should have_many(:tags).through(:site_tags) }
+    it { is_expected.to have_many(:site_tags).dependent(:destroy) }
+    it { is_expected.to have_many(:tags).through(:site_tags) }
   end
 
   describe "delegations" do
-    it { should delegate_method(:url).to(:audit) }
+    it { is_expected.to delegate_method(:url).to(:audit) }
 
     it "delegates to the most recent audit" do
       site = create(:audit, url: "https://example.com").site

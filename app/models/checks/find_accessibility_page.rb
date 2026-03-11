@@ -23,7 +23,7 @@ module Checks
     private
 
     def analyze!
-      { url: audit.accessibility_page_url }
+      { url: audit.accessibility_page_url } unless audit.accessibility_page_url.blank?
     end
   end
 end
