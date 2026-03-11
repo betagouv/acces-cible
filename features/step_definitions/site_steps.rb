@@ -51,6 +51,12 @@ Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibili
     .and_return(Page.new(url: "#{url}/accessibilité", root: "#{url}/accessibilité", html: str))
 end
 
+Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
+  allow(FindAccessibilityPageService)
+    .to receive(:find_page)
+    .and_return(nil)
+end
+
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
   fake_html = <<~HTML
         <html>
