@@ -20,11 +20,13 @@ module Checks
       "revu", "révisé", "révision", "réévaluation", "nouvelle évaluation",
       "dorénavant", "désormais", "maintenant", "actuellement", "inchangé",
     ].freeze
-
+    EMAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
+    CONTACT_FORM_REGEX = /aide|form|contact/i
+    MAILTO_PREFIX = "mailto:".freeze
     LAW_DATE = Date.new(2005, 2, 11)
     HEADERS_SCOPE = ["Établissement de cette déclaration d’accessibilité", "État de conformité", "Déclaration d’accessibilité", "Résultats des tests"]
 
-    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article
+    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article, :contact_email, :contact_form
 
     def tooltip?
       !(completed? && found_required?)
@@ -115,7 +117,30 @@ module Checks
       found_required? ? human_compliance_rate : t("checks.analyze_accessibility_page.missing_data")
     end
 
+    def find_contact_email
+      email_in_text = contact_section_text.scan(Page::MAIL_PATTERN).first
+      email_in_text = email_in_text&.gsub("(at)", "@")
+
+      return email_in_text if email_in_text.present?
+
+      page.mailto_addresses(between_headings: ["Retour d'information et contact", :next]).first
+    end
+
+    def find_contact_form
+      return if contact_links.blank?
+
+      contact_links.find { |link| CONTACT_FORM_REGEX.match?(link.text) || CONTACT_FORM_REGEX.match?(link.href) }&.href
+    end
+
     private
+
+    def contact_links
+      page.links(between_headings: ["Retour d'information et contact", :next])
+    end
+
+    def contact_section_text
+      page.text(between_headings: ["Retour d'information et contact", :next])
+    end
 
     def page
       @page ||= audit.page(:accessibility)
@@ -138,7 +163,9 @@ module Checks
         compliance_rate: find_compliance_rate,
         standard: find_standard,
         auditor: find_auditor,
-        mentions_article: find_article_mention
+        mentions_article: find_article_mention,
+        contact_email: find_contact_email,
+        contact_form: find_contact_form
       }
     end
 

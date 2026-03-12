@@ -99,6 +99,8 @@ fr:
       audit_date: Date de la déclaration
       audit_update_date: Déclaration mise à jour le
       auditor: Audit réalisé par
+      contact_email: Adresse email de contact
+      contact_form: Formulaire de contact
       compliance_rate: Taux de conformité
       found_all: Déclaration complète
       mentions_article: Mentionne l'article de loi

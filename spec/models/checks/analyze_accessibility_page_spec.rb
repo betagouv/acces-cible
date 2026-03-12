@@ -26,6 +26,146 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     end
   end
 
+  describe "#find_contact_email" do
+    context "when email is between two correct headings" do
+      context "when email is in text" do
+        {
+          "Contact : jessie@frazelle.com " => "jessie@frazelle.com",
+          "Contact : jessie(at)frazelle.com " => "jessie@frazelle.com",
+          "Contact : jessie@frazelle.com, emily@xie.com" => "jessie@frazelle.com",
+          "Contact : @emilyxie.com" => nil,
+        }.each do |text, expected_email|
+          it "extracts '#{expected_email}' from '#{text}'" do
+            allow(check).to receive(:page).and_return(build(:page, body: "<h1>Retour d'information et contact</h1><p>#{text}</p><h2>Autre</h2>"))
+            expect(check.find_contact_email).to eq(expected_email)
+          end
+        end
+      end
+
+      context "when email is a mailto" do
+        [
+          {
+            text: "Contactez-nous",
+            href: "mailto:emily@xie.com",
+            expected_result: "emily@xie.com"
+          },
+          {
+            text: "Parlons-en",
+            href: "mailto:@xie.com",
+            expected_result: nil
+          }
+        ].each do |test_case|
+          it "returns #{test_case[:expected_result]} for text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
+            body = <<~HTML
+              <h2>Retour d'information et contact</h2>
+              <a href="#{test_case[:href]}">#{test_case[:text]}</a>
+              <h2>Voies de recours</h2>
+            HTML
+            allow(check).to receive(:page).and_return(build(:page, body:))
+
+            expect(check.find_contact_email).to eq(test_case[:expected_result])
+          end
+        end
+      end
+
+      it "extracts an email from a mailto href without parameters" do
+        body = <<~HTML
+          <h2>Retour d'information et contact</h2>
+          <p><a href="mailto:jessie@frazelle.com?subject=Accessibilite">Nous ecrire</a></p>
+          <h2>Autre</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
+
+        expect(check.find_contact_email).to eq("jessie@frazelle.com")
+      end
+    end
+
+    context "when email is between the wrong headings" do
+      it "does not extract the email from the text" do
+        body = <<~HTML
+          <h2>État de conformité</h2>
+          <p>emily@xie.com</p>
+          <h2>Résultats des tests</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
+        expect(check.find_contact_email).to be_nil
+      end
+
+      it "does not extract the email from the mailto" do
+        body = <<~HTML
+          <h2>État de conformité</h2>
+              <a href="mailto:emily@xie.com">Email de contact</a>
+          <h2>Résultats des tests</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
+        expect(check.find_contact_email).to be_nil
+      end
+    end
+  end
+
+  describe "#find_contact_form" do
+    [
+      {
+        text: "Besoin d'aide ?",
+        href: "/demarches/42",
+        expected_result: "https://www.example.com/demarches/42"
+      },
+      {
+        text: "Parlons-en",
+        href: "/demarches/formulaire-contact",
+        expected_result: "https://www.example.com/demarches/formulaire-contact"
+      },
+      {
+        text: "Contactez-nous",
+        href: "/demarches/42",
+        expected_result: "https://www.example.com/demarches/42"
+      },
+      {
+        text: "Demande d'assistance",
+        href: "/aide",
+        expected_result: "https://www.example.com/aide"
+      },
+      {
+        text: "Demande d'assistance",
+        href: "https://www.example123.com/aide",
+        expected_result: "https://www.example123.com/aide"
+      },
+      {
+        text: "Parlons-en",
+        href: "/demarches/42",
+        expected_result: nil
+      },
+      {
+        text: "Contactez-nous",
+        href: "mailto:jessie@frazelle.com",
+        expected_result: nil
+      },
+    ].each do |test_case|
+      it "returns #{test_case[:expected_result]} for text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
+        body = <<~HTML
+          <h2>Retour d'information et contact</h2>
+          <p><a href="#{test_case[:href]}">#{test_case[:text]}</a></p>
+          <h2>Voies de recours</h2>
+        HTML
+        allow(check).to receive(:page).and_return(build(:page, body:))
+
+        expect(check.find_contact_form).to eq(test_case[:expected_result])
+      end
+    end
+
+    it "only searches links between the contact heading and the next heading" do
+      body = <<~HTML
+        <h2>Retour d'information et contact</h2>
+        <p>Emily Xie</p>
+        <h2>Voies de recours</h2>
+        <p><a href="/formulaire-contact">Formulaire de contact</a></p>
+      HTML
+      allow(check).to receive(:page).and_return(build(:page, body:))
+
+      expect(check.find_contact_form).to be_nil
+    end
+  end
+
   describe "#find_audit_date" do
     {
       "réalisé le 15 mars 2024" => Date.new(2024, 3, 15),

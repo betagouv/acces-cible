@@ -21,6 +21,16 @@
       <li><strong><%= t('.auditor') %></strong> : <%= check.auditor || t('.unknown') %></li>
       <li><strong><%= t('.mentions_article') %></strong>
         : <%= check.mentions_article ? t("shared.yes") : t("shared.no") %></li>
+      <li><strong><%= t('.contact_email') %></strong>
+        : <%= check.contact_email || t('.unknown') %></li>
+      <li><strong><%= t('.contact_form') %></strong>
+        :
+        <% if check.contact_form.present? %>
+          <%= link_to check.contact_form, check.contact_form %>
+        <% else %>
+          <%= t('.unknown') %>
+        <% end %>
+      </li>
     </ul>
   <% end %>
 </div>
