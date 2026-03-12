@@ -62,8 +62,6 @@ class Check < ApplicationRecord
   scope :remaining, -> { in_state(:pending, :blocked) }
   scope :errored, -> { in_state(:failed) }
 
-  broadcasts_refreshes_to ->(check) { "sites" }
-
   class << self
     def human_type
       I18n.t("checks.#{model_name.element}.type")
