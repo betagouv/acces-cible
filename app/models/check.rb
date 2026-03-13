@@ -1,12 +1,49 @@
 class Check < ApplicationRecord
+  has_many :check_transitions, autosave: false, dependent: :delete_all
+
+  include Statesman::Adapters::ActiveRecordQueries[
+            transition_class: CheckTransition,
+            initial_state: :pending
+          ]
+
+  def state_machine
+    @state_machine ||= CheckStateMachine.new(
+      self,
+      transition_class: CheckTransition,
+      association_name: :check_transitions,
+      initial_transition: false
+    )
+  end
+
+  delegate :current_state,
+           :transition_to,
+           :transition_to!,
+           :in_state?,
+           :can_transition_to?,
+           :last_transition,
+           to: :state_machine
+
+  # defines single word predicates for each state
+  CheckStateMachine.states.each do |state|
+    define_method "#{state}?" do
+      in_state?(state)
+    end
+  end
+
   TYPES = [
     :reachable,
     :language_indication,
     :accessibility_mention,
     :find_accessibility_page,
     :analyze_accessibility_page,
+    :analyze_schema,
+    :analyze_plan,
+    :accessibility_page_heading,
     :run_axe_on_homepage,
   ].freeze
+
+  # used to signal a check's `run` method has failed
+  class RuntimeError < StandardError; end
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
   REQUIREMENTS = [:reachable]
@@ -14,95 +51,99 @@ class Check < ApplicationRecord
   belongs_to :audit
   has_one :site, through: :audit
 
-  enum :status, ["pending", "passed", "failed", "blocked"].index_by(&:itself), validate: true, default: :pending
-  store_accessor :data, :error, :error_type, :backtrace
-
   delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
 
   after_initialize :set_priority
 
-  scope :due, -> { pending.where("run_at <= now()") }
-  scope :scheduled, -> { where(scheduled: true) }
-  scope :unscheduled, -> { where(scheduled: false) }
-  scope :to_schedule, -> { due.unscheduled }
-  scope :to_run, -> { due.scheduled }
   scope :prioritized, -> { order(:priority) }
+  scope :remaining, -> { in_state(:pending, :blocked) }
+  scope :errored, -> { in_state(:failed) }
 
   class << self
-    def human_type = human("checks.#{model_name.element}.type")
-    def table_header = human("checks.#{model_name.element}.table_header", default: human_type)
+    def human_type
+      I18n.t("checks.#{model_name.element}.type")
+    end
+
+    def table_header
+      I18n.t("checks.#{model_name.element}.table_header", default: human_type)
+    end
 
     def types
       @types ||= TYPES.index_with { |type| "Checks::#{type.to_s.classify}".constantize }.sort_by { |_name, klass| klass.priority }.to_h
     end
-    def names = types.keys
-    def classes = types.values
-    def priority = self::PRIORITY
-  end
 
-  def run_at = super || Time.current
-  def human_status = Check.human("status.#{status}")
-  def human_checked_at = checked_at ? l(checked_at, format: :long) : nil
-  def to_partial_path = model_name.i18n_key.to_s
-  def due? = persisted? && pending? && run_at <= Time.current
-  def root_page = @root_page ||= Page.new(url: audit.url)
-  def crawler = Crawler.new(audit.url)
-  def requirements = self.class::REQUIREMENTS # Returns subclass constant value, defaults to parent class
-  def waiting? = requirements&.any? { audit.check_status(it).pending? } || false
-  def blocked? = requirements&.any? { audit.check_status(it).failed? } || false
-  def cleared? = requirements.nil? || requirements.all? { audit.check_status(it).passed? }
-  def blocked! = update(status: :blocked, checked_at: Time.zone.now, scheduled: false)
-  def fail! = update(status: :failed, checked_at: Time.zone.now, scheduled: false)
+    def names
+      types.keys
+    end
 
-  def to_badge
-    [status_to_badge_level, status_to_badge_text, status_link].compact
-  end
+    def classes
+      types.values
+    end
 
-  def schedule!
-    transaction do
-      RunCheckJob.set(wait_for: 1.minute).perform_later(self)
-      update!(status: :pending, checked_at: nil, scheduled: true)
+    def priority
+      self::PRIORITY
     end
   end
 
-  def run
-    return schedule! if waiting?
-    return blocked! if blocked?
-
-    begin
-      self.checked_at = Time.zone.now
-      self.data = analyze!
-      self.status = :passed
-      passed?
-    rescue StandardError => e
-      self.status = :failed
-      self.data = { error: e.message, error_type: e.class.name, backtrace: Rails.backtrace_cleaner.clean(e.backtrace) }
-    end
-    save
-    passed?
+  def human_status
+    t("check.status.#{state_machine.current_state}")
   end
 
-  def original_error
-    error_type.constantize.new(error).tap { it.set_backtrace(backtrace) } if error
+  def to_partial_path
+    model_name.i18n_key.to_s
+  end
+
+  def root_page
+    @root_page ||= audit.page(:home)
+  end
+
+  def requirements
+    self.class::REQUIREMENTS
+  end
+
+  # Returns subclass constant value, defaults to parent class
+  def tooltip?
+    true
+  end
+
+  def run!
+    self.data = analyze!
+
+    save!
+  rescue StandardError => exception
+    raise Check::RuntimeError
+  end
+
+  def all_requirements_met?
+    requirements.all? { |requirement| audit.check_completed?(requirement) }
+  end
+
+  def depends_on?(requirement)
+    requirements.include?(requirement)
+  end
+
+  def to_requirement
+    type
+      .demodulize
+      .underscore
+      .to_sym
+  end
+
+  def error
+    error_type, message, backtrace = last_transition.metadata.slice("json_class", "m", "b").values
+    app_path = Rails.root.to_s
+    backtrace = backtrace.collect { it.sub(app_path, "") }
+    { error_type:, message:, backtrace: }
   end
 
   private
 
-  def analyze! = raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
-
-  def status_to_badge_level
-    case
-    when pending? then :info
-    when blocked? then :warning
-    when failed? then :error
-    when passed? && respond_to?(:custom_badge_status, true) then custom_badge_status
-    else :success
-    end
+  def analyze!
+    raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
   end
 
-  def status_to_badge_text = passed? && respond_to?(:custom_badge_text, true) ? custom_badge_text : human_status
-  def status_link = passed? && respond_to?(:custom_badge_link, true) ? custom_badge_link : nil
-
-  def set_priority = self.priority = self.class.priority
+  def set_priority
+    self.priority = self.class.priority
+  end
 end

@@ -1,155 +1,406 @@
 fr:
-  global:
-    sponsor: "Gouvernement"
-    sponsor_html: "Gouvernement"
-    service_name: "Accès cible"
-    service_description: "Contrôle l'accessibilité et la conformité des sites internet"
-
-  shared:
-    actions: "Actions"
-    confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
-    time_ago: "il y a %{time}"
-    time_until: "dans %{time}"
-    back_to_list: "Revenir à la liste"
-    new_window: " (nouvelle fenêtre)"
-
-  time:
-    formats:
-      compact: "%Y/%m/%d"
+  activemodel:
+    attributes:
+      site_upload:
+        file: Import
+    errors:
+      models:
+        site_upload:
+          attributes:
+            file:
+              invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
+              invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
+              invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
+  activerecord:
+    attributes:
+      site:
+        url: Adresse du site
+      tag:
+        name: Libellé
+    errors:
+      attributes:
+        url:
+          invalid: "n'est pas valide"
+    models:
+      site:
+        one: Site
+        other: Sites
+      team:
+        one: Équipe
+        other: Équipes
+  audit:
+    completed_at: Executé le
+    count:
+      one: Une vérification
+      other: "%{count} vérifications"
+      zero: Aucune vérification
+    new: "Nouvelle vérification"
+    redirect_url: URL de redirection
+    site_url_address: Adresse du site
+    state: État
+    status:
+      failed: Échoué
+      mixed: Mixte
+      passed: Effectué
+      pending: Planifié
+      retryable: À retenter
+      running: En cours
+    url: URL
+  audits:
+    create:
+      notice: Vérification créée
+  check:
+    attempts: Tentatives
+    completed_at: Vérification effectuée le
+    count:
+      one: Un contrôle
+      other: "%{count} contrôles"
+      zero: Aucun contrôle
+    state: État
+    status:
+      aborted: Annulé
+      blocked: Inapplicable
+      completed: Effectué
+      errored: Erreur
+      failed: Non trouvé
+      pending: Planifié
+      ready: Prêt
+      running: En cours
+    type: Type de contrôle
+  checks:
+    accessibility_mention:
+      mentions:
+        non: Non conforme
+        none: Non trouvée
+        partiellement: Partiellement conforme
+        totalement: Totalement conforme
+      table_header: Mention
+      type: Mention du niveau d'accessibilité
+    accessibility_page_heading:
+      allowed_level_differences: |
+        Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
+        Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
+      expectations: "Voici la hiérarchie attendue :"
+      explanation:
+        one: "Un seul problème relevé sur %{total} titres attendus (%{error})."
+        other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
+        zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
+      not_found: Non trouvé
+      retained: "Titre retenu :"
+      score: Taux de correspondance
+      statuses:
+        incorrect_level: niveau de titre incorrect
+        incorrect_order: ordre incorrect
+        missing: non trouvé
+        ok: valide
+      table_header: Titres
+      type: Titres de la déclaration d'accessibilité
+    analyze_accessibility_page:
+      audit_date: Date de la déclaration
+      audit_update_date: Déclaration mise à jour le
+      auditor: Audit réalisé par
+      compliance_rate: Taux de conformité
+      found_all: Déclaration complète
+      mentions_article: Mentionne l'article de loi
+      missing_data: Déclaration incomplète
+      standard: Référentiel
+      table_header: Taux de conformité
+      type: Analyse de la déclaration
+      unknown: Non détecté
+    analyze_plan:
+      all_passed: Lien trouvé et valide
+      invalid_years: Année(s) invalide(s)
+      link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
+      link_not_found: Lien non trouvé
+      link_text: Intitulé du lien
+      link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
+      link_url: Adresse du lien
+      nothing_found: Plan non trouvé
+      in_main_text: Plan trouvé dans le texte principal
+      table_header: Plan d'action
+      type: Plan d'action
+      year_not_found: non détectée
+      years: Année(s) du plan
+      years_not_found: Année(s) valides non trouvée(s)
+    analyze_schema:
+      all_passed: Lien trouvé et valide
+      invalid_years: Années invalides
+      link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
+      link_not_found: Lien non trouvé
+      link_text: Intitulé du lien
+      link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
+      link_url: Adresse du lien
+      nothing_found: Schéma non trouvé
+      in_main_text: Schéma trouvé dans le texte principal
+      table_header: Schéma
+      type: Schéma pluriannuel d'accessibilité
+      year_not_found: non détectées
+      years: Années de validité du schéma
+      years_not_found: Années valides non trouvées
+    find_accessibility_page:
+      link_to_page: "Déclaration d'accessibilité"
+      not_found: Non trouvée
+      table_header: Déclaration
+      type: Présence d'une déclaration d'accessibilité
+      view_page: "Voir la déclaration"
+    language_indication:
+      empty: Non trouvée
+      table_header: Langue
+      totalement: Totalement conforme
+      type: Indication de la langue
+    reachable:
+      reachable: Joignable à l'adresse indiquée
+      redirect_message: "Le site redirige de <b>%{original}</b> vers <b>%{redirected}</b>."
+      redirected: Redirection
+      type: Site joignable
+    run_axe_on_homepage:
+      checks_total: Contrôles effectués
+      elements_count:
+        one: un élément concerné
+        other: "%{count} éléments concernés"
+        zero: aucun élément concerné
+      impacts:
+        critical: critique
+        minor: impact mineur
+        moderate: impact modéré
+        serious: impact important
+      inapplicable: Contrôles inapplicables
+      incomplete: Contrôles incomplets
+      issues_total: Erreurs relevées
+      passes: Contrôles réussis
+      redirected: Contrôles
+      success_rate: Taux de réussite
+      table_header: "🤖 : Accueil"
+      type: "Contrôles automatiques : page d'accueil"
+      unknown: Inconnu
+      violations: Contrôles échoués
   date:
     formats:
       compact: "%Y/%m/%d"
-
+  dsfr:
+    pagination_component:
+      first: Première page
+      label: Pagination
+      last: Dernière page
+      next: Page suivante
+      page: "Page %{page}"
+      per_page:
+        one: Une ligne par page
+        other: "%{count} lignes par page"
+      per_page_label: Nombre de lignes par page
+      prev: Page précédente
   errors:
-    attributes:
-      url:
-        invalid: invalide
-
-  activerecord:
-    attributes:
-      audit:
-        checked_at: Executé le
-        status: État
-        new: "Nouvelle vérification"
-        count:
-          zero: Aucune vérification
-          one: Une vérification
-          other: "%{count} vérifications"
-      audit/status:
-        pending: Planifié
-        running: En cours
-        passed: Effectué
-        retryable: À retenter
-        failed: Échoué
-
-      check:
-        type: Type de contrôle
-        status: État
-        run_at: Vérification prévue le
-        checked_at: Vérification effectuée le
-        attempts: Tentatives
-      check/status:
-        pending: Planifié
-        running: En cours
-        passed: Effectué
-        blocked: Inapplicable
-        failed: Échoué
-      checks/accessibility_mention:
-        type: Mention du niveau d'accessibilité
-        table_header: Mention
-      checks/accessibility_mention/mentions:
-        none: Absente
-        non: Non conforme
-        partiellement: Partiellement conforme
-        totalement: Totalement conforme
-      checks/analyze_accessibility_page:
-        type: Informations sur l'audit
-        table_header: Audit
-        found_all: Déclaration complète
-        missing_data: Déclaration incomplète
-        unknown: Non détecté
-        audit_date: Date de l'audit
-        audit_update_date: Audit mis à jour le
-        compliance_rate: Taux de conformité
-        standard: Référentiel
-        auditor: Audit réalisé par
-      checks/find_accessibility_page:
-        type: Déclaration d'accessibilité
-        table_header: Déclaration
-        view_page: "Voir la déclaration"
-        link_to: "Déclaration d'accessibilité de %{name}"
-        not_found: Non trouvée
-      checks/language_indication:
-        type: Indication de la langue
-        table_header: Langue
-        empty: Absente
-        totalement: Totalement conforme
-      checks/reachable:
-        type: Site joignable
-        redirected: Redirection
-        reachable: Joignable à l'adresse indiquée
-      checks/run_axe_on_homepage:
-        type: "Contrôles automatiques : page d'accueil"
-        redirected: Contrôles
-        passes: Contrôles réussis
-        incomplete: Contrôles incomplets
-        inapplicable: Contrôles inapplicables
-        violations: Contrôles échoués
-        checks_total: Contrôles effectués
-        issues_total: Erreurs relevées
-        success_rate: Taux de réussite
-        unknown: Inconnu
-
-      site:
-        created_at: Enregistré le
-        updated_at: Date de mise à jour
-        url: Adresse du site
-        audits: Toutes les vérifications
-        audit_history: Historique des vérifications (%{total})
-        audits_count: Vérifications
-        last_audit_at: Dernière vérification
-        detail: Détails
-        view: Voir la fiche
-        view_name: Voir la fiche de %{name}
-        delete: Supprimer ce site
-        count:
-          zero: Aucun site
-          one: Un site
-          other: "%{count} sites"
-
-  errors:
-    not_found:
-      title: "Page non trouvée (erreur 404)"
     internal_server_error:
       title: "Problème technique (erreur 500)"
+    not_found:
+      title: "Page non trouvée (erreur 404)"
+  global:
+    service_description: "Contrôle l'accessibilité et la conformité des sites internet"
+    service_name: "Accès cible (version beta)"
+    sponsor: "Gouvernement"
+    sponsor_html: "Gouvernement"
   pages:
     accessibilite:
       title: Déclaration d’accessibilité
     accueil:
-      title: Accueil
+      stats:
+        sites_count:
+          one: Un site
+          other: "%{count} sites"
+          zero: Aucun site
+        teams_count:
+          one: Une équipe
+          other: "%{count} équipes"
+          zero: Aucune équipe
+      title: Présentation
     contact:
       title: Contact
     cookies:
       title: Gestion des cookies
+    display_mode:
+      dark: Thème sombre
+      legend: Choisissez un thème pour personnaliser l’apparence du site.
+      light: Thème clair
+      system: Système
+      system_hint: Utilise les paramètres système
+      title: Paramètres d’affichage
     donnees_personnelles:
       title: Gestion des données personnelles
+    help:
+      checks_documentation_title: Documentation des vérifications
+      need_help_description: Sélectionnez une section dans le menu de gauche pour en savoir plus.
+      need_help_title: Besoin d’aide ?
+      title: Aide
     mentions_legales:
       title: Mentions légales
     plan:
       title: Plan du site
-  sites:
-    index:
-      title: Tous les sites
+  sessions:
     new:
-      title: Ajouter un site
+      login_failed: Nous n'avons pas réussi à vous identifier.
+      title: Connexion à Accès Cible
+    omniauth:
+      success: Vous êtes maintenant connecté•e.
+  shared:
+    "no": Non
+    "yes": Oui
+    actions: Actions
+    add: Ajouter
+    all_lines: "toutes les lignes"
+    apply: Appliquer
+    applying: Appliquer…
+    asc: croissant
+    back_to_home: "Revenir à la page d'accueil"
+    back_to_list: "Revenir à la liste"
+    cancel: Annuler
+    confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
+    desc: décroissant
+    destroy_all: "Supprimer la sélection"
+    filter: Filtrer
+    help: Aide
+    import: Importer
+    importing: Import en cours…
+    lines:
+      one: 1 ligne
+      other: "%{count} lignes"
+      zero: 0 lignes
+    login: Se connecter
+    logout: Se déconnecter
+    new_window: " (nouvelle fenêtre)"
+    or: ou
+    page_unavailable: Cette page n'est pas disponible.
+    required_fields: Les champs obligatoires sont indiqués par un astérisque.
+    save: Enregistrer
+    saving: Enregistrement…
+    see_help: "Voir la page d'aide"
+    select_name: "Sélectionner %{name}"
+    selected_lines:
+      one: ligne sélectionnée
+      other: lignes sélectionnées
+    send: Envoyer
+    sort_by: "Trier par %{column} %{direction}"
+    x_more: Et %{x} de plus…
+  site:
+    name: "Nom du site"
+  sites:
+    add: Ajouter un site
+    all: Tous les sites
+    count:
+      one: Un site
+      other: "%{count} sites"
+      zero: Aucun site
     create:
-      notice: Site ajouté
-    edit:
-      title: Modifier le site
-    update:
-      notice: Site modifié
+      created: Site ajouté
+      new_audit: Site existant, nouvel audit programmé
     destroy:
       notice: Site supprimé
-  audits:
-    create:
-      notice: Vérification créée
+    bulk_destroy:
+      notice:
+        one: Un site supprimé
+        other: "%{count} sites supprimés"
+        zero: Aucun site supprimé
+    edit:
+      title: Modifier le site
+    form:
+      name: Nom du site
+      name_hint: "Nom utilisé pour l'affichage. S'il est laissé vide, il est récupéré automatiquement lors du prochain audit."
+      url: Adresse du site
+      url_hint: Saisissez une url valide, commençant par https:// ou http://
+    index:
+      caption: Tous les sites
+      deleting: Suppression…
+      detail: Détails
+      export_to_csv: Télécharger en CSV
+      last_audit_at: Dernière vérification
+      no_results: Aucun site à afficher.
+      no_search_results: Aucun site ne correspond à votre recherche.
+      tag_filter: Filtrer par étiquette
+      tags: Toutes les étiquettes
+      title: Tous les sites
+      url: Adresse du site
+    new:
+      file: Fichier CSV
+      file_hint: "Format attendu : fichier CSV avec une colonne obligatoire 'URL', une colonne 'Tags' optionnelle avec les tags séparés par une virgule, et une colonne optionnelle 'Nom'. Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
+      import: Importer des sites depuis un fichier
+      title: Ajouter un site
+    show:
+      audit_history: Historique des vérifications (%{total})
+      audits: Toutes les vérifications
+      audits_count: Vérifications
+      delete: Supprimer ce site
+      edit: Modifier ce site
+      new_audit: Nouvelle vérification
+      no_tag: Aucune étiquette
+      tag: Étiquette %{name}
+      url: Adresse du site
+    site:
+      view_name: Voir la fiche de %{name}
+    tags_form:
+      add: Créer une nouvelle étiquette
+      all: Toutes les étiquettes
+      new: Nouvelle étiquette
+    update:
+      notice: Site modifié
+    upload:
+      title: Importer des sites
+      uploaded:
+        one: Un site ajouté
+        other: "%{count} sites ajoutés"
+        zero: Aucun site ajouté
+  tag:
+    add: Créer une nouvelle étiquette
+    all: Toutes les étiquettes
+    count:
+      one: Une étiquette
+      other: "%{count} étiquettes"
+      zero: Aucune étiquette
+    delete: Supprimer cette étiquette
+    edit: Modifier cette étiquette
+    filter: Filtrer par étiquette
+    name: Libellé
+    new: Nouvelle étiquette
+    see_sites: Sites avec l'étiquette %{tag} (%{count})
+    sites: Sites
+    tag: Étiquette %{name}
+  tags:
+    all: Toutes les étiquettes
+    destroy:
+      notice: Étiquette supprimée
+    edit:
+      name: Libellé
+      title: Modifier l'étiquette
+    form:
+      add: Créer une nouvelle étiquette
+      all: Toutes les étiquettes
+      new: Nouvelle étiquette
+    index:
+      caption: Toutes les étiquettes
+      empty: Aucune étiquette
+      name: Libellé
+      see_sites: "Sites avec l'étiquette %{tag} (%{count})"
+      sites: Sites
+      title: Toutes les étiquettes
+    show:
+      delete: Supprimer cette étiquette
+      edit: Modifier cette étiquette
+      name: Libellé
+      see_sites: "Sites avec l'étiquette %{tag} (%{count})"
+    update:
+      notice: Étiquette modifiée
+  team:
+    all: Équipes
+    count:
+      one: Une équipe
+      other: "%{count} équipes"
+      zero: Aucune équipe
+  time:
+    formats:
+      compact: "%Y/%m/%d"
+      complete: "%d/%m/%Y à %H:%M"
+      file: "%Y%m%d-%Hh%M"
+  users:
+    show:
+      email: Adresse électronique
+      profile: Profil utilisateur
+      siret: SIRET
+      team: Équipe

@@ -1,37 +1,57 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
-  <head>
-    <title><%= head_title %></title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<html lang="<%= I18n.locale %>" data-fr-scheme="system">
+<head>
+  <title><%= head_title %></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
+  <%= javascript_tag nonce: true do %>
+    // Applique le thème le plus tôt possible pour éviter un flash of light mode
+    const e="system",t="dark",c="dark",o="data-fr-theme",a="data-fr-scheme",r=`:root[${o}], :root[${a}]`,m=()=>{document.documentElement.setAttribute(o,c),document.documentElement.style.colorScheme="dark"},n=()=>{window.matchMedia("(prefers-color-scheme: dark)").matches&&m()};
+    (()=>{if(document.documentElement.matches(r)){const c=(()=>{try{return"localStorage"in window&&null!==window.localStorage}catch(e){return!1}})()?localStorage.getItem("scheme"):"",o=document.documentElement.getAttribute(a);switch(!0){case c===t:m();break;case c===e:n();break;case o===t:m();break;case o===e:n()}}})();
+  <% end %>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= action_cable_meta_tag %>
 
-    <%= stylesheet_link_tag "dsfr.min", "application-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "utility/dsfr-utility.min", "application-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "dsfr.min", "application-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "utility/dsfr-utility.min", "application-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "dsfr.nomodule.min.js", nomodule: true %>
-    <%= yield :head %>
-  </head>
+  <%= javascript_importmap_tags %>
+  <%= javascript_include_tag "dsfr.nomodule.min", nonce: true, nomodule: true %>
+  <%= turbo_refreshes_with scroll: :preserve %>
+  <%= yield :head %>
+</head>
 
-  <body>
-    <%= render "shared/skiplinks" %>
-    <%= render "shared/header" %>
+<body>
+<%= render "shared/skiplinks" %>
+<%= render "shared/header" %>
 
-    <div class="fr-container">
-      <main class="fr-py-2w" id="main">
-        <%= render "shared/flash" %>
-        <h1><%= page_title %></h1>
-        <%= yield %>
-      </main>
-    </div>
+<div class="fr-container">
+  <main class="fr-pt-5w fr-mb-5w" id="main">
+    <% if content_for?(:center_layout) %>
+      <div class="fr-container fr-mt-8v fr-mt-md-14v fr-mb-2v fr-mb-md-8v <%= "fr-background-alt--grey fr-py-10v fr-py-md-14v" if content_for?(:boxed_layout) %>">
+        <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+          <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
+            <%= render "shared/flash" %>
+            <h1><%= page_title %></h1>
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <%= render "shared/flash" %>
+      <h1><%= page_title %></h1>
+      <%= yield %>
+    <% end %>
+  </main>
+</div>
 
-    <%= render "shared/footer" %>
-  </body>
+<%= render "shared/footer" %>
+<%= turbo_frame_tag :modal %>
+</body>
 </html>

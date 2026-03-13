@@ -1,15 +1,28 @@
-<div id="<%= dom_id check %>">
-  <h2 class="fr-h4"><%= check.human_type %></h2>
-  <%= badge check.to_badge %>
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge to_badge(check) %>
 
-  <% if check.passed? %>
-    <ul>
-      <li><strong><%= check.human(:checks_total) %></strong> : <%= number_to_human(check.checks_total) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:inapplicable) %></strong> : <%= number_to_human(check.inapplicable) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:incomplete) %></strong> : <%= number_to_human(check.incomplete) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:violations) %></strong> : <%= number_to_human(check.violations) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:passes) %></strong> : <%= number_to_human(check.passes) || check.human(:unknown) %></li>
-      <li><strong><%= check.human(:success_rate) %></strong> : <%= check.human_success_rate %></li>
-    </ul>
+  <% if check.completed? %>
+    <p>
+      <strong><%= t('.success_rate') %></strong> :
+      <%= check.human_success_rate %>
+      (<%= check.passes + check.incomplete %>/<%= check.applicable_total %>)
+    </p>
+  <% end %>
+
+  <%= dsfr_accordion do |accordion| %>
+    <% check.violation_data.each do |violation| %>
+      <% accordion.with_section title: "#{violation.help} (#{violation.human_impact})" do %>
+        <p><%= dsfr_link_to violation.description, violation.help_url, target: :_blank, rel: :noopener %></p>
+        <p><strong><%= t('.elements_count', count: violation.nodes_count) %></strong></p>
+        <% if violation.nodes %>
+          <ol>
+            <% violation.nodes_html.each do |html| %>
+            <li><%= html %></li>
+            <% end %>
+          </ol>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

@@ -4,29 +4,58 @@ module Dsfr
   class TableComponent < ApplicationComponent
     renders_one :head
     renders_one :body
+    renders_one :search, DsfrComponent::SearchComponent
+    renders_many :header_actions
+    renders_many :footer_actions
 
     SIZES = [:sm, :md, :lg].freeze
 
-    def initialize(caption:, size: :md, scroll: true, border: false, html_attributes: {})
+    def initialize(caption:, pagy: nil, html_attributes: {}, **options)
       @caption = caption
-      @size = size.to_sym
-      @scroll = scroll
-      @border = border
+      @pagy = pagy
+      options[:scroll] = options.fetch(:scroll, true)
+      options[:size] = options[:size]&.to_sym || :md
+      @options = options
       @html_attributes = html_attributes
 
-      raise ArgumentError, "size must be one of: #{SIZES.join(', ')}" unless SIZES.include?(@size)
+      raise ArgumentError, "size must be one of: #{SIZES.join(', ')}" unless SIZES.include?(size)
     end
 
     private
 
-    attr_reader :caption, :size, :border, :scroll, :html_attributes
+    attr_reader :caption, :pagy, :html_attributes
+    store_accessor :options, :size, :border, :scroll, :caption_side
+
+    def wrapper_attributes
+      html_attributes.merge(class: table_classes, data: { controller: :table, table_hidden_class: "fr-hidden" })
+    end
 
     def table_classes
-      classes = ["fr-table"]
-      classes << "fr-table--#{size}" if [:sm, :lg].include?(size)
-      classes << "fr-table--border" if border
-      classes << "fr-table--no-scroll" unless scroll
-      classes.join(" ")
+      class_names(
+        html_attributes.delete(:class),
+        "fr-table",
+        "fr-table--#{size}" => [:sm, :lg].include?(size),
+        "fr-table--border" => border,
+        "fr-table--no-scroll" => !scroll,
+        "fr-table--no-caption" => caption_side == :hidden,
+        "fr-table--caption-bottom" => caption_side == :bottom,
+      )
+    end
+
+    def paginated?
+      pagy.present?
+    end
+
+    def pagination
+      (PaginationComponent.new(pagy:) if pagy)
+    end
+
+    def header_actions?
+      header_actions.any?
+    end
+
+    def header?
+      search? || header_actions?
     end
   end
 end

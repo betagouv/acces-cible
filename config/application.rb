@@ -33,6 +33,7 @@ module AccesCible
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: ["assets", "tasks"])
+    config.autoload_paths << "#{config.root}/app/components/concerns"
 
     # Display custom error pages
     config.exceptions_app = routes
@@ -45,14 +46,18 @@ module AccesCible
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Don't generate system test files.
+    # Setup time zone
+    config.time_zone = "Paris"
+    config.active_record.default_timezone = :utc
+
+    # Don't generate unneeded files
     config.generators do |generate|
       generate.helper = false
       generate.controller_specs = false
       generate.request_specs = false
       generate.routing_specs = false
       generate.view_specs = false
-      generate.system_tests = false
+      generate.system_tests = nil
     end
   end
 end

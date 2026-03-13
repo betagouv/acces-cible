@@ -1,0 +1,53 @@
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge to_badge(check) %>
+
+  <p>
+    <%= t('.allowed_level_differences') %>
+    <br>
+    <% if check.completed? && check.comparison.present? %>
+    <%= check.human_explanation %>
+    <% else %>
+      <%= t('.expectations') %>
+    <% end %>
+  </p>
+  <ul class="fr-raw-list fr-mt-2w">
+    <% if check.completed? && check.comparison.present? %>
+      <% check.heading_statuses.each do |heading_status| %>
+        <li class="fr-mb-2w">
+          <% if heading_status.ok? %>
+            <%= icon(:checkbox, class: "fr-mr-1v fr-label--success") %>
+          <% elsif heading_status.warning? %>
+            <%= icon(:warning, class: "fr-mr-1v fr-label--error") %>
+          <% else %>
+            <%= icon(:close, :circle, class: "fr-mr-1v fr-label--error") %>
+          <% end %>
+          <strong>
+            <code>&lt;h<%= heading_status.expected_level %>&gt;</code>
+            <%= heading_status.expected_heading %>
+            <code>&lt;/h<%= heading_status.expected_level %>&gt;</code>
+          </strong>
+          <% unless heading_status.ok? %>
+            (<%= heading_status.message %>)
+          <% end %>
+          <% if heading_status.fuzzy_match? %>
+            <p class="fr-ml-4w fr-mb-0">
+              <%= t('.retained') %>
+              <cite><%= heading_status.actual_heading %></cite>
+            </p>
+          <% end %>
+        </li>
+      <% end %>
+    <% else %>
+      <% Checks::AccessibilityPageHeading::EXPECTED_HEADINGS.each do |level, heading| %>
+        <li class="fr-mb-2w">
+          <strong>
+            <code>&lt;h<%= level %>&gt;</code>
+            <%= heading %>
+            <code>&lt;/h<%= level %>&gt;</code>
+          </strong>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

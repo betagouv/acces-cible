@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+RAILS_ENV=test bundle exec rake rspec_watcher:watch

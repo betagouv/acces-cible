@@ -1,10 +1,24 @@
 class SitesController < ApplicationController
-  before_action :set_site, except: [:index, :create]
+  include ActionController::Live
+  before_action :set_site, only: [:show, :edit, :update, :destroy]
+  before_action :set_sites, only: :index
+  before_action :set_bulk_sites, only: :bulk_destroy
   before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
 
   # GET /sites
   def index
-    @pagy, @sites = pagy Site.sort_by_audit_date.includes(:audit)
+    params[:sort] ||= { completed_at: :desc }
+    @tags = current_user.team.tags.in_alphabetical_order
+
+    respond_to do |format|
+      format.html do
+        @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params), limit: pagy_limit
+      end
+      format.csv do
+        set_csv_headers
+        stream_csv
+      end
+    end
   end
 
   # GET /sites/1
@@ -20,12 +34,24 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    @site = Site.find_or_create_by_url(site_params)
-    if @site.persisted?
-      @site.audit.schedule if @site.audit.pending?
-      redirect_to @site, notice: t(".notice")
+    url = site_params[:url]
+    @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
+    @site.assign_attributes(site_params)
+    notice = t(@site.new_record? ? ".created" : ".new_audit")
+    if @site.save
+      redirect_to @site, notice:
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
+    end
+  end
+
+  # POST /sites/upload
+  def upload
+    @upload = SiteUpload.new(site_upload_params)
+    if @upload.save
+      redirect_to sites_path, notice: t(".uploaded", count: @upload.count)
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -34,7 +60,7 @@ class SitesController < ApplicationController
     if @site.update(site_params)
       redirect_to @site, notice: t(".notice"), status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -44,10 +70,43 @@ class SitesController < ApplicationController
     redirect_to sites_path, notice: t(".notice"), status: :see_other
   end
 
+  # DELETE /sites
+  def bulk_destroy
+    count = @sites.count
+    @sites.in_batches(of: 100) { |batch| batch.destroy_all }
+    redirect_back fallback_location: sites_path, notice: t(".notice", count:), status: :see_other
+  end
+
   private
 
+  def set_csv_headers
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    response.headers["Content-Disposition"] = "attachment; filename=#{SiteCsvExport.filename}"
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Last-Modified"] = Time.now.httpdate
+  end
+
+  def stream_csv
+    SiteCsvExport.stream_csv_to(response.stream, @sites)
+  ensure
+    response.stream.close
+  end
+
+  def sites_scope
+    current_user.team.sites
+  end
   def set_site
-    @site = params[:id].present? ? Site.friendly.find(params.expect(:id)) : Site.new
+    @site = sites_scope.preloaded.friendly.find(params.expect(:id))
+  end
+
+  def set_sites
+    @sites = sites_scope
+  end
+
+
+  def set_bulk_sites
+    ids = params.expect(id: [])
+    @sites = sites_scope.where(id: ids)
   end
 
   def redirect_old_slugs
@@ -55,6 +114,10 @@ class SitesController < ApplicationController
   end
 
   def site_params
-    params.expect(site: [:url])
+    params.expect(site: [:url, :name, tag_ids: [], tags_attributes: [:name]])
+  end
+
+  def site_upload_params
+    params.expect(site_upload: [:file, [tag_ids: [], tags_attributes: [:name]]]).merge(team: current_user.team)
   end
 end

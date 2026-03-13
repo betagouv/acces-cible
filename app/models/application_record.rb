@@ -1,14 +1,46 @@
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
-  delegate :l, to: :I18n
-  delegate :human, :human_count, to: :class
-  delegate :helpers, to: ApplicationController
+  delegate :l, :t, to: :I18n
+  delegate :to_percent, :helpers, to: :class
+  delegate :report, to: ErrorHelper
 
   class << self
-    alias human human_attribute_name
-    def human_count(count, attr = nil) = human(attr || :count, count:)
+    delegate :helpers, to: ApplicationController
+
+    def to_percent(number, **options)
+      helpers.number_to_percentage(number, options.with_defaults(precision: 2, strip_insignificant_zeros: true))
+    end
+
+    def bulk_reset_counter(association, counter: nil)
+      counter ||= "#{association}_count"
+      reflection = reflect_on_association(association)
+      raise ArgumentError, "Association #{association} not found in #{self.name} model" unless reflection
+
+      unless [:has_many, :has_and_belongs_to_many].include?(reflection.macro)
+        raise ArgumentError, "Association #{association} must be has_many or has_and_belongs_to_many"
+      end
+
+      reflection = reflection.through_reflection if reflection.through_reflection?
+      case
+      when reflection.macro == :has_many
+        table = reflection.klass.table_name
+        foreign_key = reflection.foreign_key
+      when reflection.macro == :has_and_belongs_to_many
+        table = reflection.join_table
+        foreign_key = reflection.association_foreign_key
+      end
+
+      update_all("#{counter} = (SELECT count(*) FROM #{table} WHERE #{table}.#{foreign_key} = #{table_name}.#{primary_key})")
+    end
+
+    def human_count(count = nil)
+      count ||= self.count
+      "#{count} #{model_name.human(count:).downcase}"
+    end
   end
 
-  def to_title = respond_to?(:name) ? name : to_s
+  def to_title
+    respond_to?(:name) ? name : to_s
+  end
 end

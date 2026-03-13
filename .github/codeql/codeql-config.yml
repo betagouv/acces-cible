@@ -1,0 +1,7 @@
+name: "CodeQL Config"
+
+paths-ignore:
+  - "config/credentials.yml.enc"
+  - "config/credentials/*.yml.enc"
+  - "config/master.key"
+  - "config/credentials/*.key"

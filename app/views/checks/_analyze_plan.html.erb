@@ -1,0 +1,42 @@
+<div class="fr-mb-5w" id="<%= dom_id check %>">
+  <h2 class="fr-h4 fr-mb-1w"><%= check.human_type %></h2>
+  <%= badge to_badge(check) %>
+
+  <% if check.completed? %>
+    <ul>
+      <% if check.link_url %>
+        <li>
+          <strong><%= t('.link_text') %> :</strong>
+          <%= check.link_text %>
+        </li>
+        <li>
+          <strong><%= t('.link_url') %> :</strong>
+          <%= link_to check.link_url, check.link_url, target: :_blank %>
+          <% if !check.reachable %>
+            <br><%= t('.link_unreachable') %>
+          <% end %>
+          <% if check.link_misplaced %>
+            <br><%= t('.link_misplaced') %>
+          <% end %>
+        </li>
+      <% elsif check.text %>
+        <li>
+          <strong><%= t('.in_main_text') %> :</strong>
+          <%= check.text %>
+        </li>
+      <% else %>
+        <li>
+          <strong><%= t('.nothing_found') %></strong>
+        </li>
+      <% end %>
+      <li>
+        <strong><%= t('.years') %> :</strong>
+        <% if check.years.present? %>
+          <%= check.years.join("-") %>
+        <% else %>
+          <%= t('.year_not_found') %>
+        <% end %>
+      </li>
+    </ul>
+  <% end %>
+</div>

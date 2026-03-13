@@ -1,17 +1,37 @@
 services:
-  web:
+  web: &server
     build:
       dockerfile: Dockerfile.dev
     image: acces_cible
     environment:
       DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
+      RUBY_DEBUG_HOST: 0.0.0.0
+      RUBY_DEBUG_NO_RELINE: true
+      RUBY_DEBUG_PORT: 12345
+      WEB_CONCURRENCY: 0
     ports:
       - "3000:3000"
     volumes:
       - "./:/app"
       - "/app/node_modules"
+    depends_on:
+      - db
+  css-watcher:
+    <<: *server
+    command: ["bin/rails", "dartsass:watch"]
+    ports: []
+    entrypoint: ''
+  jobs:
+    <<: *server
+    command: "bin/jobs"
+    entrypoint: ''
+    ports: []
+    environment:
+      DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
+      RUBY_DEBUG_PORT: 3500
+      RUBY_DEBUG_PORT_RANGE: 10
   db:
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_PASSWORD: 'dummy'
       PGPORT: 5433

@@ -1,62 +1,123 @@
 class Audit < ApplicationRecord
-  belongs_to :site, touch: true, counter_cache: true
-  Check.types.each do |name, klass|
-    has_one name, class_name: klass.name, dependent: :destroy
-  end
+  belongs_to :site, counter_cache: true
+  has_many :checks, -> { prioritized }, dependent: :destroy
+
+  after_create_commit :fetch_resources!, :create_checks
 
   validates :url, presence: true, url: true
-  normalizes :url, with: ->(url) { URI.parse(url.strip).normalize.to_s }
+  normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
-  enum :status, [
-    "pending",    # Initial state, no checks started
-    "passed",     # All checks passed
-    "mixed",      # Some checks failed
-    "failed",     # All checks failed
-  ].index_by(&:itself), validate: true, default: :pending
-
-  scope :sort_by_newest, -> { order(checked_at: :desc) }
+  scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
-  scope :past, -> { where.not(status: :pending) }
+  scope :completed, -> { where.not(completed_at: nil) }
+  scope :current, -> { where(current: true) }
+  scope :with_check_transitions, -> { includes(checks: :check_transitions) }
 
-  delegate :hostname, :path, to: :parsed_url
+  Check.types.each do |name, klass|
+    define_method(name) do
+      instance_variable_get("@#{name}") ||
+        instance_variable_set("@#{name}", checks.to_a.find { |check| klass === check } || checks.build(type: klass))
+    end
+  end
 
-  after_create_commit :create_checks
+  def fetch_resources!
+    FetchResourcesJob.perform_later(self)
+  end
 
-  def parsed_url = @parsed_url ||= URI.parse(url).normalize
-  def url_without_scheme = @url_without_scheme ||= [hostname, path == "/" ? nil : path].compact.join(nil)
-  def checks = Check.where(audit: self)
-  def schedule = RunAuditJob.perform_later(self)
+  def page(kind)
+    kind = kind.to_s.to_sym
+    page_url = page_url_for(kind)
 
-  def all_checks
-    Check.names.map { |name| send(name) || send(:"build_#{name}") }
+    return if page_url.nil?
+
+    build_page(kind, page_url)
+  end
+
+  def check_completed?(identifier)
+    send(identifier).completed?
   end
 
   def create_checks
-    all_checks.select(&:new_record?).each(&:save)
-    all_checks
+    Check.types.each_value { |klass| checks.create!(type: klass.name) }
   end
 
-  def check_status(check)
-    (send(check)&.status || :pending).to_s.inquiry
+  def all_check_states
+    checks.collect(&:current_state)
   end
 
-  def derive_status_from_checks
-    new_status = if all_checks.any?(&:new_record?)
-       :pending
-    elsif (check_statuses = all_checks.collect(&:status).uniq).one?
-       check_statuses.first
+  def pending?
+    completed_at.nil?
+  end
+
+  def status_from_checks
+    states = all_check_states
+
+    if states.uniq.one?
+      states.first
+    elsif states.include?("pending")
+      :pending
     else
-       :mixed
+      :mixed
     end
-    update(status: new_status)
   end
 
-  def set_checked_at
-    latest_checked_at = checks.collect(&:checked_at).compact.sort.last
-    update(checked_at: latest_checked_at)
+  def complete?
+    checks.remaining.none?
   end
 
-  def checked?(name)
-    public_send(name)&.passed?
+  def after_check_completed
+    if complete?
+      update!(completed_at: Time.zone.now)
+      site.set_current_audit!
+    else
+      ProcessAuditJob.perform_later(self)
+    end
+  end
+
+  def abort_dependent_checks!(check)
+    checks
+      .remaining
+      .filter { |other_check| other_check.depends_on?(check.to_requirement) }
+      .each { |other_check| other_check.transition_to!(:aborted) }
+  end
+
+  def update_home_page!(url, html)
+    update!(
+      home_page_url: url,
+      home_page_html: html
+    )
+  end
+
+  def update_accessibility_page!(url, html)
+    update!(
+      accessibility_page_url: url,
+      accessibility_page_html: html
+    )
+  end
+
+  private
+
+  def build_page(kind, page_url)
+    snapshot_html = html_for(kind)
+
+    Page.new(url: page_url, root: url, html: snapshot_html)
+  end
+
+  def page_url_for(kind)
+    case kind
+    when :home
+      url
+    when :accessibility
+      find_accessibility_page&.url
+    else
+      raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
+    end
+  end
+
+  def html_for(kind)
+    case kind
+    when :home then home_page_html
+    when :accessibility then accessibility_page_html
+    end
   end
 end

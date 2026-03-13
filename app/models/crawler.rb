@@ -1,65 +1,50 @@
 class Crawler
-  include Enumerable
-  MAX_CRAWLED_PAGES = 100
+  MAX_CRAWLED_PAGES = 5
 
-  class NoMatchError < StandardError
-    def initialize(root, crawled, &block)
-      super("Crawled #{crawled.size} pages starting from #{root} but #{block} found no match.")
-    end
-  end
-  class CrawlLimitReachedError < StandardError
-    def initialize(root, crawl_up_to)
-      super("Stopping after crawling #{crawl_up_to} pages starting from #{root}.")
-    end
-  end
-
-  def initialize(root, crawl_up_to: nil)
-    @root = Link.new(root)
+  def initialize(root, crawl_up_to: nil, root_page_html: nil, queue: nil)
+    @root = Link.from(Link.root_from(root))
     @crawl_up_to = crawl_up_to || MAX_CRAWLED_PAGES
-    @queue = LinkList.new(root)
+    @root_page_html = root_page_html
+    @queue = queue || LinkList.new(root)
     @crawled = LinkList.new
   end
 
-  def find(&block)
-    found = nil
-    detect { |page, queue| found = page if block.call(page, queue) }
-    found or raise NoMatchError.new(root, crawled, &block)
+  def find_page(&block)
+    each_page { |page| return page if block.call(page) }
   end
 
   private
 
   attr_accessor :queue
-  attr_reader :root, :crawled, :crawl_up_to
+  attr_reader :root, :crawled, :crawl_up_to, :root_page_html
 
-  def each
+  def each_page
     while queue.any?
-      raise CrawlLimitReachedError.new(root, crawl_up_to) if crawled.size >= crawl_up_to
+      return if crawled.size >= crawl_up_to
+      page = get_page
 
-      next unless page = get_page
+      next unless page
 
-      enqueue page.internal_links
-      yield page, queue
-      break if queue.empty?
+      yield page
     end
+  end
+
+  def create_page!(link)
+    html = if link.href == root.href && root_page_html.present?
+      root_page_html
+    else
+      nil
+    end
+
+    Page.new(url: link.href, root: root.href, html: html)
   end
 
   def get_page
-    crawled << link = queue.shift
-    Rails.logger.info { "#{crawled.size}: Crawling #{link.href}" }
-    Page.new(url: link.href, root:)
-  rescue StandardError => e
-    case e
-    when Page::InvalidTypeError
-      Rails.logger.info { "Skipping non-HTML page #{link.href}" }
-    when SocketError, Timeout::Error, Errno::ECONNREFUSED
-      Rails.logger.warn { "Network error crawling #{link.href}: #{e.message}" }
-    else
-      Rails.logger.error { "Unexpected error crawling #{link.href}: #{e.message}" }
-    end
-    nil
-  end
+    link = queue.shift
+    return if crawled.include?(link.href)
+    return nil unless link
 
-  def enqueue(links)
-    queue.add(*links.reject { |link| crawled.include?(link) })
+    crawled << link
+    create_page!(link)
   end
 end

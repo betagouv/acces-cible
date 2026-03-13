@@ -1,49 +1,95 @@
 class Site < ApplicationRecord
   extend FriendlyId
 
-  has_many :audits, dependent: :destroy
-  has_one_of_many :audit, -> { past.sort_by_newest }, dependent: :destroy
+  belongs_to :team, touch: true
+  has_many :audits, -> { sort_by_newest }, dependent: :destroy
+  has_many :site_tags, dependent: :destroy
+  has_many :tags, -> { in_alphabetical_order }, through: :site_tags
+  accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  friendly_id :url_without_scheme, use: [:slugged, :history]
+  scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
+  scope :preloaded, -> { with_current_audit.includes(:tags, :slugs, audits: { checks: :check_transitions }) }
 
-  delegate :url, :url_without_scheme, to: :audit
+  after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
 
-  scope :sort_by_audit_url, -> do
-    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
-    subquery = joins(:audits)
-      .select("DISTINCT ON (sites.id) sites.*, #{sortable_url} as sortable_url")
-      .order("sites.id, sortable_url")
-    from(subquery, :sites).order(:sortable_url)
-  end
-  scope :sort_by_audit_date, -> do
-    joins("LEFT JOIN (
-        SELECT site_id, MAX(checked_at) as latest_check
-        FROM audits
-        GROUP BY site_id
-      ) latest_audits ON sites.id = latest_audits.site_id")
-    .order("latest_audits.latest_check DESC NULLS LAST, sites.created_at DESC")
-  end
+  friendly_id :url_without_scheme_and_www, use: [:slugged, :history, :scoped], scope: :team_id
+
+  delegate :url, to: :audit, allow_nil: true
+
+  validates :url, presence: true, url: true
+
+  broadcasts_refreshes
 
   class << self
-    def find_or_create_by_url(attributes)
+    def find_by_url(attributes)
       url = attributes.to_h.fetch(:url).strip
-      attributes.delete(:name) if attributes[:name].blank?
+      return if url.empty?
+
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
-      joins(:audits).find_by(audits: { url: normalized_url })&.tap { it.update(attributes) } || create(attributes)
+      joins(:audits).find_by(audits: { url: normalized_url })
     end
   end
 
   def url=(new_url)
-    audit = audits.build(url: new_url)
+    return if url == new_url
+
+    if audit.pending?
+      audit.url = new_url
+      audit.save if audit.persisted?
+    else
+      audits.build(url: new_url)
+    end
   end
 
-  def name = super.presence || url_without_scheme
-  alias to_title name
-  def audit = super || audits.last || audits.build
-  def should_generate_new_friendly_id? = new_record? || (audit && slug != url_without_scheme.parameterize)
+  def url_without_scheme_and_www
+    Link.url_without_scheme_and_www(audit.url)
+  end
+
+  def name_with_fallback
+    name.presence || url_without_scheme_and_www
+  end
+
+  alias to_title name_with_fallback
+  alias to_s name_with_fallback
+
+  def tags_attributes=(attributes)
+    return if (name = attributes[:name]).blank?
+
+    tags << team.tags.find_or_create_by(name:)
+  end
+
+  def should_generate_new_friendly_id?
+    new_record? || (slug != url_without_scheme_and_www.parameterize) || super
+  end
+
+  def update_slug!
+    tap { self.slug = nil; friendly_id }.save!
+  end
+
+  def audit
+    audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
+  end
 
   def audit!
-    audits.create(url:).tap(&:schedule).tap(&:persisted?)
+    audits.create!(url:, current: audits.current.none? || audits.none?)
+  end
+
+  def actual_current_audit
+    audits.completed.sort_by_newest.first || audits.sort_by_newest.first
+  end
+
+  def set_current_audit!
+    return if actual_current_audit && audit == actual_current_audit
+
+    transaction do
+      audit&.update!(current: false)
+      actual_current_audit&.update!(current: true)
+      update_slug!
+    end
+  end
+
+  def tags_list
+    tags.collect(&:name).join(", ")
   end
 end

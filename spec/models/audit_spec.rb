@@ -1,21 +1,15 @@
 require "rails_helper"
 
 RSpec.describe Audit do
-  subject(:audit) { build(:audit, site: nil) }
+  subject(:audit) { build(:audit) }
 
-  let(:site) { create(:site) }
+  let(:site) { audit.site }
 
-  it "has a valid factory" do
-    audit = build(:audit)
-    expect(audit).to be_valid
-  end
+  it { is_expected.to be_valid }
 
   describe "associations" do
-    it { is_expected.to belong_to(:site).touch(true) }
-
-    Check.names.each do |name|
-      it { is_expected.to have_one(name).dependent(:destroy) }
-    end
+    it { is_expected.to belong_to(:site) }
+    it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 
   describe "validations" do
@@ -30,23 +24,13 @@ RSpec.describe Audit do
     end
   end
 
-  describe "enums" do
-    it do
-      should define_enum_for(:status)
-        .validating
-        .with_values(["pending", "passed", "mixed", "failed"].index_by(&:itself))
-        .backed_by_column_of_type(:string)
-        .with_default(:pending)
-    end
-  end
-
   describe "scopes" do
     before { site.audit.destroy }
 
-    it ".sort_by_newest returns audits in descending order by checked_at date" do
-      oldest = create(:audit, site:, checked_at: 3.days.ago)
-      older = create(:audit, site:, checked_at: 2.days.ago)
-      newer = create(:audit, site:, checked_at: 1.day.ago)
+    it ".sort_by_newest returns audits in descending order by created_at date" do
+      oldest = create(:audit, site:, created_at: 3.days.ago)
+      older = create(:audit, site:, created_at: 2.days.ago)
+      newer = create(:audit, site:, created_at: 1.day.ago)
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
@@ -60,114 +44,222 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#parsed_url" do
-    it "returns a parsed and normalized URI" do
-      audit.url = "https://example.com/path/"
-      expect(audit.parsed_url).to be_a(URI::HTTPS)
-      expect(audit.parsed_url.to_s).to eq(audit.url)
+  describe "#page" do
+    subject(:page) { audit.page(kind) }
+
+    let(:audit) { create(:audit, :without_checks, url: "https://example.com") }
+    let(:mock_page) { instance_double(Page, html: nil) }
+
+    before do
+      allow(Page).to receive(:new).and_return(mock_page)
+    end
+
+    context "when kind is :home" do
+      let(:kind) { :home }
+
+      it "creates a Page with the audit url" do
+        expect(Page).to receive(:new).with(url: audit.url, root: audit.url, html: nil)
+        page
+      end
+
+      it "returns the Page instance" do
+        expect(page).to eq(mock_page)
+      end
+    end
+
+    context "when kind is :accessibility" do
+      let(:kind) { :accessibility }
+
+      context "when find_accessibility_page check has a url" do
+        let(:check) { instance_double(Checks::FindAccessibilityPage, url: "#{audit.url}/accessibilite") }
+
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(check)
+        end
+
+        it "creates a Page with the accessibility page url" do
+          expect(Page).to receive(:new).with(url: "#{audit.url}/accessibilite", root: audit.url, html: nil)
+          page
+        end
+
+        it "returns the Page instance" do
+          expect(page).to eq(mock_page)
+        end
+      end
+
+      context "when find_accessibility_page check has no url" do
+        let(:check) { instance_double(Checks::FindAccessibilityPage, url: nil) }
+
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(check)
+        end
+
+        it "returns nil" do
+          expect(page).to be_nil
+        end
+      end
+
+      context "when find_accessibility_page check does not exist" do
+        before do
+          allow(audit).to receive(:find_accessibility_page).and_return(nil)
+        end
+
+        it "returns nil" do
+          expect(page).to be_nil
+        end
+      end
+    end
+
+    context "when kind is nil" do
+      let(:kind) { nil }
+
+      it "raises an ArgumentError" do
+        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind ''/)
+      end
+    end
+
+    context "when kind is unrecognised" do
+      let(:kind) { :hmoe }
+
+      it "raises an ArgumentError" do
+        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind 'hmoe'/)
+      end
     end
   end
 
-  describe "#url_without_scheme" do
-    it "returns hostname for root path" do
-      audit.url = "https://example.com"
-      expect(audit.url_without_scheme).to eq("example.com")
+  describe "#status_from_checks" do
+    subject { audit.status_from_checks }
+
+    let(:combined_states) { [] }
+
+    before do
+      # FIXME: this isn't great but we haven't made enough progress to
+      # factor out the state logic out of the model and mock something
+      # else than the subject under test
+      allow(audit).to receive(:all_check_states).and_return combined_states # rubocop:disable RSpec/SubjectStub
     end
 
-    it "returns hostname and path for non-root path" do
-      audit.url = "https://example.com/path"
-      expect(audit.url_without_scheme).to eq("example.com/path")
+    context "when some checks are still pending" do
+      let(:combined_states) { ["pending", "completed"] }
+
+      it { is_expected.to eq :pending }
     end
 
-    it "memoizes the result" do
-      audit.url = "https://example.com"
-      first_result = audit.url_without_scheme
-      allow(audit).to receive(:hostname).and_return("different.com") # rubocop:disable RSpec/SubjectStub
-      expect(audit.url_without_scheme).to eq(first_result)
+    context "with existing checks of different statuses" do
+      let(:combined_states) { ["failed", "completed", "blocked"] }
+
+      it { is_expected.to eq :mixed }
+    end
+
+    context "when all checks have the same status" do
+      let(:combined_states) { ["testing"] }
+
+      it { is_expected.to eq "testing" }
     end
   end
 
-  describe "#all_checks" do
-    let(:audit) { build(:audit) }
+  describe "#pending?" do
+    subject { audit }
 
-    it "returns all checks, building missing ones" do
-      checks = audit.all_checks
-      expect(checks.size).to eq(Check.types.size)
-      expect(checks.all?(&:new_record?)).to be true
+    let(:completed_at) { nil }
+    let(:audit) { build(:audit, completed_at: completed_at) }
+
+    context "when audit is not completed" do
+      it { is_expected.to be_pending }
+    end
+
+    context "when audit is completed" do
+      let(:completed_at) { Time.current }
+
+      it { is_expected.not_to be_pending }
     end
   end
 
   describe "#create_checks" do
-    let(:audit) { create(:audit) }
+    subject(:create_checks) { audit.create_checks }
+
+    let(:audit) { create(:audit, :without_checks) }
 
     it "creates all check types" do
-      expect(audit.create_checks.size).to eq(Check.types.size)
-
-      Check.types.keys.each do |name|
-        expect(audit.public_send(name)).to be_persisted
-      end
+      expect { create_checks }.to change(Check, :count).by(Check.types.size)
     end
   end
 
-  describe "#derive_status_from_checks" do
+  describe "after_create callback" do
+    let(:audit) { build(:audit) }
+
+    it "calls create_checks when audit is created" do
+      expect(audit).to receive(:create_checks).and_call_original
+      expect { audit.save! }.to change(Check, :count).by(Check.types.size)
+    end
+  end
+
+  describe "after a check has completed" do
     let(:audit) { create(:audit) }
 
-    it "sets status to pending when any check is new" do
-      audit = build(:audit)
-      audit.derive_status_from_checks
-      expect(audit.status).to eq("pending")
+    it "reschedules a ProcessAuditJob with itself" do
+      expect { audit.after_check_completed }.to have_enqueued_job(ProcessAuditJob).with(audit)
     end
 
-    it "sets status to mixed when checks have different statuses" do
-      audit.all_checks.first.update!(status: :passed)
-      audit.all_checks.last.update!(status: :failed)
-      audit.derive_status_from_checks
-      expect(audit.status).to eq("mixed")
-    end
+    context "when there are no jobs left" do
+      before do
+        allow(audit.checks).to receive(:remaining).and_return []
+      end
 
-    it "sets status to match checks when all have same status" do
-      audit.all_checks.each { |check| check.update(status: :passed) }
-      audit.derive_status_from_checks
-      expect(audit.status).to eq("passed")
+      it "does not enqueue a new ProcessAuditJob" do
+        expect { audit.after_check_completed }.not_to enqueue_job(ProcessAuditJob)
+      end
+
+      it "updates its completed_at timestamp" do
+        freeze_time do
+          expect { audit.after_check_completed }
+            .to change(audit, :completed_at)
+                  .from(nil)
+                  .to(Time.current)
+        end
+      end
     end
   end
 
-  describe "#checked?(name)" do
-    subject(:checked) { audit.checked?(name) }
+  describe "fetch_resources!" do
+    let(:audit) { create(:audit) }
 
-    let(:audit) { build(:audit) }
-    let(:name) { Check.names.first }
+    it "triggers the home page fetch" do
+      expect { audit.fetch_resources! }
+        .to have_enqueued_job(FetchResourcesJob)
+              .with(audit)
+              .exactly(:once)
+    end
+  end
 
-    context "when check has not run" do
-      before do
-        allow(audit).to receive(name).and_return(nil)
-      end
+  describe "abort_dependent_checks!" do
+    let(:audit) { create(:audit, :without_checks) }
 
-      it "returns nil" do
-        expect(checked).to be_nil
-      end
+    let(:original_check) { create(:check, :reachable, :failed, audit: audit) }
+    let(:dependent_check) { create(:check, :accessibility_mention, :pending, audit: audit) }
+
+    before do
+      allow(dependent_check)
+        .to receive(:depends_on?)
+              .with(original_check.type)
+              .and_return true
     end
 
-    context "when check has failed" do
-      before do
-        check = instance_double(Check.types[name].name, passed?: false)
-        allow(audit).to receive(name).and_return(check)
-      end
-
-      it "returns false" do
-        expect(checked).to be false
-      end
+    it "aborts any check that depends on the failed one" do
+      expect { audit.abort_dependent_checks!(original_check) }
+        .to change { dependent_check.reload.current_state }
+              .from("pending").to("aborted")
     end
+  end
 
-    context "when check has passed" do
-      before do
-        check = instance_double(Check.types[name].name, passed?: true)
-        allow(audit).to receive(name).and_return(check)
-      end
+  describe "update_home_page!" do
+    let(:url) { "https://example.com" }
+    let(:html) { "html_content" }
 
-      it "returns true" do
-        expect(checked).to be true
-      end
+    it "updates the home page HTML" do
+      expect { audit.update_home_page!(url, html) }
+        .to change(audit, :home_page_html).from(nil).to(html)
+                                          .and change(audit, :home_page_url).from(nil).to(url)
     end
   end
 end

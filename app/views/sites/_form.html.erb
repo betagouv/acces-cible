@@ -1,7 +1,9 @@
+<%# locals: (site:) %>
 <%= form_with(model: site) do |f| %>
-  <%= f.dsfr_input_field :url, :text_field, type: :url, required: true, autofocus: true, hint: "Saisissez une url valide, commençant par https:// ou http://" %>
+  <%= f.dsfr_input_field :url, :text_field, label: t(".url"), type: :url, required: true, autofocus: true, hint: t('.url_hint') %>
+  <%= f.dsfr_text_field :name, label: t(".name"), hint: t('.name_hint') %>
 
-  <%= f.submit "Enregistrer", name: nil, class: "fr-btn", data: { disable_with: "Enregistrement…" } %>
+  <%= render "tags_form", object: f.object %>
 
-  <%= link_to "Annuler", { action: site.persisted? ? :show : :index }, class: "fr-btn fr-btn--secondary" %>
+  <%= f.submit t("shared.#{site.persisted? ? :save : :add}"), name: nil, class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
 <% end %>

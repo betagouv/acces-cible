@@ -26,7 +26,7 @@ require "database_cleaner"
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
+Rails.root.glob("spec/support/**/*.rb").sort.each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -51,7 +51,7 @@ RSpec.configure do |config|
   # config.use_active_record = false
 
   require "webmock/rspec"
-  WebMock.disable_net_connect!
+  WebMock.disable_net_connect!(allow_localhost: true)
 
   # Setup Database cleaner to avoid state leaks between tests
   config.before(:suite) do
@@ -84,6 +84,12 @@ RSpec.configure do |config|
   config.before(type: :component) do
     require "view_component/test_helpers"
   end
+
+  # Job-specific config
+  config.include ActiveJob::TestHelper, type: :job
+
+  # Request-specific config
+  config.include Capybara::RSpecMatchers, type: :request
 
   # RSpec Rails uses metadata to mix in different behaviours to your tests,
   # for example enabling you to call `get` and `post` in request specs. e.g.:

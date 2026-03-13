@@ -1,10 +1,14 @@
 name: CI
+permissions:
+  contents: read
 
 on:
   push:
     branches:
-      - '**'  # This will match all branches
-  pull_request:  # Added to also run on PRs
+      - "main"
+      - "staging"
+      - "production"
+  pull_request:
 
 jobs:
   scan_ruby:
@@ -13,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -30,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -44,10 +48,13 @@ jobs:
   lint:
     name: Rubocop
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write # To annotate PRs
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -75,25 +82,18 @@ jobs:
 
     env:
       RAILS_ENV: test
+      RAILS_TEST_KEY: ${{ secrets.RAILS_TEST_KEY }}
       DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
       DISABLE_BOOTSNAP: "1"
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips
+        uses: actions/checkout@v6
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
-
-      - name: Fix GA Chrome Permissions
-        run: |
-          sudo chown root:root /opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome-sandbox
-          sudo chmod 4755 /opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome-sandbox
 
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -103,22 +103,11 @@ jobs:
       - name: Set up database schema
         run: bin/rails db:schema:load
 
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+
       - name: Run tests
         run: bundle exec rspec
 
-  deploy:
-    name: Déploiement sur Scalingo
-    runs-on: ubuntu-latest
-
-    needs: [test, lint]
-
-    if: ${{ (github.ref == 'refs/heads/staging') && !contains(github.event.head_commit.message, '[skip-deploy]') }}
-
-    steps:
-      - name: Install Scalingo CLI
-        run: curl -O https://cli-dl.scalingo.com/install && bash install
-
-      - run: scalingo login --api-token ${{ secrets.SCALINGO_TOKEN }}
-      - name: Déploiement sur staging
-        if: ${{ github.ref == 'refs/heads/staging' }}
-        run: scalingo --app acces-cible-staging integration-link-manual-deploy staging
+      - name: Run feature tests
+        run: bundle exec cucumber

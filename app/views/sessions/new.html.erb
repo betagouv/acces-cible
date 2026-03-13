@@ -1,0 +1,10 @@
+<% use_centered_layout %>
+
+<h2>Se connecter avec ProConnect</h2>
+
+<%= dsfr_proconnect_button(target: omniauth_path(provider: :proconnect)) %>
+
+<% if Rails.env.development? %>
+  <%= or_separator %>
+  <%= button_to "Se connecter en mode développeur", omniauth_path(provider: :developer), method: :post, remote: false, data: { turbo: false }, class: "fr-btn fr-btn--lg fr-mb-3w", form_class: "fr-btns-group" %>
+<% end %>

@@ -1,24 +1,33 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
+  include Authentication
+  include ErrorHelper
+  include ActionView::RecordIdentifier
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  DEFAULT_PAGY_LIMIT = 20
+  MAX_PAGY_LIMIT = 100
+
+  layout :layout_selector
 
   helper_method :resource, :resource_model
 
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
     @title = t("errors.not_found.title")
     respond_to do |format|
-      format.any  { head :not_found }
+      format.any { head :not_found }
       format.html { render "errors/not_found", status: :not_found }
     end
   end
   rescue_from ActiveRecord::NotNullViolation do |exception|
     @title = t("errors.internal_server_error.title")
     respond_to do |format|
-      format.any  { head :internal_server_error }
+      format.any { head :internal_server_error }
       format.html { render "errors/internal_server_error", status: :internal_server_error }
     end
+  end
+  rescue_from Pagy::OverflowError do |exception|
+    path_without_page = [request.path, request.query_string.sub(/&?page=\d*/, "")].compact_blank.join("?")
+    redirect_to path_without_page, alert: t("shared.page_unavailable")
   end
 
   private
@@ -35,5 +44,18 @@ class ApplicationController < ActionController::Base
     @instance_variable_name ||= "@#{action_name == "index" ? controller_name : controller_name.singularize}"
   end
 
-  def get_request? = request.request_method_symbol == :get
+  def layout_selector
+    "modal" if turbo_frame_request_id == "modal" # => link with "data-turbo-frame": :modal
+  end
+
+  def get_request?
+    request.request_method_symbol == :get
+  end
+
+  def pagy_limit
+    limit = params[:limit].to_i
+    limit = DEFAULT_PAGY_LIMIT if limit <= 0
+
+    [limit, MAX_PAGY_LIMIT].min
+  end
 end

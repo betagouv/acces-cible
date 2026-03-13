@@ -12,6 +12,11 @@ RSpec.describe Link do
       expect(normalized.to_s).to include("?param=value")
     end
 
+    it "normalizes paths with doubled slashes" do
+      normalized = described_class.normalize("http://example.com/folder//")
+      expect(normalized.to_s).to eq("http://example.com/folder/")
+    end
+
     it "normalizes paths with parent directory references" do
       normalized = described_class.normalize("http://example.com/folder/../page.html")
       expect(normalized.to_s).to eq("http://example.com/page.html")
@@ -47,6 +52,18 @@ RSpec.describe Link do
       expect(normalized.to_s).to eq("http://example.com/")
     end
 
+    it "handles accented URLs" do
+      normalized = described_class.normalize("http://www.lucé.fr/./..///")
+      converted = "http://www.lucé.fr/"
+      expect(normalized.to_s).to eq(converted)
+    end
+
+    it "handles punycode" do
+      normalized = described_class.normalize("https://xn--mairie-saint-l-epb.fr/")
+      converted = "https://mairie-saint-lô.fr/"
+      expect(normalized.to_s).to eq(converted)
+    end
+
     it "normalizes redundant slashes" do
       normalized = described_class.normalize("http://example.com//folder///page.html")
       expect(normalized.to_s).to eq("http://example.com/folder/page.html")
@@ -67,10 +84,11 @@ RSpec.describe Link do
       expect(normalized.to_s).to eq("http://example.com/%C3%A9t%C3%A9.html")
     end
 
-    it "treats URLs as equal if they refer to the same document" do
-      url1 = described_class.normalize("http://example.com/path/page")
-      url2 = described_class.normalize("http://example.com/path/page/")
-      expect(url1.to_s).to eq(url2.to_s)
+    it "preserves trailing slashes in paths" do
+      url_without_slash = described_class.normalize("http://example.com/path/page")
+      url_with_slash = described_class.normalize("http://example.com/path/page/")
+      expect(url_without_slash.to_s).to eq("http://example.com/path/page")
+      expect(url_with_slash.to_s).to eq("http://example.com/path/page/")
     end
 
     it "preserves the original scheme" do
@@ -94,6 +112,123 @@ RSpec.describe Link do
         normalized_urls = urls.map { |url| described_class.normalize(url).to_s }
         expect(normalized_urls.uniq.size).to eq(1)
         expect(normalized_urls.first).to eq("http://example.com/folder/page.html")
+      end
+    end
+
+    it "raises InvalidUriError for malformed URIs like maitlo:accueil@example.com" do
+      expect { described_class.normalize("maitlo:accueil@itxassou.fr") }.to raise_error(Link::InvalidUriError)
+    end
+  end
+
+  describe ".root_from" do
+    it "returns path for root URL" do
+      url = described_class.root_from("http://example.com")
+      expect(url).to eq("http://example.com/")
+    end
+
+    it "preserves trailing slash" do
+      url = described_class.root_from("http://example.com/path/")
+      expect(url).to eq("http://example.com/path/")
+    end
+
+    it "returns path for nested file" do
+      url = described_class.root_from("http://example.com/path/to/file.pdf")
+      expect(url).to eq("http://example.com/path/to/")
+    end
+
+    it "returns path for nested page" do
+      url = described_class.root_from("http://example.com/path/to/page")
+      expect(url).to eq("http://example.com/path/to/")
+    end
+
+    it "returns path without query" do
+      url = described_class.root_from("http://example.com/path/with?a-query-string")
+      expect(url).to eq("http://example.com/path/")
+    end
+  end
+
+  describe ".url_without_scheme_and_www" do
+    subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
+
+    context "when subdomain is www" do
+      let(:url) { "https://www.domain.com/" }
+
+      it "returns the hostname without www" do
+        expect(url_without_scheme_and_www).to eq("domain.com")
+      end
+    end
+
+    context "when subdomain is not www" do
+      let(:url) { "https://sub.domain.com/" }
+
+      it "returns the hostname with subdomain" do
+        expect(url_without_scheme_and_www).to eq("sub.domain.com")
+      end
+    end
+
+    context "when path is empty" do
+      let(:url) { "https://www.example.com/" }
+
+      it "returns hostname only" do
+        expect(url_without_scheme_and_www).to eq("example.com")
+      end
+    end
+
+    context "when path is not empty" do
+      let(:url) { "https://www.example.com/path/to/page#section?query=string" }
+
+      it "returns hostname and path" do
+        expect(url_without_scheme_and_www).to eq("example.com/path/to/page")
+      end
+    end
+  end
+
+  describe ".from(source)" do
+    subject(:from) { described_class.from(source) }
+
+    context "when source is a Link" do
+      let(:source) { described_class.new(href: "http://example.com/") }
+
+      it "returns the original object" do
+        expect(from).to be_a described_class
+        expect(from.object_id).to eq source.object_id
+      end
+    end
+
+    context "when source is a String" do
+      let(:source) { "http://example.com/" }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq source
+      end
+    end
+
+    context "when source is a URI" do
+      let(:uri) { "http://example.com/" }
+      let(:source) { URI.parse(uri) }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq uri
+      end
+    end
+
+    context "when source is an Addressable::URI" do
+      let(:uri) { "http://example.com/" }
+      let(:source) { Addressable::URI.parse(uri) }
+
+      it "returns a new Link" do
+        expect(from).to be_a described_class
+        expect(from.href).to eq uri
+      end
+    end
+
+    context "when source is something else" do
+      let(:source) { Page.new }
+
+      it "raises ArgumentError" do
+        expect { from }.to raise_error(ArgumentError)
       end
     end
   end
@@ -120,6 +255,11 @@ RSpec.describe Link do
       link = described_class.new(href: "https://example.com", text: nil)
       expect(link.text).to eq("")
     end
+
+    it "handles //" do
+      link = described_class.new(href: "https://example.com//", text: nil)
+      expect(link.href).to eq("https://example.com/")
+    end
   end
 
   describe "#to_str" do
@@ -143,9 +283,9 @@ RSpec.describe Link do
         expect(link1).to eq(link2)
       end
 
-      it "if relative parts resolve to the same href" do
+      it "if relative parts resolve to the same href with matching trailing slash" do
         link1 = described_class.new(href: "https://example.com/path", text: "Example 1")
-        link2 = described_class.new(href: "https://example.com/other/../path/", text: "Example 2")
+        link2 = described_class.new(href: "https://example.com/other/../path", text: "Example 2")
         expect(link1).to eq(link2)
       end
     end

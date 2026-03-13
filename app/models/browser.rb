@@ -1,23 +1,22 @@
 # Based on https://railsnotes.xyz/blog/ferrum-stealth-browsing
 
 class Browser
-  include Singleton
-
-  PAGE_TIMEOUT = 5 # seconds
-  PROCESS_TIMEOUT = 10 # seconds
+  PAGE_TIMEOUT = 1.minute
+  PROCESS_TIMEOUT = 30.seconds
   WINDOW_SIZES = [
     [1366, 768],
     [1440, 900],
     [1280, 800],
     [1920, 1080]
   ].freeze
+  SUCCESS_CODE = 200
   CHROME_VERSIONS = (101..134).to_a.freeze
   MACOS_VERSIONS = ["10_15_7", "13_4_1", "13_6_6", "14_1_2", "14_7_1", "14_7_3", "15_1_1"].freeze
 
   HEADERS = {
     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "Accept-Encoding" => "gzip, deflate, br, zstd",
-    "Accept-Language" => "fr-FR,en-US;q=0.9,en;q=0.8",
+    "Accept-Language" => "fr;q=1",
     "Cache-Control" => "no-cache",
     "Pragma" => "no-cache",
     "Priority" => "u=0, i",
@@ -31,11 +30,11 @@ class Browser
   }.freeze
 
   BLOCKED_EXTENSIONS = [
-    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"].freeze,
-    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"].freeze,
-    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"].freeze,
-    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"].freeze
-  ].flatten.freeze
+    FONTS = [".woff", ".woff2", ".ttf", ".otf", ".eot"],
+    VIDEOS = [".mp4", ".avi", ".mov", ".mkv", ".webm"],
+    AUDIO = [".mp3", ".ogg", ".wav", ".aac", ".flac"],
+    IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif"]
+  ].flatten.then { |extensions| Regexp.new("(#{Regexp.union(extensions).source})(?:\\?.*|#.*)?$") }
 
   BLOCKED_DOMAINS = [
     "google-analytics.com",
@@ -45,116 +44,139 @@ class Browser
     "twitter.com",
     "linkedin.com",
     "doubleclick.net",
-    "adservice.google.com"
-  ].freeze
-
-  AXE_SOURCE_PATH = Rails.root.join("vendor/javascript/axe.min.js").freeze
+    "adservice.google.com",
+    "youtube.com",
+    "play.google.com",
+    "sites.statistiques.online",
+    "googleapis.com",
+  ].then { |domains| Regexp.union(domains) }
 
   class << self
-    delegate_missing_to :instance
-  end
+    def reachable?(url)
+      url && head(url)[:status] == SUCCESS_CODE
+    end
 
-  def get(url)
-    with_page do |page|
-      page.go_to(url)
+    def head(url)
+      response = HTTP
+        .headers(request_headers)
+        .timeout(connect: 3, read: 3)
+        .follow(max_hops: 3)
+        .head(url, ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE })
+      # Disable SSL because some websites provide CRLs via HTTP,
+      # which OpenSSL ignores, throwing connection failure.
+      # Harmless for head requests.
+
       {
-        body: page.body,
-        status: page.network.status || 200,
-        headers: page.network.response&.headers || {},
-        current_url: URI.parse(page.current_url)
+        status: response.code || 0,
+        current_url: Link.normalize(response.uri.to_s)
+      }
+    rescue => e
+      {
+        status: 0,
+        current_url: Link.normalize(url)
       }
     end
-  end
 
-  def axe_check(url)
-    with_page do |page|
-      page.bypass_csp
-      page.go_to(url)
-      page.add_script_tag(content: File.read(AXE_SOURCE_PATH))
-      page.evaluate_async(<<~JS, PAGE_TIMEOUT)
-        axe.run(document, { standards: "wcag2aa", reporter: "v2" }).then(results => __f(results))
-      JS
+    def request_headers
+      HEADERS.merge(random_user_agent)
     end
-  end
 
-  private
+    def random_user_agent
+      macos_version = MACOS_VERSIONS.sample
+      chrome_version = CHROME_VERSIONS.sample
+      {
+        "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
+      }
+    end
 
-  def browser
-    @browser ||= begin
-      Ferrum::Browser.new(settings).tap do |browser|
-        browser.network.intercept
-        browser.on(:request) do |request|
-          if request.url.end_with?(*BLOCKED_EXTENSIONS)
-            request.abort
-          elsif BLOCKED_DOMAINS.any? { |domain| request.url.include?(domain) }
-            request.abort
-          else
-            request.continue
-          end
-        end
-        browser
+    def settings
+      @settings ||= begin
+        {
+          headless: :new,
+          timeout: PAGE_TIMEOUT,
+          window_size: WINDOW_SIZES.sample,
+          process_timeout: PROCESS_TIMEOUT,
+          pending_connection_errors: false,
+          extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
+          browser_options: {
+            "disable-blink-features": "AutomationControlled",
+            "disable-popup-blocking": true,
+            "disable-notifications": true,
+            "no-sandbox" => nil,
+            "disable-gpu" => nil,
+            "disable-dev-shm-usage" => nil,
+            "disable-background-timer-throttling" => nil,
+            "disable-backgrounding-occluded-windows" => nil,
+            "disable-renderer-backgrounding" => nil,
+            "disable-features" => "TranslateUI,VizDisplayCompositor",
+            "disable-extensions" => nil,
+            "disable-plugins" => nil,
+            "disable-default-apps" => nil,
+            "user-data-dir" => (@user_data_dir = "/tmp/chrome-#{SecureRandom.hex(8)}"),
+            "remote-debugging-port" => (9222 + Random.rand(1000)).to_s
+          }
+        }.tap do |options|
+          options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
+          options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
+          options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
+        end.freeze
       end
     end
-  end
 
-  def reset
-    browser&.reset
-    browser&.quit
-    @browser = nil
-  end
+    def get(url)
+      with_page do |page|
+        page.go_to(url)
+        page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
 
-  def with_page
-    begin
-      page = create_page
-      result = yield(page)
-      result
-    rescue Ferrum::TimeoutError, Ferrum::PendingConnectionsError => e
-      Rails.logger.warn { "Network idle timeout: #{e.message}, proceeding with current state" }
-      raise e unless defined?(page) && page
-      yield(page) # Try again to get what we can from the page
-    rescue Ferrum::Error => ferrum_error
-      Rails.logger.error { "Browser error: #{ferrum_error.message}" }
-      raise ferrum_error
-    ensure
-      reset
-    end
-  end
-
-  def create_page
-    browser.create_page.tap do |page|
-      page.headers.set(HEADERS)
-      page.headers.add(random_user_agent)
-      page.network.wait_for_idle(timeout: 2)
-    end
-  end
-
-  def settings
-    @settings ||= begin
-      {
-        headless: :new,
-        timeout: PAGE_TIMEOUT,
-        window_size: WINDOW_SIZES.sample,
-        process_timeout: PROCESS_TIMEOUT,
-        extensions: [Rails.root.join("vendor/javascript/stealth.min.js")],
-        browser_options: {
-          "disable-blink-features": "AutomationControlled",
-          "disable-popup-blocking": true,
-          "disable-notifications": true
+        {
+          body: page.body,
+          status: page.network.status,
+          content_type: page.network.response.content_type,
+          current_url: Link.normalize(page.current_url)
         }
-      }.tap do |options|
-        options[:browser_path] = ENV["GOOGLE_CHROME_SHIM"] if Rails.env.production?
-        options[:proxy] = Rails.application.credentials.proxy if Rails.env.production?
-        options[:browser_options].merge!("no-sandbox" => nil) if ENV["WITHIN_DOCKER"].present?
-      end.freeze
+      end
     end
-  end
 
-  def random_user_agent
-    macos_version = MACOS_VERSIONS.sample
-    chrome_version = CHROME_VERSIONS.sample
-    {
-      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X #{macos_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/#{chrome_version}.0.0.0 Safari/537.36",
-      "Sec-Ch-Ua" => "\"Google Chrome\";v=\"#{chrome_version}\", \"Chromium\";v=\"#{chrome_version}\", \"Not_A Brand\";v=\"24\"",
-    }
+    def page_from_html(html)
+      with_page do |page|
+        page.content = html
+        page.bypass_csp
+
+        yield(page)
+      end
+    end
+
+    def run_script_on_html(html, script, script_tag)
+      page_from_html(html) do |page|
+        page.add_script_tag(content: script_tag)
+
+        page.evaluate_async(script, PAGE_TIMEOUT)
+      end
+    end
+
+    private
+
+    def browser
+      @browser ||= Ferrum::Browser.new(settings)
+    end
+
+    def with_page
+      page = nil
+
+      begin
+        page = create_page
+        yield(page)
+      ensure
+        page&.close
+      end
+    end
+
+    def create_page
+      browser.create_page.tap do |page|
+        page.headers.set(request_headers)
+        page.network.blocklist = [BLOCKED_EXTENSIONS, BLOCKED_DOMAINS]
+      end
+    end
   end
 end

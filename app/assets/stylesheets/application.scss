@@ -1,7 +1,7 @@
 // Avoid "the notch" on iPhones and Pixel phones
 @supports (width: env(safe-area-inset-left)) {
   @media only screen and (orientation: landscape) {
-    body main {
+    body {
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
     }
@@ -14,6 +14,17 @@ form.button_to {
   display: contents;
 }
 
+// Empêche l'affichage des boutons [hidden], que la classe .fr-btn affiche par défaut
+.fr-btn[hidden] {
+  display: none !important;
+}
+
+// Supprime la bordure en double sur mobile quand il n'y a qu'un seul lien
+.fr-nav__item:first-child::before {
+  box-shadow: none;
+}
+
+// Ajuste les badges pour permettre de n'afficher que l'icône
 .fr-badge {
   // Ajoute un outline quand il contient un lien caché qui a le focus
   &:has(a:focus) {
@@ -44,5 +55,154 @@ form.button_to {
   &.fr-link--icon-right::after {
     margin-right: 0;
     margin-left: 0;
+  }
+}
+
+// Increase button spacing for clarity (particularly useful to place primary/secondary apart)
+.fr-btns-group--space-between {
+  justify-content: space-between;
+}
+
+// Improve file upload group affordance
+.fr-upload-group {
+  .fr-upload {
+    transition: all var(--transition-duration-default, 0.2s) ease;
+  }
+  &.dragover .fr-upload,
+  .fr-upload:focus {
+    outline: var(--border-width-default, 2px) solid #0a76f6;
+    outline-offset: 2px;
+    background-color: var(--background-action-low-blue-france);
+  }
+}
+
+// Improve pagination spacing on mobile
+.fr-pagination {
+  width: 100%;
+}
+.fr-pagination__list {
+  align-content: space-between;
+  & > li {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+// Fix bottom margin for pagination limit selector
+.fr-table__footer .fr-select-group {
+  margin-bottom: 0;
+}
+
+// Allow visually hiding a legend, when it duplicates a heading
+.fr-legend--hidden .fr-fieldset__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap; /* added line */
+  border: 0;
+  display: block;
+  height: 0;
+}
+
+// Allow placing input and buttons side-by-side
+.fr-input-group--inline {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 1rem;
+
+  .fr-input-group,
+  .fr-input {
+    flex: 1;
+    margin-bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  .fr-btn {
+    align-self: flex-end;
+    margin-bottom: 0;
+    border-top-right-radius: .25rem;
+    height: 100%;
+  }
+}
+
+// Style indeterminate checkboxes
+.fr-checkbox-group input[type="checkbox"]:indeterminate + label::before {
+  background-color: var(--border-action-high-blue-france) !important;
+  background-image: linear-gradient(to right, var(--background-default-grey) 0%, var(--background-default-grey) 100%) !important;
+  background-size: 0.7rem 0.095rem !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+// Allow enlarging clickable inputs (radio, checkboxes)
+.fr-enlarge-input {
+  position: relative;
+  .fr-radio-group .fr-label::after,
+  .fr-checkbox-group .fr-label::after {
+    content: "";
+    inset: 0;
+    position: absolute;
+    pointer-events: auto;
+    z-index: 1;
+  }
+  &.fr-cell--fixed {
+    .fr-radio-group .fr-label::after,
+    .fr-checkbox-group .fr-label::after {
+      margin: -.5rem -1rem -.5rem -2.5rem;
+    }
+  }
+}
+
+// Fix vertical alignment of table actions
+.fr-table__header .fr-btns-group li:last-child .fr-btn {
+  margin-bottom: 0;
+}
+
+// Add visual distinction for dev & staging environments
+.fr-header {
+  &.staging::before,
+  &.development::before {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    padding: .5em;
+  }
+  &.staging::before {
+    content: "Environnement de staging";
+    background-color: orange;
+  }
+  &.development::before {
+    content: "Environnement de développement";
+    background-color: #87ec87;
+  }
+}
+
+// Fix vertical alignment of search and counter on narrow screens
+@media (max-width: 47.999em) {
+  .fr-search-bar + .fr-table__detail {
+    margin-top: .5rem;
+  }
+}
+
+// Fix spacing between table header elements on larger screens
+@media (min-width: 48em) {
+  .fr-table__header .fr-table__detail {
+    margin-bottom: 0;
+  }
+  .fr-search-bar + .fr-table__detail {
+    margin-left: .5rem;
+  }
+}
+
+@media print {
+  .fr-btns-group {
+    display: none !important;
   }
 }

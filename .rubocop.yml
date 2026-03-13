@@ -41,10 +41,6 @@ Naming/VariableNumber:
 # Rspec
 RSpec/ExampleLength:
   Enabled: false
-RSpec/ImplicitExpect:
-  Enabled: false
-RSpec/ImplicitSubject:
-  Enabled: false
 RSpec/IndexedLet:
   Enabled: false
 RSpec/LetSetup:
@@ -57,7 +53,7 @@ RSpec/MultipleMemoizedHelpers:
   AllowSubject: true
   Max: 10
 RSpec/NestedGroups:
-  Max: 4
+  Max: 5
 RSpec/ContextWording:
   Prefixes:
     - and
@@ -66,6 +62,9 @@ RSpec/ContextWording:
     - with
     - without
     - returns
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - "spec/components/**/*.rb"
 
 Style/StringLiterals:
   EnforcedStyle: "double_quotes"

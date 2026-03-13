@@ -1,14 +1,54 @@
 Sentry.init do |config|
   return unless Rails.env.production?
 
-  config.dsn = "https://cb48a87a9a7c2f33bf362a8d91c0a594@sentry.incubateur.net/218"
+  config.dsn = Rails.application.credentials.sentry.dsn
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
+  config.environment = :staging if Rails.application.staging?
+  config.release = ENV["CONTAINER_VERSION"]
 
-  # Set tracesSampleRate to 1.0 to capture 100%
-  # of transactions for performance monitoring.
-  # We recommend adjusting this value in production
-  config.traces_sample_rate = 0.005
+  config.before_send = lambda do |event, hint|
+    # Remove server_name from the event so it doesn't affect grouping
+    event.server_name = nil
 
-  config.release = ENV["CONTAINER_VERSION"] if ENV["CONTAINER_VERSION"].present?
-  config.environment = :staging if ENV["APP_URL"].to_s.ends_with?("incubateur.net")
+    # Filter sensitive data using Rails parameter filtering
+    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+    event.extra = filter.filter(event.extra) if event.extra
+    event.user = filter.filter(event.user) if event.user
+    event.contexts = filter.filter(event.contexts) if event.contexts
+
+    event
+  end
+
+  # Environment-specific performance and debugging settings
+  if Rails.application.staging?
+    config.traces_sample_rate = 0.1
+    config.profiles_sample_rate = 0.8
+    config.include_local_variables = true
+  else
+    config.traces_sample_rate = 0.005
+    config.profiles_sample_rate = 0.5
+  end
+
+  # Use new Ruby profiler (requires gem "vernier" in Gemfile)
+  config.profiler_class = Sentry::Vernier::Profiler
+
+  # Filter common non-actionable exceptions
+  config.excluded_exceptions += %w[
+    ActionController::BadRequest
+    ActionController::UnknownFormat
+    ActionDispatch::Http::MimeNegotiation::InvalidType
+    Rack::QueryParser::InvalidParameterError
+    CGI::Session::CookieStore::TamperedWithCookie
+  ]
+
+  # Add user context for authenticated requests
+  config.before_send_transaction = lambda do |event, hint|
+    if defined?(Current) && Current.respond_to?(:user) && Current.user
+      Sentry.set_user(
+        id: Current.user.id,
+        email: Current.user.email
+      )
+    end
+    event
+  end
 end
