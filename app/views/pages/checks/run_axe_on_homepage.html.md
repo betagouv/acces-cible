@@ -2,7 +2,7 @@
 
 ### Objectif
 
-Évaluer automatiquement la page d’accueil avec un outil de contrôle d’accessibilité et donner un score de réussite sur un ensemble de règles liées au RGAA.
+Évaluer automatiquement la page d’accueil avec un outil de contrôle d’accessibilité et donner un score de réussite sur une sélection de règles liées au RGAA.
 
 ### Évaluation
 
