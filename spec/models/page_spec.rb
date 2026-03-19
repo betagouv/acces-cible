@@ -24,6 +24,9 @@ RSpec.describe Page do
           <a href="https://external.com">External</a>
           <a href="tel:123456">Phone</a>
           <a href="mailto:test@example.com">Email</a>
+          <a href="mailto:test1@example.com">Email 1</a>
+          <a href="mailto:test2@example.com">test2@example.com</a>
+          <a href="mailtoto:test3@example.com">Contactez-nous</a>
           <a href="#section">Section</a>
           <a href="relative/path">Relative</a>
           <a href="javascript:alert('')">Javascript</a>
@@ -618,6 +621,12 @@ RSpec.describe Page do
   describe "#headings" do
     it "returns an array of text, one line for each heading" do
       expect(page.headings).to eq(["Main Heading", "Sub Heading"])
+    end
+  end
+
+  describe "#mail_to_links" do
+    it "returns an array of mailto links" do
+      expect(page.mailto_addresses).to eq(%w[test@example.com test1@example.com test2@example.com test3@example.com])
     end
   end
 

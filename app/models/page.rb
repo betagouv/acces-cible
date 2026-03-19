@@ -4,6 +4,8 @@ class Page
   FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
   LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
+  MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
+  MAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+(?:@|\(at\))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
   SELECTORS = {
     main: "main, [role=main], article, #main, #content, #main-content, .main-content, .content, .site-content"
   }.freeze
@@ -110,6 +112,12 @@ class Page
     rescue Link::InvalidUriError
       next
     end.compact
+  end
+
+  def mailto_addresses(between_headings: nil)
+    source_for(between_headings:).css(MAIL_TO_SELECTOR).map do |mailto|
+      mailto.attributes["href"].value.scan(MAIL_PATTERN).first
+    end
   end
 
   private

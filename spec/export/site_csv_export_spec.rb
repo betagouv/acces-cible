@@ -75,6 +75,8 @@ RSpec.describe SiteCsvExport do
                                            "Taux de conformité",
                                            "Date de la déclaration",
                                            "Déclaration mise à jour le",
+                                           "Adresse email de contact",
+                                           "Formulaire de contact",
                                            "Schéma pluriannuel d'accessibilité",
                                            "Années de validité du schéma",
                                            "Plan d'action",
@@ -102,6 +104,8 @@ RSpec.describe SiteCsvExport do
         expect(row["Taux de conformité"]).to eq("85,5%")
         expect(row["Date de la déclaration"]).to eq("2023-06-15")
         expect(row["Déclaration mise à jour le"]).to eq("2025-08-20")
+        expect(row["Adresse email de contact"]).to eq("Non trouvé")
+        expect(row["Formulaire de contact"]).to eq("Non trouvé")
         expect(row["Schéma pluriannuel d'accessibilité"]).to eq("https://example.com/schema.pdf")
         expect(row["Années de validité du schéma"]).to eq("2023-2024")
         expect(row["Plan d'action"]).to eq("https://example.com/plan.pdf")
