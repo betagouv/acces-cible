@@ -8,7 +8,7 @@ module AccessibilityDocumentAnalyzer
     def find_link
       return unless page
 
-      page.links(skip_files: false, scope: :main)
+      page.links(skip_files: false)
           .select { |link| link.text.match? self.class::PATTERN }
           .max_by { |link| extract_valid_years(link.text) }
     end
@@ -16,7 +16,7 @@ module AccessibilityDocumentAnalyzer
     def link_between_headings
       return unless page
 
-      page.links(skip_files: false, scope: :main, between_headings: [:previous, "État de conformité"])
+      page.links(skip_files: false, between_headings: [:previous, "État de conformité"])
           .select { |link| link.text.match? self.class::PATTERN }
           .max_by { |link| extract_valid_years(link.text) }
     end
@@ -24,7 +24,7 @@ module AccessibilityDocumentAnalyzer
     def find_text_in_main
       return unless page
 
-      page.text(scope: :main)
+      page.text
           .scan(self.class::PATTERN)
           .flatten
           .compact

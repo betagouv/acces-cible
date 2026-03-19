@@ -6,9 +6,6 @@ class Page
   LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
   MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
   MAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+(?:@|\(at\))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
-  SELECTORS = {
-    main: "main, [role=main], article, #main, #content, #main-content, .main-content, .content, .site-content"
-  }.freeze
 
   class InvalidTypeError < StandardError
     def initialize(url, content_type)
@@ -56,8 +53,8 @@ class Page
     dom.title.to_s.squish
   end
 
-  def text(scope: nil, between_headings: nil)
-    source_for(scope:, between_headings:).text&.squish
+  def text(between_headings: nil)
+    source_for(between_headings:).text&.squish
   end
 
   def heading_levels
@@ -97,8 +94,8 @@ class Page
     raise ParseError.new url, e.message
   end
 
-  def links(skip_files: true, scope: nil, between_headings: nil)
-    source_for(scope:, between_headings:).css(LINKS_SELECTOR).collect do |link|
+  def links(skip_files: true, between_headings: nil)
+    source_for(between_headings:).css(LINKS_SELECTOR).collect do |link|
       href = link["href"].to_s
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
@@ -142,8 +139,8 @@ class Page
     @dom_headings ||= dom.css(HEADINGS)
   end
 
-  def heading(matcher, scope: nil)
-    source_for(scope:).css(HEADINGS).find do |heading|
+  def heading(matcher)
+    source_for.css(HEADINGS).find do |heading|
       if matcher.is_a?(Regexp)
         matcher.match?(heading.text.squish)
       else
@@ -164,31 +161,33 @@ class Page
     end
   end
 
-  def find_heading_nodes(start_matcher, end_matcher, scope: nil)
-    headings = source_for(scope:).css(HEADINGS)
+  def find_heading_nodes(start_matcher, end_matcher)
+    headings = source_for.css(HEADINGS)
 
     if start_matcher == :previous
-      end_node = heading(end_matcher, scope:)
+      end_node = heading(end_matcher)
       start_node = heading_relative_to(end_node, :previous, headings)
     elsif end_matcher == :next
-      start_node = heading(start_matcher, scope:)
+      start_node = heading(start_matcher)
       end_node = heading_relative_to(start_node, :next, headings)
     else
-      start_node = heading(start_matcher, scope:)
-      end_node = heading(end_matcher, scope:)
+      start_node = heading(start_matcher)
+      end_node = heading(end_matcher)
     end
 
     [start_node, end_node]
   end
 
-  def source_for(scope: nil, between_headings: nil)
-    if between_headings
-      start_matcher, end_matcher = between_headings
-      start_node, end_node = find_heading_nodes(start_matcher, end_matcher, scope:)
-      return dom.fragment unless start_node && end_node
+  def source_for(between_headings: nil)
+    return dom unless between_headings
+
+    start_matcher, end_matcher = between_headings
+    start_node, end_node = find_heading_nodes(start_matcher, end_matcher)
+
+    if start_node && end_node
       dom_between(start_node, end_node)
     else
-      scope ? (css(SELECTORS[scope]).first || dom) : dom
+      dom.fragment
     end
   end
 
