@@ -64,7 +64,7 @@ RSpec.describe Checks::FindAccessibilityPage do
   end
 
   describe "#custom_badge_status" do
-    it "returns :success when url is present" do
+    it "returns :success when url is present and internal" do
       check.url = "#{root_url}/accessibility"
       check.internal = true
       expect(check.send(:custom_badge_status)).to eq(:success)
@@ -74,6 +74,12 @@ RSpec.describe Checks::FindAccessibilityPage do
       check.url = "#{root_url}/accessibility"
       check.internal = false
       expect(check.send(:custom_badge_status)).to eq(:warning)
+    end
+
+    it "returns :success when internal is nil to preserve legacy behavior" do
+      check.url = "#{root_url}/accessibility"
+      check.internal = nil
+      expect(check.send(:custom_badge_status)).to eq(:success)
     end
 
     it "returns :error when url is blank even if internal is nil" do
