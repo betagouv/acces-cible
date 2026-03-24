@@ -13,9 +13,11 @@ module Checks
     end
 
     def custom_badge_status
-      return :warning unless internal
-
-      found? ? :success : :error
+      if found?
+        internal ? :success : :warning
+      else
+        :error
+      end
     end
 
     def custom_badge_link
