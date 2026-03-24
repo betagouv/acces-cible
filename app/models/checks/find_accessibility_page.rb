@@ -2,7 +2,7 @@ module Checks
   class FindAccessibilityPage < Check
     PRIORITY = 20
 
-    store_accessor :data, :url
+    store_accessor :data, :url, :internal
 
     def found?
       url.present?
@@ -13,6 +13,8 @@ module Checks
     end
 
     def custom_badge_status
+      return :warning unless internal
+
       found? ? :success : :error
     end
 
@@ -23,7 +25,9 @@ module Checks
     private
 
     def analyze!
-      { url: audit.accessibility_page_url } unless audit.accessibility_page_url.blank?
+      internal = Link.internal?(audit.accessibility_page_url, audit.home_page_url)
+
+      { url: audit.accessibility_page_url, internal: } unless audit.accessibility_page_url.blank?
     end
   end
 end
