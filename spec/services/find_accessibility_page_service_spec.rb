@@ -68,7 +68,7 @@ RSpec.describe FindAccessibilityPageService do
 
     context "when the homepage contains an external accessibility link" do
       let(:home_page_html) do
-        "<a href="https://external.example.org/accessibilite">Déclaration d'accessibilité</a>"
+        "<a href=\"https://external.example.org/accessibilite\">Déclaration d'accessibilité</a>"
       end
 
       let(:expected_link_list) do
