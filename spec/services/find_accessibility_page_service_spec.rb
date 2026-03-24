@@ -66,6 +66,34 @@ RSpec.describe FindAccessibilityPageService do
       end
     end
 
+    context "when the homepage contains an external accessibility link" do
+      let(:home_page_html) do
+        "<a href="https://external.example.org/accessibilite">Déclaration d'accessibilité</a>"
+      end
+
+      let(:expected_link_list) do
+        ["https://external.example.org/accessibilite"]
+      end
+
+      it "adds the external link to the prioritized queue" do
+        allow(Crawler).to receive(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        ).and_return(crawler)
+
+        allow(crawler).to receive(:find_page).and_return(nil)
+
+        described_class.call(audit)
+
+        expect(Crawler).to have_received(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        )
+      end
+    end
+
     it "does nothing if no page is found" do
       allow(crawler).to receive(:find_page).and_return(nil)
 
@@ -89,7 +117,7 @@ RSpec.describe FindAccessibilityPageService do
     end
 
     before do
-      allow(page).to receive(:internal_links).and_return(links)
+      allow(page).to receive(:links).and_return(links)
       allow(described_class).to receive(:links_by_priority) { |incoming_links| incoming_links }
     end
 
