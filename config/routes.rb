@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :upload
       get :upload, to: redirect("/sites/new")
       delete :bulk_destroy
+      get :csv_export
     end
     resources :audits, only: [:create, :show]
   end
