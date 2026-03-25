@@ -32,8 +32,11 @@ guard:
 debug:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rdbg -nA web 12345
 
-test:
+rspec:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rspec
+
+cucumber:
+	$(DOCKER-RUN) web $(BUNDLE-EXEC) cucumber
 
 db:
 	$(DOCKER-RUN) -e PAGER= db psql $(DATABASE_URL)
