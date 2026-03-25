@@ -31,18 +31,23 @@ form.button_to {
     outline-color: #0a76f6;
     outline-style: solid;
     outline-width: 2px;
+
     a {
       outline: none;
     }
   }
+
   &[role=tooltip] {
     outline-offset: 0;
+
     &::before {
       margin-right: -.125rem; // Centre l'icône quand le badge n'a pas de texte visible
     }
+
     &:not(a) {
       cursor: help;
     }
+
     &[target=_blank]::after {
       display: none; // Masque l'icône nouvelle fenêtre en mode tooltip
     }
@@ -68,6 +73,7 @@ form.button_to {
   .fr-upload {
     transition: all var(--transition-duration-default, 0.2s) ease;
   }
+
   &.dragover .fr-upload,
   .fr-upload:focus {
     outline: var(--border-width-default, 2px) solid #0a76f6;
@@ -76,22 +82,37 @@ form.button_to {
   }
 }
 
-// Improve pagination spacing on mobile
-.fr-pagination {
-  width: 100%;
-}
-.fr-pagination__list {
-  align-content: space-between;
-  & > li {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-  }
+
+.fr-table__footer--start,
+.fr-table__footer--end {
+  flex: 1;
 }
 
-// Fix bottom margin for pagination limit selector
-.fr-table__footer .fr-select-group {
-  margin-bottom: 0;
+// Basic Pagy nav styling to align with DSFR pagination look
+
+.pagy.series-nav a:hover {
+  background: var(--background-disabled-grey);
+}
+
+.pagy.series-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  background: var(--background-default-grey);
+  text-decoration: none;
+}
+
+.pagy.series-nav a[aria-current="page"] {
+  background: var(--background-action-high-blue-france);
+  color: var(--text-inverted-blue-france);
+}
+
+.pagy.series-nav a[role="separator"] {
+  border-color: transparent;
+  background: transparent;
+  pointer-events: none;
 }
 
 // Allow visually hiding a legend, when it duplicates a heading
@@ -144,6 +165,7 @@ form.button_to {
 // Allow enlarging clickable inputs (radio, checkboxes)
 .fr-enlarge-input {
   position: relative;
+
   .fr-radio-group .fr-label::after,
   .fr-checkbox-group .fr-label::after {
     content: "";
@@ -152,6 +174,7 @@ form.button_to {
     pointer-events: auto;
     z-index: 1;
   }
+
   &.fr-cell--fixed {
     .fr-radio-group .fr-label::after,
     .fr-checkbox-group .fr-label::after {
@@ -174,10 +197,12 @@ form.button_to {
     font-weight: bold;
     padding: .5em;
   }
+
   &.staging::before {
     content: "Environnement de staging";
     background-color: orange;
   }
+
   &.development::before {
     content: "Environnement de développement";
     background-color: #87ec87;

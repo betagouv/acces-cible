@@ -12,7 +12,7 @@ class SitesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params), limit: pagy_limit
+        @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params)
       end
       format.csv do
         set_csv_headers
@@ -95,6 +95,7 @@ class SitesController < ApplicationController
   def sites_scope
     current_user.team.sites
   end
+
   def set_site
     @site = sites_scope.preloaded.friendly.find(params.expect(:id))
   end
@@ -102,7 +103,6 @@ class SitesController < ApplicationController
   def set_sites
     @sites = sites_scope
   end
-
 
   def set_bulk_sites
     ids = params.expect(id: [])

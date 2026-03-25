@@ -3,14 +3,9 @@ require "rails_helper"
 RSpec.describe Dsfr::TableComponent, type: :component do
   subject(:component) { described_class.new(**params) }
 
-  let(:pagy) { instance_double(Pagy, page: 1, last: 1, count: 10, limit: 20, series: []) }
   let(:caption) { "Test table" }
-  let(:params) { { caption:, pagy: } }
+  let(:params) { { caption: } }
   let(:rendered_component) { render_inline(component) }
-
-  before do
-    allow_any_instance_of(Dsfr::PaginationComponent).to receive(:url_for).and_return("/things") # rubocop:disable RSpec/AnyInstance
-  end
 
   it "renders the DSFR table structure" do
     expect(rendered_component).to have_css("div.fr-table") do |table_wrapper|
@@ -26,7 +21,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
   describe "initialize" do
     context "when caption is not provided" do
-      let(:params) { { pagy: } }
+      let(:params) { {} }
 
       it "raises an ArgumentError" do
         expect { component }.to raise_error(ArgumentError, /missing keyword: :caption/)
@@ -34,7 +29,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
 
     context "when HTML attributes are provided" do
-      let(:params) { { caption:, pagy:, html_attributes: { class: "custom-class", id: "test-table" } } }
+      let(:params) { { caption:, html_attributes: { class: "custom-class", id: "test-table" } } }
 
       it "applies HTML attributes to the table element" do
         expect(rendered_component).to have_css("div.fr-table.custom-class#test-table table")
@@ -43,7 +38,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
     [:sm, :md, :lg, :xl].each do |size|
       context "when size option is :#{size}" do
-        let(:params) { { caption:, pagy:, size: } }
+        let(:params) { { caption:, size: } }
 
         if size == :xl
           it "raises an ArgumentError" do
@@ -66,7 +61,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
       bottom: "fr-table--caption-bottom"
     }.each do |caption_side, expected_css|
       context "when caption_side is :#{}" do
-        let(:params) { { caption:, pagy:, caption_side: } }
+        let(:params) { { caption:, caption_side: } }
 
         it "contains 'div.#{expected_css}" do
           expect(rendered_component).to have_css("div.#{expected_css}")
@@ -76,7 +71,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
     [true, false].each do |border|
       context "when border is #{border}" do
-        let(:params) { { caption:, pagy:, border: } }
+        let(:params) { { caption:, border: } }
 
         if border
           it "has the border class" do
@@ -92,7 +87,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
     [true, false].each do |scroll|
       context "when scroll is #{scroll}" do
-        let(:params) { { caption:, pagy:, scroll: } }
+        let(:params) { { caption:, scroll: } }
 
         if scroll
           it "doesn't have the no-scroll class" do
@@ -122,14 +117,6 @@ RSpec.describe Dsfr::TableComponent, type: :component do
       end
 
       expect(rendered_component).to have_css("tbody tr td", text: "Data")
-    end
-  end
-
-  describe "pagination" do
-    let(:pagy) { instance_double(Pagy, last: 10, page: 1, prev: nil, next: 2, limit: 20, series: ["1", 2, 3, :gap, 10], vars: {}, count: 100) }
-
-    it "renders the pagination component inside the table footer" do
-      expect(rendered_component).to have_css("div.fr-table__footer--middle nav.fr-pagination")
     end
   end
 

@@ -4,7 +4,7 @@ class TagsController < ApplicationController
 
   # GET /tags
   def index
-    @pagy, @tags = pagy current_user.team.tags.in_alphabetical_order, limit: pagy_limit
+    @pagy, @tags = pagy current_user.team.tags.in_alphabetical_order
   end
 
   # POST /tags
@@ -22,7 +22,7 @@ class TagsController < ApplicationController
 
   # GET /tags/1
   def show
-    @pagy, @sites = pagy @tag.sites, limit: pagy_limit
+    @pagy, @sites = pagy @tag.sites
   end
 
   # GET /tags/1/edit

@@ -1,11 +1,8 @@
 class ApplicationController < ActionController::Base
-  include Pagy::Backend
+  include Pagy::Method
   include Authentication
   include ErrorHelper
   include ActionView::RecordIdentifier
-
-  DEFAULT_PAGY_LIMIT = 20
-  MAX_PAGY_LIMIT = 100
 
   layout :layout_selector
 
@@ -25,9 +22,9 @@ class ApplicationController < ActionController::Base
       format.html { render "errors/internal_server_error", status: :internal_server_error }
     end
   end
-  rescue_from Pagy::OverflowError do |exception|
-    path_without_page = [request.path, request.query_string.sub(/&?page=\d*/, "")].compact_blank.join("?")
-    redirect_to path_without_page, alert: t("shared.page_unavailable")
+
+  rescue_from Pagy::RangeError do |exception|
+    redirect_to url_for(page: exception.pagy.last), status: :see_other
   end
 
   private
@@ -50,12 +47,5 @@ class ApplicationController < ActionController::Base
 
   def get_request?
     request.request_method_symbol == :get
-  end
-
-  def pagy_limit
-    limit = params[:limit].to_i
-    limit = DEFAULT_PAGY_LIMIT if limit <= 0
-
-    [limit, MAX_PAGY_LIMIT].min
   end
 end
