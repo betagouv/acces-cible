@@ -2,16 +2,16 @@ require "rails_helper"
 
 RSpec.describe Checks::FindAccessibilityPage do
   let(:root_url) { "https://example.com" }
-  let(:audit) { build(:audit, accessibility_page_url: "#{root_url}/accessibility") }
+  let(:home_page_url) { root_url }
+  let(:accessibility_page_url) { "#{root_url}/accessibility" }
+  let(:audit) { build(:audit, home_page_url:, accessibility_page_url:) }
   let(:check) { described_class.new(audit:) }
 
   describe "#analyze!" do
     subject(:analyze) { check.send(:analyze!) }
 
     context "when no accessibility page was found" do
-      before do
-        audit.update!(accessibility_page_url: nil)
-      end
+      let(:accessibility_page_url) { nil }
 
       it { is_expected.to be_nil }
     end
@@ -23,12 +23,7 @@ RSpec.describe Checks::FindAccessibilityPage do
     end
 
     context "when the accessibility page is external" do
-      before do
-        audit.update!(
-            home_page_url: "https://example.com",
-            accessibility_page_url: "https://external.example.org/accessibilite"
-          )
-      end
+      let(:accessibility_page_url) { "https://external.example.org/accessibilite" }
 
       it "returns the URL and internal = false" do
         expect(analyze).to eq(
