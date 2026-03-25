@@ -140,14 +140,14 @@ fr:
       years: Années de validité du schéma
       years_not_found: Années valides non trouvées
     find_accessibility_page:
+      external_explanation: "Cette déclaration est hébergée hors du site audité"
+      hosted_on_audited_site: Déclaration hébergée sur le site audité
+      hosted_on_audited_site_unknown: Inconnu
       link_to_page: "Déclaration d'accessibilité"
       not_found: Non trouvée
       table_header: Déclaration
       type: Présence d'une déclaration d'accessibilité
-      hosted_on_audited_site: Déclaration hébergée sur le site audité
-      hosted_on_audited_site_unknown: Inconnu
       view_page: "Voir la déclaration"
-      external_explanation: "Cette déclaration est hébergée hors du site audité"
     language_indication:
       empty: Non trouvée
       table_header: Langue
