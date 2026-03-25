@@ -4,6 +4,12 @@ def team
   @team ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email]).team
 end
 
+def stub_accessibility_page(html:, declaration_url:)
+  allow(FindAccessibilityPageService)
+    .to receive(:find_page)
+    .and_return(Page.new(url: declaration_url, root: declaration_url, html: html))
+end
+
 Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
   steps %(
    Sachant que le site "#{url}" renvoie une réponse HTML normale
@@ -45,10 +51,18 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'ac
     )
 end
 
-Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
-  allow(FindAccessibilityPageService)
-    .to receive(:find_page)
-    .and_return(Page.new(url: "#{url}/accessibilité", root: "#{url}/accessibilité", html: str))
+Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, html|
+  stub_accessibility_page(
+    html:,
+    declaration_url: "#{url}/accessibilité"
+  )
+end
+
+Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, html, declaration_url|
+  stub_accessibility_page(
+    html:,
+    declaration_url:
+  )
 end
 
 Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
@@ -152,6 +166,12 @@ end
 Alors('la section {string} indique {string}') do |name, str|
   within(find('h2', text: name).ancestor('div', id: /checks_/)) do |section|
     expect(section).to have_content(str)
+  end
+end
+
+Alors('la section {string} n\'indique pas {string}') do |name, str|
+  within(find('h2', text: name).ancestor('div', id: /checks_/)) do |section|
+    expect(section).not_to have_content(str)
   end
 end
 
