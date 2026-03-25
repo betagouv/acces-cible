@@ -33,7 +33,7 @@ debug:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rdbg -nA web 12345
 
 test:
-	$(DOCKER-RUN) web $(BUNDLE-EXEC) rspec $(file)
+	$(DOCKER-RUN) web $(BUNDLE-EXEC) rspec
 
 db:
 	$(DOCKER-RUN) -e PAGER= db psql $(DATABASE_URL)
