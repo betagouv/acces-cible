@@ -34,7 +34,7 @@ class FindAccessibilityPageService
         audit.home_page_url
       ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
 
-      children_links = page.internal_links.reject do |link|
+      children_links = page.links.reject do |link|
         excluded_targets.include?(Link.url_without_scheme_and_www(link.href))
       end
 
@@ -60,7 +60,7 @@ class FindAccessibilityPageService
     def prioritize_queue!(url:, starting_html:)
       root_link = Link.from(Link.root_from(url))
       links = if starting_html.present?
-        Page.new(url:, root: root_link.href, html: starting_html).internal_links
+        Page.new(url:, root: root_link.href, html: starting_html).links
       else
         []
       end

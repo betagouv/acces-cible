@@ -8,6 +8,8 @@ Trouver la présence de la déclaration d’accessibilité sur le site.
 
 Nous cherchons un lien vers la page d’accessibilité à partir de la page d’accueil et l’enregistrons pour les analyses suivantes.
 D'abord depuis le lien de la mention, si existante, puis dans les liens présents dans la page d'accueil.
+La déclaration peut être hébergée sur le site audité ou sur un site externe.
+Lorsqu'elle est trouvée sur un site externe, le message « Cette déclaration est hébergée hors du site audité » est affiché dans la section.
 
 ### Badges affichés dans le tableau du site
 
@@ -23,6 +25,10 @@ D'abord depuis le lien de la mention, si existante, puis dans les liens présent
       <tr>
         <td><p class="fr-badge fr-badge--success"></p></td>
         <td><p>Réussi - Déclaration trouvée</p></td>
+      </tr>
+      <tr>
+        <td><p class="fr-badge fr-badge--warning"></p></td>
+        <td><p>Avertissement - Déclaration trouvée, mais hébergée hors du site audité</p></td>
       </tr>
       <tr>
         <td><p class="fr-badge fr-badge--error"><%= t("checks.find_accessibility_page.not_found") %></p></td>
