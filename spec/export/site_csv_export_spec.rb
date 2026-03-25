@@ -114,12 +114,12 @@ RSpec.describe SiteCsvExport do
         expect(row["Année(s) du plan"]).to eq("2025")
       end
 
-      it "exports unknown when the accessibility declaration host is unknown" do
+      it "keeps not found when the accessibility declaration host is unknown" do
         site.audit.reload.find_accessibility_page.update!(url: "https://example.com/accessibilite", internal: nil)
 
         row = parsed_csv.first
 
-        expect(row["Déclaration hébergée sur le site audité"]).to eq("Inconnu")
+        expect(row["Déclaration hébergée sur le site audité"]).to eq("Non trouvé")
       end
     end
 
