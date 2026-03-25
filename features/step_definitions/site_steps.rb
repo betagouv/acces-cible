@@ -4,12 +4,6 @@ def team
   @team ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email]).team
 end
 
-def stub_accessibility_page(html:, declaration_url:)
-  allow(FindAccessibilityPageService)
-    .to receive(:find_page)
-    .and_return(Page.new(url: declaration_url, root: declaration_url, html: html))
-end
-
 Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
   steps %(
    Sachant que le site "#{url}" renvoie une réponse HTML normale
@@ -51,18 +45,56 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'ac
     )
 end
 
-Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, html|
-  stub_accessibility_page(
-    html:,
-    declaration_url: "#{url}/accessibilité"
-  )
+Sachantque("le site {string} renvoie {string} pour la page d'accueil") do |url, html|
+  allow(Browser)
+    .to receive(:get)
+    .with(url)
+    .and_return(
+      body: html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
 end
 
-Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, html, declaration_url|
-  stub_accessibility_page(
-    html:,
-    declaration_url:
-  )
+Sachantque("l'adresse {string} renvoie {string}") do |url, html|
+  allow(Browser)
+    .to receive(:get)
+    .with(url)
+    .and_return(
+      body: html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
+end
+
+Sachantque("l'adresse {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
+  fake_html = <<~HTML
+        <html>
+          <head>
+            <title>Déclaration d'accessibilité</title>
+          </head>
+          <body>
+            <h2>État de conformité</h2>
+            <h2>Établissement de cette déclaration d'accessibilité</h2>
+          </body>
+        </html>
+      HTML
+
+  step(%(l'adresse "#{url}" renvoie "#{fake_html}"))
+end
+
+Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
+  allow(FindAccessibilityPageService)
+    .to receive(:find_page)
+    .and_return(Page.new(url: "#{url}/accessibilité", root: "#{url}/accessibilité", html: str))
+end
+
+Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, str, declaration_url|
+  allow(FindAccessibilityPageService)
+    .to receive(:find_page)
+    .and_return(Page.new(url: declaration_url, root: declaration_url, html: str))
 end
 
 Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
