@@ -12,6 +12,7 @@ class SiteCsvExport
     I18n.t("checks.language_indication.type"),
     I18n.t("checks.accessibility_mention.type"),
     I18n.t("checks.find_accessibility_page.type"),
+    I18n.t("checks.find_accessibility_page.hosted_on_audited_site"),
     I18n.t("checks.analyze_accessibility_page.auditor"),
     I18n.t("checks.analyze_accessibility_page.compliance_rate"),
     I18n.t("checks.analyze_accessibility_page.audit_date"),
@@ -58,6 +59,7 @@ class SiteCsvExport
           extract_value(language, language&.indication),
           extract_value(mention, mention&.mention_text),
           extract_value(find_accessibility, find_accessibility&.url),
+          extract_value(find_accessibility, hosted_on_audited_site(find_accessibility)),
           extract_value(analyze_accessibility, analyze_accessibility&.auditor),
           extract_value(analyze_accessibility, analyze_accessibility&.human_compliance_rate),
           extract_value(analyze_accessibility, analyze_accessibility&.audit_date),
@@ -97,5 +99,12 @@ class SiteCsvExport
     else
       check.link_url
     end
+  end
+
+  def self.hosted_on_audited_site(check)
+    return nil unless check&.found?
+    return I18n.t("checks.find_accessibility_page.hosted_on_audited_site_unknown") if check.internal.nil?
+
+    check.internal.to_s
   end
 end

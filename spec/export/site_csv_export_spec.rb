@@ -30,7 +30,7 @@ RSpec.describe SiteCsvExport do
         create(:check, :reachable, :completed, audit:)
         create(:check, :language_indication, audit:, indication: nil)
         create(:check, :accessibility_mention, :completed, audit:, mention: "totalement")
-        create(:check, :find_accessibility_page, :completed, audit:, url: "https://example.com/accessibilite")
+        create(:check, :find_accessibility_page, :completed, audit:, url: "https://example.com/accessibilite", internal: true)
         create(:check, :analyze_accessibility_page, audit:, data: {
           compliance_rate: 85.5,
           audit_date: Date.new(2023, 6, 15),
@@ -71,6 +71,7 @@ RSpec.describe SiteCsvExport do
                                            "Indication de la langue",
                                            "Mention du niveau d'accessibilité",
                                            "Présence d'une déclaration d'accessibilité",
+                                           "Déclaration hébergée sur le site audité",
                                            "Audit réalisé par",
                                            "Taux de conformité",
                                            "Date de la déclaration",
@@ -100,6 +101,7 @@ RSpec.describe SiteCsvExport do
         expect(row["Indication de la langue"]).to eq("Non trouvé")
         expect(row["Mention du niveau d'accessibilité"]).to eq("Totalement conforme")
         expect(row["Présence d'une déclaration d'accessibilité"]).to eq("https://example.com/accessibilite")
+        expect(row["Déclaration hébergée sur le site audité"]).to eq("true")
         expect(row["Audit réalisé par"]).to eq("Bear & Bee")
         expect(row["Taux de conformité"]).to eq("85,5%")
         expect(row["Date de la déclaration"]).to eq("2023-06-15")
@@ -110,6 +112,14 @@ RSpec.describe SiteCsvExport do
         expect(row["Années de validité du schéma"]).to eq("2023-2024")
         expect(row["Plan d'action"]).to eq("https://example.com/plan.pdf")
         expect(row["Année(s) du plan"]).to eq("2025")
+      end
+
+      it "exports unknown when the accessibility declaration host is unknown" do
+        site.audit.reload.find_accessibility_page.update!(url: "https://example.com/accessibilite", internal: nil)
+
+        row = parsed_csv.first
+
+        expect(row["Déclaration hébergée sur le site audité"]).to eq("Inconnu")
       end
     end
 
