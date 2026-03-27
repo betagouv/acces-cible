@@ -21,7 +21,7 @@ sh:
 	$(DOCKER-RUN) web bash
 
 cl:
-	$(DOCKER-RUN) web ./bin/rails c
+	$(DOCKER-RUN) -e IRBRC=/app/.irbrc web ./bin/rails c
 
 lint:
 	$(DOCKER-RUN) web $(BUNDLE-EXEC) rubocop
