@@ -10,6 +10,7 @@ fr:
             file:
               invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
               invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
+              invalid_row_url: "Le fichier contient une URL invalide à la ligne %{line_number} : %{url}"
               invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
   activerecord:
     attributes:
