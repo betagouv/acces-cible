@@ -336,5 +336,19 @@ RSpec.describe SiteUpload do
         expect { site_upload.save }.not_to raise_error
       end
     end
+
+    context "when the CSV is malformed" do
+      let(:csv_content) { %(url,name\n"https://example.com/,Example Site) }
+
+      it "returns false, adds an error, and logs the parsing failure" do
+        allow(Rails.logger).to receive(:warn)
+
+        expect(site_upload.save).to be false
+        expect(site_upload.errors.added?(:file, :malformed_csv)).to be(true)
+        expect(Rails.logger).to have_received(:warn).with(
+          include("site_upload_malformed_csv", "filename=\"sites.csv\"")
+        )
+      end
+    end
   end
 end

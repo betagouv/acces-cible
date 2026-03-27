@@ -36,6 +36,7 @@ class SiteUpload
     return false unless valid?
 
     parse_sites
+    return false if errors.any?
 
     transaction do
       create!(new_sites.values) if new_sites.any?
@@ -85,6 +86,15 @@ class SiteUpload
         self.new_sites[url] = { url:, team:, name:, tag_ids: combined_tag_ids }
       end
     end
+  rescue CSV::MalformedCSVError => error
+    Rails.logger.warn(
+      "site_upload_malformed_csv " \
+      "team_id=#{team&.id.inspect} " \
+      "filename=#{file&.original_filename.inspect} " \
+      "error_class=#{error.class.name.inspect} " \
+      "error_message=#{error.message.inspect}"
+    )
+    errors.add(:file, :malformed_csv)
   end
 
   private

@@ -11,6 +11,7 @@ fr:
               invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
               invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
               invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
+              malformed_csv: Le fichier CSV est mal formé. Veuillez ré-exporter votre fichier depuis votre tableur et vérifier sa structure.
   activerecord:
     attributes:
       site:
