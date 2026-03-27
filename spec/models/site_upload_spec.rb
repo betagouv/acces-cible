@@ -155,6 +155,36 @@ RSpec.describe SiteUpload do
       expect(site_upload.new_sites.values.first[:name]).to eq("UTF8 Example")
     end
 
+    it "logs an invalid URL row" do
+      csv.write("url,name\nhttps://example.com/,Example Site\nhttp://,Broken")
+      csv.rewind
+      allow(Rails.logger).to receive(:warn)
+
+      site_upload.parse_sites
+
+      expect(site_upload.errors.added?(:file, :invalid_row_url, line_number: 3, url: "http://")).to be(true)
+      expect(Rails.logger).to have_received(:warn).with(
+        include("site_upload_invalid_url", "line_number=3", "raw_url=\"http://\"", "filename=\"sites.csv\"")
+      )
+    end
+
+    it "continues parsing and collects multiple invalid URL rows" do
+      csv.write("url,name\nhttps://example.com/,Example Site\nhttp://,Broken\n/contact,Relative\nhttps://test.com/,Test Site")
+      csv.rewind
+      allow(Rails.logger).to receive(:warn)
+
+      site_upload.parse_sites
+
+      expect(site_upload.new_sites.keys).to contain_exactly("https://example.com/", "https://test.com/")
+      expect(site_upload.errors.details[:file]).to include(
+        error: :invalid_row_url, line_number: 3, url: "http://"
+      )
+      expect(site_upload.errors.details[:file]).to include(
+        error: :invalid_row_url, line_number: 4, url: "/contact"
+      )
+      expect(Rails.logger).to have_received(:warn).twice
+    end
+
     it "ignores duplicate existing sites" do
       existing_site = build(:site, url: "https://example.com/")
       allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
