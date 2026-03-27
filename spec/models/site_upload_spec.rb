@@ -155,6 +155,14 @@ RSpec.describe SiteUpload do
       expect(site_upload.new_sites.values.first[:name]).to eq("UTF8 Example")
     end
 
+    it "ignores blank lines" do
+      csv.write("url,name\nhttps://example.com/,Example Site\n,\nhttps://test.com/,Test Site")
+      csv.rewind
+
+      expect { site_upload.parse_sites }.not_to raise_error
+      expect(site_upload.new_sites.keys).to contain_exactly("https://example.com/", "https://test.com/")
+    end
+
     it "ignores duplicate existing sites" do
       existing_site = build(:site, url: "https://example.com/")
       allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
