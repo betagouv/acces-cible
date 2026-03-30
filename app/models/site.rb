@@ -22,10 +22,7 @@ class Site < ApplicationRecord
 
   class << self
     def find_by_url(attributes)
-      url = attributes.to_h.fetch(:url)
-      raise ArgumentError, "url must be a String" unless url.is_a?(String)
-
-      url = url.strip
+      url = attributes.to_h.fetch(:url).strip
       return if url.empty?
 
       # Ignore http/https duplicates when searching

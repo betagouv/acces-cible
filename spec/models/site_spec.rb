@@ -32,13 +32,6 @@ RSpec.describe Site do
       end
     end
 
-    context "when url is not a string" do
-      it "raises an explicit error" do
-        expect { described_class.find_by_url(url: Addressable::URI.parse(url)) }
-          .to raise_error(ArgumentError, "url must be a String")
-      end
-    end
-
     context "when nothing exists for that URL" do
       it "returns nil" do
         expect(described_class.find_by_url(url: "http://not-an-existing-site.com")).to be_nil
