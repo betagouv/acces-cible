@@ -1,23 +1,21 @@
 Sentry.init do |config|
   return unless Rails.env.production?
 
-  config.dsn = Rails.application.credentials.sentry.dsn
+  config.dsn = Rails.application.credentials.dig(:sentry, :dsn)
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
   config.environment = :staging if Rails.application.staging?
   config.release = ENV["CONTAINER_VERSION"]
 
-  config.before_send = lambda do |event, hint|
-    # Remove server_name from the event so it doesn't affect grouping
-    event.server_name = nil
-
-    # Filter sensitive data using Rails parameter filtering
-    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-    event.extra = filter.filter(event.extra) if event.extra
-    event.user = filter.filter(event.user) if event.user
-    event.contexts = filter.filter(event.contexts) if event.contexts
-
-    event
-  end
+  # Enable structured logging
+  # By default, Sentry captures :active_record, :action_controller
+  # https://docs.sentry.io/platforms/ruby/guides/rails/logs/#structured-logging-subscribers
+  # This config enables :active_job too
+  config.enable_logs = true
+  config.rails.structured_logging.subscribers = {
+    active_record: Sentry::Rails::LogSubscribers::ActiveRecordSubscriber,
+    action_controller: Sentry::Rails::LogSubscribers::ActionControllerSubscriber,
+    active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
+  }
 
   # Environment-specific performance and debugging settings
   if Rails.application.staging?
