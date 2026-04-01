@@ -11,6 +11,7 @@ fr:
               invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
               invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
               invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
+              malformed_csv: Le fichier CSV est mal formé. Veuillez ré-exporter votre fichier depuis votre tableur et vérifier sa structure.
   activerecord:
     attributes:
       site:
@@ -181,18 +182,6 @@ fr:
   date:
     formats:
       compact: "%Y/%m/%d"
-  dsfr:
-    pagination_component:
-      first: Première page
-      label: Pagination
-      last: Dernière page
-      next: Page suivante
-      page: "Page %{page}"
-      per_page:
-        one: Une ligne par page
-        other: "%{count} lignes par page"
-      per_page_label: Nombre de lignes par page
-      prev: Page précédente
   errors:
     internal_server_error:
       title: "Problème technique (erreur 500)"
@@ -239,6 +228,27 @@ fr:
       title: Mentions légales
     plan:
       title: Plan du site
+  pagy:
+    p11n: 'OneUptoTwoOther'
+    aria_label:
+      nav:
+        one: "Page"
+        other: "Pages"
+      previous: "Précédent"
+      next: "Suivant"
+    previous: "&lt;"
+    next: "&gt;"
+    gap: "&hellip;"
+    item_name:
+      one: "élément"
+      other: "éléments"
+    info_tag:
+      no_count: "Page %{page} sur %{pages}"
+      no_items: "Aucun %{item_name} trouvé"
+      single_page: "Affichage de %{count} %{item_name}"
+      multiple_pages: "%{from}-%{to} sur %{count} %{item_name}"
+    input_nav_js: "Page %{page_input} sur %{pages}"
+    limit_tag_js: "Afficher %{limit_input} %{item_name} par page"
   sessions:
     new:
       login_failed: Nous n'avons pas réussi à vous identifier.
@@ -273,6 +283,11 @@ fr:
     new_window: " (nouvelle fenêtre)"
     or: ou
     page_unavailable: Cette page n'est pas disponible.
+    pagination:
+      per_page:
+        one: Une ligne par page
+        other: "%{count} lignes par page"
+      per_page_label: Nombre de lignes par page
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
     save: Enregistrer
     saving: Enregistrement…

@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+
+PREVIEW_KINDS = %w[home accessibility].freeze
+
+usage = <<~USAGE
+  Usage: bin/preview_audit home|accessibility [AUDIT_ID]
+
+  Examples:
+    bin/preview_audit home 42
+    bin/preview_audit accessibility
+USAGE
+
+def find_audit(audit_id)
+  audit_id ? Audit.find(audit_id) : Audit.last
+end
+
+def html_for(audit, kind)
+  case kind
+  when "home" then audit.home_page_html
+  when "accessibility" then audit.accessibility_page_html
+  end
+end
+
+def create_preview(audit, kind, html)
+  filename = "audit-#{audit.id}-#{kind}.html"
+  container_path = Rails.root.join("tmp", filename)
+  host_root = ENV["HOST_APP_PATH"].presence
+  preview_path = host_root.present? ? Pathname.new(host_root).join("tmp", filename) : container_path
+
+  File.write(container_path, html)
+
+  preview_path
+end
+
+# main
+
+if ARGV.length < 1 || ARGV.length > 2
+  abort usage
+end
+
+kind, audit_id = ARGV
+
+unless PREVIEW_KINDS.include?(kind)
+  abort("Unknown preview kind #{kind.inspect}. Use home or accessibility.\n\n#{usage}")
+end
+
+puts "Start"
+
+audit = find_audit(audit_id)
+abort("No audits found.") if audit.nil?
+
+html = html_for(audit, kind)
+abort("No preview HTML available for '#{kind}' on audit ##{audit.id}.") if html.blank?
+
+preview_path = create_preview(audit, kind, html)
+
+puts "Preview file: #{preview_path}"
+puts "End"

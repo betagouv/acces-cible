@@ -226,7 +226,9 @@ bundle exec rubocop
 bundle exec rubocop -a
 ```
 
-## 🔬 Debug
+## 🔬 Outils de debugging
+
+### Debugger
 
 Dans l'environnement Docker, vous pouvez utiliser `debug` pour
 arrêter et explorer votre code à un endroit précis :
@@ -248,3 +250,24 @@ web-1          | DEBUGGER: wait for debugger connection...
 
 ouvrez un terminal et lancez `make debug` qui se connecte
 automatiquement au debugger.
+
+### Prévisualiser une page crawlée
+
+Le script `bin/preview_audit` permet d'ouvrir le HTML crawlé d'un audit dans le navigateur.
+
+```bash
+bin/preview_audit home|accessibility [AUDIT_ID]
+```
+
+- `home` : page d'accueil crawlée
+- `accessibility` : page accessibilité crawlée
+- `AUDIT_ID` : optionnel, utilise le dernier audit si absent
+
+Exemples :
+
+```bash
+bin/preview_audit home 42
+bin/preview_audit accessibility
+```
+
+Le fichier généré est placé dans `tmp/` et le chemin est affiché en sortie.

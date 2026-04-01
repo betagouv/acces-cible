@@ -18,7 +18,7 @@ die:
 	docker compose down --remove-orphans --volumes
 
 sh:
-	$(DOCKER-RUN) web bash
+	$(DOCKER-RUN) -e HISTFILE=/app/tmp/.bash_history web bash
 
 cl:
 	$(DOCKER-RUN) web ./bin/rails c
