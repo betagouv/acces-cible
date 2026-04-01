@@ -172,7 +172,7 @@ RSpec.describe SiteUpload do
 
       expect(site_upload.errors.added?(:file, :invalid_row_url, line_number: 3, url: "http://")).to be(true)
       expect(Rails.logger).to have_received(:warn).with(
-        include("site_upload_invalid_url", "line_number=3", "raw_url=\"http://\"", "filename=\"sites.csv\"")
+        include("site_upload_invalid_url", "line_number=3", "raw_url=http://", "filename=sites.csv")
       )
     end
 
@@ -384,7 +384,7 @@ RSpec.describe SiteUpload do
         expect(site_upload.save).to be false
         expect(site_upload.errors.added?(:file, :malformed_csv)).to be(true)
         expect(Rails.logger).to have_received(:warn).with(
-          include("site_upload_malformed_csv", "filename=\"sites.csv\"")
+          include("site_upload_malformed_csv", "filename=sites.csv")
         )
       end
     end
