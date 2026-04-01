@@ -69,26 +69,9 @@ Sachantque("l'adresse {string} renvoie {string}") do |url, html|
     )
 end
 
-Sachantque("l'adresse {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
-  fake_html = <<~HTML
-        <html>
-          <head>
-            <title>Déclaration d'accessibilité</title>
-          </head>
-          <body>
-            <h2>État de conformité</h2>
-            <h2>Établissement de cette déclaration d'accessibilité</h2>
-          </body>
-        </html>
-      HTML
-
-  step(%(l'adresse "#{url}" renvoie "#{fake_html}"))
-end
 
 Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
-  allow(FindAccessibilityPageService)
-    .to receive(:find_page)
-    .and_return(Page.new(url: "#{url}/accessibilité", root: "#{url}/accessibilité", html: str))
+  step(%(le site "#{url}" renvoie "#{str}" à l'adresse "#{url}/accessibilité" pour la déclaration d'accessibilité))
 end
 
 Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, str, declaration_url|

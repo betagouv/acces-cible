@@ -9,7 +9,7 @@ Fonctionnalité: Vérifications de la présence d'une déclaration d'accessibili
 
   Plan du scénario: indique la présence d'une déclaration d'accessibilité
     Sachant que le site "https://foobar.com/" renvoie "<contenu>" pour la page d'accueil
-    Sachant que l'adresse "<url>" renvoie une réponse HTML normale pour la déclaration d'accessibilité
+    Sachant que le site "<url>" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
     Alors la vérification "Présence d'une déclaration d'accessibilité" indique "Déclaration d'accessibilité"
