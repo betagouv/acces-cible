@@ -9,6 +9,14 @@
   <%= header.with_direct_link_simple title: t("pages.accueil.title"), path: root_path, active: current_page?(root_path) %>
 
   <%= header.with_tool_link title: t("pages.display_mode.title"), path: display_mode_path, html_attributes: { class: icon_class(:theme), "data-turbo-frame": :modal } %>
+  <% header.with_custom_tool_link do %>
+    <%= button_tag "🐟",
+          type: "button",
+          class: "fr-btn fr-btn--tertiary-no-outline upside-down-toggle",
+          title: "Remettre le site à l'endroit",
+          aria: { pressed: true },
+          data: { action: "click->upside-down#toggle", upside_down_toggle: true } %>
+  <% end %>
 
   <% if authenticated? %>
     <%= header.with_tool_link title: current_user.name.truncate(30), path: user_path, html_attributes: { class: [icon_class("account-circle", btn: :tertiary)] } %>

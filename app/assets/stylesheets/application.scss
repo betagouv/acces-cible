@@ -231,3 +231,16 @@ form.button_to {
     display: none !important;
   }
 }
+
+html[data-upside-down="true"] body {
+  transform: rotate(180deg);
+  transform-origin: center center;
+}
+
+html[data-upside-down="true"] [data-upside-down-toggle] {
+  transform: rotate(180deg);
+}
+
+.upside-down-toggle {
+  white-space: nowrap;
+}
