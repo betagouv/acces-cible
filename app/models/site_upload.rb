@@ -78,16 +78,16 @@ class SiteUpload
         parsed_url = Link.parse(raw_url)
         raise Link::InvalidUriError.new(raw_url) if parsed_url.relative?
 
-        url = Link.normalize(parsed_url).to_s
+        url = Link.normalize(parsed_url)
       rescue Link::InvalidUriError => error
         Rails.logger.warn(
           "site_upload_invalid_url " \
-          "team_id=#{team&.id.inspect} " \
-          "filename=#{file&.original_filename.inspect} " \
-          "line_number=#{line_number.inspect} " \
-          "raw_url=#{raw_url.inspect} " \
-          "error_class=#{error.class.name.inspect} " \
-          "error_message=#{error.message.inspect}"
+          "team_id=#{team&.id} " \
+          "filename=#{file&.original_filename} " \
+          "line_number=#{line_number} " \
+          "raw_url=#{raw_url} " \
+          "error_class=#{error.class.name} " \
+          "error_message=#{error.message}"
         )
         errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
         next
@@ -110,10 +110,10 @@ class SiteUpload
   rescue CSV::MalformedCSVError => error
     Rails.logger.warn(
       "site_upload_malformed_csv " \
-      "team_id=#{team&.id.inspect} " \
-      "filename=#{file&.original_filename.inspect} " \
-      "error_class=#{error.class.name.inspect} " \
-      "error_message=#{error.message.inspect}"
+      "team_id=#{team&.id} " \
+      "filename=#{file&.original_filename} " \
+      "error_class=#{error.class.name} " \
+      "error_message=#{error.message}"
     )
     errors.add(:file, :malformed_csv)
   end
