@@ -70,7 +70,10 @@ class SiteUpload
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8", col_sep:) do |row|
       row = row.to_h.transform_keys { |header| header.to_s.downcase } # Case-insensitive headers
 
-      url = Link.normalize(row["url"])
+      raw_url = row["url"].to_s.strip
+      next if raw_url.empty?
+
+      url = Link.normalize(raw_url)
       name = row["nom"] || row["name"]
       tag_names = row["tags"].present? ? row["tags"].split(",").map(&:strip).compact_blank.uniq : []
 

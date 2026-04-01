@@ -22,7 +22,7 @@ Link = Data.define(:href, :text) do
     def normalize(href)
       uri = parse(href)
       uri.fragment = nil # Fragments shouldn't change the target document
-      return uri if uri.relative?
+      return uri.to_s if uri.relative?
 
       path = uri.path
       path = path.gsub("//", "/")
