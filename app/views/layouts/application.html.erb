@@ -9,19 +9,6 @@
     const e="system",t="dark",c="dark",o="data-fr-theme",a="data-fr-scheme",r=`:root[${o}], :root[${a}]`,m=()=>{document.documentElement.setAttribute(o,c),document.documentElement.style.colorScheme="dark"},n=()=>{window.matchMedia("(prefers-color-scheme: dark)").matches&&m()};
     (()=>{if(document.documentElement.matches(r)){const c=(()=>{try{return"localStorage"in window&&null!==window.localStorage}catch(e){return!1}})()?localStorage.getItem("scheme"):"",o=document.documentElement.getAttribute(a);switch(!0){case c===t:m();break;case c===e:n();break;case o===t:m();break;case o===e:n()}}})();
   <% end %>
-  <%= javascript_tag nonce: true do %>
-    (() => {
-      try {
-        const preference = window.localStorage?.getItem("upside-down-enabled");
-
-        if (preference !== "false") {
-          document.documentElement.dataset.upsideDown = "true";
-        }
-      } catch (_) {
-        document.documentElement.dataset.upsideDown = "true";
-      }
-    })();
-  <% end %>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= action_cable_meta_tag %>
@@ -40,7 +27,7 @@
   <%= yield :head %>
 </head>
 
-<body data-controller="upside-down">
+<body>
 <%= render "shared/skiplinks" %>
 <%= render "shared/header" %>
 
