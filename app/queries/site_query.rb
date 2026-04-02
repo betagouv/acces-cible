@@ -1,20 +1,13 @@
 class SiteQuery < SimpleDelegator
   def order_by(params)
-    directions = [:asc, :desc]
     key, direction = params[:sort]&.to_unsafe_h&.first
-    direction = direction.to_s.downcase.to_sym.presence_in(directions) || directions.first
+    direction = normalize_direction(direction)
+
     case key
     in "url"
-      sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '')")
-      subquery = model.with_current_audit
-                      .select("sites.*, #{sortable_url} as sortable_url")
-                      .order(Arel.sql("sortable_url #{direction}"))
-      from(subquery, :sites).order(Arel.sql("sortable_url #{direction}"))
+      order_by_url(direction)
     else
-      subquery = model.with_current_audit
-                      .select("sites.*, audits.completed_at AS last_completed_at")
-                      .order(Arel.sql("last_completed_at #{direction} NULLS LAST"))
-      from(subquery, :sites).order(Arel.sql("last_completed_at #{direction} NULLS LAST, sites.created_at #{direction}"))
+      order_by_completed_at(direction)
     end
   end
 
@@ -32,5 +25,28 @@ class SiteQuery < SimpleDelegator
       end
     end
     scope
+  end
+
+  private
+
+  def normalize_direction(direction)
+    direction.to_s.downcase.to_sym.presence_in([:asc, :desc]) || :asc
+  end
+
+  def order_by_url(direction)
+    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\\.)?', '')")
+    subquery = model.with_current_audit
+                    .select("sites.*, #{sortable_url} AS sortable_url")
+                    .order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
+    from(subquery, :sites).order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
+  end
+
+  def order_by_completed_at(direction)
+    subquery = model.with_current_audit
+                    .select("sites.*, audits.completed_at AS last_completed_at")
+                    .order(Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST" : "last_completed_at ASC NULLS LAST"))
+    from(subquery, :sites).order(
+      Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST, sites.created_at DESC" : "last_completed_at ASC NULLS LAST, sites.created_at ASC")
+    )
   end
 end
