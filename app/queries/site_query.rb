@@ -1,14 +1,26 @@
 class SiteQuery < SimpleDelegator
-  def order_by(params)
-    key, direction = params[:sort]&.to_unsafe_h&.first
-    direction = normalize_direction(direction)
+  DIRECTIONS = {
+    "asc" => :asc,
+    "desc" => :desc,
+  }.freeze
 
-    case key
-    in "url"
-      order_by_url(direction)
-    else
-      order_by_completed_at(direction)
-    end
+  def order_by_url(direction)
+    direction = normalize_direction(direction)
+    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\\.)?', '')")
+    subquery = model.with_current_audit
+                    .select("sites.*, #{sortable_url} AS sortable_url")
+                    .order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
+    from(subquery, :sites).order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
+  end
+
+  def order_by_completed_at(direction)
+    direction = normalize_direction(direction)
+    subquery = model.with_current_audit
+                    .select("sites.*, audits.completed_at AS last_completed_at")
+                    .order(Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST" : "last_completed_at ASC NULLS LAST"))
+    from(subquery, :sites).order(
+      Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST, sites.created_at DESC" : "last_completed_at ASC NULLS LAST, sites.created_at ASC")
+    )
   end
 
   def filter_by(params)
@@ -30,23 +42,6 @@ class SiteQuery < SimpleDelegator
   private
 
   def normalize_direction(direction)
-    direction.to_s.downcase.to_sym.presence_in([:asc, :desc]) || :asc
-  end
-
-  def order_by_url(direction)
-    sortable_url = Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\\.)?', '')")
-    subquery = model.with_current_audit
-                    .select("sites.*, #{sortable_url} AS sortable_url")
-                    .order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
-    from(subquery, :sites).order(Arel.sql(direction == :desc ? "sortable_url DESC" : "sortable_url ASC"))
-  end
-
-  def order_by_completed_at(direction)
-    subquery = model.with_current_audit
-                    .select("sites.*, audits.completed_at AS last_completed_at")
-                    .order(Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST" : "last_completed_at ASC NULLS LAST"))
-    from(subquery, :sites).order(
-      Arel.sql(direction == :desc ? "last_completed_at DESC NULLS LAST, sites.created_at DESC" : "last_completed_at ASC NULLS LAST, sites.created_at ASC")
-    )
+    DIRECTIONS.fetch(direction.to_s.downcase, :asc)
   end
 end

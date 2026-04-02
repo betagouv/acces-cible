@@ -12,7 +12,7 @@ class SitesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params)
+        @pagy, @sites = pagy ordered_sites(@sites.preloaded.filter_by(params))
       end
       format.csv do
         set_csv_headers
@@ -90,6 +90,16 @@ class SitesController < ApplicationController
     SiteCsvExport.stream_csv_to(response.stream, @sites)
   ensure
     response.stream.close
+  end
+
+  def ordered_sites(scope)
+    sort = params.fetch(:sort, {}).permit(:url, :completed_at)
+
+    if sort[:url].present?
+      scope.order_by_url(sort[:url])
+    else
+      scope.order_by_completed_at(sort[:completed_at])
+    end
   end
 
   def sites_scope
