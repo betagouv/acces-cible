@@ -47,6 +47,22 @@ RSpec.describe "Sites" do
         expect(response).to redirect_to("/sites?page=1")
       end
     end
+
+    context "when a stored site URL is unsafe" do
+      let!(:site) { create(:site, :completed, team:) }
+      let(:unsafe_url) { "ftp://example.com" }
+
+      before do
+        Audit.where(id: site.audit.id).update_all(url: unsafe_url)
+      end
+
+      it "does not render a clickable unsafe link" do
+        get_sites
+
+        expect(response.body).not_to include(%(href="#{unsafe_url}"))
+        expect(response.body).to include("URL invalide")
+      end
+    end
   end
 
   describe "GET /sites/:id" do
@@ -80,6 +96,45 @@ RSpec.describe "Sites" do
         get_site
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when a stored site URL is unsafe" do
+      let(:unsafe_url) { "ftp://example.com" }
+
+      before do
+        Audit.where(id: site.audit.id).update_all(url: unsafe_url)
+      end
+
+      it "renders the URL as text instead of an unsafe link" do
+        get_site
+
+        expect(response.body).not_to include(%(href="#{unsafe_url}"))
+        expect(response.body).to include("URL invalide")
+      end
+    end
+
+    context "when redirected URLs contain HTML" do
+      let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+      let(:reachable_check) { site.audit.reachable }
+
+      before do
+        site.audit.update_column(:home_page_url, "https://safe.example")
+        reachable_check.update!(
+          data: {
+            original_url: %(<img src=x onerror=alert('xss-1')>),
+            redirect_url: %(<script>alert('xss-2')</script>)
+          }
+        )
+      end
+
+      it "escapes the redirected URLs in the message" do
+        get_site
+
+        expect(response.body).not_to include("<img src=x onerror=alert('xss-1')>")
+        expect(response.body).not_to include("<script>alert('xss-2')</script>")
+        expect(response.body).to include("xss-1")
+        expect(response.body).to include("xss-2")
       end
     end
   end

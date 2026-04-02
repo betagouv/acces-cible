@@ -39,6 +39,21 @@ RSpec.describe ApplicationHelper do
     end
   end
 
+  describe "#safe_external_link_to" do
+    it "renders a link for http and https URLs" do
+      result = helper.safe_external_link_to("Example", "https://example.com", target: :_blank)
+
+      expect(result).to have_selector("a[href='https://example.com'][target='_blank']", text: "Example")
+    end
+
+    it "renders a translated fallback text for unsafe URLs" do
+      result = helper.safe_external_link_to("Example", "javascript:alert(1)")
+
+      expect(result).not_to have_selector("a")
+      expect(result).to eq(I18n.t("shared.invalid_url"))
+    end
+  end
+
   describe "#sortable_header" do
     subject(:sortable_header) { helper.sortable_header("Name", column, **options) }
 

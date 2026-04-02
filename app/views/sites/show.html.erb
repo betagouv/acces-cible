@@ -4,7 +4,7 @@
   <div class="fr-col-12 fr-col-md-8">
     <p>
       <strong><%= t(".url") %> :</strong>
-      <%= link_to @site.url, @site.url, target: :_blank %>
+      <%= safe_external_link_to(@site.url, @site.url, target: :_blank) %>
     </p>
     <p>
       <strong><%= t("tags.all") %> :</strong>
