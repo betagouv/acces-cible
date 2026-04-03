@@ -177,14 +177,24 @@ RSpec.describe Page do
       expect(page.dom).to be_a(Nokogiri::HTML::Document)
     end
 
-    it "ignores invisible elements" do
-      expect(page.dom.css("style, meta, div.d-none")).to be_empty
+    it "preserves hidden and technical elements in the raw DOM" do
+      expect(page.dom.at_css("style")).to be_present
+      expect(page.dom.at_css("meta")).to be_present
+      expect(page.dom.at_css("div.d-none")).to be_present
     end
 
     it "caches the parsed document" do
       first_dom = page.dom
       second_dom = page.dom
       expect(first_dom).to be(second_dom)
+    end
+
+    it "preserves root attributes on a visibility-hidden html element" do
+      page = build(:page, html: '<html lang="fr-FR" style="visibility:hidden"><body><p>Bonjour</p></body></html>')
+
+      expect(page.dom.root.name).to eq("html")
+      expect(page.dom.root["lang"]).to eq("fr-FR")
+      expect(page.dom.root["style"]).to include("visibility:hidden")
     end
 
     context "when HTML is invalid" do
@@ -291,21 +301,25 @@ RSpec.describe Page do
         end
       end
 
-      context "with invisible elements between headings" do
+      context "with hidden and technical elements between headings" do
         let(:body) do
           <<~HTML
             <h1>Start Section</h1>
             <p>Visible content</p>
+            <div hidden>Hidden attribute content</div>
             <div style="display: none;">Hidden content</div>
+            <div style="visibility: hidden;">Visibility hidden content</div>
             <script>console.log('script')</script>
             <h1>End Section</h1>
           HTML
         end
 
-        it "excludes invisible elements from result" do
+        it "includes hidden content but excludes technical nodes from result" do
           result = page.text(between_headings: [/Start/, /End/])
-          expect(result).to eq("Visible content")
-          expect(result).not_to include("Hidden content")
+          expect(result).to include("Visible content")
+          expect(result).to include("Hidden attribute content")
+          expect(result).to include("Hidden content")
+          expect(result).to include("Visibility hidden content")
           expect(result).not_to include("script")
         end
       end
@@ -663,6 +677,19 @@ RSpec.describe Page do
           links = page.links(between_headings: [/Start/, /End/], skip_files: false)
           expect(links.collect(&:text)).to eq(["PDF Document", "Regular Link"])
         end
+      end
+
+      it "returns links inside hidden containers between headings" do
+        page = build(:page, body: <<~HTML)
+          <h1>Start</h1>
+          <div hidden><a href="/hidden-attribute">Hidden Attribute Link</a></div>
+          <div style="display: none;"><a href="/hidden-style">Hidden Style Link</a></div>
+          <div style="visibility: hidden;"><a href="/hidden-visibility">Hidden Visibility Link</a></div>
+          <h1>End</h1>
+        HTML
+
+        links = page.links(between_headings: [/Start/, /End/])
+        expect(links.collect(&:text)).to eq(["Hidden Attribute Link", "Hidden Style Link", "Hidden Visibility Link"])
       end
 
       context "with string patterns" do
