@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.2"
+gem "rails", "~> 8.1.3"
 gem "rails-i18n"
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
@@ -49,7 +49,7 @@ gem "sentry-ruby"
 gem "sentry-rails"
 
 # Allow I18N URLs
-gem "addressable", "~> 2.8"
+gem "addressable", "~> 2.9"
 
 # Pagination
 gem "pagy", "~> 43"
