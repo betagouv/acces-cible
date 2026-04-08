@@ -23,6 +23,15 @@ module ApplicationHelper
     end
   end
 
+  def safe_external_link_to(label, url, **options)
+    href = Link.safe_external_url(url)
+    if href
+      link_to(label, href, **options)
+    else
+      t("shared.invalid_url")
+    end
+  end
+
   def sortable_header(text, param, **options)
     current_sort = params.dig(:sort, param)&.downcase&.to_sym
     direction = current_sort == :asc ? :desc : :asc

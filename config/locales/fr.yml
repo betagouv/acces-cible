@@ -156,7 +156,7 @@ fr:
       type: Indication de la langue
     reachable:
       reachable: Joignable à l'adresse indiquée
-      redirect_message: "Le site redirige de <b>%{original}</b> vers <b>%{redirected}</b>."
+      redirect_message: Le site redirige de %{original} vers %{redirected}.
       redirected: Redirection
       type: Site joignable
     run_axe_on_homepage:
@@ -275,6 +275,7 @@ fr:
     help: Aide
     import: Importer
     importing: Import en cours…
+    invalid_url: URL invalide
     lines:
       one: 1 ligne
       other: "%{count} lignes"

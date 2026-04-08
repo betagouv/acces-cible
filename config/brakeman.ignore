@@ -1,39 +1,6 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "7ddb9cedcb2dc187bc5b3ae5fc0d5569413f5618fc4d0b7c456cc317a535d09e",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/sites/_site.html.erb",
-      "line": 4,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to((Unresolved Model).new.url_without_scheme_and_www.truncate(35, :separator => /\\W/), (Unresolved Model).new.url, :target => :_blank, :title => (if ((Unresolved Model).new.url_without_scheme_and_www.length > 35) then\n  (Unresolved Model).new.url_without_scheme_and_www\nelse\n  nil\nend))",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "sites/index",
-          "line": 33,
-          "file": "app/views/sites/index.html.erb",
-          "rendered": {
-            "name": "sites/_site",
-            "file": "app/views/sites/_site.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "sites/_site"
-      },
-      "user_input": "(Unresolved Model).new.url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c4cad965475b6097943e188932e000414d4bc34d7a9b5826abdcf5ab14bd684e",
@@ -103,5 +70,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "8.0.2"
+  "brakeman_version": "8.0.4"
 }
