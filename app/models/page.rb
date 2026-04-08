@@ -2,7 +2,7 @@ class Page
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
   DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
   FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
-  INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
+  NON_CONTENT_ELEMENTS = "script, style, noscript, meta, link, iframe[src]".freeze
   LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
   MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
   MAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+(?:@|\(at\))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
@@ -86,12 +86,7 @@ class Page
   end
 
   def dom
-    @dom ||= Nokogiri::HTML(html).tap do |document|
-      document.css(INVISIBLE_ELEMENTS).each(&:remove)
-      document.xpath("//text()[normalize-space(.) != '']").each { |node| node.content = " #{node.content} " }
-    end
-  rescue Nokogiri::SyntaxError => e
-    raise ParseError.new url, e.message
+    @dom ||= parse_html_document
   end
 
   def links(skip_files: true, between_headings: nil)
@@ -136,7 +131,7 @@ class Page
   end
 
   def dom_headings
-    @dom_headings ||= dom.css(HEADINGS)
+    @dom_headings ||= content_dom.css(HEADINGS)
   end
 
   def heading(matcher)
@@ -179,7 +174,7 @@ class Page
   end
 
   def source_for(between_headings: nil)
-    return dom unless between_headings
+    return content_dom unless between_headings
 
     start_matcher, end_matcher = between_headings
     start_node, end_node = find_heading_nodes(start_matcher, end_matcher)
@@ -201,8 +196,21 @@ class Page
       node.ancestors.any? { |ancestor| nodes_between.include?(ancestor) }
     end
 
-    dom.fragment.tap do |fragment|
+    content_dom.fragment.tap do |fragment|
       deduped_nodes.each { |node| fragment.add_child(node.dup) }
     end
+  end
+
+  def content_dom
+    @content_dom ||= parse_html_document.tap do |document|
+      document.css(NON_CONTENT_ELEMENTS).each(&:remove)
+      document.xpath("//text()[normalize-space(.) != '']").each { |node| node.content = " #{node.content} " }
+    end
+  end
+
+  def parse_html_document
+    Nokogiri::HTML(html)
+  rescue Nokogiri::SyntaxError => e
+    raise ParseError.new url, e.message
   end
 end

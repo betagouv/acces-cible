@@ -94,6 +94,42 @@ RSpec.describe FindAccessibilityPageService do
       end
     end
 
+    context "when the homepage html root is visibility-hidden" do
+      let(:home_page_html) do
+        <<~HTML
+          <html style="visibility:hidden;opacity:0">
+            <body>
+              <footer>
+                <a href="https://accessibilite.example.org/declaration">Accessibilité : partiellement conforme</a>
+              </footer>
+            </body>
+          </html>
+        HTML
+      end
+
+      let(:expected_link_list) do
+        ["https://accessibilite.example.org/declaration"]
+      end
+
+      it "still prioritizes the accessibility link" do
+        allow(Crawler).to receive(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        ).and_return(crawler)
+
+        allow(crawler).to receive(:find_page).and_return(nil)
+
+        described_class.call(audit)
+
+        expect(Crawler).to have_received(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        )
+      end
+    end
+
     it "does nothing if no page is found" do
       allow(crawler).to receive(:find_page).and_return(nil)
 
