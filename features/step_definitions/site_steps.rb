@@ -202,6 +202,15 @@ Quand("je choisis {string} dans le menu principal") do |item|
   end
 end
 
-Alors('la page contient un CSV dont une ligne commence par {string}') do |str|
+Alors('la page retourne un CSV dont une ligne commence par {string}') do |str|
   expect(page.body.lines.one? { |line| line.start_with?(str) }).to be_truthy
+end
+
+Alors('la page retourne un CSV qui contient strictement les sites {string}') do |str|
+  sites = str.delete(' ').split(",")
+  expect(page.body.lines.count).to eq(sites.count + 1)
+
+  sites.each do |site|
+    expect(page.body.lines.one? { |line| line.start_with?(site) }).to be_truthy
+  end
 end

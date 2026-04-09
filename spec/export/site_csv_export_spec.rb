@@ -19,6 +19,7 @@ RSpec.describe SiteCsvExport do
     let(:csv_output) do
       output = StringIO.new
       described_class.stream_csv_to(output, Site.where(id: site.id))
+
       output.string
     end
 
