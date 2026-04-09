@@ -41,7 +41,7 @@ class SiteUpload
 
     transaction do
       create!(new_sites.values) if new_sites.any?
-      existing_sites.values.each { |site| site.save && site.audit! }
+      existing_sites.values.each { |site| site.save && site.create_audit! }
     end
     true
   end

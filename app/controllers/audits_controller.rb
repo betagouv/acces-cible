@@ -3,7 +3,7 @@ class AuditsController < ApplicationController
 
   # POST /sites/1/audits
   def create
-    @audit = @site.audit!
+    @audit = @site.create_audit!
     if @audit.persisted?
       redirect_to [@site, @audit], notice: t(".notice")
     else
