@@ -105,12 +105,16 @@ RSpec.describe "Sites" do
     end
 
     context "when URL already exists" do
-      it "doesn't create a duplicate site" do
+      it "creates a new audit for the existing site without creating a duplicate site" do
         existing_site = create(:site, url:, team:)
+        initial_site_count = Site.count
 
-        expect { post_site }.not_to change(Site, :count)
+        expect { post_site }.to change(Audit, :count).by(1)
+          .and change(Check, :count).by(Check.names.count)
 
+        expect(Site.count).to eq(initial_site_count)
         expect(response).to redirect_to(site_path(existing_site))
+        expect(flash[:notice]).to eq(I18n.t("sites.create.new_audit"))
       end
     end
 

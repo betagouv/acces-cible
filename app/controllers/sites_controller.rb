@@ -36,9 +36,8 @@ class SitesController < ApplicationController
   def create
     url = site_params[:url]
     @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
-    @site.assign_attributes(site_params)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
-    if @site.save
+    if @site.save_and_create_audit_if_needed(site_params)
       redirect_to @site, notice:
     else
       render :new, status: :unprocessable_content

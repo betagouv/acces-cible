@@ -71,8 +71,34 @@ class Site < ApplicationRecord
     audits.find(&:current?) || audits.current.last || audits.first || audits.build(current: true)
   end
 
-  def audit!
+  def create_audit!
     audits.create!(url:, current: audits.current.none? || audits.none?)
+  end
+
+  def create_audit
+    audits.create(url:, current: audits.current.none? || audits.none?)
+  end
+
+  def save_and_create_audit_if_needed(attributes)
+    resubmitting_existing_site = persisted? && Link.normalize(attributes[:url]) == url
+    assign_attributes(attributes)
+
+    return save unless resubmitting_existing_site
+
+    with_transaction_returning_status do
+      next false unless save
+
+      audit = create_audit
+
+      if audit.persisted?
+        true
+      else
+        audit.errors.each do |error|
+          errors.add(error.attribute, error.message)
+        end
+        false
+      end
+    end
   end
 
   def actual_current_audit
