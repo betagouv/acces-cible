@@ -35,8 +35,10 @@ class SitesController < ApplicationController
   # POST /sites
   def create
     url = site_params[:url]
+    attributes = site_params.except(:url)
     @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
-    @site.assign_attributes(site_params)
+    @site.assign_attributes(attributes)
+    @site.audits.build(url:)
     notice = t(@site.new_record? ? ".created" : ".new_audit")
     if @site.save
       redirect_to @site, notice:
@@ -57,7 +59,7 @@ class SitesController < ApplicationController
 
   # PATCH/PUT /sites/1
   def update
-    if @site.update(site_params)
+    if @site.update(site_params.except(:url))
       redirect_to @site, notice: t(".notice"), status: :see_other
     else
       render :edit, status: :unprocessable_content

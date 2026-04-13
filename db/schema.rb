@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_27_092803) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_141721) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,14 +19,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_27_092803) do
     t.string "accessibility_page_url"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.boolean "current", default: false, null: false
     t.text "home_page_html"
     t.string "home_page_url"
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
     t.string "url", null: false
     t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
-    t.index ["site_id", "current"], name: "index_audits_on_site_id_and_current", unique: true, where: "(current = true)"
     t.index ["site_id"], name: "index_audits_on_site_id"
     t.index ["url"], name: "index_audits_on_url"
   end
