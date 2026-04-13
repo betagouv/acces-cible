@@ -35,7 +35,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 # Add a web interface to control jobs
-gem "mission_control-jobs", "~> 1.1"
+gem "solid_queue_monitor", "~> 1.2"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
