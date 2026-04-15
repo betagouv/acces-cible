@@ -1,37 +1,4 @@
 ActiveSupport.on_load(:active_record) do
-  module QueryExtensions
-    def query_object_class
-      "#{model.name}Query".safe_constantize
-    end
-
-    def filter_by(params)
-      if query_object_class
-        query_object_class.new(self).filter_by(params)
-      else
-        raise NameError, "Missing #{model.name}Query class for #{model.name}.filter_by"
-      end
-    end
-
-    def order_by(params)
-      key, direction = extract_sort_from(params)
-      if query_object_class
-        query_object_class.new(self).order_by(params) || self
-      elsif key = key.presence_in(model.column_names)
-        order(key => direction)
-      else
-        order("created_at" => direction)
-      end
-    end
-
-    def extract_sort_from(params)
-      directions = [:asc, :desc]
-      key, direction = params[:sort]&.to_unsafe_h&.first
-      direction = direction.to_s.downcase.to_sym.presence_in(directions) || directions.first
-      [key, direction]
-    end
-  end
-  ActiveRecord::Relation.include(QueryExtensions)
-
   module CsvExportExtensions
     def export_object_class
       "#{model.name}CsvExport".constantize

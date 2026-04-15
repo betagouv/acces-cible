@@ -3,6 +3,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "5d4399958a6343d1fe98752a5cdd03fb464e5d3bd8260c5d9ced1244fc8e645b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/concerns/sites_filtering.rb",
+      "line": 56,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"REGEXP_REPLACE(audits.url, '^https?://(www\\\\.)?', '') #{sort_direction.upcase}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SitesFiltering",
+        "method": "order_by_url"
+      },
+      "user_input": "sort_direction.upcase",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "c4cad965475b6097943e188932e000414d4bc34d7a9b5826abdcf5ab14bd684e",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -17,52 +40,6 @@
         "method": "self.bulk_reset_counter"
       },
       "user_input": "association",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/queries/site_query.rb",
-      "line": 11,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"sortable_url #{direction}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SiteQuery",
-        "method": "order_by"
-      },
-      "user_input": "direction",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "f427c3b5ebadb7f54595eca0757c8296d4b6552e9c1975c47515e9a2c343ab30",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/queries/site_query.rb",
-      "line": 12,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"sortable_url #{direction}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SiteQuery",
-        "method": "order_by"
-      },
-      "user_input": "direction",
       "confidence": "Medium",
       "cwe_id": [
         89

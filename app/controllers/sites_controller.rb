@@ -1,19 +1,25 @@
 class SitesController < ApplicationController
   include ActionController::Live
+  include SitesFiltering
   before_action :set_site, only: [:show, :edit, :update, :destroy]
-  before_action :set_sites, only: :index
+  before_action :set_sites, only: [:index, :csv_export]
   before_action :set_bulk_sites, only: :bulk_destroy
-  before_action :redirect_old_slugs, except: [:index, :new, :create], if: :get_request?
+  before_action :redirect_old_slugs, except: [:index, :new, :create, :csv_export], if: :get_request?
 
   # GET /sites
   def index
-    params[:sort] ||= { completed_at: :desc }
+    params[:sort] ||= { completed_at: SitesFiltering::DEFAULT_DIRECTION }
     @tags = current_user.team.tags.in_alphabetical_order
 
     respond_to do |format|
       format.html do
-        @pagy, @sites = pagy @sites.preloaded.filter_by(params).order_by(params)
+        @pagy, @sites = pagy @sites
       end
+    end
+  end
+
+  def csv_export
+    respond_to do |format|
       format.csv do
         set_csv_headers
         stream_csv
@@ -93,7 +99,7 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites
+    current_user.team.sites.preloaded
   end
 
   def set_site
@@ -101,12 +107,11 @@ class SitesController < ApplicationController
   end
 
   def set_sites
-    @sites = sites_scope
+    @sites = filter_and_order_sites(sites_scope, ids: site_ids)
   end
 
   def set_bulk_sites
-    ids = params.expect(id: [])
-    @sites = sites_scope.where(id: ids)
+    @sites = sites_scope.where(id: site_ids)
   end
 
   def redirect_old_slugs
@@ -118,6 +123,10 @@ class SitesController < ApplicationController
   end
 
   def site_upload_params
-    params.expect(site_upload: [:file, [tag_ids: [], tags_attributes: [:name]]]).merge(team: current_user.team)
+    params.expect(site_upload: [:file, { tag_ids: [], tags_attributes: [:name] }]).merge(team: current_user.team)
+  end
+
+  def site_ids
+    params[:id] || []
   end
 end

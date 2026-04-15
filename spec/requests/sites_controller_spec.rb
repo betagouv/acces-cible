@@ -15,29 +15,6 @@ RSpec.describe "Sites" do
       expect(response).to have_http_status(:ok)
     end
 
-    context "when requesting CSV format" do
-      subject(:get_csv) { get sites_path(format: :csv) }
-
-      let!(:site) { create(:site, :completed, team:) }
-
-      it "returns CSV content" do
-        get_csv
-
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include("text/csv")
-        expect(response.headers["Content-Disposition"]).to include("attachment")
-        expect(response.headers["Content-Disposition"]).to include("sites_")
-      end
-
-      it "includes site data in CSV" do
-        get_csv
-
-        csv = CSV.parse(response.body, col_sep: ";", headers: true)
-        expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(site.url_without_scheme_and_www)
-      end
-    end
-
     context "when requesting an empty page" do
       let!(:paged_sites) { create_list(:site, 10, team:) }
 
@@ -61,6 +38,58 @@ RSpec.describe "Sites" do
 
         expect(response.body).not_to include(%(href="#{unsafe_url}"))
         expect(response.body).to include("URL invalide")
+      end
+    end
+  end
+
+  describe "GET /sites/csv_export" do
+    subject(:get_csv) { get csv_export_sites_path(format: :csv), params: request_params }
+
+    let(:tag) { create(:tag, team:) }
+    let!(:site) { create(:site, :completed, team:) }
+    let!(:other_site) { create(:site, :completed, team:, tag_ids: [tag.id]) }
+
+    let(:request_params) { {} }
+
+    it "returns CSV content" do
+      get_csv
+
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("sites_")
+    end
+
+    it "includes sites data in CSV" do
+      get_csv
+
+      csv = CSV.parse(response.body, col_sep: ";", headers: true)
+      expect(csv.count).to eq(2)
+      expect(csv[0]["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+      expect(csv[1]["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+    end
+
+    context "when filtering by site ids" do
+      let(:request_params) { { id: [other_site.id] } }
+
+      it "returns only selected sites" do
+        get_csv
+
+        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        expect(csv.count).to eq(1)
+        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+      end
+    end
+
+    context "when filtering by tag id" do
+      let(:request_params) { { filter: { tag_id: tag.id } } }
+
+      it "returns only tagged sites" do
+        get_csv
+
+        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        expect(csv.count).to eq(1)
+        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
       end
     end
   end
