@@ -251,6 +251,20 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         expect(check.find_compliance_rate).to eq(expected_rate)
       end
     end
+
+    it "extracts the updated rate when test results start with a nested heading" do
+      body = <<~HTML
+        <h2>Résultats des tests</h2>
+        <h3>Résultats des tests</h3>
+        <p>L’audit de conformité réalisé par la société <strong>IPEDIS</strong> révèle que :</p>
+        <p>Le taux global de conformité était de 51,43% en Juin 2023, mis à jour à 71,21% sur l’ensemble critères du référentiel générale d’amélioration de l’accessibilité (RGAA).</p>
+        <h2>Contenus non accessibles</h2>
+      HTML
+      allow(check).to receive(:page).and_return(build(:page, body:))
+
+      expect(check.find_compliance_rate).to eq(71.21)
+      expect(check.find_auditor).to eq("IPEDIS")
+    end
   end
 
   describe "#find_standard" do

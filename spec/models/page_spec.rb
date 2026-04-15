@@ -408,6 +408,20 @@ RSpec.describe Page do
           expect(result).to eq("Content in second section")
         end
 
+        it "includes nested sub-sections until the next heading of the same or higher level" do
+          body = <<~HTML
+            <h2>Results</h2>
+            <h3>Results</h3>
+            <p>Audit details</p>
+            <p>71,21%</p>
+            <h2>Other section</h2>
+          HTML
+          page = described_class.new(url: "https://example.com", html: body)
+
+          result = page.text(between_headings: [/Results/, :next])
+          expect(result).to eq("Results Audit details 71,21%")
+        end
+
         context "when matched heading is the last heading" do
           it "returns empty string" do
             result = page.text(between_headings: [/Third Heading/, :next])
@@ -420,6 +434,19 @@ RSpec.describe Page do
             result = page.text(between_headings: [/Nonexistent/, :next])
             expect(result).to eq("")
           end
+        end
+
+        it "returns the section until the end of the document when no heading of the same or higher level follows" do
+          body = <<~HTML
+            <h2>Section</h2>
+            <p>Intro</p>
+            <h3>Details</h3>
+            <p>Tail content</p>
+          HTML
+          page = described_class.new(url: "https://example.com", html: body)
+
+          result = page.text(between_headings: [/Section/, :next])
+          expect(result).to eq("Intro Details Tail content")
         end
       end
 
@@ -456,6 +483,36 @@ RSpec.describe Page do
             result = page.text(between_headings: [:previous, /Nonexistent/])
             expect(result).to eq("")
           end
+        end
+
+        it "keeps previous matching scoped to the immediately preceding heading" do
+          body = <<~HTML
+            <h1>Overview</h1>
+            <p>Overview content</p>
+            <h2>Details</h2>
+            <p>Details content</p>
+            <h3>Nested</h3>
+            <p>Nested content</p>
+          HTML
+          page = described_class.new(url: "https://example.com", html: body)
+
+          result = page.text(between_headings: [:previous, /Details/])
+          expect(result).to eq("Overview content")
+        end
+      end
+
+      context "when the explicit ending heading is not found" do
+        let(:body) do
+          <<~HTML
+            <h2>Section A</h2>
+            <p>Alpha content</p>
+            <h2>Section C</h2>
+          HTML
+        end
+
+        it "returns empty string" do
+          result = page.text(between_headings: ["Section A", "Section B"])
+          expect(result).to eq("")
         end
       end
 

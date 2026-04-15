@@ -155,10 +155,26 @@ class Page
 
     case direction
     when :next
-      headings[index + 1]
+      next_section_boundary(node, headings)
     when :previous
       index > 0 ? headings[index - 1] : nil
     end
+  end
+
+  def next_section_boundary(node, headings)
+    index = headings.index(node)
+    return nil unless index
+
+    current_level = heading_level(node)
+    following_headings = headings[(index + 1)..]
+
+    following_headings.find do |candidate|
+      heading_level(candidate) <= current_level
+    end
+  end
+
+  def heading_level(node)
+    node.name.delete_prefix("h").to_i
   end
 
   def find_heading_nodes(start_matcher, end_matcher)
@@ -184,17 +200,21 @@ class Page
     start_matcher, end_matcher = between_headings
     start_node, end_node = find_heading_nodes(start_matcher, end_matcher)
 
-    if start_node && end_node
+    if start_node
       dom_between(start_node, end_node)
     else
       dom.fragment
     end
   end
 
-  def dom_between(start_node, end_node)
-    # Find all nodes between start_node and end_node
-    # (following-siblings only works when nodes are at the same level)
-    nodes_between = start_node.xpath("following::*") & end_node.xpath("preceding::*")
+  def dom_between(start_node, end_node = nil)
+    nodes_between = if end_node
+      # Find all nodes between start_node and end_node
+      # (following-siblings only works when nodes are at the same level)
+      start_node.xpath("following::*") & end_node.xpath("preceding::*")
+    else
+      start_node.xpath("following::*")
+    end
 
     # Remove nodes whose parent is already included (UL>LI,P>EM etc)
     deduped_nodes = nodes_between.reject do |node|
