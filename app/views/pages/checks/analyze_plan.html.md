@@ -26,7 +26,7 @@ Un simple texte sans lien dans la déclaration est relevé en tant qu'avertissem
         <td>Réussi - Lien trouvé et valide</td>
       </tr>
       <tr>
-        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.invalid_year") %></p></td>
+        <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_plan.invalid_years") %></p></td>
         <td>Avertissement - Lien trouvé et valide, mais les années précisées sont invalides (anciennes/incohérentes) </td>
       </tr>
       <tr>
