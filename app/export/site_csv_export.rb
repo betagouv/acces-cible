@@ -1,5 +1,6 @@
 class SiteCsvExport
   COL_SEP = ";"
+  UTF8_BOM = "\uFEFF"
 
   HEADERS = [
     I18n.t("audit.site_url_address"),
@@ -32,6 +33,7 @@ class SiteCsvExport
   end
 
   def self.stream_csv_to(output_stream, sites)
+    output_stream.write(UTF8_BOM)
     output_stream.write CSV.generate_line(HEADERS, col_sep: COL_SEP)
 
     sites.in_batches(of: 200) do |batch|
