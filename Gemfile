@@ -109,6 +109,7 @@ group :development do
   gem "rack-mini-profiler"
   gem "memory_profiler"
   gem "stackprof"
+  gem "i18n-tasks", "~> 1.1.2"
 end
 
 group :test do
