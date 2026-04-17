@@ -283,6 +283,8 @@ GEM
     hashdiff (1.2.1)
     hashie (5.1.0)
       logger
+    highline (3.1.2)
+      reline
     html-attributes-utils (1.0.2)
       activesupport (>= 6.1.4.4)
     http (6.0.2)
@@ -292,6 +294,18 @@ GEM
       domain_name (~> 0.5)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
+    i18n-tasks (1.1.2)
+      activesupport (>= 4.0.2)
+      ast (>= 2.1.0)
+      erubi
+      highline (>= 3.0.0)
+      i18n
+      parser (>= 3.2.2.1)
+      prism
+      rails-i18n
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.8, >= 1.8.1)
+      terminal-table (>= 1.5.1)
     ice_nine (0.11.2)
     importmap-rails (2.2.3)
       actionpack (>= 6.0.0)
@@ -621,6 +635,8 @@ GEM
     sys-uname (1.5.0)
       ffi (~> 1.1)
       memoist3 (~> 1.0.0)
+    terminal-table (4.0.0)
+      unicode-display_width (>= 1.1.1, < 4)
     thor (1.5.0)
     thread_safe (0.3.6)
     timeout (0.6.1)
@@ -701,6 +717,7 @@ DEPENDENCIES
   guard-cucumber
   guard-rspec
   http
+  i18n-tasks (~> 1.1.2)
   importmap-rails
   markdown_views
   memory_profiler
