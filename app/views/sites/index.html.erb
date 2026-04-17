@@ -46,7 +46,11 @@
     <% else %>
       <tr>
         <td colspan="<%= 5 + Check.classes.size %>">
-          <%= t(params.dig(:filter, :q).present? ? '.no_search_results' : '.no_results') %>
+          <% if params.dig(:filter, :q).present? %>
+            <%= t(".no_search_results") %>
+          <% else %>
+            <%= t(".no_results") %>
+          <% end %>
         </td>
       </tr>
     <% end %>

@@ -43,7 +43,11 @@ class SitesController < ApplicationController
     url = site_params[:url]
     @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
     @site.assign_attributes(site_params)
-    notice = t(@site.new_record? ? ".created" : ".new_audit")
+    notice = if @site.new_record?
+      t(".created")
+    else
+      t(".new_audit")
+    end
     if @site.save
       redirect_to @site, notice:
     else

@@ -13,7 +13,11 @@ module Checks
     end
 
     def custom_badge_text
-      t(found? ? "link_to_page" : "not_found", scope: "checks.find_accessibility_page")
+      if found?
+        t("checks.find_accessibility_page.link_to_page")
+      else
+        t("checks.find_accessibility_page.not_found")
+      end
     end
 
     def custom_badge_status
