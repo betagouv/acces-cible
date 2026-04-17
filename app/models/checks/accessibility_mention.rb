@@ -17,7 +17,10 @@ module Checks
     delegate :text, to: :root_page, prefix: true
 
     def mention_text
-      completed? ? t("#{mention || 'none'}", scope: "checks.accessibility_mention.mentions") : ""
+      return "" unless completed?
+
+      key = mention || "none"
+      t("checks.accessibility_mention.mentions.#{key}")
     end
 
     def custom_badge_text

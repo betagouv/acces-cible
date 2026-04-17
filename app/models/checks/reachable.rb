@@ -12,7 +12,11 @@ module Checks
     end
 
     def custom_badge_text
-      t(redirected? ? "redirected" : "reachable", scope: "checks.reachable")
+      if redirected?
+        t("checks.reachable.redirected")
+      else
+        t("checks.reachable.reachable")
+      end
     end
 
     def custom_badge_status

@@ -32,11 +32,6 @@ fr:
         other: Équipes
   audit:
     completed_at: Executé le
-    count:
-      one: Une vérification
-      other: "%{count} vérifications"
-      zero: Aucune vérification
-    new: "Nouvelle vérification"
     redirect_url: URL de redirection
     site_url_address: Adresse du site
     state: État
@@ -52,13 +47,7 @@ fr:
     create:
       notice: Vérification créée
   check:
-    attempts: Tentatives
     completed_at: Vérification effectuée le
-    count:
-      one: Un contrôle
-      other: "%{count} contrôles"
-      zero: Aucun contrôle
-    state: État
     status:
       aborted: Annulé
       blocked: Inapplicable
@@ -68,7 +57,6 @@ fr:
       pending: Planifié
       ready: Prêt
       running: En cours
-    type: Type de contrôle
   checks:
     accessibility_mention:
       mentions:
@@ -87,9 +75,7 @@ fr:
         one: "Un seul problème relevé sur %{total} titres attendus (%{error})."
         other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
         zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
-      not_found: Non trouvé
       retained: "Titre retenu :"
-      score: Taux de correspondance
       statuses:
         incorrect_level: niveau de titre incorrect
         incorrect_order: ordre incorrect
@@ -104,7 +90,6 @@ fr:
       contact_email: Adresse email de contact
       contact_form: Formulaire de contact
       compliance_rate: Taux de conformité
-      found_all: Déclaration complète
       mentions_article: Mentionne l'article de loi
       missing_data: Déclaration incomplète
       standard: Référentiel
@@ -148,11 +133,9 @@ fr:
       not_found: Non trouvée
       table_header: Déclaration
       type: Présence d'une déclaration d'accessibilité
-      view_page: "Voir la déclaration"
     language_indication:
       empty: Non trouvée
       table_header: Langue
-      totalement: Totalement conforme
       type: Indication de la langue
     reachable:
       reachable: Joignable à l'adresse indiquée
@@ -160,7 +143,6 @@ fr:
       redirected: Redirection
       type: Site joignable
     run_axe_on_homepage:
-      checks_total: Contrôles effectués
       elements_count:
         one: un élément concerné
         other: "%{count} éléments concernés"
@@ -170,16 +152,9 @@ fr:
         minor: impact mineur
         moderate: impact modéré
         serious: impact important
-      inapplicable: Contrôles inapplicables
-      incomplete: Contrôles incomplets
-      issues_total: Erreurs relevées
-      passes: Contrôles réussis
-      redirected: Contrôles
       success_rate: Taux de réussite
       table_header: "🤖 : Accueil"
       type: "Contrôles automatiques : page d'accueil"
-      unknown: Inconnu
-      violations: Contrôles échoués
   date:
     formats:
       compact: "%Y/%m/%d"
@@ -191,21 +166,11 @@ fr:
   global:
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
     service_name: "Accès cible (version beta)"
-    sponsor: "Gouvernement"
     sponsor_html: "Gouvernement"
   pages:
     accessibilite:
       title: Déclaration d’accessibilité
     accueil:
-      stats:
-        sites_count:
-          one: Un site
-          other: "%{count} sites"
-          zero: Aucun site
-        teams_count:
-          one: Une équipe
-          other: "%{count} équipes"
-          zero: Aucune équipe
       title: Présentation
     contact:
       title: Contact
@@ -275,10 +240,6 @@ fr:
     help: Aide
     import: Importer
     importing: Import en cours…
-    lines:
-      one: 1 ligne
-      other: "%{count} lignes"
-      zero: 0 lignes
     login: Se connecter
     logout: Se déconnecter
     new_window: " (nouvelle fenêtre)"
@@ -305,10 +266,6 @@ fr:
   sites:
     add: Ajouter un site
     all: Tous les sites
-    count:
-      one: Un site
-      other: "%{count} sites"
-      zero: Aucun site
     create:
       created: Site ajouté
       new_audit: Site existant, nouvel audit programmé
@@ -346,7 +303,6 @@ fr:
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications
-      audits_count: Vérifications
       delete: Supprimer ce site
       edit: Modifier ce site
       new_audit: Nouvelle vérification
@@ -367,32 +323,12 @@ fr:
         one: Un site ajouté
         other: "%{count} sites ajoutés"
         zero: Aucun site ajouté
-  tag:
-    add: Créer une nouvelle étiquette
-    all: Toutes les étiquettes
-    count:
-      one: Une étiquette
-      other: "%{count} étiquettes"
-      zero: Aucune étiquette
-    delete: Supprimer cette étiquette
-    edit: Modifier cette étiquette
-    filter: Filtrer par étiquette
-    name: Libellé
-    new: Nouvelle étiquette
-    see_sites: Sites avec l'étiquette %{tag} (%{count})
-    sites: Sites
-    tag: Étiquette %{name}
   tags:
     all: Toutes les étiquettes
     destroy:
       notice: Étiquette supprimée
     edit:
-      name: Libellé
       title: Modifier l'étiquette
-    form:
-      add: Créer une nouvelle étiquette
-      all: Toutes les étiquettes
-      new: Nouvelle étiquette
     index:
       caption: Toutes les étiquettes
       empty: Aucune étiquette
@@ -407,15 +343,8 @@ fr:
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
     update:
       notice: Étiquette modifiée
-  team:
-    all: Équipes
-    count:
-      one: Une équipe
-      other: "%{count} équipes"
-      zero: Aucune équipe
   time:
     formats:
-      compact: "%Y/%m/%d"
       complete: "%d/%m/%Y à %H:%M"
       file: "%Y%m%d-%Hh%M"
   users:
