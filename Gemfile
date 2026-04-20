@@ -35,7 +35,8 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 # Add a web interface to control jobs
-gem "solid_queue_monitor", "~> 1.2"
+# DO NOT MERGE UNTIL PROPER RELEASE OF SOLID_QUEUE_MONITOR
+gem "solid_queue_monitor", github: 'vishaltps/solid_queue_monitor', branch: 'main'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false

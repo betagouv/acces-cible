@@ -6,9 +6,3 @@ SolidQueueMonitor.setup do |config|
   config.auto_refresh_enabled = true
   config.auto_refresh_interval = 30
 end
-
-Rails.application.config.to_prepare do
-  # The gem renders inline <style>/<script> tags and also mutates inline styles from JavaScript,
-  # which conflicts with the application's strict CSP. See /config/initializers/content_security_policy.rb
-  SolidQueueMonitor::ApplicationController.content_security_policy false
-end
