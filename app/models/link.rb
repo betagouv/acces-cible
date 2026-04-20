@@ -23,7 +23,7 @@ Link = Data.define(:href, :text) do
       return if href.blank?
 
       uri = parse(href)
-      uri.to_s if uri.host.present? && uri.scheme&.match?(/\Ahttps?\z/)
+      uri.to_s if uri.host.present? && uri.scheme&.in?(%w[http https])
     rescue Link::InvalidUriError
       nil
     end

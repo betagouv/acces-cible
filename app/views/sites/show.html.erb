@@ -1,10 +1,15 @@
 <%= turbo_stream_from @site %>
+<% site_url = Link.safe_external_url(@site.url) %>
 
 <div class="fr-grid-row">
   <div class="fr-col-12 fr-col-md-8">
     <p>
       <strong><%= t(".url") %> :</strong>
-      <%= safe_external_link_to(@site.url, @site.url, target: :_blank) %>
+      <% if site_url %>
+        <%= link_to @site.url, site_url, target: :_blank %>
+      <% else %>
+        <%= t("shared.invalid_url") %>
+      <% end %>
     </p>
     <p>
       <strong><%= t("tags.all") %> :</strong>

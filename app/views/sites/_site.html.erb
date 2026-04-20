@@ -3,13 +3,13 @@
   <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: site.name_with_fallback), url_for([site, site.audit]), title: t('.view_name', name: site.name_with_fallback), line: true, side: :left, sr_only: true) %></td>
   <% display_url = site.url_without_scheme_and_www %>
   <% truncated_url = display_url.truncate(35, separator: /\W/) %>
+  <% href = Link.safe_external_url(site.url) %>
   <td>
-    <%= safe_external_link_to(
-      truncated_url,
-      site.url,
-      target: :_blank,
-      title: (display_url unless truncated_url == display_url)
-    ) %>
+    <% if href %>
+      <%= link_to(truncated_url, href, target: :_blank, title: (display_url unless truncated_url == display_url)) %>
+    <% else %>
+      <%= t("shared.invalid_url") %>
+    <% end %>
   </td>
   <% site.audit.checks.each do |check| %>
     <td id="<%= dom_id(check, :sites_table) %>" class="fr-cell--center"><%= badge(to_badge(check), tooltip: check.tooltip?) %></td>
