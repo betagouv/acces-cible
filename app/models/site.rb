@@ -40,6 +40,8 @@ class Site < ApplicationRecord
     else
       audits.build(url: new_url)
     end
+
+    persist_site_urls!(new_url)
   end
 
   def url_without_scheme_and_www
@@ -91,5 +93,12 @@ class Site < ApplicationRecord
 
   def tags_list
     tags.collect(&:name).join(", ")
+  end
+
+  private
+
+  def persist_site_urls!(url)
+    self[:url] = url
+    self[:normalized_url] = Link.url_without_scheme_and_www(url)
   end
 end
