@@ -96,9 +96,9 @@ RSpec.describe SiteCsvExport do
         row = parsed_csv.first
         audit = site.audit.reload
 
-        expect(row["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+        expect(row["Adresse du site"]).to eq(site.normalized_url)
         expect(row["Nom du site"]).to eq(site.name)
-        expect(row["URL"]).to eq(audit.url)
+        expect(row["URL"]).to eq(site.url)
         expect(row["URL de redirection"]).to be_nil
         expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
         expect(row["Vérification effectuée le"]).to eq(audit.completed_at.to_s)

@@ -8,7 +8,7 @@ module Checks
     def redirected?
       return if audit.home_page_url.blank?
 
-      normalize(audit.home_page_url) != normalize(audit.url)
+      normalize(audit.home_page_url) != normalize(site.url)
     end
 
     def custom_badge_text
@@ -31,7 +31,7 @@ module Checks
       site.update(name: root_page.title) if site && site.name.blank?
 
       if redirected?
-        { original_url: audit.url, redirect_url: audit.home_page_url }
+        { original_url: site.url, redirect_url: audit.home_page_url }
       else
         {}
       end

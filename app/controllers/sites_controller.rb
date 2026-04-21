@@ -40,18 +40,21 @@ class SitesController < ApplicationController
 
   # POST /sites
   def create
-    url = site_params[:url]
-    @site = current_user.team.sites.find_by_url(url:) || current_user.team.sites.build
-    @site.assign_attributes(site_params)
-    notice = if @site.new_record?
-      t(".created")
+    normalized_url = Link.url_without_scheme_and_www(site_params[:url])
+    @site = current_user.team.sites.find_by(normalized_url:)
+
+    if @site
+      @site.audit!
+      redirect_to @site, notice: t(".new_audit")
     else
-      t(".new_audit")
-    end
-    if @site.save
-      redirect_to @site, notice:
-    else
-      render :new, status: :unprocessable_content
+      @site = current_user.team.sites.build(site_params)
+
+      if @site.save
+        @site.audit!
+        redirect_to @site, notice: t(".created")
+      else
+        render :new, status: :unprocessable_content
+      end
     end
   end
 
@@ -107,7 +110,7 @@ class SitesController < ApplicationController
   end
 
   def set_site
-    @site = sites_scope.preloaded.friendly.find(params.expect(:id))
+    @site = current_user.team.sites.friendly.find(params.expect(:id))
   end
 
   def set_sites

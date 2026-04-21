@@ -13,10 +13,10 @@ RSpec.describe FetchHomePageService do
     allow(audit).to receive(:update_home_page!)
   end
 
-  it "calls Browser.get with the audit URL" do
+  it "calls Browser.get with the site URL" do
     fetch!
 
-    expect(Browser).to have_received(:get).with(audit.url)
+    expect(Browser).to have_received(:get).with(audit.site.url)
   end
 
   it "stores the home page on the audit" do

@@ -8,7 +8,6 @@ class Audit < ApplicationRecord
   normalizes :url, with: ->(url) { Link.normalize(url).to_s }
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
-  scope :sort_by_url, -> { order(Arel.sql("REGEXP_REPLACE(audits.url, '^https?://(www\.)?', '') ASC")) }
   scope :completed, -> { where.not(completed_at: nil) }
   scope :current, -> { where(current: true) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
@@ -100,15 +99,15 @@ class Audit < ApplicationRecord
   def build_page(kind, page_url)
     snapshot_html = html_for(kind)
 
-    Page.new(url: page_url, root: url, html: snapshot_html)
+    Page.new(url: page_url, root: site.url, html: snapshot_html)
   end
 
   def page_url_for(kind)
     case kind
     when :home
-      url
+      home_page_url
     when :accessibility
-      find_accessibility_page&.url
+      accessibility_page_url
     else
       raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
     end

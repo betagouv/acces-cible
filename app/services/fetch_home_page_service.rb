@@ -4,7 +4,7 @@ class FetchHomePageService
   class << self
     def call(audit)
       Browser
-        .get(audit.url)
+        .get(audit.site.url)
         .then do |response|
         Rails.logger.silence do
           audit.update_home_page!(response[:current_url], response[:body])

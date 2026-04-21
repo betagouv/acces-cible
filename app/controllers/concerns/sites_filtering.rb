@@ -25,7 +25,7 @@ module SitesFiltering
     term = "%#{search_query}%"
 
     scope.where(
-      "sites.name ILIKE ? OR audits.url ILIKE ?",
+      "sites.name ILIKE ? OR sites.url ILIKE ?",
       term,
       term
     )
@@ -51,11 +51,8 @@ module SitesFiltering
   end
 
   def order_by_url(scope)
-    scope.order(
-      Arel.sql(
-        "REGEXP_REPLACE(audits.url, '^https?://(www\\.)?', '') #{sort_direction.upcase}"
-      )
-    )
+    direction = sort_direction.upcase
+    scope.order("sites.normalized_url #{direction} NULLS LAST, sites.created_at #{direction}")
   end
 
   def sort_by_url?
