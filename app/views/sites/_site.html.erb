@@ -2,7 +2,7 @@
   <%= dsfr_row_check(site) %>
   <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: site.name_with_fallback), url_for([site, site.audit]), title: t('.view_name', name: site.name_with_fallback), line: true, side: :left, sr_only: true) %></td>
   <% display_url = site.url_without_scheme_and_www %>
-  <% truncated_url = display_url.truncate(35, separator: /\W/) %>
+  <% truncated_url = display_url.truncate(ApplicationHelper::TRUNCATION_LENGTH, separator: /\W/) %>
   <% href = Link.safe_external_url(site.url) %>
   <td>
     <% if href %>
@@ -16,7 +16,7 @@
   <% end %>
   <td class="fr-cell--multiline">
     <% tags = site.tags.collect(&:name) %>
-    <%= safe_join tags.take(3).map { dsfr_tag(title: it.truncate(35), size: :sm) } %>
+    <%= safe_join tags.take(3).map { dsfr_tag(title: it.truncate(ApplicationHelper::TRUNCATION_LENGTH), size: :sm) } %>
     <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: tags[3..].to_sentence) if tags.size > 3 %>
   </td>
   <td>

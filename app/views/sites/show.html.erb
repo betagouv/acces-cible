@@ -15,7 +15,7 @@
       <strong><%= t("tags.all") %> :</strong>
       <% if @site.tags.load.any? %>
         <% @site.tags.each do |tag| %>
-          <%= dsfr_tag(title: tag.name.truncate(35), url: tag_path(tag), size: :sm, html_attributes: { title: t(".tag", name: tag.name) }) %>
+          <%= dsfr_tag(title: tag.name.truncate(ApplicationHelper::TRUNCATION_LENGTH), url: tag_path(tag), size: :sm, html_attributes: { title: t(".tag", name: tag.name) }) %>
         <% end %>
       <% else %>
         <%= t(".no_tag") %>
