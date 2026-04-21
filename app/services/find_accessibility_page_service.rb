@@ -45,7 +45,7 @@ class FindAccessibilityPageService
 
     def required_headings_present?(current_page)
       matching_headings = current_page.headings.select do |heading|
-        Checks::AccessibilityPageHeading.expected_headings.any? do |required_heading|
+        AccessibilityDeclarationHeadings.expected_heading_titles.any? do |required_heading|
           fuzzy_match?(heading, required_heading)
         end
       end

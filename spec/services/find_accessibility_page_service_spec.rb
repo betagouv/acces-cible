@@ -10,9 +10,9 @@ RSpec.describe FindAccessibilityPageService do
   describe ".call" do
     let(:matching_page_url) { "https://example.com/accessibility" }
     let(:matching_page_html) do
-      "<html><body><h1>#{Checks::AccessibilityPageHeading.expected_headings[0]}</h1><h1>#{Checks::AccessibilityPageHeading.expected_headings[1]}</h1></body></html>"
+      "<html><body><h1>#{AccessibilityDeclarationHeadings.expected_heading_titles[0]}</h1><h1>#{AccessibilityDeclarationHeadings.expected_heading_titles[1]}</h1></body></html>"
     end
-    let(:matching_page) { instance_double(Page, url: matching_page_url, html: matching_page_html, headings: Checks::AccessibilityPageHeading.expected_headings.first(2)) }
+    let(:matching_page) { instance_double(Page, url: matching_page_url, html: matching_page_html, headings: AccessibilityDeclarationHeadings.expected_heading_titles.first(2)) }
     let(:crawler) { instance_double(Crawler) }
 
     before do
