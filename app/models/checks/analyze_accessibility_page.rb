@@ -1,5 +1,7 @@
 module Checks
   class AnalyzeAccessibilityPage < Check
+    include AccessibilityDeclarationHeadings
+
     PRIORITY = 21
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
@@ -170,7 +172,7 @@ module Checks
     end
 
     def declaration_heading?(text)
-      AccessibilityDeclarationHeadings.expected_heading_titles.any? { |heading| heading_match?(heading, text) }
+      expected_declaration_heading_titles.any? { |heading| heading_match?(heading, text) }
     end
 
     def heading_match?(matcher, text)

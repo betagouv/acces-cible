@@ -4,6 +4,8 @@ class FindAccessibilityPageService
   REQUIRED_DECLARATION_HEADINGS = 2
 
   class << self
+    include AccessibilityDeclarationHeadings
+
     def call(audit)
       queue = prioritize_queue!(url: audit.home_page_url, starting_html: audit.home_page_html)
       crawler = Crawler.new(audit.home_page_url, root_page_html: audit.home_page_html, queue: queue)
@@ -45,7 +47,7 @@ class FindAccessibilityPageService
 
     def required_headings_present?(current_page)
       matching_headings = current_page.headings.select do |heading|
-        AccessibilityDeclarationHeadings.expected_heading_titles.any? do |required_heading|
+        expected_declaration_heading_titles.any? do |required_heading|
           fuzzy_match?(heading, required_heading)
         end
       end

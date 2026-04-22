@@ -1,4 +1,6 @@
 module AccessibilityDeclarationHeadings
+  extend ActiveSupport::Concern
+
   EXPECTED_HEADINGS = [
     [2, "État de conformité"],
     [3, "Résultats des tests"],
@@ -15,7 +17,11 @@ module AccessibilityDeclarationHeadings
     [2, "Voies de recours"],
   ].freeze
 
-  def self.expected_heading_titles
-    EXPECTED_HEADINGS.map { |_, heading_title| heading_title }
+  def expected_declaration_headings
+    EXPECTED_HEADINGS
+  end
+
+  def expected_declaration_heading_titles
+    expected_declaration_headings.map { |_, heading_title| heading_title }
   end
 end

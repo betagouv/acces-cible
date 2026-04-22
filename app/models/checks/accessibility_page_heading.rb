@@ -1,5 +1,7 @@
 module Checks
   class AccessibilityPageHeading < Check
+    include AccessibilityDeclarationHeadings
+
     PRIORITY = 22
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
     COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
@@ -15,7 +17,7 @@ module Checks
     end
 
     def total
-      AccessibilityDeclarationHeadings.expected_heading_titles.count
+      expected_declaration_heading_titles.count
     end
 
     def failures
@@ -65,7 +67,7 @@ module Checks
     end
 
     def indexed_expected_headings
-      @indexed_expected_headings ||= AccessibilityDeclarationHeadings::EXPECTED_HEADINGS.each_with_index.map do |(level, heading), index|
+      @indexed_expected_headings ||= expected_declaration_headings.each_with_index.map do |(level, heading), index|
         [index, heading, level]
       end
     end
@@ -75,7 +77,7 @@ module Checks
     end
 
     def compare_headings
-      return AccessibilityDeclarationHeadings::EXPECTED_HEADINGS.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
+      return expected_declaration_headings.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
 
       # Two-pass approach: first match all headings, then determine status
       expected_to_actual = {}

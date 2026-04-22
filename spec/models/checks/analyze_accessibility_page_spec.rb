@@ -28,33 +28,27 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     it "extracts data from declaration sections using the next declaration heading" do
       body = <<~HTML
         <h1>Déclaration d’accessibilité</h1>
-        <p>Carrefour s’engage à rendre ses sites internet accessibles conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
         <h2>État de conformité</h2>
-        <p>Le site « Carrefour FR » est partiellement conforme avec le RGAA version 4.1.</p>
+        <p>Le service est partiellement conforme avec le RGAA version 4.1.</p>
         <h2>Résultats des tests</h2>
         <h3>Résultats des tests</h3>
-        <p>L’audit de conformité réalisé par la société <strong>IPEDIS</strong> révèle que :</p>
-        <p>Le taux global de conformité était de 51,43% en Juin 2023, mis à jour à 71,21% sur l’ensemble critères du référentiel générale d’amélioration de l’accessibilité (RGAA).</p>
-        <h2>Contenus non accessibles</h2>
-        <p>Plusieurs non-conformités ont été identifiées.</p>
+        <p>L’audit de conformité réalisé par la société <strong>AccessFacile</strong> révèle que :</p>
+        <p>Le taux global de conformité était de 51,43% en Juin 2023, mis à jour à 71,21% sur l’ensemble des critères du RGAA.</p>
         <h2>Retour d'information et contact</h2>
-        <h3>Contact</h3>
         <p>
           Pour toute question, écrire à
-          <a href="mailto:direction_communication_groupe@carrefour.com">direction_communication_groupe@carrefour.com</a>
+          <a href="mailto:contact@rond-point.example">contact@rond-point.example</a>
         </p>
         <h2>Voies de recours</h2>
-        <p>Vous pouvez contacter le Défenseur des droits.</p>
       HTML
 
       allow(check).to receive(:page).and_return(build(:page, body:))
 
       expect(check.send(:analyze!)).to include(
                                          compliance_rate: 71.21,
-                                         auditor: "IPEDIS",
+                                         auditor: "AccessFacile",
                                          standard: "RGAA version 4.1",
-                                         mentions_article: true,
-                                         contact_email: "direction_communication_groupe@carrefour.com"
+                                         contact_email: "contact@rond-point.example"
                                        )
     end
   end
