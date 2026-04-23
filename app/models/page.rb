@@ -186,16 +186,26 @@ class Page
 
     if start_node && (end_node || end_matcher == :next)
       dom_between(start_node, end_node)
+    elsif end_node && start_matcher == :previous
+      dom_between(start_node, end_node)
     else
       dom.fragment
     end
   end
 
-  def dom_between(start_node, end_node = nil)
-    # Find all nodes after start_node, optionally bounded by end_node.
+  def dom_between(start_node = nil, end_node = nil)
+    # Find all nodes after start_node, before end_node, or between both.
     # (following-siblings only works when nodes are at the same level)
-    nodes_between = start_node.xpath("following::*")
-    nodes_between &= end_node.xpath("preceding::*") if end_node
+    nodes_between =
+      if start_node && end_node
+        start_node.xpath("following::*") & end_node.xpath("preceding::*")
+      elsif start_node
+        start_node.xpath("following::*")
+      elsif end_node
+        end_node.xpath("preceding::*")
+      else
+        []
+      end
 
     # Remove nodes whose parent is already included (UL>LI,P>EM etc)
     deduped_nodes = nodes_between.reject do |node|
