@@ -34,6 +34,7 @@ RSpec.describe "Sites" do
     let!(:other_site) { create(:site, :completed, team:, tag_ids: [tag.id]) }
 
     let(:request_params) { {} }
+    let(:csv_without_bom) { response.body.delete_prefix(SiteCsvExport::UTF8_BOM) }
 
     it "returns CSV content" do
       get_csv
@@ -42,12 +43,13 @@ RSpec.describe "Sites" do
       expect(response.content_type).to include("text/csv")
       expect(response.headers["Content-Disposition"]).to include("attachment")
       expect(response.headers["Content-Disposition"]).to include("sites_")
+      expect(response.body).to start_with(SiteCsvExport::UTF8_BOM)
     end
 
     it "includes sites data in CSV" do
       get_csv
 
-      csv = CSV.parse(response.body, col_sep: ";", headers: true)
+      csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
       expect(csv.count).to eq(2)
       expect(csv[0]["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
       expect(csv[1]["Adresse du site"]).to eq(site.url_without_scheme_and_www)
@@ -59,7 +61,7 @@ RSpec.describe "Sites" do
       it "returns only selected sites" do
         get_csv
 
-        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
         expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
       end
@@ -71,7 +73,7 @@ RSpec.describe "Sites" do
       it "returns only tagged sites" do
         get_csv
 
-        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
         expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
       end
