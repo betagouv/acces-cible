@@ -184,17 +184,18 @@ class Page
     start_matcher, end_matcher = between_headings
     start_node, end_node = find_heading_nodes(start_matcher, end_matcher)
 
-    if start_node && end_node
+    if start_node && (end_node || end_matcher == :next)
       dom_between(start_node, end_node)
     else
       dom.fragment
     end
   end
 
-  def dom_between(start_node, end_node)
-    # Find all nodes between start_node and end_node
+  def dom_between(start_node, end_node = nil)
+    # Find all nodes after start_node, optionally bounded by end_node.
     # (following-siblings only works when nodes are at the same level)
-    nodes_between = start_node.xpath("following::*") & end_node.xpath("preceding::*")
+    nodes_between = start_node.xpath("following::*")
+    nodes_between &= end_node.xpath("preceding::*") if end_node
 
     # Remove nodes whose parent is already included (UL>LI,P>EM etc)
     deduped_nodes = nodes_between.reject do |node|

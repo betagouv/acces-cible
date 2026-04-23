@@ -39,7 +39,6 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
           Pour toute question, écrire à
           <a href="mailto:contact@rond-point.example">contact@rond-point.example</a>
         </p>
-        <h2>Voies de recours</h2>
       HTML
 
       allow(check).to receive(:page).and_return(build(:page, body:))
