@@ -24,6 +24,32 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
                                          mentions_article: true
                                        )
     end
+
+    it "extracts data from declaration sections using the next declaration heading" do
+      body = <<~HTML
+        <h1>Déclaration d’accessibilité</h1>
+        <h2>État de conformité</h2>
+        <p>Le service est partiellement conforme avec le RGAA version 4.1.</p>
+        <h2>Résultats des tests</h2>
+        <h3>Résultats des tests</h3>
+        <p>L’audit de conformité réalisé par la société <strong>AccessFacile</strong> révèle que :</p>
+        <p>Le taux global de conformité était de 51,43% en Juin 2023, mis à jour à 71,21% sur l’ensemble des critères du RGAA.</p>
+        <h2>Retour d'information et contact</h2>
+        <p>
+          Pour toute question, écrire à
+          <a href="mailto:contact@rond-point.example">contact@rond-point.example</a>
+        </p>
+      HTML
+
+      allow(check).to receive(:page).and_return(build(:page, body:))
+
+      expect(check.send(:analyze!)).to include(
+                                         compliance_rate: 71.21,
+                                         auditor: "AccessFacile",
+                                         standard: "RGAA version 4.1",
+                                         contact_email: "contact@rond-point.example"
+                                       )
+    end
   end
 
   describe "#find_contact_email" do

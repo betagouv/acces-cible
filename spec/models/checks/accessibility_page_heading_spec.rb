@@ -15,7 +15,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
 
     let(:page_headings) { analyze[:page_headings] }
     let(:comparison) { analyze[:comparison] }
-    let(:expected_headings) { described_class::EXPECTED_HEADINGS }
+    let(:expected_headings) { AccessibilityDeclarationHeadings::EXPECTED_HEADINGS }
 
     before do
       check.audit = audit
@@ -141,7 +141,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
     context "when all headings are :ok" do
       let(:comparison_data) do
         {
-          comparison: described_class::EXPECTED_HEADINGS.map do |level, heading|
+          comparison: AccessibilityDeclarationHeadings::EXPECTED_HEADINGS.map do |level, heading|
             [heading, level, :ok, heading]
           end
         }
@@ -155,7 +155,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
     context "when all headings are :missing" do
       let(:comparison_data) do
         {
-          comparison: described_class::EXPECTED_HEADINGS.map do |level, heading|
+          comparison: AccessibilityDeclarationHeadings::EXPECTED_HEADINGS.map do |level, heading|
             [heading, level, :missing, nil]
           end
         }
@@ -171,7 +171,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
         {
           comparison: [
             ["État de conformité", 2, :incorrect_level, "État de conformité"],
-            *described_class::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
+            *AccessibilityDeclarationHeadings::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
           ]
         }
       end
@@ -186,7 +186,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
         {
           comparison: [
             ["État de conformité", 2, :incorrect_order, "État de conformité"],
-            *described_class::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
+            *AccessibilityDeclarationHeadings::EXPECTED_HEADINGS[1..-1].map { |level, heading| [heading, level, :ok, heading] }
           ]
         }
       end
@@ -225,7 +225,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
     context "when half headings are :ok and half are :incorrect_level" do
       let(:comparison_data) do
         {
-          comparison: described_class::EXPECTED_HEADINGS.map.with_index do |(level, heading), index|
+          comparison: AccessibilityDeclarationHeadings::EXPECTED_HEADINGS.map.with_index do |(level, heading), index|
             status = index.even? ? :ok : :incorrect_level
             [heading, level, status, heading]
           end

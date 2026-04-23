@@ -395,6 +395,7 @@ RSpec.describe Page do
             <h2>Second Heading</h2>
             <p>Content in second section</p>
             <h3>Third Heading</h3>
+            <p>Content in third section</p>
           HTML
         end
 
@@ -409,9 +410,9 @@ RSpec.describe Page do
         end
 
         context "when matched heading is the last heading" do
-          it "returns empty string" do
+          it "returns text until the end of the document" do
             result = page.text(between_headings: [/Third Heading/, :next])
-            expect(result).to eq("")
+            expect(result).to eq("Content in third section")
           end
         end
 
@@ -426,6 +427,7 @@ RSpec.describe Page do
       context "with :previous relative matcher" do
         let(:body) do
           <<~HTML
+            <p>Introduction text</p>
             <h1>First Heading</h1>
             <p>Content in first section</p>
             <h2>Second Heading</h2>
@@ -445,9 +447,9 @@ RSpec.describe Page do
         end
 
         context "when matched heading is the first heading" do
-          it "returns empty string" do
+          it "returns text from the start of the document" do
             result = page.text(between_headings: [:previous, /First Heading/])
-            expect(result).to eq("")
+            expect(result).to eq("Introduction text")
           end
         end
 
@@ -614,6 +616,8 @@ RSpec.describe Page do
             <a href="/link1">Link 1</a>
             <h2>Second Heading</h2>
             <a href="/link2">Link 2</a>
+            <h3>Third Heading</h3>
+            <a href="/link3">Link 3</a>
           HTML
 
           links = page.links(between_headings: [/First Heading/, :next])
@@ -621,17 +625,18 @@ RSpec.describe Page do
           expect(links.collect(&:text)).not_to include("Link 2")
         end
 
-        it "returns empty array when matched heading is the last heading" do
+        it "returns links until the end of the document when matched heading is the last heading" do
           page = build(:page, body: "<h1>Last Heading</h1><a href='/link'>Link</a>")
 
           links = page.links(between_headings: [/Last Heading/, :next])
-          expect(links).to eq([])
+          expect(links.collect(&:text)).to eq(["Link"])
         end
       end
 
       context "with :previous relative matcher" do
         it "returns links from previous heading to matched heading" do
           page = build(:page, body: <<~HTML)
+            <a href="/intro">Intro Link</a>
             <h1>First Heading</h1>
             <a href="/link1">Link 1</a>
             <h2>Second Heading</h2>
@@ -643,11 +648,11 @@ RSpec.describe Page do
           expect(links.collect(&:text)).not_to include("Link 2")
         end
 
-        it "returns empty array when matched heading is the first heading" do
-          page = build(:page, body: "<h1>First Heading</h1><a href='/link'>Link</a>")
+        it "returns links from the start of the document when matched heading is the first heading" do
+          page = build(:page, body: "<a href='/intro'>Intro Link</a><h1>First Heading</h1><a href='/link'>Link</a>")
 
           links = page.links(between_headings: [:previous, /First Heading/])
-          expect(links).to eq([])
+          expect(links.collect(&:text)).to eq(["Intro Link"])
         end
       end
 

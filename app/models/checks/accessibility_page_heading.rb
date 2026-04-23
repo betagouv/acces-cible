@@ -1,31 +1,10 @@
 module Checks
   class AccessibilityPageHeading < Check
+    include AccessibilityDeclarationHeadings
+
     PRIORITY = 22
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
-    EXPECTED_HEADINGS = [
-      [2, "État de conformité"],
-      [3, "Résultats des tests"],
-      [2, "Contenus non accessibles"],
-      [3, "Non-conformités"],
-      [3, "Dérogations pour charge disproportionnée"],
-      [3, "Contenus non soumis à l'obligation d'accessibilité"],
-      [2, "Établissement de cette déclaration d'accessibilité"],
-      [3, "Technologies utilisées pour la réalisation du site"],
-      [3, "Environnement de test"],
-      [3, "Outils pour évaluer l'accessibilité"],
-      [3, "Pages du site ayant fait l'objet de la vérification de conformité"],
-      [2, "Retour d'information et contact"],
-      [2, "Voies de recours"],
-    ].freeze
     COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
-
-    delegate :expected_headings, to: :class
-
-    class << self
-      def expected_headings
-        EXPECTED_HEADINGS.collect(&:last)
-      end
-    end
 
     store_accessor :data, :page_headings, :comparison
 
@@ -38,7 +17,7 @@ module Checks
     end
 
     def total
-      expected_headings.count
+      expected_declaration_heading_titles.count
     end
 
     def failures
@@ -88,7 +67,9 @@ module Checks
     end
 
     def indexed_expected_headings
-      @indexed_expected_headings ||= EXPECTED_HEADINGS.each_with_index.map { |(level, heading), index| [index, heading, level] }
+      @indexed_expected_headings ||= expected_declaration_headings.each_with_index.map do |(level, heading), index|
+        [index, heading, level]
+      end
     end
 
     def indexed_page_headings
@@ -96,7 +77,7 @@ module Checks
     end
 
     def compare_headings
-      return EXPECTED_HEADINGS.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
+      return expected_declaration_headings.map { |level, heading| [heading, level, :missing, nil] } unless page_headings
 
       # Two-pass approach: first match all headings, then determine status
       expected_to_actual = {}
