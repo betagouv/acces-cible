@@ -325,9 +325,6 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    json-schema (6.2.0)
-      addressable (~> 2.8)
-      bigdecimal (>= 3.1, < 5)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     listen (3.10.0)
@@ -353,8 +350,6 @@ GEM
       rouge (~> 4)
       securerandom
     matrix (0.4.3)
-    mcp (0.8.0)
-      json-schema (>= 4.1)
     memoist3 (1.0.0)
     memory_profiler (1.1.0)
     method_source (1.1.0)
@@ -418,8 +413,8 @@ GEM
       json
       uri
       yaml
-    parallel (1.27.0)
-    parser (3.3.10.2)
+    parallel (2.0.1)
+    parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
     pg (1.6.3)
@@ -505,7 +500,7 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    regexp_parser (2.11.3)
+    regexp_parser (2.12.0)
     reline (0.6.3)
       io-console (~> 0.5)
     rexml (3.4.4)
@@ -534,12 +529,11 @@ GEM
     rspec-watcher (0.3.3)
       listen (~> 3.0)
       rspec-core (~> 3.0)
-    rubocop (1.85.1)
+    rubocop (1.86.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
-      mcp (~> 0.6)
-      parallel (~> 1.10)
+      parallel (>= 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 2.9.3, < 3.0)
