@@ -113,6 +113,30 @@ RSpec.describe "Sites" do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context "when redirected URLs contain HTML" do
+      let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+      let(:reachable_check) { site.audit.reachable }
+
+      before do
+        site.audit.update_column(:home_page_url, "https://safe.example")
+        reachable_check.update!(
+          data: {
+            original_url: %(<img src=x onerror=alert('xss-1')>),
+            redirect_url: %(<script>alert('xss-2')</script>)
+          }
+        )
+      end
+
+      it "escapes the redirected URLs in the message" do
+        get_site
+
+        expect(response.body).not_to include("<img src=x onerror=alert('xss-1')>")
+        expect(response.body).not_to include("<script>alert('xss-2')</script>")
+        expect(response.body).to include("xss-1")
+        expect(response.body).to include("xss-2")
+      end
+    end
   end
 
   describe "POST /sites" do
