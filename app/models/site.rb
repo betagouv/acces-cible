@@ -27,7 +27,7 @@ class Site < ApplicationRecord
 
       # Ignore http/https duplicates when searching
       normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
-      joins(:audits).find_by(audits: { url: normalized_url })
+      includes(:audits, :slugs).joins(:audits).find_by(audits: { url: normalized_url })
     end
   end
 

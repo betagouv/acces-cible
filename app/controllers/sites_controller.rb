@@ -107,7 +107,7 @@ class SitesController < ApplicationController
   end
 
   def set_site
-    @site = sites_scope.preloaded.friendly.find(params.expect(:id))
+    @site = sites_scope.friendly.find(params.expect(:id))
   end
 
   def set_sites
