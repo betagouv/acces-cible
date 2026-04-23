@@ -59,7 +59,7 @@ class TagsController < ApplicationController
   end
 
   def set_tag
-    @tag = current_user.team.tags.friendly.find(params[:id])
+    @tag = current_user.team.tags.includes(:site_tags, :slugs).friendly.find(params[:id])
   end
 
   def redirect_old_slugs
