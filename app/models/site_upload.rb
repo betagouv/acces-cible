@@ -15,34 +15,24 @@ class SiteUpload
   ].freeze
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
-  SUPPORTED_SEPARATORS = [",", ";"].freeze
-  FIRST_DATA_ROW_NUMBER = 2 # Row 1 contains CSV headers
-  BOM = /^\xEF\xBB\xBF/
 
-  attr_accessor :file, :team, :tag_ids, :tags, :new_sites, :existing_sites
+  attr_accessor :file, :team, :tag_ids, :tags
 
   validates :file, :team, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
 
-  delegate :create!, :transaction, to: :Site
-
   def initialize(attributes = {})
     super
     @tag_ids ||= []
-    @new_sites = {}
-    @existing_sites = {}
   end
 
   def save
     return false unless valid?
 
-    parse_sites
+    sites_data = csv_parser.parse_data!
     return false if errors.any?
 
-    transaction do
-      create!(new_sites.values) if new_sites.any?
-      existing_sites.values.each { |site| site.save && site.audit! }
-    end
+    ProcessSiteUploadJob.perform_later(sites_data, team.id, tag_ids)
     true
   end
 
@@ -61,73 +51,10 @@ class SiteUpload
     super(attributes.slice(:team).merge(attributes))
   end
 
-  def count
-    (new_sites&.length || 0) + (existing_sites&.length || 0)
-  end
-
-  def parse_sites
-    require "csv"
-
-    CSV.foreach(file.path, headers: true, encoding: "bom|utf-8", col_sep:).with_index(FIRST_DATA_ROW_NUMBER) do |row, line_number|
-      row = row.to_h.transform_keys { |header| header.to_s.downcase } # Case-insensitive headers
-
-      raw_url = row["url"].to_s.strip
-      next if raw_url.empty?
-
-      begin
-        parsed_url = Link.parse(raw_url)
-        raise Link::InvalidUriError.new(raw_url) if parsed_url.relative?
-
-        url = Link.normalize(parsed_url)
-      rescue Link::InvalidUriError => error
-        Rails.logger.warn(
-          "site_upload_invalid_url " \
-          "team_id=#{team&.id} " \
-          "filename=#{file&.original_filename} " \
-          "line_number=#{line_number} " \
-          "raw_url=#{raw_url} " \
-          "error_class=#{error.class.name} " \
-          "error_message=#{error.message}"
-        )
-        errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
-        next
-      end
-      name = row["nom"] || row["name"]
-      tag_names = row["tags"].present? ? row["tags"].split(",").map(&:strip).compact_blank.uniq : []
-
-      row_tag_ids = tag_names.map { |n| team.tags.find_or_create_by(name: n).id }
-      combined_tag_ids = (tag_ids + row_tag_ids).uniq
-      existing_site = team.sites.find_by_url(url:)
-
-      if existing_site
-        existing_site.assign_attributes(tag_ids: combined_tag_ids.union(existing_site.tag_ids))
-        existing_site.assign_attributes(name:) unless existing_site.name
-        self.existing_sites[url] = existing_site
-      else
-        self.new_sites[url] = { url:, team:, name:, tag_ids: combined_tag_ids }
-      end
-    end
-  rescue CSV::MalformedCSVError => error
-    Rails.logger.warn(
-      "site_upload_malformed_csv " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
-    )
-    errors.add(:file, :malformed_csv)
-  end
-
   private
 
-  def first_line
-    @first_line ||= File.open(file.path, &:gets)&.strip&.sub(BOM, "") || ""
-  end
-
-  def col_sep
-    SUPPORTED_SEPARATORS.max_by { |sep| first_line.count(sep) }
-  rescue StandardError
-    SUPPORTED_SEPARATORS.first
+  def csv_parser
+    @csv_parser ||= CsvSiteParser.new(file:, team:, errors:)
   end
 
   def valid_file_size
@@ -140,8 +67,7 @@ class SiteUpload
   end
 
   def valid_headers
-    headers = CSV.parse_line(first_line, col_sep:) || []
-    missing_headers = REQUIRED_HEADERS - headers.compact.collect(&:downcase)
+    missing_headers = REQUIRED_HEADERS - csv_parser.headers
     errors.add(:file, :invalid_headers) unless missing_headers.empty?
   rescue CSV::MalformedCSVError, StandardError
     errors.add(:file, :invalid_headers)

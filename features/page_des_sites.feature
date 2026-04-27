@@ -17,6 +17,8 @@ Fonctionnalité:
       """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que toutes les tâches de fond sont terminées
+    Et que je clique sur "Tous les sites"
     Et que je filtre par étiquette "public"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | suresnes.fr       |
@@ -32,6 +34,8 @@ Fonctionnalité:
       """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que toutes les tâches de fond sont terminées
+    Et que je clique sur "Tous les sites"
     Et que je clique sur "Trier par Adresse du site croissant"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | beta.gouv.fr      |
@@ -56,6 +60,8 @@ Fonctionnalité:
       """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que toutes les tâches de fond sont terminées
+    Et que je clique sur "Tous les sites"
     Et que je clique sur "Trier par Adresse du site croissant"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | alpha.gouv.fr   |
