@@ -21,7 +21,7 @@ Fonctionnalité: Ajout d'un site
       url
       https://beta.gouv.fr
       https://numerique.gouv.fr
-      """
+    """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
-    Alors la page contient "2 sites ajoutés"
+    Alors la page contient "L'import du fichier CSV a commencé. Les sites seront ajoutés progressivement."

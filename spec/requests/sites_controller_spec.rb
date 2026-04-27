@@ -206,7 +206,7 @@ RSpec.describe "Sites" do
     let(:file) { fixture_file_upload("sites.csv", "text/csv") }
 
     it "schedules audits and redirects to sites index" do
-      upload_mock = instance_double(SiteUpload, save: true, count: 2)
+      upload_mock = instance_double(SiteUpload, save: true)
       allow(SiteUpload).to receive(:new).and_return(upload_mock)
 
       upload_sites
@@ -214,7 +214,7 @@ RSpec.describe "Sites" do
       expect(response).to redirect_to(sites_path)
       follow_redirect!
       expect(response).to have_http_status(:ok)
-      expect(flash[:notice]).to include("2")
+      expect(flash[:notice]).to include("L'import du fichier CSV a commencé. Les sites seront ajoutés progressivement.")
     end
 
     context "when upload is invalid" do

@@ -320,10 +320,7 @@ fr:
       notice: Site modifié
     upload:
       title: Importer des sites
-      uploaded:
-        one: Un site ajouté
-        other: "%{count} sites ajoutés"
-        zero: Aucun site ajouté
+      started: L'import du fichier CSV a commencé. Les sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
     destroy:
