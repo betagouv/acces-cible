@@ -176,9 +176,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when the upload is invalid" do
-      before do
-        allow(site_upload).to receive(:valid?).and_return(false)
-      end
+      let(:csv_content) { "invalid_header,name\nhttps://example.com/,Example Site" }
 
       it "returns false without enqueuing a job" do
         expect { expect(site_upload.save).to be false }
