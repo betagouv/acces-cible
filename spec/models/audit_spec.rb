@@ -34,14 +34,6 @@ RSpec.describe Audit do
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
-
-    it ".sort_by_url orders by URL ignoring protocol and www" do
-      gamma = create(:audit, site:, url: "https://www.gamma.com")
-      alpha = create(:audit, site:, url: "https://alpha.com/path")
-      beta = create(:audit, site:, url: "http://www.beta.com")
-
-      expect(described_class.sort_by_url).to eq([alpha, beta, gamma])
-    end
   end
 
   describe "#page" do

@@ -25,9 +25,7 @@ module AuthHelpers
 end
 
 RSpec.configure do |config|
-  config.include AuthHelpers, type: :feature
   config.include AuthHelpers, type: :request
-  config.include AuthHelpers, type: :system
 
   OmniAuth.config.logger = Logger.new(IO::NULL)
   OmniAuth.config.silence_get_warning = true
