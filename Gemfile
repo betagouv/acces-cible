@@ -131,9 +131,4 @@ group :test do
 
   # Allow stubbing requests during tests
   gem "webmock"
-
-  # Allow testing accessibility using Axe-core. Only available in JS feature tests
-  gem "axe-core-capybara", "~> 4.11"
-  gem "axe-core-rspec", "~> 4.8"
-  gem "selenium-webdriver", "~> 4.43"
 end

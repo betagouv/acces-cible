@@ -29,20 +29,12 @@ class Page
     html.present? ? setup_page_data : fetch_page_data
   end
 
-  def root?
-    url == root
-  end
-
   def parsed_root
     @parsed_root ||= Link.parse(root)
   end
 
   def path
     url.to_s.delete_prefix(root.to_s)
-  end
-
-  def redirected?
-    actual_url.present? && actual_url != url
   end
 
   def css(selector)
@@ -79,10 +71,6 @@ class Page
 
   def success?
     status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
-  end
-
-  def error?
-    status > 399
   end
 
   def dom
