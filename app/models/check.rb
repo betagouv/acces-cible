@@ -84,6 +84,10 @@ class Check < ApplicationRecord
     def priority
       self::PRIORITY
     end
+
+    def browser_context_required?
+      false
+    end
   end
 
   def human_status

@@ -6,7 +6,6 @@ class ApplicationJob < ActiveJob::Base
   # Most jobs are safe to ignore if the underlying records are no longer available
   discard_on ActiveJob::DeserializationError, ActiveRecord::RecordNotFound
 
-  around_perform :with_browser_context
   around_perform :monitor_with_sentry
 
   private

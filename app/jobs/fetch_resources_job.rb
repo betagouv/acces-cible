@@ -1,6 +1,8 @@
 class FetchResourcesJob < ApplicationJob
   queue_as :slow
 
+  around_perform :with_browser_context
+
   rescue_from(Ferrum::StatusError, Ferrum::TimeoutError) do |exception|
     Rails.logger.debug("Failed to fetch SOME home page HTML because: #{exception}")
   end
