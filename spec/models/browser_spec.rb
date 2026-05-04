@@ -2,34 +2,36 @@ require "rails_helper"
 
 RSpec.describe Browser do
   let(:url) { "https://example.com/" }
-  let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
-  let(:browser_double) { instance_double(Ferrum::Browser) }
-  let(:contexts_double) { instance_double(Ferrum::Contexts) }
-  let(:context_double) { instance_double(Ferrum::Context) }
-  let(:headers_double) { instance_double(Ferrum::Headers) }
-  let(:page_double) { instance_double(Ferrum::Page) }
-  let(:response_double) { instance_double(Ferrum::Network::Response) }
 
-  before do
-    allow(described_class).to receive(:browser).and_return(browser_double)
-    allow(browser_double).to receive(:create_page).and_return(page_double)
-    allow(browser_double).to receive(:contexts).and_return(contexts_double)
-    allow(browser_double).to receive(:quit)
-    allow(contexts_double).to receive(:create).and_return(context_double)
-    allow(context_double).to receive(:create_page).and_return(page_double)
-    allow(context_double).to receive(:dispose)
+  shared_context "with stubbed Ferrum browser" do
+    let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
+    let(:browser_double) { instance_double(Ferrum::Browser) }
+    let(:contexts_double) { instance_double(Ferrum::Contexts) }
+    let(:context_double) { instance_double(Ferrum::Context) }
+    let(:headers_double) { instance_double(Ferrum::Headers) }
+    let(:page_double) { instance_double(Ferrum::Page) }
+    let(:response_double) { instance_double(Ferrum::Network::Response) }
 
-    allow(headers_double).to receive(:set)
-    allow(network_double).to receive(:blocklist=)
-    allow(network_double).to receive(:wait_for_idle)
-    allow(network_double).to receive_messages(status: 200, response: response_double)
-    allow(response_double).to receive(:content_type).and_return("text/html")
+    before do
+      allow(described_class).to receive(:browser).and_return(browser_double)
+      allow(browser_double).to receive_messages(create_page: page_double, contexts: contexts_double)
+      allow(browser_double).to receive(:quit)
+      allow(contexts_double).to receive(:create).and_return(context_double)
+      allow(context_double).to receive(:create_page).and_return(page_double)
+      allow(context_double).to receive(:dispose)
 
-    allow(page_double).to receive(:go_to).with(url)
-    allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
-    allow(page_double).to receive(:close)
+      allow(headers_double).to receive(:set)
+      allow(network_double).to receive(:blocklist=)
+      allow(network_double).to receive(:wait_for_idle)
+      allow(network_double).to receive_messages(status: 200, response: response_double)
+      allow(response_double).to receive(:content_type).and_return("text/html")
 
-    allow(Link).to receive(:normalize).with(url).and_return(url)
+      allow(page_double).to receive(:go_to).with(url)
+      allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
+      allow(page_double).to receive(:close)
+
+      allow(Link).to receive(:normalize).with(url).and_return(url)
+    end
   end
 
   describe ".reachable?" do
@@ -117,7 +119,6 @@ RSpec.describe Browser do
       end
     end
 
-    # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "when request follows redirects" do
       let(:final_url) { "https://example.com/final" }
       let(:normalized_url) { "https://example.com/final/" }
@@ -133,7 +134,6 @@ RSpec.describe Browser do
         expect(Link).to have_received(:normalize).with(final_url)
       end
     end
-    # rubocop:enable RSpec/MultipleMemoizedHelpers
 
     context "when request times out" do
       before do
@@ -176,6 +176,8 @@ RSpec.describe Browser do
   describe ".get" do
     subject(:get_result) { described_class.get(url) }
 
+    include_context "with stubbed Ferrum browser"
+
     it "creates a new browser instance and calls get" do
       expect(get_result).not_to be_nil
     end
@@ -210,12 +212,16 @@ RSpec.describe Browser do
   end
 
   describe "#browser" do
+    include_context "with stubbed Ferrum browser"
+
     it "creates a new Ferrum::Browser instance during initialization" do
       expect(described_class.send(:browser)).to eq(browser_double)
     end
   end
 
   describe ".within_job_context" do
+    include_context "with stubbed Ferrum browser"
+
     after do
       Thread.current[described_class::JOB_CONTEXT_KEY] = nil
     end
@@ -234,6 +240,8 @@ RSpec.describe Browser do
   end
 
   describe "#with_page" do
+    include_context "with stubbed Ferrum browser"
+
     it "yields the created page" do
       expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
     end
@@ -250,6 +258,8 @@ RSpec.describe Browser do
   end
 
   describe "#create_page" do
+    include_context "with stubbed Ferrum browser"
+
     before do
       allow(browser_double).to receive(:create_page).and_return(page_double)
       allow(headers_double).to receive(:set)
