@@ -4,6 +4,8 @@ RSpec.describe Browser do
   let(:url) { "https://example.com/" }
   let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
   let(:browser_double) { instance_double(Ferrum::Browser) }
+  let(:contexts_double) { instance_double(Ferrum::Contexts) }
+  let(:context_double) { instance_double(Ferrum::Context) }
   let(:headers_double) { instance_double(Ferrum::Headers) }
   let(:page_double) { instance_double(Ferrum::Page) }
   let(:response_double) { instance_double(Ferrum::Network::Response) }
@@ -11,7 +13,11 @@ RSpec.describe Browser do
   before do
     allow(described_class).to receive(:browser).and_return(browser_double)
     allow(browser_double).to receive(:create_page).and_return(page_double)
+    allow(browser_double).to receive(:contexts).and_return(contexts_double)
     allow(browser_double).to receive(:quit)
+    allow(contexts_double).to receive(:create).and_return(context_double)
+    allow(context_double).to receive(:create_page).and_return(page_double)
+    allow(context_double).to receive(:dispose)
 
     allow(headers_double).to receive(:set)
     allow(network_double).to receive(:blocklist=)
@@ -96,7 +102,7 @@ RSpec.describe Browser do
       it "makes HEAD request with correct options" do
         head_result
 
-        expect(HTTP).to have_received(:headers)
+        expect(HTTP).to have_received(:headers).with(described_class::REQUEST_HEADERS)
         expect(http_chain).to have_received(:timeout).with(connect: 3, read: 3)
         expect(http_chain).to have_received(:follow).with(max_hops: 3)
         expect(http_chain).to have_received(:head).with(url, ssl:)
@@ -209,6 +215,24 @@ RSpec.describe Browser do
     end
   end
 
+  describe ".within_job_context" do
+    after do
+      Thread.current[described_class::JOB_CONTEXT_KEY] = nil
+    end
+
+    it "creates and disposes a browser context around the block" do
+      result = described_class.within_job_context do
+        expect(Thread.current[described_class::JOB_CONTEXT_KEY]).to eq(context_double)
+        "success"
+      end
+
+      expect(result).to eq("success")
+      expect(contexts_double).to have_received(:create)
+      expect(context_double).to have_received(:dispose)
+      expect(Thread.current[described_class::JOB_CONTEXT_KEY]).to be_nil
+    end
+  end
+
   describe "#with_page" do
     it "yields the created page" do
       expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
@@ -239,16 +263,26 @@ RSpec.describe Browser do
       expect(result).to eq(page_double)
     end
 
+    it "creates a page from the current context when present" do
+      Thread.current[described_class::JOB_CONTEXT_KEY] = context_double
+
+      result = described_class.send(:create_page)
+
+      expect(context_double).to have_received(:create_page)
+      expect(browser_double).not_to have_received(:create_page)
+      expect(result).to eq(page_double)
+    ensure
+      Thread.current[described_class::JOB_CONTEXT_KEY] = nil
+    end
+
     it "sets the blocklist on the page's context" do
-      expect(network_double)
-        .to receive(:blocklist=)
-              .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
+      expect(network_double).to receive(:blocklist=).with(described_class::BLOCKED_URL_PATTERNS)
 
       described_class.send(:create_page)
     end
 
-    it "sets all headers including user agent on the page" do
-      request_headers = Browser::HEADERS.merge({ "User-Agent" => "test-agent" })
+    it "sets request headers on the page" do
+      request_headers = { "Accept-Language" => "fr" }
       allow(described_class).to receive(:request_headers).and_return(request_headers)
 
       described_class.send(:create_page)
