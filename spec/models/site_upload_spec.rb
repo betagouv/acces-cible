@@ -160,6 +160,12 @@ RSpec.describe SiteUpload do
           )
       end
 
+      it "stores the number of parsed sites" do
+        site_upload.save
+
+        expect(site_upload.count).to eq(2)
+      end
+
       it "passes tag_ids to the job" do
         site_upload.tag_ids = [1, 2, 3]
 

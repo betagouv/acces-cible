@@ -24,4 +24,4 @@ Fonctionnalité: Ajout d'un site
     """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
-    Alors la page contient "L'import du fichier CSV a commencé. Les sites seront ajoutés progressivement."
+    Alors la page contient "L'import du fichier CSV a commencé. 2 sites seront ajoutés progressivement."

@@ -59,7 +59,7 @@ class SitesController < ApplicationController
   def upload
     @upload = SiteUpload.new(site_upload_params)
     if @upload.save
-      redirect_to sites_path, notice: t(".started")
+      redirect_to sites_path, notice: t(".started", count: @upload.count)
     else
       render :new, status: :unprocessable_content
     end

@@ -17,6 +17,7 @@ class SiteUpload
   REQUIRED_HEADERS = ["url"].freeze
 
   attr_accessor :file, :team, :tag_ids, :tags
+  attr_reader :count
 
   validates :file, :team, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
@@ -32,6 +33,7 @@ class SiteUpload
     sites_data = csv_parser.parse_data!
     return false if errors.any?
 
+    @count = sites_data.count
     ProcessSiteUploadJob.perform_later(sites_data, team.id, tag_ids)
     true
   end
