@@ -58,6 +58,7 @@ class Check < ApplicationRecord
 
   scope :prioritized, -> { order(:priority) }
   scope :remaining, -> { in_state(:pending, :blocked) }
+  scope :failed, -> { in_state(:failed) }
 
   class << self
     def human_type
