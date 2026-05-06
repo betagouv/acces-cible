@@ -1,7 +1,6 @@
 services:
   web: &server
-    build:
-      dockerfile: Dockerfile.dev
+    build: .
     image: acces_cible
     environment:
       DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
