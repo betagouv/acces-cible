@@ -199,7 +199,7 @@ GEM
       html-attributes-utils (~> 1)
       view_component (~> 4)
     dumb_delegator (1.1.0)
-    erb (6.0.3)
+    erb (6.0.4)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
