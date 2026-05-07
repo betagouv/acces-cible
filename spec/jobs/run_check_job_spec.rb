@@ -10,7 +10,6 @@ RSpec.describe RunCheckJob do
 
   context "when the check goes well" do
     before do
-      allow(Browser).to receive(:within_job_context).and_yield
       # Sure, the any_instance_of is sad but there is no other way:
       # since ActiveJob deserializes models with GlobalID, mocking the
       # object here will have no effect when ActiveJob reinstantiates
@@ -32,31 +31,6 @@ RSpec.describe RunCheckJob do
                 .from("ready")
                 .to("completed")
       end
-    end
-
-    it "does not run ordinary checks inside a browser context" do
-      perform_enqueued_jobs(only: described_class) { described_class.perform_later(check) }
-
-      expect(Browser).not_to have_received(:within_job_context)
-    end
-  end
-
-  context "when the check needs a browser context" do
-    let(:check) { create(:check, :run_axe_on_homepage, :ready) }
-
-    before do
-      allow(Browser).to receive(:within_job_context).and_yield
-      allow_any_instance_of(Checks::RunAxeOnHomepage) # rubocop:disable RSpec/AnyInstance
-        .to receive(:run!) do |instance|
-        instance.data = { test: "success" }
-        instance.save!
-      end
-    end
-
-    it "runs inside a browser context" do
-      perform_enqueued_jobs(only: described_class) { described_class.perform_later(check) }
-
-      expect(Browser).to have_received(:within_job_context)
     end
   end
 

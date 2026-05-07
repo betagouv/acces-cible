@@ -36,10 +36,6 @@ module Checks
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
 
-    def self.browser_context_required?
-      true
-    end
-
     def tooltip?
       !completed?
     end

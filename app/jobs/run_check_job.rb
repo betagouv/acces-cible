@@ -1,8 +1,6 @@
 require "json/add/exception" # required to serialize errors as JSON
 
 class RunCheckJob < ApplicationJob
-  around_perform :with_browser_context, if: :browser_context_required?
-
   rescue_from Check::RuntimeError do |exception|
     arguments.first.transition_to!(:errored, exception.cause.as_json)
   end
@@ -22,11 +20,5 @@ class RunCheckJob < ApplicationJob
 
   def perform(check)
     check.run!
-  end
-
-  private
-
-  def browser_context_required?
-    arguments.first.class.browser_context_required?
   end
 end

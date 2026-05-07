@@ -12,7 +12,6 @@ describe FetchResourcesJob do
   let(:audit) { create(:audit) }
 
   before do
-    allow(Browser).to receive(:within_job_context).and_yield
     allow(FetchHomePageService).to receive(:call).with(audit)
     allow(FindAccessibilityPageService).to receive(:call).with(audit)
   end
@@ -34,12 +33,6 @@ describe FetchResourcesJob do
       .to have_enqueued_job(ProcessAuditJob)
       .exactly(:once)
       .with(audit)
-  end
-
-  it "runs inside a browser context" do
-    fetch_resources_job
-
-    expect(Browser).to have_received(:within_job_context)
   end
 
   describe "error cases" do
