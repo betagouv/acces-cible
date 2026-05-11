@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe ProcessSingleSiteJob do
+RSpec.describe ProcessBatchSitesCreationJob do
   describe "#perform" do
-    subject(:run_job) { job.perform(site_data, team.id, extra_tag_ids) }
+    subject(:run_job) { job.perform(sites_data, team.id, extra_tag_ids) }
 
     let(:job) { described_class.new }
     let(:team) { create(:team) }
@@ -13,6 +13,7 @@ RSpec.describe ProcessSingleSiteJob do
         "tag_names" => ["tag_1", "tag_2"]
       }
     end
+    let(:sites_data) { [site_data] }
     let(:extra_tag_ids) { [] }
 
     context "when the site does not exist" do
@@ -109,6 +110,27 @@ RSpec.describe ProcessSingleSiteJob do
 
         expect(Site.last.tags.map(&:name)).to contain_exactly("tag")
       end
+    end
+
+    context "with multiple sites" do
+      let(:sites_data) do
+        [
+          { "url" => "https://example.com/", "name" => "Example", "tag_names" => ["tag_1"] },
+          { "url" => "https://test.com/", "name" => "Test", "tag_names" => ["tag_2"] }
+        ]
+      end
+
+      it "processes all sites in the batch" do
+        expect { run_job }.to change(Site, :count).by(2)
+      end
+    end
+
+    it "broadcasts a sites index refresh after the batch" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
+
+      run_job
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with([team, :sites])
     end
   end
 end

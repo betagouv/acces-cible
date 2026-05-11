@@ -10,9 +10,18 @@ RSpec.describe ProcessSiteUploadJob do
   end
 
   describe "#perform" do
-    it "enqueues one job per site" do
+    it "enqueues one job for the batch" do
       expect { described_class.perform_now(sites_data, team.id, []) }
-        .to have_enqueued_job(ProcessSingleSiteJob).exactly(:twice)
+        .to have_enqueued_job(ProcessBatchSitesCreationJob).with(sites_data, team.id, []).exactly(:once)
+    end
+
+    it "splits large imports into batches of 100 sites" do
+      sites_data = Array.new(201) do |index|
+        { "url" => "https://example-#{index}.com/", "name" => "Example #{index}", "tag_names" => [] }
+      end
+
+      expect { described_class.perform_now(sites_data, team.id, []) }
+        .to have_enqueued_job(ProcessBatchSitesCreationJob).exactly(3).times
     end
   end
 end
