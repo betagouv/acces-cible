@@ -32,7 +32,7 @@ Fonctionnalité: Page du site
     Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
-    Et que toutes les tâches de fond sont terminées
+    Et que l'import est terminé
     Et que je clique sur "Tous les sites"
     Et que je clique sur "Voir la fiche de beta.gouv.fr"
     Et que je clique sur "Étiquette éticouette"

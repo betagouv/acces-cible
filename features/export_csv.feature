@@ -37,7 +37,7 @@ Fonctionnalité: Export d'un CSV
     Et que je choisis "Ajouter un site" dans le menu principal
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
-    Et que toutes les tâches de fond sont terminées
+    Et que l'import est terminé
     Et que je choisis "Tous les sites" dans le menu principal
     Et que je clique sur "Trier par Adresse du site croissant"
     Et que je filtre par étiquette "public"

@@ -8,6 +8,11 @@ Quand("les tâches de fond sont terminées") do
   perform_enqueued_jobs
 end
 
+Quand("l'import est terminé") do
+  perform_enqueued_jobs(only: ProcessSiteUploadJob)
+  perform_enqueued_jobs(only: ProcessBatchSitesCreationJob)
+end
+
 # ce step sert à délencher et épuiser toutes les tâches qu'une tâche
 # elle-même peut programmer, ex : ProcessAuditJob déclenche plusieurs
 # RunCheckJobs.
