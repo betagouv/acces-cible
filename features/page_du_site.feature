@@ -28,6 +28,8 @@ Fonctionnalité: Page du site
       url;nom;tags
       https://beta.gouv.fr;beta.gouv.fr;éticouette
       """
+    Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la page d'accueil
+    Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
     Et que toutes les tâches de fond sont terminées
