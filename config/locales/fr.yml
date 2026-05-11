@@ -321,9 +321,9 @@ fr:
     upload:
       title: Importer des sites
       started:
-        zero: L’import du fichier CSV a commencé. Aucun site n’a été détecté.
-        one: L’import du fichier CSV a commencé. 1 site sera ajouté.
-        other: L’import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
+        zero: L'import du fichier CSV a commencé. Aucun site n’a été détecté.
+        one: L'import du fichier CSV a commencé. 1 site sera ajouté.
+        other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
     destroy:

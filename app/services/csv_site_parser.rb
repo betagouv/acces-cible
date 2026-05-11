@@ -28,14 +28,7 @@ class CsvSiteParser
 
     sites_by_url.values
   rescue CSV::MalformedCSVError => error
-    Rails.logger.warn(
-      "site_upload_malformed_csv " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
-    )
-    errors.add(:file, :malformed_csv)
+    report_malformed_csv(error)
     []
   end
 
@@ -63,6 +56,22 @@ class CsvSiteParser
 
     Link.normalize(parsed_url)
   rescue Link::InvalidUriError => error
+    report_invalid_url(error, raw_url, line_number)
+    nil
+  end
+
+  def report_malformed_csv(error)
+    Rails.logger.warn(
+      "site_upload_malformed_csv " \
+      "team_id=#{team&.id} " \
+      "filename=#{file&.original_filename} " \
+      "error_class=#{error.class.name} " \
+      "error_message=#{error.message}"
+    )
+    errors.add(:file, :malformed_csv)
+  end
+
+  def report_invalid_url(error, raw_url, line_number)
     Rails.logger.warn(
       "site_upload_invalid_url " \
       "team_id=#{team&.id} " \
@@ -73,7 +82,6 @@ class CsvSiteParser
       "error_message=#{error.message}"
     )
     errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
-    nil
   end
 
   def merge_site_data!(sites_by_url, url, row)

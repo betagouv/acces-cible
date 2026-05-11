@@ -5,6 +5,12 @@ RSpec.describe CsvSiteParser do
 
   let(:team) { create(:team) }
   let(:errors) { ActiveModel::Errors.new(SiteUpload.new) }
+  let(:expected_sites_data) do
+    [
+      { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
+      { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
+    ]
+  end
   let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttps://test.com/,Test Site" }
   let(:encoding) { Encoding::UTF_8 }
   let(:csv) do
@@ -23,10 +29,7 @@ RSpec.describe CsvSiteParser do
 
   describe "#parse_data!" do
     it "returns an array of site hashes" do
-      expect(parser.parse_data!).to contain_exactly(
-        { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
-        { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
-      )
+      expect(parser.parse_data!).to eq(expected_sites_data)
     end
 
     context "with mixed case headers" do
@@ -42,11 +45,6 @@ RSpec.describe CsvSiteParser do
       it "parses the CSV file correctly" do
         csv.write("url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site")
         csv.rewind
-
-        expected_sites_data = [
-          { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
-          { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
-        ]
 
         expect(parser.parse_data!).to eq(expected_sites_data)
       end

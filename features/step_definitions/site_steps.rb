@@ -11,6 +11,15 @@ Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |u
   )
 end
 
+Sachantque("les sites suivants renvoient une réponse HTML normale :") do |table|
+  table.raw.flatten.each do |url|
+    steps %(
+      Sachant que le site "#{url}" renvoie une réponse HTML normale pour la page d'accueil
+      Et que le site "#{url}" renvoie une réponse HTML normale pour la déclaration d'accessibilité
+    )
+  end
+end
+
 # FIXME: because Chrome goes through the "real" network, we cannot use
 # Webmock to mock the requests: Webmock will hijack `net/http` and
 # other low-level Ruby network libraries but not the actual network,

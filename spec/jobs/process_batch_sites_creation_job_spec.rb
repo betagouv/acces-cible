@@ -2,13 +2,15 @@ require "rails_helper"
 
 RSpec.describe ProcessBatchSitesCreationJob do
   describe "#perform" do
-    subject(:run_job) { job.perform(sites_data, team.id, extra_tag_ids) }
+    subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids) }
 
-    let(:job) { described_class.new }
     let(:team) { create(:team) }
+    let(:created_site) { Site.last }
+    let(:site_tags) { created_site.tags.pluck(:name) }
+    let(:url) { "https://example.com/" }
     let(:site_data) do
       {
-        "url" => "https://example.com/",
+        "url" => url,
         "name" => "New Name",
         "tag_names" => ["tag_1", "tag_2"]
       }
@@ -24,16 +26,15 @@ RSpec.describe ProcessBatchSitesCreationJob do
       it "sets the site attributes" do
         run_job
 
-        site = Site.last
-        expect(site.url).to eq("https://example.com/")
-        expect(site.name).to eq("New Name")
-        expect(site.team).to eq(team)
+        expect(created_site.url).to eq(url)
+        expect(created_site.name).to eq("New Name")
+        expect(created_site.team).to eq(team)
       end
 
       it "creates and associates tags" do
         run_job
 
-        expect(Site.last.tags.map(&:name)).to contain_exactly("tag_1", "tag_2")
+        expect(site_tags).to contain_exactly("tag_1", "tag_2")
       end
 
       context "with extra tags" do
@@ -43,28 +44,25 @@ RSpec.describe ProcessBatchSitesCreationJob do
         it "associates CSV tags and extra tags" do
           run_job
 
-          expect(Site.last.tags.map(&:name)).to contain_exactly("tag_1", "tag_2", "extra_tag")
+          expect(site_tags).to contain_exactly("tag_1", "tag_2", "extra_tag")
         end
       end
 
       context "when the CSV name is missing" do
-        let(:site_data) { { "url" => "https://example.com/", "tag_names" => [] } }
+        let(:site_data) { { "url" => url, "tag_names" => [] } }
 
         it "creates the site without a name" do
           run_job
 
-          expect(Site.last.name).to be_nil
+          expect(created_site.name).to be_nil
         end
       end
     end
 
     context "when the site already exists" do
-      let!(:site) { create(:site, team:, url: "https://example.com/", name: "Original Name") }
-      let!(:existing_tag) { create(:tag, team:, name: "existing_tag") }
-
-      before do
-        site.tags << existing_tag
-      end
+      let(:existing_tag) { create(:tag, team:, name: "existing_tag") }
+      let(:site_name) { "Original Name" }
+      let!(:existing_site) { create(:site, team:, url:, name: site_name, tags: [existing_tag]) }
 
       it "does not create a new site" do
         expect { run_job }.not_to change(Site, :count)
@@ -73,24 +71,24 @@ RSpec.describe ProcessBatchSitesCreationJob do
       it "merges new tags with existing tags" do
         run_job
 
-        expect(site.reload.tags.map(&:name)).to contain_exactly("existing_tag", "tag_1", "tag_2")
+        expect(existing_site.reload.tags.map(&:name)).to contain_exactly("existing_tag", "tag_1", "tag_2")
       end
 
       it "schedules a new audit" do
-        expect { run_job }.to change { site.reload.audits.count }.by(1)
+        expect { run_job }.to change { existing_site.reload.audits.count }.by(1)
       end
 
       context "when the site name is blank" do
-        before { site.update!(name: nil) }
+        let(:site_name) { "" }
 
         it "updates the name from the CSV" do
-          expect { run_job }.to change { site.reload.name }.from(nil).to("New Name")
+          expect { run_job }.to change { existing_site.reload.name }.from("").to("New Name")
         end
       end
 
       context "when the site name is already present" do
         it "does not overwrite the existing name" do
-          expect { run_job }.not_to change { site.reload.name }
+          expect { run_job }.not_to change { existing_site.reload.name }
         end
       end
     end
@@ -98,7 +96,7 @@ RSpec.describe ProcessBatchSitesCreationJob do
     context "with duplicate tags" do
       let(:site_data) do
         {
-          "url" => "https://example.com/",
+          "url" => url,
           "tag_names" => ["tag", "tag"]
         }
       end
@@ -108,14 +106,14 @@ RSpec.describe ProcessBatchSitesCreationJob do
       it "deduplicates tags" do
         run_job
 
-        expect(Site.last.tags.map(&:name)).to contain_exactly("tag")
+        expect(site_tags).to contain_exactly("tag")
       end
     end
 
     context "with multiple sites" do
       let(:sites_data) do
         [
-          { "url" => "https://example.com/", "name" => "Example", "tag_names" => ["tag_1"] },
+          { "url" => url, "name" => "Example", "tag_names" => ["tag_1"] },
           { "url" => "https://test.com/", "name" => "Test", "tag_names" => ["tag_2"] }
         ]
       end

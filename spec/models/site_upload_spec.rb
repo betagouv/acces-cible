@@ -1,9 +1,16 @@
 require "rails_helper"
 
 RSpec.describe SiteUpload do
-  subject(:site_upload) { described_class.new(file:, team:) }
+  subject(:site_upload) { described_class.new(file:, team:, tag_ids:) }
 
   let(:team) { create(:team) }
+  let(:tag_ids) { [] }
+  let(:parsed_sites_data) do
+    [
+      { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
+      { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
+    ]
+  end
   let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttps://test.com/,Test Site" }
   let(:encoding) { Encoding::UTF_8 }
   let(:csv) do
@@ -150,14 +157,7 @@ RSpec.describe SiteUpload do
     context "when the upload is valid" do
       it "enqueues a site upload processing job" do
         expect { site_upload.save }
-          .to have_enqueued_job(ProcessSiteUploadJob).with(
-            [
-              { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
-              { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
-            ],
-            team.id,
-            []
-          )
+          .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids)
       end
 
       it "stores the number of parsed sites" do
@@ -166,27 +166,25 @@ RSpec.describe SiteUpload do
         expect(site_upload.count).to eq(2)
       end
 
-      it "passes tag_ids to the job" do
-        site_upload.tag_ids = [1, 2, 3]
+      context "with selected tags" do
+        let(:tag_ids) { [1, 2, 3] }
 
-        expect { site_upload.save }
-          .to have_enqueued_job(ProcessSiteUploadJob).with(
-            [
-              { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
-              { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
-            ],
-            team.id,
-            [1, 2, 3]
-          )
+        it "passes tag_ids to the job" do
+          expect { site_upload.save }
+            .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids)
+        end
       end
     end
 
     context "when the upload is invalid" do
       let(:csv_content) { "invalid_header,name\nhttps://example.com/,Example Site" }
 
-      it "returns false without enqueuing a job" do
-        expect { expect(site_upload.save).to be false }
-          .not_to have_enqueued_job(ProcessSiteUploadJob)
+      it "returns false" do
+        expect(site_upload.save).to be false
+      end
+
+      it "does not enqueue a job" do
+        expect { site_upload.save }.not_to have_enqueued_job(ProcessSiteUploadJob)
       end
     end
 
@@ -217,11 +215,20 @@ RSpec.describe SiteUpload do
     context "when the CSV contains invalid URLs" do
       let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttp://,Broken" }
 
-      it "returns false and does not enqueue a job" do
+      before do
         allow(Rails.logger).to receive(:warn)
+      end
 
-        expect { expect(site_upload.save).to be false }
-          .not_to have_enqueued_job(ProcessSiteUploadJob)
+      it "returns false" do
+        expect(site_upload.save).to be false
+      end
+
+      it "does not enqueue a job" do
+        expect { site_upload.save }.not_to have_enqueued_job(ProcessSiteUploadJob)
+      end
+
+      it "adds an error" do
+        site_upload.save
         expect(site_upload.errors.added?(:file, :invalid_row_url, line_number: 3, url: "http://")).to be(true)
       end
     end
