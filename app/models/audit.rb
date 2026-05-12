@@ -99,7 +99,7 @@ class Audit < ApplicationRecord
   def build_page(kind, page_url)
     snapshot_html = html_for(kind)
 
-    Page.new(url: page_url, root: site.url, html: snapshot_html)
+    Page.new(url: page_url, root: home_page_url, html: snapshot_html)
   end
 
   def page_url_for(kind)
