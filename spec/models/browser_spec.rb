@@ -6,19 +6,14 @@ RSpec.describe Browser do
   shared_context "with stubbed Ferrum browser" do
     let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
     let(:browser_double) { instance_double(Ferrum::Browser) }
-    let(:contexts_double) { instance_double(Ferrum::Contexts) }
-    let(:context_double) { instance_double(Ferrum::Context) }
     let(:headers_double) { instance_double(Ferrum::Headers) }
     let(:page_double) { instance_double(Ferrum::Page) }
     let(:response_double) { instance_double(Ferrum::Network::Response) }
 
     before do
       allow(described_class).to receive(:browser).and_return(browser_double)
-      allow(browser_double).to receive_messages(create_page: page_double, contexts: contexts_double)
+      allow(browser_double).to receive(:create_page).and_return(page_double)
       allow(browser_double).to receive(:quit)
-      allow(contexts_double).to receive(:create).and_return(context_double)
-      allow(context_double).to receive(:create_page).and_return(page_double)
-      allow(context_double).to receive(:dispose)
 
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
@@ -219,26 +214,6 @@ RSpec.describe Browser do
     end
   end
 
-  describe ".within_job_context" do
-    include_context "with stubbed Ferrum browser"
-
-    after do
-      Thread.current[described_class::JOB_CONTEXT_KEY] = nil
-    end
-
-    it "creates and disposes a browser context around the block" do
-      result = described_class.within_job_context do
-        expect(Thread.current[described_class::JOB_CONTEXT_KEY]).to eq(context_double)
-        "success"
-      end
-
-      expect(result).to eq("success")
-      expect(contexts_double).to have_received(:create)
-      expect(context_double).to have_received(:dispose)
-      expect(Thread.current[described_class::JOB_CONTEXT_KEY]).to be_nil
-    end
-  end
-
   describe "#with_page" do
     include_context "with stubbed Ferrum browser"
 
@@ -271,18 +246,6 @@ RSpec.describe Browser do
 
       expect(browser_double).to have_received(:create_page)
       expect(result).to eq(page_double)
-    end
-
-    it "creates a page from the current context when present" do
-      Thread.current[described_class::JOB_CONTEXT_KEY] = context_double
-
-      result = described_class.send(:create_page)
-
-      expect(context_double).to have_received(:create_page)
-      expect(browser_double).not_to have_received(:create_page)
-      expect(result).to eq(page_double)
-    ensure
-      Thread.current[described_class::JOB_CONTEXT_KEY] = nil
     end
 
     it "sets the blocklist on the page's context" do

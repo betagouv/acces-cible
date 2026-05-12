@@ -3,7 +3,6 @@ class Browser
   PROCESS_TIMEOUT = 30.seconds
   WINDOW_SIZE = [1366, 768].freeze
   SUCCESS_CODE = 200
-  JOB_CONTEXT_KEY = :acces_cible_browser_context
 
   REQUEST_HEADERS = {
     "Accept-Language" => "fr"
@@ -97,16 +96,6 @@ class Browser
       end.freeze
     end
 
-    def within_job_context
-      previous_context = Thread.current[JOB_CONTEXT_KEY]
-      Thread.current[JOB_CONTEXT_KEY] = browser.contexts.create
-
-      yield
-    ensure
-      Thread.current[JOB_CONTEXT_KEY]&.dispose
-      Thread.current[JOB_CONTEXT_KEY] = previous_context
-    end
-
     def get(url)
       with_page do |page|
         page.go_to(url)
@@ -144,10 +133,6 @@ class Browser
       @browser ||= Ferrum::Browser.new(settings)
     end
 
-    def current_context
-      Thread.current[JOB_CONTEXT_KEY]
-    end
-
     def with_page
       page = create_page
       yield(page)
@@ -156,9 +141,7 @@ class Browser
     end
 
     def create_page
-      page = current_context ? current_context.create_page : browser.create_page
-
-      page.tap do
+      browser.create_page.tap do |page|
         page.headers.set(request_headers)
         page.network.blocklist = BLOCKED_URL_PATTERNS
       end

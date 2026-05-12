@@ -6,16 +6,9 @@ class ApplicationJob < ActiveJob::Base
   # Most jobs are safe to ignore if the underlying records are no longer available
   discard_on ActiveJob::DeserializationError, ActiveRecord::RecordNotFound
 
-  around_perform :with_browser_context
   around_perform :monitor_with_sentry
 
   private
-
-  def with_browser_context
-    Browser.within_job_context do
-      yield
-    end
-  end
 
   def monitor_with_sentry
     transaction = Sentry.start_transaction(
