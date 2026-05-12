@@ -1,7 +1,6 @@
 class Browser
   PAGE_TIMEOUT = 1.minute
   PROCESS_TIMEOUT = 30.seconds
-  WINDOW_SIZE = [1366, 768].freeze
   SUCCESS_CODE = 200
 
   REQUEST_HEADERS = {
@@ -80,7 +79,6 @@ class Browser
       {
         headless: :new,
         timeout: PAGE_TIMEOUT,
-        window_size: WINDOW_SIZE,
         process_timeout: PROCESS_TIMEOUT,
         pending_connection_errors: false,
         extensions: [STEALTH_EXTENSION],
