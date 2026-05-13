@@ -34,10 +34,9 @@ RSpec.describe Checks::Reachable do
 
   describe "#analyze!" do
     let(:reachable) { true }
-    let(:redirects) { false }
 
     before do
-      allow(root_page).to receive_messages(success?: reachable, redirected?: redirects, title: "Page title", status: 200)
+      allow(root_page).to receive_messages(success?: reachable, title: "Page title", status: 200)
       allow(site).to receive_messages(update: true)
     end
 
