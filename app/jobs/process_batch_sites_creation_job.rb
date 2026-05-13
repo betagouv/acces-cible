@@ -29,7 +29,7 @@ class ProcessBatchSitesCreationJob < ApplicationJob
       update_site(site, site_data, tag_ids)
       site.audit!
     else
-      Site.create!(url: site_data["url"], team:, name: site_data["name"], tag_ids: tag_ids.uniq)
+      Site.create!(url: site_data["url"], team:, name: site_data["name"], tag_ids: tag_ids.uniq).audit!
     end
   end
 

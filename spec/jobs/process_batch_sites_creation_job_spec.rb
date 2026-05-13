@@ -37,6 +37,10 @@ RSpec.describe ProcessBatchSitesCreationJob do
         expect(site_tags).to contain_exactly("tag_1", "tag_2")
       end
 
+      it "schedules an audit for the new site" do
+        expect { run_job }.to change(Audit, :count).by(1)
+      end
+
       context "with extra tags" do
         let(:extra_tag) { create(:tag, team:, name: "extra_tag") }
         let(:extra_tag_ids) { [extra_tag.id] }
