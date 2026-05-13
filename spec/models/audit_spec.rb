@@ -64,11 +64,8 @@ RSpec.describe Audit do
       let(:kind) { :accessibility }
 
       context "when find_accessibility_page check has a url" do
-        let(:accessibility_url) { "#{site.url}/accessibilite" }
-
-        before do
-          audit.accessibility_page_url = accessibility_url
-        end
+        let(:accessibility_url) { "https://example.com/accessibility" }
+        let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url, accessibility_page_url: accessibility_url) }
 
         it "creates a Page with the accessibility page url" do
           expect(Page).to receive(:new).with(url: accessibility_url, root: site.url, html: nil)
@@ -81,7 +78,7 @@ RSpec.describe Audit do
       end
 
       context "when find_accessibility_page check has no url" do
-        before { audit.accessibility_page_url = nil }
+        let(:accessibility_url) { nil }
 
         it "returns nil" do
           expect(page).to be_nil

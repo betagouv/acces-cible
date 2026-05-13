@@ -83,12 +83,12 @@ class SiteUpload
       rescue Link::InvalidUriError => error
         Rails.logger.warn(
           "site_upload_invalid_url " \
-            "team_id=#{team&.id} " \
-            "filename=#{file&.original_filename} " \
-            "line_number=#{line_number} " \
-            "raw_url=#{raw_url} " \
-            "error_class=#{error.class.name} " \
-            "error_message=#{error.message}"
+          "team_id=#{team&.id} " \
+          "filename=#{file&.original_filename} " \
+          "line_number=#{line_number} " \
+          "raw_url=#{raw_url} " \
+          "error_class=#{error.class.name} " \
+          "error_message=#{error.message}"
         )
         errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
         next
@@ -111,10 +111,10 @@ class SiteUpload
   rescue CSV::MalformedCSVError => error
     Rails.logger.warn(
       "site_upload_malformed_csv " \
-        "team_id=#{team&.id} " \
-        "filename=#{file&.original_filename} " \
-        "error_class=#{error.class.name} " \
-        "error_message=#{error.message}"
+      "team_id=#{team&.id} " \
+      "filename=#{file&.original_filename} " \
+      "error_class=#{error.class.name} " \
+      "error_message=#{error.message}"
     )
     errors.add(:file, :malformed_csv)
   end

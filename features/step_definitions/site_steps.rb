@@ -24,49 +24,49 @@ end
 # NICE and we should do something about it soon.
 Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'accueil") do |url|
   fake_html = <<~HTML
-    <html>
-      <head>
-        <title>Site title</title>
-      </head>
-      <body>
-        <h1>Hello</h1>
-      </body>
-    </html>
-  HTML
+        <html>
+          <head>
+            <title>Site title</title>
+          </head>
+          <body>
+            <h1>Hello</h1>
+          </body>
+        </html>
+      HTML
 
   allow(Browser)
     .to receive(:get)
-          .with(url)
-          .and_return(
-            body: fake_html,
-            status: 200,
-            content_type: "text/html",
-            current_url: url
-          )
+    .with(url)
+    .and_return(
+      body: fake_html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
 end
 
 Sachantque("le site {string} renvoie {string} pour la page d'accueil") do |url, html|
   allow(Browser)
     .to receive(:get)
-          .with(url)
-          .and_return(
-            body: html,
-            status: 200,
-            content_type: "text/html",
-            current_url: url
-          )
+    .with(url)
+    .and_return(
+      body: html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
 end
 
 Sachantque("l'adresse {string} renvoie {string}") do |url, html|
   allow(Browser)
     .to receive(:get)
-          .with(url)
-          .and_return(
-            body: html,
-            status: 200,
-            content_type: "text/html",
-            current_url: url
-          )
+    .with(url)
+    .and_return(
+      body: html,
+      status: 200,
+      content_type: "text/html",
+      current_url: url
+    )
 end
 
 Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
@@ -76,26 +76,26 @@ end
 Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, str, declaration_url|
   allow(FindAccessibilityPageService)
     .to receive(:find_page)
-          .and_return(Page.new(url: declaration_url, root: declaration_url, html: str))
+    .and_return(Page.new(url: declaration_url, root: declaration_url, html: str))
 end
 
 Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
   allow(FindAccessibilityPageService)
     .to receive(:find_page)
-          .and_return(nil)
+    .and_return(nil)
 end
 
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
   fake_html = <<~HTML
-    <html>
-      <head>
-        <title>Site title</title>
-      </head>
-      <body>
-        <h1>Hello</h1>
-      </body>
-    </html>
-  HTML
+        <html>
+          <head>
+            <title>Site title</title>
+          </head>
+          <body>
+            <h1>Hello</h1>
+          </body>
+        </html>
+      HTML
 
   step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end

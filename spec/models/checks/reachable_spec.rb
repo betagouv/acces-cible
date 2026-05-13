@@ -4,9 +4,9 @@ RSpec.describe Checks::Reachable do
   let(:check) { described_class.new }
   let(:original_url) { "https://example.com" }
   let(:home_page_url) { original_url }
-  let(:audit) { instance_double(Audit, home_page_url:, update!: true) }
   let(:root_page) { instance_double(Page, html: nil) }
-  let(:site) { build(:site, url: original_url) }
+  let(:site) { create(:site, url: original_url) }
+  let(:audit) { build(:audit, site:, home_page_url:) }
 
   before do
     allow(check).to receive_messages(audit:, root_page:, site:)
