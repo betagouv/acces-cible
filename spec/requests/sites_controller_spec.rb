@@ -51,8 +51,8 @@ RSpec.describe "Sites" do
 
       csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
       expect(csv.count).to eq(2)
-      expect(csv[0]["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
-      expect(csv[1]["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+      expect(csv[0]["Adresse du site"]).to eq(other_site.normalized_url)
+      expect(csv[1]["Adresse du site"]).to eq(site.normalized_url)
     end
 
     context "when filtering by site ids" do
@@ -63,7 +63,7 @@ RSpec.describe "Sites" do
 
         csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
       end
     end
 
@@ -75,7 +75,7 @@ RSpec.describe "Sites" do
 
         csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
       end
     end
   end
@@ -184,9 +184,9 @@ RSpec.describe "Sites" do
   describe "DELETE /sites" do
     subject(:delete_sites) { delete bulk_destroy_sites_path, params: { id: site_ids } }
 
-    let!(:site) { create(:site, team:) }
-    let!(:other_site) { create(:site, team:) }
-    let!(:team_site) { create(:site, team: create(:team)) }
+    let!(:site) { create(:site, :completed, team:) }
+    let!(:other_site) { create(:site, :completed, team:) }
+    let!(:team_site) { create(:site, :completed, team: create(:team)) }
     let(:site_ids) { [site.id, other_site.id] }
 
     it "destroys selected sites and redirects to index" do

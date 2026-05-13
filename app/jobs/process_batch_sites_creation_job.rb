@@ -23,7 +23,7 @@ class ProcessBatchSitesCreationJob < ApplicationJob
   def process_site(site_data, team, tag_ids)
     tag_names = site_data["tag_names"] || []
     tag_ids = tag_ids + tag_ids_from_names(team, tag_names)
-    site = team.sites.find_by_url(url: site_data["url"])
+    site = team.sites.find_by(url: site_data["url"])
 
     if site
       update_site(site, site_data, tag_ids)

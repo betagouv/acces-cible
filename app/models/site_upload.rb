@@ -35,6 +35,7 @@ class SiteUpload
 
     @count = sites_data.count
     ProcessSiteUploadJob.perform_later(sites_data, team.id, tag_ids)
+
     true
   end
 

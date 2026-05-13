@@ -51,7 +51,6 @@ class Check < ApplicationRecord
   belongs_to :audit
   has_one :site, through: :audit
 
-  delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
 
   after_initialize :set_priority

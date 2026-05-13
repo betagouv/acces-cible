@@ -20,7 +20,6 @@ RSpec.describe RunCheckJob do
         instance.save!
       end
       allow(Browser).to receive(:get)
-                          .with(normalized_url)
                           .and_return({ body:, status:, content_type:, current_url: normalized_url })
     end
 
@@ -42,7 +41,6 @@ RSpec.describe RunCheckJob do
         instance.save!
       end
       allow(Browser).to receive(:get)
-                          .with(normalized_url)
                           .and_return({ body:, status:, content_type:, current_url: normalized_url })
     end
 

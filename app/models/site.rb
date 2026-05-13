@@ -10,46 +10,21 @@ class Site < ApplicationRecord
   scope :with_current_audit, -> { joins(:audits).merge(Audit.current) }
   scope :preloaded, -> { with_current_audit.includes(:tags, :slugs, audits: { checks: :check_transitions }) }
 
+  before_validation :set_normalized_url, if: :will_save_change_to_url?
   after_save :set_current_audit!, unless: -> { audits_count == audits_count_before_last_save }
 
-  friendly_id :url_without_scheme_and_www, use: [:slugged, :history, :scoped], scope: :team_id
-
-  delegate :url, to: :audit, allow_nil: true
+  friendly_id :normalized_url, use: [:slugged, :history, :scoped], scope: :team_id
 
   validates :url, presence: true, url: true
 
   broadcasts_refreshes
 
-  class << self
-    def find_by_url(attributes)
-      url = attributes.to_h.fetch(:url).strip
-      return if url.empty?
-
-      # Ignore http/https duplicates when searching
-      normalized_url = [url, url.sub(/^https?/, url.start_with?("https") ? "http" : "https")]
-      joins(:audits).find_by(audits: { url: normalized_url })
-    end
-  end
-
-  def url=(new_url)
-    return if url == new_url
-
-    if audit.pending?
-      audit.url = new_url
-      audit.save if audit.persisted?
-    else
-      audits.build(url: new_url)
-    end
-
-    persist_site_urls!(new_url)
-  end
-
-  def url_without_scheme_and_www
-    Link.url_without_scheme_and_www(audit.url)
+  def set_normalized_url
+    self.normalized_url = Link.url_without_scheme_and_www(url)
   end
 
   def name_with_fallback
-    name.presence || url_without_scheme_and_www
+    name.presence || normalized_url
   end
 
   alias to_title name_with_fallback
@@ -62,7 +37,7 @@ class Site < ApplicationRecord
   end
 
   def should_generate_new_friendly_id?
-    new_record? || (slug != url_without_scheme_and_www.parameterize) || super
+    new_record? || (slug != normalized_url.parameterize) || super
   end
 
   def update_slug!
@@ -93,12 +68,5 @@ class Site < ApplicationRecord
 
   def tags_list
     tags.collect(&:name).join(", ")
-  end
-
-  private
-
-  def persist_site_urls!(url)
-    self[:url] = url
-    self[:normalized_url] = Link.url_without_scheme_and_www(url)
   end
 end
