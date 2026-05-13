@@ -59,10 +59,8 @@ Fonctionnalité: Page du site
 
   Scénario: Un agent peut voir l'historique des audits
     Sachant que je rajoute un site "https://example.gouv.fr"
-    Et que je demande une nouvelle vérification du site "https://example.gouv.fr"
-    Quand je clique sur "Tous les sites"
-    Et que je clique sur "Voir la fiche de example.gouv.fr"
-    Alors la page contient "Historique des vérifications"
+    Et que je clique sur "Nouvelle vérification"
+    Alors la page contient "Historique des vérifications (2)"
 
   Scénario: Un agent voit un message quand le site n'a pas d'étiquettes
     Sachant que je rajoute un site "https://example.gouv.fr"

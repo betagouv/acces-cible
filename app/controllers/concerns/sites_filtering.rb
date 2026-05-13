@@ -42,7 +42,7 @@ module SitesFiltering
   end
 
   def order_by_completed_at(scope)
-    scope.order("audits.completed_at #{sort_direction.upcase} NULLS LAST, sites.created_at #{sort_direction.upcase}")
+    scope.includes(:last_completed_audit).order("audits.completed_at #{sort_direction.upcase} NULLS LAST, sites.created_at #{sort_direction.upcase}")
   end
 
   def order_by_url(scope)

@@ -130,10 +130,10 @@ RSpec.describe "Sites" do
 
     context "when redirected URLs contain HTML" do
       let(:site) { create(:site, :with_data, team:, name: "Example Site") }
-      let(:reachable_check) { site.audit.reachable }
+      let(:reachable_check) { site.last_audit.reachable }
 
       before do
-        site.audit.update_column(:home_page_url, "https://safe.example")
+        site.last_audit.update_column(:home_page_url, "https://safe.example")
         reachable_check.update!(
           data: {
             original_url: %(<img src=x onerror=alert('xss-1')>),
@@ -164,7 +164,7 @@ RSpec.describe "Sites" do
                                                                             .and change(Check, :count).by(Check.names.count)
 
       site = Site.last
-      audit = site.audit
+      audit = site.last_audit
       expect(audit).to be_present
       expect(audit).to be_pending
 

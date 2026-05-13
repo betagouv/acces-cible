@@ -25,7 +25,7 @@ RSpec.describe Audit do
   end
 
   describe "scopes" do
-    before { site.audit.destroy }
+    before { site.audits.destroy_all }
 
     it ".sort_by_newest returns audits in descending order by created_at date" do
       oldest = create(:audit, site:, created_at: 3.days.ago)

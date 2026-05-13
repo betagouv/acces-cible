@@ -29,7 +29,7 @@ class SitesController < ApplicationController
 
   # GET /sites/1
   def show
-    @audit = @site.audit
+    @audit = @site.last_audit
   end
 
   # GET /sites/new
