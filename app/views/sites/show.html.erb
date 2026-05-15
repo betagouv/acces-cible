@@ -37,9 +37,9 @@
   </div>
   <div class="fr-col-12 fr-col-md-4">
     <% audits = @site.audits.sort_by_newest.load %>
-    <%= dsfr_sidemenu(button: t(".audits"), title: t(".audit_history", total: audits.count), right: true) do |sidemenu| %>
+    <%= dsfr_side_menu(title: t(".audit_history", total: audits.count), html_attributes: { class: "fr-sidemenu--right" }) do |sidemenu| %>
       <% audits.each do |audit| %>
-        <% sidemenu.with_item text: l(audit.created_at.in_time_zone, format: :long).upcase_first, href: url_for([@site, audit]), active: @audit == audit %>
+        <% sidemenu.with_item title: l(audit.created_at.in_time_zone, format: :long).upcase_first, path: url_for([@site, audit]), current_page: @audit == audit %>
       <% end %>
     <% end %>
   </div>
