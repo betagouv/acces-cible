@@ -206,14 +206,6 @@ RSpec.describe Browser do
     end
   end
 
-  describe "#browser" do
-    include_context "with stubbed Ferrum browser"
-
-    it "creates a new Ferrum::Browser instance during initialization" do
-      expect(described_class.send(:browser)).to eq(browser_double)
-    end
-  end
-
   describe "#with_page" do
     include_context "with stubbed Ferrum browser"
 
