@@ -2,6 +2,7 @@ module ApplicationHelper
   include DsfrHelper
   include PageHelper
   include IconHelper
+  include JdmaHelper
 
   TRUNCATION_LENGTH = 35.freeze
 

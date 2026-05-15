@@ -167,6 +167,9 @@ fr:
     service_description: "Contrôle l'accessibilité et la conformité des sites internet"
     service_name: "Accès cible (version beta)"
     sponsor_html: "Gouvernement"
+  jdma:
+    production_button_label: Signaler un problème
+    staging_button_label: Une remarque ?
   pages:
     accessibilite:
       title: Déclaration d’accessibilité

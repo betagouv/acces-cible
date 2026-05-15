@@ -4,14 +4,17 @@
 # See the Securing Rails Applications Guide for more information:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
+JDMA_HOST = "https://jedonnemonavis.numerique.gouv.fr".freeze
+
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src    :self
-    policy.img_src     :self, :data
+    policy.img_src     :self, :data, JDMA_HOST
     policy.object_src  :none
     policy.script_src  :self
     policy.style_src   :self
+    policy.frame_src   JDMA_HOST
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
   end
