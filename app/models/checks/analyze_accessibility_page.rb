@@ -150,10 +150,6 @@ module Checks
       [:audit_date, :compliance_rate, :mentions_article].all? { send(it).present? }
     end
 
-    def found_all?
-      found_required? && [:standard, :auditor].all? { send(it).present? }
-    end
-
     def analyze!
       return unless page
 

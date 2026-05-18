@@ -3,12 +3,6 @@ module DsfrHelper
     render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, html_attributes:), &block
   end
 
-  def dsfr_sidemenu(title:, button: nil, sticky: false, full_height: false, right: false, &block)
-    component = Dsfr::SidemenuComponent.new(title:, button:, sticky:, full_height:, right:)
-    yield(component) if block_given?
-    render component
-  end
-
   def dsfr_tooltip(text, title:, type: :button)
     render Dsfr::TooltipComponent.new(text, title:, type:)
   end

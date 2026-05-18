@@ -8,7 +8,9 @@ module Checks
     def redirected?
       return if audit.home_page_url.blank?
 
-      normalize(audit.home_page_url) != normalize(audit.url)
+      normalized_audit_url = Link.url_without_scheme_and_www(audit.home_page_url)
+
+      normalized_audit_url != site.normalized_url
     end
 
     def custom_badge_text
@@ -31,21 +33,10 @@ module Checks
       site.update(name: root_page.title) if site && site.name.blank?
 
       if redirected?
-        { original_url: audit.url, redirect_url: audit.home_page_url }
+        { original_url: site.url, redirect_url: audit.home_page_url }
       else
         {}
       end
-    end
-
-    def normalize(url)
-      parsed = Link.parse(url.downcase)
-      host = parsed.host.start_with?("www.") ? parsed.host[4..-1] : parsed.host
-      {
-        host: host,
-        path: parsed.path,
-        query: parsed.query,
-        fragment: parsed.fragment
-      }
     end
   end
 end

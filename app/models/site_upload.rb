@@ -40,9 +40,10 @@ class SiteUpload
     return false if errors.any?
 
     transaction do
-      create!(new_sites.values) if new_sites.any?
+      create!(new_sites.values).each(&:audit!) if new_sites.any?
       existing_sites.values.each { |site| site.save && site.audit! }
     end
+
     true
   end
 
@@ -97,7 +98,7 @@ class SiteUpload
 
       row_tag_ids = tag_names.map { |n| team.tags.find_or_create_by(name: n).id }
       combined_tag_ids = (tag_ids + row_tag_ids).uniq
-      existing_site = team.sites.find_by_url(url:)
+      existing_site = team.sites.find_by(url:)
 
       if existing_site
         existing_site.assign_attributes(tag_ids: combined_tag_ids.union(existing_site.tag_ids))

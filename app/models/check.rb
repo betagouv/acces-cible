@@ -51,14 +51,13 @@ class Check < ApplicationRecord
   belongs_to :audit
   has_one :site, through: :audit
 
-  delegate :parsed_url, to: :audit
   delegate :human_type, to: :class
 
   after_initialize :set_priority
 
   scope :prioritized, -> { order(:priority) }
   scope :remaining, -> { in_state(:pending, :blocked) }
-  scope :errored, -> { in_state(:failed) }
+  scope :failed, -> { in_state(:failed) }
 
   class << self
     def human_type

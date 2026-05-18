@@ -5,7 +5,6 @@ Rails.application.routes.draw do
     get "auth/failure", action: :new
     get "auth/:provider", action: :new, as: :omniauth
     get "auth/:provider/callback", action: :omniauth
-    post "auth/:provider/logout", action: :destroy
     delete :logout, action: :destroy, as: :logout
   end
 
@@ -13,7 +12,6 @@ Rails.application.routes.draw do
   resources :sites do
     collection do
       post :upload
-      get :upload, to: redirect("/sites/new")
       delete :bulk_destroy
       get :csv_export
     end

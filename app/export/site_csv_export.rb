@@ -51,7 +51,7 @@ class SiteCsvExport
         axe = audit&.run_axe_on_homepage
 
         row = [
-          site.url_without_scheme_and_www,
+          site.normalized_url,
           site.name,
           site.url,
           audit.reachable.redirect_url,

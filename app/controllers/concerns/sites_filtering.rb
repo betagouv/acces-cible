@@ -1,8 +1,8 @@
 module SitesFiltering
   extend ActiveSupport::Concern
 
-  DEFAULT_DIRECTION = "desc"
-  SORT_DIRECTIONS = %w[asc desc].freeze
+  DEFAULT_DIRECTION = :desc
+  SORT_DIRECTIONS = %i[asc desc].freeze
 
   private
 
@@ -25,7 +25,7 @@ module SitesFiltering
     term = "%#{search_query}%"
 
     scope.where(
-      "sites.name ILIKE ? OR audits.url ILIKE ?",
+      "sites.name ILIKE ? OR sites.url ILIKE ?",
       term,
       term
     )
@@ -38,24 +38,15 @@ module SitesFiltering
   end
 
   def order_sites(scope)
-    if sort_by_url?
-      order_by_url(scope)
-    else
-      order_by_completed_at(scope)
-    end
+    sort_by_url? ? order_by_url(scope) : order_by_completed_at(scope)
   end
 
   def order_by_completed_at(scope)
-    direction = sort_direction.upcase
-    scope.order("audits.completed_at #{direction} NULLS LAST, sites.created_at #{direction}")
+    scope.order("audits.completed_at #{sort_direction.upcase} NULLS LAST, sites.created_at #{sort_direction.upcase}")
   end
 
   def order_by_url(scope)
-    scope.order(
-      Arel.sql(
-        "REGEXP_REPLACE(audits.url, '^https?://(www\\.)?', '') #{sort_direction.upcase}"
-      )
-    )
+    scope.order(normalized_url: sort_direction)
   end
 
   def sort_by_url?
@@ -65,6 +56,9 @@ module SitesFiltering
   def sort_direction
     direction = params.dig(:sort, :url).presence || params.dig(:sort, :completed_at).presence
 
+    return DEFAULT_DIRECTION if direction.blank?
+
+    direction = direction.to_sym
     direction.in?(SORT_DIRECTIONS) ? direction : DEFAULT_DIRECTION
   end
 

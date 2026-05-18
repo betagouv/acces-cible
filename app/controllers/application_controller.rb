@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   layout :layout_selector
 
-  helper_method :resource, :resource_model
+  helper_method :resource
 
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
     @title = t("errors.not_found.title")
@@ -28,10 +28,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  def resource_model
-    controller_path.classify.demodulize.safe_constantize
-  end
 
   def resource
     @resource ||= instance_variable_get(instance_variable_name)
