@@ -1,4 +1,7 @@
-<% if (config = jdma_widget_config) %>
+<% config = jdma_widget_config %>
+<% show_jdma_widget = authenticated? && config.present? %>
+
+<% if show_jdma_widget %>
   <%= javascript_include_tag(
         "#{JdmaHelper::JDMA_HOST}/static/jdma-modal-widget.js",
         nonce: true,
