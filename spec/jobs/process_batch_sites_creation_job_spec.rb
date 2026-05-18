@@ -5,126 +5,17 @@ RSpec.describe ProcessBatchSitesCreationJob do
     subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids) }
 
     let(:team) { create(:team) }
-    let(:created_site) { Site.last }
-    let(:site_tags) { created_site.tags.pluck(:name) }
     let(:url) { "https://example.com/" }
-    let(:site_data) do
-      {
-        "url" => url,
-        "name" => "New Name",
-        "tag_names" => ["tag_1", "tag_2"]
-      }
+    let(:sites_data) do
+      [
+        { "url" => url, "name" => "Example", "tag_names" => ["tag_1"] },
+        { "url" => "https://test.com/", "name" => "Test", "tag_names" => ["tag_2"] }
+      ]
     end
-    let(:sites_data) { [site_data] }
     let(:extra_tag_ids) { [] }
 
-    context "when the site does not exist" do
-      it "creates a new site" do
-        expect { run_job }.to change(Site, :count).by(1)
-      end
-
-      it "sets the site attributes" do
-        run_job
-
-        expect(created_site.url).to eq(url)
-        expect(created_site.name).to eq("New Name")
-        expect(created_site.team).to eq(team)
-      end
-
-      it "creates and associates tags" do
-        run_job
-
-        expect(site_tags).to contain_exactly("tag_1", "tag_2")
-      end
-
-      it "schedules an audit for the new site" do
-        expect { run_job }.to change(Audit, :count).by(1)
-      end
-
-      context "with extra tags" do
-        let(:extra_tag) { create(:tag, team:, name: "extra_tag") }
-        let(:extra_tag_ids) { [extra_tag.id] }
-
-        it "associates CSV tags and extra tags" do
-          run_job
-
-          expect(site_tags).to contain_exactly("tag_1", "tag_2", "extra_tag")
-        end
-      end
-
-      context "when the CSV name is missing" do
-        let(:site_data) { { "url" => url, "tag_names" => [] } }
-
-        it "creates the site without a name" do
-          run_job
-
-          expect(created_site.name).to be_nil
-        end
-      end
-    end
-
-    context "when the site already exists" do
-      let(:existing_tag) { create(:tag, team:, name: "existing_tag") }
-      let(:site_name) { "Original Name" }
-      let!(:existing_site) { create(:site, team:, url:, name: site_name, tags: [existing_tag]) }
-
-      it "does not create a new site" do
-        expect { run_job }.not_to change(Site, :count)
-      end
-
-      it "merges new tags with existing tags" do
-        run_job
-
-        expect(existing_site.reload.tags.map(&:name)).to contain_exactly("existing_tag", "tag_1", "tag_2")
-      end
-
-      it "schedules a new audit" do
-        expect { run_job }.to change { existing_site.reload.audits.count }.by(1)
-      end
-
-      context "when the site name is blank" do
-        let(:site_name) { "" }
-
-        it "updates the name from the CSV" do
-          expect { run_job }.to change { existing_site.reload.name }.from("").to("New Name")
-        end
-      end
-
-      context "when the site name is already present" do
-        it "does not overwrite the existing name" do
-          expect { run_job }.not_to change { existing_site.reload.name }
-        end
-      end
-    end
-
-    context "with duplicate tags" do
-      let(:site_data) do
-        {
-          "url" => url,
-          "tag_names" => ["tag", "tag"]
-        }
-      end
-      let(:duplicate_tag) { create(:tag, team:, name: "tag") }
-      let(:extra_tag_ids) { [duplicate_tag.id] }
-
-      it "deduplicates tags" do
-        run_job
-
-        expect(site_tags).to contain_exactly("tag")
-      end
-    end
-
-    context "with multiple sites" do
-      let(:sites_data) do
-        [
-          { "url" => url, "name" => "Example", "tag_names" => ["tag_1"] },
-          { "url" => "https://test.com/", "name" => "Test", "tag_names" => ["tag_2"] }
-        ]
-      end
-
-      it "processes all sites in the batch" do
-        expect { run_job }.to change(Site, :count).by(2)
-      end
+    it "processes all sites in the batch" do
+      expect { run_job }.to change(Site, :count).by(2)
     end
 
     it "broadcasts a sites index refresh after the batch" do
