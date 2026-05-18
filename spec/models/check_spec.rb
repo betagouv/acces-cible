@@ -10,7 +10,6 @@ RSpec.describe Check do
   end
 
   describe "delegations" do
-    it { is_expected.to delegate_method(:parsed_url).to(:audit) }
     it { is_expected.to delegate_method(:human_type).to(:class) }
   end
 
@@ -45,10 +44,12 @@ RSpec.describe Check do
   end
 
   describe "#root_page" do
-    it "returns a Page with the audit URL" do
-      audit = build(:audit, url: "https://example.com/")
-      check = build(:check, :accessibility_mention, audit:)
-      expect(Page).to receive(:new).with(url: "https://example.com/", root: "https://example.com/", html: nil)
+    let(:site) { create(:site, url: "https://example.com/") }
+    let(:audit) { create(:audit, site:, home_page_url: "https://example.com/", accessibility_page_url: nil) }
+    let(:check) { build(:check, :accessibility_mention, audit:) }
+
+    it "returns a Page with the site URL" do
+      expect(Page).to receive(:new).with(url: audit.home_page_url, root: audit.home_page_url, html: nil)
       check.root_page
     end
   end

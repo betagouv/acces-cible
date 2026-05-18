@@ -9,7 +9,7 @@
 # For example:
 #
 Pagy::OPTIONS[:limit] = 20 # Limit the items per page
-Pagy::OPTIONS[:client_max_limit] = 200 # The client can request a limit up to 200
+Pagy::OPTIONS[:max_limit] = 200 # The client can request a limit up to 200
 Pagy::OPTIONS[:per_page] = [10, 20, 50, 100, 200]
 Pagy::OPTIONS[:raise_range_error] = true
 # Pagy::OPTIONS[:max_pages] = 200          # Allow only 200 pages

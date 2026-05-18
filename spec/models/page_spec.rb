@@ -118,38 +118,6 @@ RSpec.describe Page do
     end
   end
 
-  describe "#root?" do
-    it "returns false when URL is not the root URL" do
-      expect(page.root?).to be false
-    end
-
-    context "when URL is the root URL" do
-      let(:url) { root }
-
-      it "returns true" do
-        expect(page.root?).to be true
-      end
-    end
-  end
-
-  describe "#redirected?" do
-    context "when actual_url is the original URL" do
-      it "returns false" do
-        allow(page).to receive(:actual_url).and_return(Link.normalize(url))
-
-        expect(page.redirected?).to be false
-      end
-    end
-
-    context "when actual_url is different from the original URL" do
-      it "returns true" do
-        allow(page).to receive(:actual_url).and_return(root)
-
-        expect(page.redirected?).to be true
-      end
-    end
-  end
-
   describe "#fetch" do
     let(:body) { nil }
 

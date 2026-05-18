@@ -120,6 +120,24 @@ RSpec.describe Link do
     end
   end
 
+  describe ".safe_external_url" do
+    it "returns the URL for an https URL" do
+      expect(described_class.safe_external_url("https://example.com")).to eq("https://example.com")
+    end
+
+    it "returns the URL for an http URL" do
+      expect(described_class.safe_external_url("http://example.com")).to eq("http://example.com")
+    end
+
+    it "returns nil for an unsupported scheme" do
+      expect(described_class.safe_external_url("javascript:alert(1)")).to be_nil
+    end
+
+    it "returns nil for a malformed URL" do
+      expect(described_class.safe_external_url("not a url")).to be_nil
+    end
+  end
+
   describe ".root_from" do
     it "returns path for root URL" do
       url = described_class.root_from("http://example.com")

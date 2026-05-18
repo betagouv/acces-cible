@@ -1,12 +1,8 @@
 class UrlValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     return if value.blank?
+    return if Link.safe_external_url(value)
 
-    begin
-      uri = Link.parse(value)
-      return if uri.host.present? && uri.scheme.match?(/^https?$/)
-    rescue Link::InvalidURIError
-    end
     record.errors.add(attribute, :invalid)
   end
 end

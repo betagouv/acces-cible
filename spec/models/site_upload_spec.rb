@@ -136,8 +136,7 @@ RSpec.describe SiteUpload do
     end
 
     it "skips sites that already exist" do
-      existing_site = build(:site, url: "https://example.com/")
-      allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
+      existing_site = create(:site, url: "https://example.com/", team:)
 
       site_upload.parse_sites
 
@@ -185,17 +184,16 @@ RSpec.describe SiteUpload do
 
       expect(site_upload.new_sites.keys).to contain_exactly("https://example.com/", "https://test.com/")
       expect(site_upload.errors.details[:file]).to include(
-        error: :invalid_row_url, line_number: 3, url: "http://"
-      )
+                                                     error: :invalid_row_url, line_number: 3, url: "http://"
+                                                   )
       expect(site_upload.errors.details[:file]).to include(
-        error: :invalid_row_url, line_number: 4, url: "/contact"
-      )
+                                                     error: :invalid_row_url, line_number: 4, url: "/contact"
+                                                   )
       expect(Rails.logger).to have_received(:warn).twice
     end
 
     it "ignores duplicate existing sites" do
-      existing_site = build(:site, url: "https://example.com/")
-      allow(team.sites).to receive(:find_by_url) { |args| existing_site if args[:url] == "https://example.com/" }
+      existing_site = create(:site, url: "https://example.com/", team:)
 
       csv.write("url,name\nhttps://example.com/,Example Site\nhttps://example.com/,Example Site Again")
       csv.rewind

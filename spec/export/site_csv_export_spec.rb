@@ -4,6 +4,7 @@ RSpec.describe SiteCsvExport do
   let(:team) { create(:team) }
   let(:tags) { ["Gouvernment", "Santé publique"].map { |name| create(:tag, name:, team:) } }
   let(:site) { create(:site, :completed, url: "https://example.com", team:, tags:) }
+  let(:csv_without_bom) { csv_output.delete_prefix(described_class::UTF8_BOM) }
 
   describe ".filename" do
     it "generates filename with current date" do
@@ -14,12 +15,16 @@ RSpec.describe SiteCsvExport do
   end
 
   describe ".stream_csv_to" do
-    subject(:parsed_csv) { CSV.parse(csv_output, col_sep: ";", headers: true) }
+    subject(:parsed_csv) { CSV.parse(csv_without_bom, col_sep: ";", headers: true) }
 
     let(:csv_output) do
       output = StringIO.new
       described_class.stream_csv_to(output, Site.where(id: site.id))
       output.string
+    end
+
+    it "prefixes the CSV with a UTF-8 BOM" do
+      expect(csv_output).to start_with(described_class::UTF8_BOM)
     end
 
     context "with completed checks" do
@@ -91,9 +96,9 @@ RSpec.describe SiteCsvExport do
         row = parsed_csv.first
         audit = site.audit.reload
 
-        expect(row["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+        expect(row["Adresse du site"]).to eq(site.normalized_url)
         expect(row["Nom du site"]).to eq(site.name)
-        expect(row["URL"]).to eq(audit.url)
+        expect(row["URL"]).to eq(site.url)
         expect(row["URL de redirection"]).to be_nil
         expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
         expect(row["Vérification effectuée le"]).to eq(audit.completed_at.to_s)

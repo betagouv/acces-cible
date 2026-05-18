@@ -34,6 +34,7 @@ RSpec.describe "Sites" do
     let!(:other_site) { create(:site, :completed, team:, tag_ids: [tag.id]) }
 
     let(:request_params) { {} }
+    let(:csv_without_bom) { response.body.delete_prefix(SiteCsvExport::UTF8_BOM) }
 
     it "returns CSV content" do
       get_csv
@@ -42,15 +43,16 @@ RSpec.describe "Sites" do
       expect(response.content_type).to include("text/csv")
       expect(response.headers["Content-Disposition"]).to include("attachment")
       expect(response.headers["Content-Disposition"]).to include("sites_")
+      expect(response.body).to start_with(SiteCsvExport::UTF8_BOM)
     end
 
     it "includes sites data in CSV" do
       get_csv
 
-      csv = CSV.parse(response.body, col_sep: ";", headers: true)
+      csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
       expect(csv.count).to eq(2)
-      expect(csv[0]["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
-      expect(csv[1]["Adresse du site"]).to eq(site.url_without_scheme_and_www)
+      expect(csv[0]["Adresse du site"]).to eq(other_site.normalized_url)
+      expect(csv[1]["Adresse du site"]).to eq(site.normalized_url)
     end
 
     context "when filtering by site ids" do
@@ -59,9 +61,9 @@ RSpec.describe "Sites" do
       it "returns only selected sites" do
         get_csv
 
-        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
       end
     end
 
@@ -71,9 +73,9 @@ RSpec.describe "Sites" do
       it "returns only tagged sites" do
         get_csv
 
-        csv = CSV.parse(response.body, col_sep: ";", headers: true)
+        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.url_without_scheme_and_www)
+        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
       end
     end
   end
@@ -109,6 +111,30 @@ RSpec.describe "Sites" do
         get_site
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when redirected URLs contain HTML" do
+      let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+      let(:reachable_check) { site.audit.reachable }
+
+      before do
+        site.audit.update_column(:home_page_url, "https://safe.example")
+        reachable_check.update!(
+          data: {
+            original_url: %(<img src=x onerror=alert('xss-1')>),
+            redirect_url: %(<script>alert('xss-2')</script>)
+          }
+        )
+      end
+
+      it "escapes the redirected URLs in the message" do
+        get_site
+
+        expect(response.body).not_to include("<img src=x onerror=alert('xss-1')>")
+        expect(response.body).not_to include("<script>alert('xss-2')</script>")
+        expect(response.body).to include("xss-1")
+        expect(response.body).to include("xss-2")
       end
     end
   end
@@ -158,9 +184,9 @@ RSpec.describe "Sites" do
   describe "DELETE /sites" do
     subject(:delete_sites) { delete bulk_destroy_sites_path, params: { id: site_ids } }
 
-    let!(:site) { create(:site, team:) }
-    let!(:other_site) { create(:site, team:) }
-    let!(:team_site) { create(:site, team: create(:team)) }
+    let!(:site) { create(:site, :completed, team:) }
+    let!(:other_site) { create(:site, :completed, team:) }
+    let!(:team_site) { create(:site, :completed, team: create(:team)) }
     let(:site_ids) { [site.id, other_site.id] }
 
     it "destroys selected sites and redirects to index" do

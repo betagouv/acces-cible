@@ -3,6 +3,8 @@ module ApplicationHelper
   include PageHelper
   include IconHelper
 
+  TRUNCATION_LENGTH = 35.freeze
+
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
   end

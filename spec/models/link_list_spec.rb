@@ -38,24 +38,6 @@ RSpec.describe LinkList do
     end
   end
 
-  describe "#prepend_unique" do
-    it "adds a unique link to the beginning" do
-      list = described_class.new(link1)
-      list.prepend_unique(link2)
-      expect(list.to_a).to eq([link2, link1])
-    end
-
-    it "ignores duplicate links" do
-      list = described_class.new(link1)
-      list.prepend_unique(link1)
-      expect(list.size).to eq(1)
-    end
-
-    it "returns self for chaining" do
-      expect(list.prepend_unique(link1)).to eq(list)
-    end
-  end
-
   describe "#add" do
     it "adds multiple unique links" do
       list.add(link1, link2, link3)

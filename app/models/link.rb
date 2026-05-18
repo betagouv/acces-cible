@@ -19,6 +19,15 @@ Link = Data.define(:href, :text) do
       raise Link::InvalidUriError.new(href)
     end
 
+    def safe_external_url(href)
+      return if href.blank?
+
+      uri = parse(href)
+      uri.to_s if uri.host.present? && uri.scheme&.in?(%w[http https])
+    rescue Link::InvalidUriError
+      nil
+    end
+
     def normalize(href)
       uri = parse(href)
       uri.fragment = nil # Fragments shouldn't change the target document
