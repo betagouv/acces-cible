@@ -11,7 +11,7 @@ Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |u
   )
 end
 
-Sachantque("les sites suivants renvoient une réponse HTML normale :") do |table|
+Sachantque("les sites suivants renvoient des réponses HTML normales pour leur page d'accueil et leur déclaration d'accessibilité :") do |table|
   table.raw.flatten.each do |url|
     steps %(
       Sachant que le site "#{url}" renvoie une réponse HTML normale pour la page d'accueil

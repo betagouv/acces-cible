@@ -30,7 +30,7 @@ Fonctionnalité: Export d'un CSV
       https://numerique.gouv.fr;gouv,public
       https://www.suresnes.fr;public
       """
-    Et que les sites suivants renvoient une réponse HTML normale :
+    Et que les sites suivants renvoient des réponses HTML normales pour leur page d'accueil et leur déclaration d'accessibilité :
       | https://beta.gouv.fr/      |
       | https://numerique.gouv.fr/ |
       | https://www.suresnes.fr/   |

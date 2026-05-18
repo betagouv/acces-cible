@@ -214,7 +214,7 @@ RSpec.describe "Sites" do
       expect(response).to redirect_to(sites_path)
       follow_redirect!
       expect(response).to have_http_status(:ok)
-      expect(flash[:notice]).to eq(I18n.t("sites.upload.started.other", count: 2))
+      expect(flash[:notice]).to eq("L'import du fichier CSV a commencé. 2 sites seront ajoutés progressivement.")
     end
 
     context "when upload is invalid" do

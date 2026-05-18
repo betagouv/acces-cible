@@ -28,16 +28,18 @@ RSpec.describe CsvSiteParser do
   end
 
   describe "#parse_data!" do
+    subject(:parsed_data) { parser.parse_data! }
+
     it "returns an array of site hashes" do
-      expect(parser.parse_data!).to eq(expected_sites_data)
+      expect(parsed_data).to eq(expected_sites_data)
     end
 
     context "with mixed case headers" do
       let(:csv_content) { "Url,Name\nhttps://example.com/,Example Site" }
 
       it "ignores header case" do
-        expect(parser.parse_data!.first["url"]).to eq("https://example.com/")
-        expect(parser.parse_data!.first["name"]).to eq("Example Site")
+        expect(parsed_data.first["url"]).to eq("https://example.com/")
+        expect(parsed_data.first["name"]).to eq("Example Site")
       end
     end
 
@@ -46,7 +48,7 @@ RSpec.describe CsvSiteParser do
         csv.write("url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site")
         csv.rewind
 
-        expect(parser.parse_data!).to eq(expected_sites_data)
+        expect(parsed_data).to eq(expected_sites_data)
       end
     end
 
@@ -54,7 +56,7 @@ RSpec.describe CsvSiteParser do
       let(:csv_content) { "url,nom,name\nhttps://example.com/,Nom,Name" }
 
       it "prefers nom over name" do
-        expect(parser.parse_data!.first["name"]).to eq("Nom")
+        expect(parsed_data.first["name"]).to eq("Nom")
       end
     end
 
@@ -62,7 +64,7 @@ RSpec.describe CsvSiteParser do
       let(:csv_content) { "url,name,tags\nhttps://example.com/,Example Site,\"tag1, tag2\"" }
 
       it "parses tags into an array" do
-        expect(parser.parse_data!.first["tag_names"]).to eq(["tag1", "tag2"])
+        expect(parsed_data.first["tag_names"]).to eq(["tag1", "tag2"])
       end
     end
 
@@ -70,11 +72,9 @@ RSpec.describe CsvSiteParser do
       let(:csv_content) { "url,name,tags\nhttps://xn--rez-dma.fr/,Punycode Example,tag1\nhttps://rezé.fr/,UTF8 Example,tag2" }
 
       it "deduplicates normalized URLs and merges tags" do
-        result = parser.parse_data!
-
-        expect(result.length).to eq(1)
-        expect(result.first["name"]).to eq("UTF8 Example")
-        expect(result.first["tag_names"]).to contain_exactly("tag1", "tag2")
+        expect(parsed_data.length).to eq(1)
+        expect(parsed_data.first["name"]).to eq("UTF8 Example")
+        expect(parsed_data.first["tag_names"]).to contain_exactly("tag1", "tag2")
       end
     end
 
@@ -82,7 +82,7 @@ RSpec.describe CsvSiteParser do
       let(:csv_content) { "url,name\nhttps://example.com/,Example Site\n,\nhttps://test.com/,Test Site" }
 
       it "ignores blank URLs" do
-        expect(parser.parse_data!.pluck("url")).to contain_exactly("https://example.com/", "https://test.com/")
+        expect(parsed_data.pluck("url")).to contain_exactly("https://example.com/", "https://test.com/")
       end
     end
 
@@ -92,7 +92,7 @@ RSpec.describe CsvSiteParser do
       it "continues parsing and collects invalid URL errors" do
         allow(Rails.logger).to receive(:warn)
 
-        expect(parser.parse_data!.pluck("url")).to contain_exactly("https://example.com/", "https://test.com/")
+        expect(parsed_data.pluck("url")).to contain_exactly("https://example.com/", "https://test.com/")
         expect(errors.details[:file]).to include(error: :invalid_row_url, line_number: 3, url: "http://")
         expect(errors.details[:file]).to include(error: :invalid_row_url, line_number: 4, url: "/contact")
         expect(Rails.logger).to have_received(:warn).twice
@@ -103,17 +103,19 @@ RSpec.describe CsvSiteParser do
       let(:csv_content) { "url,name,\nhttps://example.com/,Example Site,extra_data" }
 
       it "handles nil headers gracefully" do
-        expect { parser.parse_data! }.not_to raise_error
-        expect(parser.parse_data!.first["url"]).to eq("https://example.com/")
+        expect { parsed_data }.not_to raise_error
+        expect(parsed_data.first["url"]).to eq("https://example.com/")
       end
     end
   end
 
   describe "#headers" do
+    subject(:headers) { parser.headers }
+
     let(:csv_content) { "URL;name\nhttps://example.com/;Example Site" }
 
     it "returns lowercase headers" do
-      expect(parser.headers).to eq(["url", "name"])
+      expect(headers).to eq(["url", "name"])
     end
   end
 end
