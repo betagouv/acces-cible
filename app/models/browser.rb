@@ -86,10 +86,8 @@ class Browser
       }.tap do |options|
         if Rails.env.production?
           chrome_path = ENV["GOOGLE_CHROME_SHIM"]
-          proxy = Rails.application.credentials.proxy
 
           options[:browser_path] = chrome_path if chrome_path.present?
-          options[:proxy] = proxy if proxy.present?
         end
       end.freeze
     end
