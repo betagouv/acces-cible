@@ -1,28 +1,23 @@
 module JdmaHelper
   JDMA_HOST = "https://jedonnemonavis.numerique.gouv.fr".freeze
+  JDMA_STAGING_FORM_ID = "2229".freeze
+  JDMA_PRODUCTION_FORM_ID = "2230".freeze
+  JDMA_BUTTON_ID = "4675".freeze
+  JDMA_BUTTON_IMAGE = "#{JDMA_HOST}/static/buttons/button-problem-ghost-light.svg".freeze
 
   def jdma_widget_config
-    return staging_jdma_widget_config if Rails.application.staging?
-    return production_jdma_widget_config if Rails.env.production?
+    form_id = if Rails.application.staging?
+      JDMA_STAGING_FORM_ID
+    elsif Rails.env.production?
+      JDMA_PRODUCTION_FORM_ID
+    end
 
-    nil
-  end
+    return if form_id.nil?
 
-  private
-
-  def staging_jdma_widget_config
     {
-      form_url: "#{JDMA_HOST}/Demarches/avis/2229?button=4664",
-      button_image: "#{JDMA_HOST}/static/buttons/button-remark-solid-light.svg",
-      button_label: t("jdma.staging_button_label"),
-    }
-  end
-
-  def production_jdma_widget_config
-    {
-      form_url: "#{JDMA_HOST}/Demarches/avis/2230?button=4666",
-      button_image: "#{JDMA_HOST}/static/buttons/button-problem-solid-light.svg",
-      button_label: t("jdma.production_button_label"),
+      form_url: "#{JDMA_HOST}/Demarches/avis/#{form_id}?button=#{JDMA_BUTTON_ID}",
+      button_image: JDMA_BUTTON_IMAGE,
+      button_label: t("jdma.button_label"),
     }
   end
 end

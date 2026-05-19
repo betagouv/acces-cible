@@ -12,9 +12,9 @@ RSpec.describe JdmaHelper do
 
       it "uses the staging widget configuration" do
         expect(config).to eq(
-          form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2229?button=4664",
-          button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-remark-solid-light.svg",
-          button_label: "Une remarque ?",
+          form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2229?button=4675",
+          button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-problem-ghost-light.svg",
+          button_label: "Signaler un problème",
         )
       end
     end
@@ -27,8 +27,8 @@ RSpec.describe JdmaHelper do
 
       it "uses the production widget configuration" do
         expect(config).to eq(
-          form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2230?button=4666",
-          button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-problem-solid-light.svg",
+          form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2230?button=4675",
+          button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-problem-ghost-light.svg",
           button_label: "Signaler un problème",
         )
       end
