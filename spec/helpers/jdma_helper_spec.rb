@@ -14,7 +14,7 @@ RSpec.describe JdmaHelper do
         expect(config).to eq(
           form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2229?button=4664",
           button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-remark-solid-light.svg",
-          button_label: I18n.t("jdma.staging_button_label"),
+          button_label: "Une remarque ?",
         )
       end
     end
@@ -29,7 +29,7 @@ RSpec.describe JdmaHelper do
         expect(config).to eq(
           form_url: "https://jedonnemonavis.numerique.gouv.fr/Demarches/avis/2230?button=4666",
           button_image: "https://jedonnemonavis.numerique.gouv.fr/static/buttons/button-problem-solid-light.svg",
-          button_label: I18n.t("jdma.production_button_label"),
+          button_label: "Signaler un problème",
         )
       end
     end
