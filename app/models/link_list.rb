@@ -15,25 +15,9 @@ class LinkList
     self
   end
 
-  def prepend_unique(link)
-    link = Link.from(link)
-    list.prepend(link) unless list.include?(link)
-    self
-  end
-
   def add(*links)
     links.uniq.each { |link| self << Link.from(link) }
     self
-  end
-
-  def sort_by!
-    return self if size < 2
-
-    list.sort_by! { |a, b| yield(a, b) }
-  end
-
-  def filter!
-    list.filter! { |link| yield(link) }
   end
 
   def include?(link)

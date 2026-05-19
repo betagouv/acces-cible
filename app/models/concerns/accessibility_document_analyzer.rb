@@ -35,10 +35,6 @@ module AccessibilityDocumentAnalyzer
       link_url && valid_years && reachable
     end
 
-    def valid_link?
-      link_url && reachable
-    end
-
     def custom_badge_status
       if all_passed?
         :success

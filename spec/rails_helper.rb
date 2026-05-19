@@ -71,13 +71,6 @@ RSpec.configure do |config|
   # Allow using freeze_time, travel, travel_to, and travel_back
   config.include ActiveSupport::Testing::TimeHelpers
 
-  # Feature-specific config
-  config.include Capybara::DSL, type: :feature
-  config.include Capybara::RSpecMatchers, type: :feature
-  config.before(type: :feature) do
-    require "axe-rspec"
-  end
-
   # Component-specific config
   config.include Capybara::RSpecMatchers, type: :component
   config.include ViewComponent::TestHelpers, type: :component

@@ -34,20 +34,13 @@ RSpec.describe Audit do
 
       expect(described_class.sort_by_newest).to eq([newer, older, oldest])
     end
-
-    it ".sort_by_url orders by URL ignoring protocol and www" do
-      gamma = create(:audit, site:, url: "https://www.gamma.com")
-      alpha = create(:audit, site:, url: "https://alpha.com/path")
-      beta = create(:audit, site:, url: "http://www.beta.com")
-
-      expect(described_class.sort_by_url).to eq([alpha, beta, gamma])
-    end
   end
 
   describe "#page" do
     subject(:page) { audit.page(kind) }
 
-    let(:audit) { create(:audit, :without_checks, url: "https://example.com") }
+    let(:site) { create(:site, url: "https://example.com") }
+    let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url, accessibility_page_url: nil) }
     let(:mock_page) { instance_double(Page, html: nil) }
 
     before do
@@ -57,8 +50,8 @@ RSpec.describe Audit do
     context "when kind is :home" do
       let(:kind) { :home }
 
-      it "creates a Page with the audit url" do
-        expect(Page).to receive(:new).with(url: audit.url, root: audit.url, html: nil)
+      it "creates a Page with the site url" do
+        expect(Page).to receive(:new).with(url: site.url, root: site.url, html: nil)
         page
       end
 
@@ -71,14 +64,11 @@ RSpec.describe Audit do
       let(:kind) { :accessibility }
 
       context "when find_accessibility_page check has a url" do
-        let(:check) { instance_double(Checks::FindAccessibilityPage, url: "#{audit.url}/accessibilite") }
-
-        before do
-          allow(audit).to receive(:find_accessibility_page).and_return(check)
-        end
+        let(:accessibility_url) { "https://example.com/accessibility" }
+        let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url, accessibility_page_url: accessibility_url) }
 
         it "creates a Page with the accessibility page url" do
-          expect(Page).to receive(:new).with(url: "#{audit.url}/accessibilite", root: audit.url, html: nil)
+          expect(Page).to receive(:new).with(url: accessibility_url, root: site.url, html: nil)
           page
         end
 
@@ -88,11 +78,7 @@ RSpec.describe Audit do
       end
 
       context "when find_accessibility_page check has no url" do
-        let(:check) { instance_double(Checks::FindAccessibilityPage, url: nil) }
-
-        before do
-          allow(audit).to receive(:find_accessibility_page).and_return(check)
-        end
+        let(:accessibility_url) { nil }
 
         it "returns nil" do
           expect(page).to be_nil
@@ -100,10 +86,6 @@ RSpec.describe Audit do
       end
 
       context "when find_accessibility_page check does not exist" do
-        before do
-          allow(audit).to receive(:find_accessibility_page).and_return(nil)
-        end
-
         it "returns nil" do
           expect(page).to be_nil
         end
@@ -186,11 +168,8 @@ RSpec.describe Audit do
   end
 
   describe "after_create callback" do
-    let(:audit) { build(:audit) }
-
-    it "calls create_checks when audit is created" do
-      expect(audit).to receive(:create_checks).and_call_original
-      expect { audit.save! }.to change(Check, :count).by(Check.types.size)
+    it "creates checks when audit is created" do
+      expect { create(:audit) }.to change(Check, :count).by(Check.types.size)
     end
   end
 

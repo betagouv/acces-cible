@@ -5,8 +5,6 @@ class User < ApplicationRecord
   has_many :sites, through: :team
   has_many :sessions, dependent: :destroy
 
-  scope :logged_in, -> { joins(:sessions) }
-  scope :logged_out, -> { where.missing(:sessions) }
   scope :inactive, -> { where(updated_at: ...MAX_IDLE_TIME.ago) }
 
   validates :provider, :uid, :email, :name, :siret, presence: true

@@ -30,7 +30,7 @@ class FindAccessibilityPageService
     def enqueue_children(page, queue, audit)
       excluded_targets = [
         page.url,
-        audit.url,
+        audit.site.url,
         audit.home_page_url
       ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
 

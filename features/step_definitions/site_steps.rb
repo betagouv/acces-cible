@@ -69,7 +69,6 @@ Sachantque("l'adresse {string} renvoie {string}") do |url, html|
     )
 end
 
-
 Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
   step(%(le site "#{url}" renvoie "#{str}" à l'adresse "#{url}/accessibilité" pour la déclaration d'accessibilité))
 end
@@ -128,7 +127,7 @@ Quand("je possède un site {string} avec des données") do |url|
 end
 
 Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
-  site = team.sites.find_by_url(url:)
+  site = team.sites.find_by(url:)
   tag_names = tags_str.split(",").map(&:strip)
   tag_names.each do |name|
     tag = FactoryBot.create(:tag, name:, team:)
@@ -137,7 +136,7 @@ Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
 end
 
 Quand("je demande une nouvelle vérification du site {string}") do |url|
-  site = team.sites.find_by_url(url:)
+  site = team.sites.find_by(url:)
   site.audits.create!(url: site.url, current: false)
 end
 
@@ -156,7 +155,7 @@ Alors("la page contient un tableau") do
 end
 
 Alors("la page contient toutes les vérifications du site {string} avec le préfixe {string}") do |url, prefix|
-  site = team.sites.find_by_url(url:)
+  site = team.sites.find_by(url:)
   expect(page).to have_css("table") if prefix.present?
   site.audit.checks.each do |check|
     expect(page).to have_content(check.class.table_header)
@@ -164,7 +163,7 @@ Alors("la page contient toutes les vérifications du site {string} avec le préf
 end
 
 Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
-  site = team.sites.find_by_url(url:)
+  site = team.sites.find_by(url:)
   expect(page).to have_css("table")
   site.audit.checks.each do |check|
     expect(page).to have_content(check.table_header)
@@ -172,7 +171,7 @@ Alors("la page contient un tableau avec toutes les vérifications du site {strin
 end
 
 Alors("la page contient toutes les vérifications du site {string}") do |url|
-  site = team.sites.find_by_url(url:)
+  site = team.sites.find_by(url:)
   site.audit.checks.each do |check|
     expect(page).to have_content(check.human_type)
   end
