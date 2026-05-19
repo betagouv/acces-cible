@@ -5,20 +5,18 @@ class SiteBatchCreationService
   end
 
   def process(site_data)
-    site_tag_ids = tag_ids + tag_ids_from_names(site_data["tag_names"] || [])
-    site = team.sites.find_by(url: site_data["url"])
+    site_tag_ids = @tag_ids + tag_ids_from_names(site_data["tag_names"] || [])
+    site = @team.sites.find_by(url: site_data["url"])
 
     if site
       update_site(site, site_data, site_tag_ids)
       site.audit!
     else
-      Site.create!(url: site_data["url"], team:, name: site_data["name"], tag_ids: site_tag_ids.uniq).audit!
+      Site.create!(url: site_data["url"], team: @team, name: site_data["name"], tag_ids: site_tag_ids.uniq).audit!
     end
   end
 
   private
-
-  attr_reader :team, :tag_ids
 
   def update_site(site, site_data, site_tag_ids)
     site.tag_ids = site_tag_ids.union(site.tag_ids)
@@ -31,8 +29,8 @@ class SiteBatchCreationService
   end
 
   def find_or_create_tag(name)
-    team.tags.find_or_create_by!(name:)
+    @team.tags.find_or_create_by!(name:)
   rescue ActiveRecord::RecordNotUnique
-    team.tags.find_by!(name:)
+    @team.tags.find_by!(name:)
   end
 end
