@@ -8,12 +8,12 @@ class SitesController < ApplicationController
 
   # GET /sites
   def index
-    params[:sort] ||= { completed_at: SitesFiltering::DEFAULT_DIRECTION }
+    params[:sort] ||= { last_audited_at: SitesFiltering::DEFAULT_DIRECTION }
     @tags = current_user.team.tags.in_alphabetical_order
 
     respond_to do |format|
       format.html do
-        @pagy, @sites = pagy @sites
+        @pagy, @sites = pagy(@sites.preloaded)
       end
     end
   end
@@ -106,7 +106,7 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites.preloaded
+    current_user.team.sites
   end
 
   def set_site

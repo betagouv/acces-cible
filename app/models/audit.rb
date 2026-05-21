@@ -65,7 +65,9 @@ class Audit < ApplicationRecord
 
   def after_check_completed
     if complete?
-      update!(completed_at: Time.zone.now)
+      current_timestamp = Time.zone.now
+      update!(completed_at: current_timestamp)
+      site.update!(last_audited_at: current_timestamp)
     else
       ProcessAuditJob.perform_later(self)
     end

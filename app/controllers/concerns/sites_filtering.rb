@@ -38,11 +38,11 @@ module SitesFiltering
   end
 
   def order_sites(scope)
-    sort_by_url? ? order_by_url(scope) : order_by_completed_at(scope)
+    sort_by_url? ? order_by_url(scope) : order_by_last_audited_at(scope)
   end
 
-  def order_by_completed_at(scope)
-    scope.includes(:last_completed_audit).order("audits.completed_at #{sort_direction.upcase} NULLS LAST, sites.created_at #{sort_direction.upcase}")
+  def order_by_last_audited_at(scope)
+    scope.order("sites.last_audited_at #{sort_direction.upcase} NULLS LAST, sites.created_at #{sort_direction.upcase}")
   end
 
   def order_by_url(scope)
@@ -54,7 +54,7 @@ module SitesFiltering
   end
 
   def sort_direction
-    direction = params.dig(:sort, :url).presence || params.dig(:sort, :completed_at).presence
+    direction = params.dig(:sort, :url).presence || params.dig(:sort, :last_audited_at).presence
 
     return DEFAULT_DIRECTION if direction.blank?
 

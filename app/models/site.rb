@@ -6,14 +6,13 @@ class Site < ApplicationRecord
   has_many :audits, -> { sort_by_newest }, dependent: :destroy
 
   has_one :last_audit, -> { order(created_at: :desc) }, class_name: "Audit"
-  has_one :last_completed_audit, -> { completed.order(completed_at: :desc) }, class_name: "Audit"
 
   has_many :site_tags, dependent: :destroy
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
 
   accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  scope :preloaded, -> { preload(:tags, :slugs, :last_completed_audit, last_audit: { checks: :check_transitions }) }
+  scope :preloaded, -> { preload(:tags, :slugs, last_audit: { checks: :check_transitions }) }
 
   before_validation :set_normalized_url, if: :will_save_change_to_url?
 
@@ -42,10 +41,6 @@ class Site < ApplicationRecord
 
   def should_generate_new_friendly_id?
     new_record? || (slug != normalized_url.parameterize) || super
-  end
-
-  def update_slug!
-    tap { self.slug = nil; friendly_id }.save!
   end
 
   def audit!
