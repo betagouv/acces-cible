@@ -2,29 +2,6 @@ require "rails_helper"
 
 RSpec.describe Browser do
   let(:url) { "https://example.com/" }
-  let(:network_double) { instance_double(Ferrum::Network, status: 200, response: nil) }
-  let(:browser_double) { instance_double(Ferrum::Browser) }
-  let(:headers_double) { instance_double(Ferrum::Headers) }
-  let(:page_double) { instance_double(Ferrum::Page) }
-  let(:response_double) { instance_double(Ferrum::Network::Response) }
-
-  before do
-    allow(described_class).to receive(:browser).and_return(browser_double)
-    allow(browser_double).to receive(:create_page).and_return(page_double)
-    allow(browser_double).to receive(:quit)
-
-    allow(headers_double).to receive(:set)
-    allow(network_double).to receive(:blocklist=)
-    allow(network_double).to receive(:wait_for_idle)
-    allow(network_double).to receive_messages(status: 200, response: response_double)
-    allow(response_double).to receive(:content_type).and_return("text/html")
-
-    allow(page_double).to receive(:go_to).with(url)
-    allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
-    allow(page_double).to receive(:close)
-
-    allow(Link).to receive(:normalize).with(url).and_return(url)
-  end
 
   describe ".reachable?" do
     subject(:reachable?) { described_class.reachable?(url) }
@@ -96,7 +73,7 @@ RSpec.describe Browser do
       it "makes HEAD request with correct options" do
         head_result
 
-        expect(HTTP).to have_received(:headers)
+        expect(HTTP).to have_received(:headers).with(described_class::REQUEST_HEADERS)
         expect(http_chain).to have_received(:timeout).with(connect: 3, read: 3)
         expect(http_chain).to have_received(:follow).with(max_hops: 3)
         expect(http_chain).to have_received(:head).with(url, ssl:)
@@ -111,7 +88,6 @@ RSpec.describe Browser do
       end
     end
 
-    # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "when request follows redirects" do
       let(:final_url) { "https://example.com/final" }
       let(:normalized_url) { "https://example.com/final/" }
@@ -127,7 +103,6 @@ RSpec.describe Browser do
         expect(Link).to have_received(:normalize).with(final_url)
       end
     end
-    # rubocop:enable RSpec/MultipleMemoizedHelpers
 
     context "when request times out" do
       before do
@@ -170,8 +145,24 @@ RSpec.describe Browser do
   describe ".get" do
     subject(:get_result) { described_class.get(url) }
 
-    it "creates a new browser instance and calls get" do
-      expect(get_result).not_to be_nil
+    let(:browser_double) { instance_double(Ferrum::Browser) }
+    let(:headers_double) { instance_double(Ferrum::Headers) }
+    let(:network_double) { instance_double(Ferrum::Network) }
+    let(:page_double) { instance_double(Ferrum::Page) }
+    let(:response_double) { instance_double(Ferrum::Network::Response) }
+
+    before do
+      allow(described_class).to receive(:browser).and_return(browser_double)
+      allow(browser_double).to receive(:create_page).and_return(page_double)
+      allow(headers_double).to receive(:set)
+      allow(network_double).to receive(:blocklist=)
+      allow(network_double).to receive(:wait_for_idle)
+      allow(network_double).to receive_messages(status: 200, response: response_double)
+      allow(response_double).to receive(:content_type).and_return("text/html")
+      allow(page_double).to receive(:go_to).with(url)
+      allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
+      allow(page_double).to receive(:close)
+      allow(Link).to receive(:normalize).with(url).and_return(url)
     end
 
     it "waits for network idle" do
@@ -203,13 +194,14 @@ RSpec.describe Browser do
     end
   end
 
-  describe "#browser" do
-    it "creates a new Ferrum::Browser instance during initialization" do
-      expect(described_class.send(:browser)).to eq(browser_double)
-    end
-  end
-
   describe "#with_page" do
+    let(:page_double) { instance_double(Ferrum::Page) }
+
+    before do
+      allow(described_class).to receive(:create_page).and_return(page_double)
+      allow(page_double).to receive(:close)
+    end
+
     it "yields the created page" do
       expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
     end
@@ -226,10 +218,17 @@ RSpec.describe Browser do
   end
 
   describe "#create_page" do
+    let(:browser_double) { instance_double(Ferrum::Browser) }
+    let(:headers_double) { instance_double(Ferrum::Headers) }
+    let(:network_double) { instance_double(Ferrum::Network) }
+    let(:page_double) { instance_double(Ferrum::Page) }
+
     before do
+      allow(described_class).to receive(:browser).and_return(browser_double)
       allow(browser_double).to receive(:create_page).and_return(page_double)
       allow(headers_double).to receive(:set)
-      allow(page_double).to receive(:headers).and_return(headers_double)
+      allow(network_double).to receive(:blocklist=)
+      allow(page_double).to receive_messages(headers: headers_double, network: network_double)
     end
 
     it "creates a page from the browser" do
@@ -240,15 +239,13 @@ RSpec.describe Browser do
     end
 
     it "sets the blocklist on the page's context" do
-      expect(network_double)
-        .to receive(:blocklist=)
-              .with([described_class::BLOCKED_EXTENSIONS, described_class::BLOCKED_DOMAINS])
+      expect(network_double).to receive(:blocklist=).with(described_class::BLOCKED_URL_PATTERNS)
 
       described_class.send(:create_page)
     end
 
-    it "sets all headers including user agent on the page" do
-      request_headers = Browser::HEADERS.merge({ "User-Agent" => "test-agent" })
+    it "sets request headers on the page" do
+      request_headers = { "Accept-Language" => "fr" }
       allow(described_class).to receive(:request_headers).and_return(request_headers)
 
       described_class.send(:create_page)
