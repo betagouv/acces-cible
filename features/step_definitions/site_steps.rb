@@ -132,7 +132,6 @@ end
 Quand("je possède un site {string} avec des données") do |url|
   site = FactoryBot.create(:site, :with_data, url:, team:)
   site.reload
-  site.set_current_audit!
 end
 
 Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
@@ -142,11 +141,6 @@ Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
     tag = FactoryBot.create(:tag, name:, team:)
     site.tags << tag
   end
-end
-
-Quand("je demande une nouvelle vérification du site {string}") do |url|
-  site = team.sites.find_by(url:)
-  site.audits.create!(url: site.url, current: false)
 end
 
 Alors("la page contient un lien vers {string}") do |url|
@@ -166,7 +160,7 @@ end
 Alors("la page contient toutes les vérifications du site {string} avec le préfixe {string}") do |url, prefix|
   site = team.sites.find_by(url:)
   expect(page).to have_css("table") if prefix.present?
-  site.audit.checks.each do |check|
+  site.last_audit.checks.each do |check|
     expect(page).to have_content(check.class.table_header)
   end
 end
@@ -174,14 +168,14 @@ end
 Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
   site = team.sites.find_by(url:)
   expect(page).to have_css("table")
-  site.audit.checks.each do |check|
+  site.last_audit.checks.each do |check|
     expect(page).to have_content(check.table_header)
   end
 end
 
 Alors("la page contient toutes les vérifications du site {string}") do |url|
   site = team.sites.find_by(url:)
-  site.audit.checks.each do |check|
+  site.last_audit.checks.each do |check|
     expect(page).to have_content(check.human_type)
   end
 end

@@ -2,18 +2,19 @@ FactoryBot.define do
   factory :site do
     sequence(:url) { |n| "https://www.example-#{n}.com/" }
     team { association :team }
+    audits { [association(:audit)] }
 
     trait :completed do
       after(:create) do |site|
-        audit = site.audits.current.first || create(:audit, :current, site:, url: site.url)
-        audit.update!(completed_at: 1.day.ago)
+        site.audits.first.update!(completed_at: 1.day.ago)
+        site.update!(last_audited_at: 1.day.ago)
       end
     end
 
     trait :with_data do
       completed
       after(:create) do |site|
-        audit = site.audit
+        audit = site.last_audit
         Check.names.each do |check_name|
           check = audit.send(check_name)
           data = build(:check, check_name, :with_data).data

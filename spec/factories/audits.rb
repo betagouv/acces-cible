@@ -9,10 +9,6 @@ FactoryBot.define do
       end
     end
 
-    trait :current do
-      current { true }
-    end
-
     trait :completed do
       completed_at { 1.day.ago }
     end

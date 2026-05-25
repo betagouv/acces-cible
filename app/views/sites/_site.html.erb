@@ -1,6 +1,8 @@
+<% last_audit = site.last_audit %>
+
 <tr id="<%= dom_id(site, :sites_table) %>">
   <%= dsfr_row_check(site) %>
-  <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: site.name_with_fallback), url_for([site, site.audit]), title: t('.view_name', name: site.name_with_fallback), line: true, side: :left, sr_only: true) %></td>
+  <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: site.name_with_fallback), url_for([site, last_audit]), title: t('.view_name', name: site.name_with_fallback), line: true, side: :left, sr_only: true) %></td>
   <% display_url = site.normalized_url %>
   <% truncated_url = display_url.truncate(ApplicationHelper::TRUNCATION_LENGTH, separator: /\W/) %>
   <% href = Link.safe_external_url(site.url) %>
@@ -12,7 +14,7 @@
     <% end %>
   </td>
   <% Check.names.each do |check_name| %>
-    <% check = site.audit.send(check_name) %>
+    <% check = last_audit&.send(check_name) %>
     <%= tag.td class: "fr-cell--center" do %>
       <% if check %>
         <%= badge(to_badge(check), tooltip: check.tooltip?) %>
@@ -27,8 +29,10 @@
     <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: tags[3..].to_sentence) if tags.size > 3 %>
   </td>
   <td>
-    <% completed_at = site.audit.completed_at || site.audit.updated_at %>
-    <% local_time = completed_at.in_time_zone %>
-    <%= time_tag local_time, l(local_time, format: :complete), title: l(local_time, format: :long) %>
+    <% completed_at = site.last_audited_at || last_audit&.updated_at %>
+    <% local_time = completed_at&.in_time_zone %>
+    <% if local_time %>
+      <%= time_tag local_time, l(local_time, format: :complete), title: l(local_time, format: :long) %>
+    <% end %>
   </td>
 </tr>

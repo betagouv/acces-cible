@@ -9,7 +9,6 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
-  scope :current, -> { where(current: true) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
 
   Check.types.each do |name, klass|
@@ -66,8 +65,9 @@ class Audit < ApplicationRecord
 
   def after_check_completed
     if complete?
-      update!(completed_at: Time.zone.now)
-      site.set_current_audit!
+      current_timestamp = Time.zone.now
+      update!(completed_at: current_timestamp)
+      site.update!(last_audited_at: current_timestamp)
     else
       ProcessAuditJob.perform_later(self)
     end

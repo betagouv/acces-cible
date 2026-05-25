@@ -29,7 +29,7 @@ RSpec.describe SiteCsvExport do
 
     context "with completed checks" do
       before do
-        audit = site.audit.reload
+        audit = site.last_audit.reload
         audit.checks.destroy_all
 
         create(:check, :reachable, :completed, audit:)
@@ -94,7 +94,7 @@ RSpec.describe SiteCsvExport do
 
       it "generates correct row data" do
         row = parsed_csv.first
-        audit = site.audit.reload
+        audit = site.last_audit.reload
 
         expect(row["Adresse du site"]).to eq(site.normalized_url)
         expect(row["Nom du site"]).to eq(site.name)
@@ -120,7 +120,7 @@ RSpec.describe SiteCsvExport do
       end
 
       it "keeps not found when the accessibility declaration host is unknown" do
-        site.audit.reload.find_accessibility_page.update!(url: "https://example.com/accessibilite", internal: nil)
+        site.last_audit.reload.find_accessibility_page.update!(url: "https://example.com/accessibilite", internal: nil)
 
         row = parsed_csv.first
 
@@ -130,7 +130,7 @@ RSpec.describe SiteCsvExport do
 
     context "with failed check" do
       before do
-        audit = site.audit.reload
+        audit = site.last_audit.reload
         audit.checks.destroy_all
 
         create(:check, :reachable, :failed, audit:)
@@ -144,7 +144,7 @@ RSpec.describe SiteCsvExport do
 
     context "with errored check" do
       before do
-        audit = site.audit.reload
+        audit = site.last_audit.reload
         audit.checks.destroy_all
 
         create(:check, :accessibility_mention, :errored, audit:)
@@ -158,7 +158,7 @@ RSpec.describe SiteCsvExport do
 
     context "with aborted check" do
       before do
-        audit = site.audit.reload
+        audit = site.last_audit.reload
         audit.checks.destroy_all
 
         create(:check, :accessibility_mention, :aborted, audit:)
