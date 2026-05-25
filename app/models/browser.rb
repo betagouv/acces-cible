@@ -40,6 +40,8 @@ class Browser
   BROWSER_OPTIONS = {
     "disable-blink-features" => "AutomationControlled",
     "disable-dev-shm-usage" => nil,
+    "disable-features" => "TranslateUI,VizDisplayCompositor",
+    "disable-gpu" => nil,
     "no-sandbox" => nil
   }.freeze
 
@@ -82,7 +84,7 @@ class Browser
         process_timeout: PROCESS_TIMEOUT,
         pending_connection_errors: false,
         extensions: [STEALTH_EXTENSION],
-        browser_options: BROWSER_OPTIONS.dup
+        browser_options: browser_options
       }.tap do |options|
         if Rails.env.production?
           chrome_path = ENV["GOOGLE_CHROME_SHIM"]
@@ -127,6 +129,16 @@ class Browser
 
     def browser
       @browser ||= Ferrum::Browser.new(settings)
+    end
+
+    def browser_options
+      BROWSER_OPTIONS.merge(
+        "user-data-dir" => user_data_dir,
+      )
+    end
+
+    def user_data_dir
+      @user_data_dir ||= "/tmp/chrome-#{SecureRandom.hex(8)}"
     end
 
     def with_page
