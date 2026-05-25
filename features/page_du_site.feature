@@ -25,11 +25,15 @@ Fonctionnalité: Page du site
   Scénario: Un agent peut accéder aux étiquettes depuis la page du site
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
       """
-      url;tags
-      https://beta.gouv.fr;éticouette
+      url;nom;tags
+      https://beta.gouv.fr;beta.gouv.fr;éticouette
       """
+    Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la page d'accueil
+    Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
+    Et que je clique sur "Tous les sites"
     Et que je clique sur "Voir la fiche de beta.gouv.fr"
     Et que je clique sur "Étiquette éticouette"
     Alors la page est titrée "éticouette"

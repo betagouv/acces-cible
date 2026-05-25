@@ -15,6 +15,20 @@ RSpec.describe "Sites" do
       expect(response).to have_http_status(:ok)
     end
 
+    context "when an audit has not created its checks yet" do
+      let!(:site) { create(:site, team:) }
+      let!(:audit) { create(:audit, :current, :without_checks, site:, url: site.url) }
+
+      it "renders a pending badge for every expected check" do
+        get_sites
+
+        row = Nokogiri::HTML(response.body).at_css("tbody tr")
+
+        expect(row.css("td .fr-badge--info").count).to eq(Check.classes.size)
+        expect(row.text).to include("Planifié")
+      end
+    end
+
     context "when requesting an empty page" do
       let!(:paged_sites) { create_list(:site, 10, team:) }
 
@@ -214,7 +228,7 @@ RSpec.describe "Sites" do
       expect(response).to redirect_to(sites_path)
       follow_redirect!
       expect(response).to have_http_status(:ok)
-      expect(flash[:notice]).to include("2")
+      expect(flash[:notice]).to eq("L'import du fichier CSV a commencé. 2 sites seront ajoutés progressivement.")
     end
 
     context "when upload is invalid" do

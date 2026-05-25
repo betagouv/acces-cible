@@ -15,6 +15,7 @@ Fonctionnalité: Page des étiquettes
       """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
     Et que je clique sur "Toutes les étiquettes"
 
   Scénario: Un agent peut voir les sites associés à un tag depuis la page des tags

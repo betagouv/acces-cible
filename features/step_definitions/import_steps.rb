@@ -19,5 +19,6 @@ Quand("je rajoute un CSV de {int} sites") do |n|
       """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Et que je clique sur "Importer"
+    Et que l'import est terminé
   )
 end

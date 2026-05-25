@@ -11,8 +11,15 @@
       <%= t("shared.invalid_url") %>
     <% end %>
   </td>
-  <% site.audit.checks.each do |check| %>
-    <td id="<%= dom_id(check, :sites_table) %>" class="fr-cell--center"><%= badge(to_badge(check), tooltip: check.tooltip?) %></td>
+  <% Check.names.each do |check_name| %>
+    <% check = site.audit.send(check_name) %>
+    <%= tag.td class: "fr-cell--center" do %>
+      <% if check %>
+        <%= badge(to_badge(check), tooltip: check.tooltip?) %>
+      <% else %>
+        <%= badge(:info, t("check.status.pending"), tooltip: true) %>
+      <% end %>
+    <% end %>
   <% end %>
   <td class="fr-cell--multiline">
     <% tags = site.tags.collect(&:name) %>

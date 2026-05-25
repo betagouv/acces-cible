@@ -30,9 +30,15 @@ Fonctionnalité: Export d'un CSV
       https://numerique.gouv.fr;gouv,public
       https://www.suresnes.fr;public
       """
+    Et que les sites suivants renvoient des réponses HTML normales pour leur page d'accueil et leur déclaration d'accessibilité :
+      | https://beta.gouv.fr/      |
+      | https://numerique.gouv.fr/ |
+      | https://www.suresnes.fr/   |
     Et que je choisis "Ajouter un site" dans le menu principal
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
+    Et que je choisis "Tous les sites" dans le menu principal
     Et que je clique sur "Trier par Adresse du site croissant"
     Et que je filtre par étiquette "public"
     Et que je clique sur "Télécharger en CSV"

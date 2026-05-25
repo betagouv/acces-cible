@@ -14,9 +14,11 @@ Fonctionnalité:
       https://beta.gouv.fr;beta
       https://numerique.gouv.fr;gouv,public
       https://www.suresnes.fr;public
-      """
+    """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
+    Et que je clique sur "Tous les sites"
     Et que je filtre par étiquette "public"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | suresnes.fr       |
@@ -29,9 +31,11 @@ Fonctionnalité:
       https://beta.gouv.fr
       https://www.suresnes.fr
       https://numerique.gouv.fr
-      """
+    """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
+    Et que je clique sur "Tous les sites"
     Et que je clique sur "Trier par Adresse du site croissant"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | beta.gouv.fr      |
@@ -53,9 +57,11 @@ Fonctionnalité:
       https://lambda.gouv.fr;public
       https://psi.gouv.fr;public
       https://omega.gouv.fr;public
-      """
+    """
     Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     Quand je clique sur "Importer"
+    Et que l'import est terminé
+    Et que je clique sur "Tous les sites"
     Et que je clique sur "Trier par Adresse du site croissant"
     Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
       | alpha.gouv.fr   |
