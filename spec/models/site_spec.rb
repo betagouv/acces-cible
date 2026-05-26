@@ -7,10 +7,14 @@ RSpec.describe Site do
 
   it { is_expected.to be_valid }
 
-  it "normalizes its URL" do
-    site = create(:site, url: " HTTPS://EXAMPLE.COM/path/ ")
+  describe "URL normalization" do
+    subject(:site) { create(:site, url: " HTTPS://EXAMPLE.COM/path/ ") }
 
-    expect(site.url).to eq("https://example.com/path/")
+    it "normalizes its URL" do
+      site = create(:site, url: " HTTPS://EXAMPLE.COM/path/ ")
+
+      expect(site.url).to eq("https://example.com/path/")
+    end
   end
 
   describe "associations" do
