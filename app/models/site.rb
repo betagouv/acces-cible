@@ -19,6 +19,7 @@ class Site < ApplicationRecord
   friendly_id :normalized_url, use: [:slugged, :history, :scoped], scope: :team_id
 
   validates :url, presence: true, url: true
+  normalizes :url, with: ->(url) { Link.normalize(url) }
 
   broadcasts_refreshes
 

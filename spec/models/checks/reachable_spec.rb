@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Checks::Reachable do
   let(:check) { described_class.new }
-  let(:original_url) { "https://example.com" }
+  let(:original_url) { "https://example.com/" }
   let(:home_page_url) { original_url }
   let(:root_page) { instance_double(Page, html: nil) }
   let(:site) { create(:site, url: original_url) }
