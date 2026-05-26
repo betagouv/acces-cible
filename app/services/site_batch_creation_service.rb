@@ -6,6 +6,7 @@ class SiteBatchCreationService
 
   def process(site_data)
     site_tag_ids = @tag_ids + tag_ids_from_names(site_data["tag_names"] || [])
+    site_tag_ids = normalized_tag_ids(site_tag_ids)
     site = @team.sites.find_by(url: site_data["url"])
 
     if site
@@ -22,6 +23,10 @@ class SiteBatchCreationService
     site.tag_ids = site_tag_ids.union(site.tag_ids)
     site.name = site_data["name"] if site_data["name"].present? && site.name.blank?
     site.save!
+  end
+
+  def normalized_tag_ids(tag_ids)
+    tag_ids.compact_blank.map(&:to_i).uniq
   end
 
   def tag_ids_from_names(tag_names)

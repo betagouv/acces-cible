@@ -94,6 +94,17 @@ RSpec.describe SiteBatchCreationService do
           expect { process_site }.not_to change { existing_site.reload.name }
         end
       end
+
+      context "when a selected tag is already attached and present in the CSV" do
+        let(:site_data) { { "url" => url, "tag_names" => ["existing_tag"] } }
+        let(:extra_tag_ids) { [existing_tag.id.to_s] }
+
+        it "does not try to attach the same tag twice" do
+          process_site
+
+          expect(existing_site.reload.tags.map(&:name)).to contain_exactly("existing_tag")
+        end
+      end
     end
 
     context "with duplicate tags" do
@@ -110,6 +121,16 @@ RSpec.describe SiteBatchCreationService do
         process_site
 
         expect(site_tags).to contain_exactly("tag")
+      end
+
+      context "when selected tag IDs include a blank value from the form" do
+        let(:extra_tag_ids) { [""] }
+
+        it "ignores blank tag IDs" do
+          process_site
+
+          expect(site_tags).to contain_exactly("tag")
+        end
       end
     end
   end
