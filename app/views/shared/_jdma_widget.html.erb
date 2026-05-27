@@ -1,0 +1,16 @@
+<% config = jdma_widget_config %>
+<% show_jdma_widget = authenticated? && config.present? %>
+
+<% if show_jdma_widget %>
+  <%= javascript_include_tag(
+        "#{JdmaHelper::JDMA_HOST}/static/jdma-modal-widget.js",
+        nonce: true,
+        defer: true,
+        data: {
+          jdma_form_url: config[:form_url],
+          jdma_button_image: config[:button_image],
+          jdma_button_label: config[:button_label],
+          jdma_position: "bottom-right",
+        }
+      ) %>
+<% end %>
