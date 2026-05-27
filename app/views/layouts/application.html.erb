@@ -53,6 +53,8 @@
 
 <%= render "shared/footer" %>
 <%= turbo_frame_tag :modal %>
-<%= render "shared/jdma_widget" %>
+<% if show_jdma_widget? %>
+  <%= render "shared/jdma_widget" %>
+<% end %>
 </body>
 </html>
