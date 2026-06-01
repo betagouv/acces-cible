@@ -17,7 +17,7 @@ RSpec.describe "Sites" do
 
     context "when an audit has not created its checks yet" do
       let!(:site) { create(:site, team:) }
-      let!(:audit) { create(:audit, :without_checks, site:, url: site.url) }
+      let!(:audit) { create(:audit, :without_checks, site:) }
 
       it "renders a pending badge for every expected check" do
         get_sites

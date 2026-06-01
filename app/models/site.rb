@@ -18,6 +18,7 @@ class Site < ApplicationRecord
 
   friendly_id :normalized_url, use: [:slugged, :history, :scoped], scope: :team_id
 
+  validates :normalized_url, presence: true
   validates :url, presence: true, url: true
   normalizes :url, with: ->(url) { Link.normalize(url) }
 
@@ -45,7 +46,7 @@ class Site < ApplicationRecord
   end
 
   def audit!
-    audits.create!(url:)
+    audits.create!
   end
 
   def tags_list

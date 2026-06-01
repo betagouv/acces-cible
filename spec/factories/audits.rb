@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :audit do
-    url { "https://example.com" }
-    site { association :site, url:, audits: [instance] }
+    site { association :site, audits: [instance] }
 
     trait :without_checks do
       after(:create) do |audit, _eval|

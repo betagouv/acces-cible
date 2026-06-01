@@ -5,7 +5,8 @@ RSpec.describe FindAccessibilityPageService do
 
   let(:root_url) { "https://example.com" }
   let(:home_page_html) { '<a href="/accessibilite">Accessibilité</a>' }
-  let(:audit) { build(:audit, url: root_url, home_page_url: root_url, home_page_html: home_page_html) }
+  let(:site) { build(:site, url: root_url) }
+  let(:audit) { build(:audit, site:, home_page_url: root_url, home_page_html: home_page_html) }
 
   describe ".call" do
     let(:matching_page_url) { "https://example.com/accessibility" }
@@ -104,7 +105,7 @@ RSpec.describe FindAccessibilityPageService do
   end
 
   describe ".enqueue_children" do
-    let(:audit) { build(:audit, url: "https://example.com", home_page_url: "https://www.example.com/redirection") }
+    let(:audit) { build(:audit, site:, home_page_url: "https://www.example.com/redirection") }
     let(:queue) { LinkList.new }
     let(:page) { instance_double(Page, url: "https://example.com/a") }
     let(:links) do

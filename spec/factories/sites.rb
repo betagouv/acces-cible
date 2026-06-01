@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :site do
     sequence(:url) { |n| "https://www.example-#{n}.com/" }
+    sequence(:normalized_url) { |n| "example-#{n}.com" }
     team { association :team }
     audits { [association(:audit)] }
 

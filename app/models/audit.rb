@@ -4,9 +4,6 @@ class Audit < ApplicationRecord
 
   after_create_commit :fetch_resources!, :create_checks
 
-  validates :url, presence: true, url: true
-  normalizes :url, with: ->(url) { Link.normalize(url).to_s }
-
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
