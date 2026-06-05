@@ -1,7 +1,10 @@
+require "fileutils"
+
 class Browser
   PAGE_TIMEOUT = 1.minute
   PROCESS_TIMEOUT = 30.seconds
   SUCCESS_CODE = 200
+  MAX_PAGES_PER_BROWSER = Integer(ENV.fetch("CHROME_MAX_PAGES_PER_BROWSER", 100))
 
   REQUEST_HEADERS = {
     "Accept-Language" => "fr"
@@ -36,6 +39,9 @@ class Browser
 
   TRACKING_DOMAIN_PATTERN = Regexp.union(TRACKING_DOMAINS)
   BLOCKED_URL_PATTERNS = [BLOCKED_FILE_PATTERN, TRACKING_DOMAIN_PATTERN].freeze
+  THREAD_BROWSER_KEY = :acces_cible_browser
+  THREAD_BROWSER_PAGE_COUNT_KEY = :acces_cible_browser_page_count
+  THREAD_USER_DATA_DIR_KEY = :acces_cible_browser_user_data_dir
 
   BROWSER_OPTIONS = {
     "disable-blink-features" => "AutomationControlled",
@@ -128,7 +134,11 @@ class Browser
     private
 
     def browser
-      @browser ||= Ferrum::Browser.new(settings)
+      current_browser || set_current_browser
+    end
+
+    def browser_page_count
+      Thread.current.fetch(THREAD_BROWSER_PAGE_COUNT_KEY, 0)
     end
 
     def browser_options
@@ -138,14 +148,19 @@ class Browser
     end
 
     def user_data_dir
-      @user_data_dir ||= "/tmp/chrome-#{SecureRandom.hex(8)}"
+      current_user_data_dir || set_current_user_data_dir
     end
 
     def with_page
       page = create_page
       yield(page)
     ensure
-      page&.close
+      if page
+        page.close
+        set_browser_page_count(browser_page_count + 1)
+      end
+
+      recycle_browser if browser_page_count >= MAX_PAGES_PER_BROWSER
     end
 
     def create_page
@@ -153,6 +168,45 @@ class Browser
         page.headers.set(request_headers)
         page.network.blocklist = BLOCKED_URL_PATTERNS
       end
+    end
+
+    def recycle_browser
+      user_data_dir_to_remove = current_user_data_dir
+
+      current_browser.quit
+    ensure
+      clear_current_browser
+      set_browser_page_count(0)
+      clear_current_user_data_dir
+      FileUtils.rm_rf(user_data_dir_to_remove)
+    end
+
+    def current_browser
+      Thread.current[THREAD_BROWSER_KEY]
+    end
+
+    def set_current_browser
+      Thread.current[THREAD_BROWSER_KEY] = Ferrum::Browser.new(settings)
+    end
+
+    def clear_current_browser
+      Thread.current[THREAD_BROWSER_KEY] = nil
+    end
+
+    def current_user_data_dir
+      Thread.current[THREAD_USER_DATA_DIR_KEY]
+    end
+
+    def set_current_user_data_dir
+      Thread.current[THREAD_USER_DATA_DIR_KEY] = "/tmp/chrome-#{SecureRandom.hex(8)}"
+    end
+
+    def clear_current_user_data_dir
+      Thread.current[THREAD_USER_DATA_DIR_KEY] = nil
+    end
+
+    def set_browser_page_count(count)
+      Thread.current[THREAD_BROWSER_PAGE_COUNT_KEY] = count
     end
   end
 end

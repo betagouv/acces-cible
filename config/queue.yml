@@ -3,9 +3,9 @@ default: &default
     - polling_interval: 1
       batch_size: 500
   workers:
-    - queues: "slow"
+    - queues: "chrome"
       processes: 1
-      threads: 3
+      threads: <%= ENV.fetch("CHROME_JOB_THREADS", 3) %>
       polling_interval: 0.1
     - queues: [ default,cable,background ]
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 2) %>

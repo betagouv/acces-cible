@@ -8,6 +8,15 @@ class ProcessAuditJob < ApplicationJob
       .checks
       .remaining
       .filter { |check| Statesman::Machine.retry_conflicts { check.transition_to(:ready) } }
-      .each { |check| RunCheckJob.set(group: "check_#{check.id}").perform_later(check) }
+      .each { |check| enqueue_check(check) }
+  end
+
+  private
+
+  def enqueue_check(check)
+    options = { group: "check_#{check.id}" }
+    options[:queue] = :chrome if check.is_a?(Checks::RunAxeOnHomepage)
+
+    RunCheckJob.set(options).perform_later(check)
   end
 end
