@@ -79,6 +79,7 @@ class Browser
 
     def settings
       {
+        url: ENV.fetch("CHROME_URL"),
         headless: :new,
         timeout: PAGE_TIMEOUT,
         process_timeout: PROCESS_TIMEOUT,
