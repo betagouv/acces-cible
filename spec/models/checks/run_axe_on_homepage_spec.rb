@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Checks::RunAxeOnHomepage do
-  let(:check) { described_class.new }
+  let(:check) { create(:check, :run_axe_on_homepage) }
 
   describe ".axe_check", :aggregate_failures do
     subject(:axe_check) { check.send(:run_axe_check) }
@@ -19,38 +19,34 @@ RSpec.describe Checks::RunAxeOnHomepage do
       }
     end
 
-    let(:browser_instance) { instance_double(Ferrum::Browser) }
-    let(:page_instance) { instance_double(Ferrum::Page) }
-    let(:audit_instance) { instance_double(Audit, home_page_html: html_content) }
-    let(:headers_double) { instance_double(Ferrum::Headers) }
-    let(:network_double) { instance_double(Ferrum::Network) }
-
     before do
-      allow(check).to receive(:audit).and_return(audit_instance)
+      allow(Browser).to receive(:run_script_on_html)
 
-      allow(Ferrum::Browser).to receive(:new).and_return(browser_instance)
-      allow(browser_instance).to receive(:create_page).and_return(page_instance)
-      allow(browser_instance).to receive(:quit)
+      allow(File)
+        .to receive(:read)
+        .with(described_class.const_get("AXE_LOCALE_PATH"))
+        .and_return("localized axe JSON")
 
-      allow(headers_double).to receive(:set)
-      allow(network_double).to receive(:blocklist=)
-      allow(network_double).to receive(:wait_for_idle)
+      allow(File)
+        .to receive(:read)
+        .with(described_class.const_get("AXE_SOURCE_PATH"))
+        .and_return("axe JS mock")
 
-      allow(page_instance).to receive(:content=)
-      allow(page_instance).to receive(:bypass_csp)
-      allow(page_instance).to receive(:add_script_tag)
-      allow(page_instance).to receive_messages(headers: headers_double, network: network_double, evaluate_async: axe_results)
-      allow(page_instance).to receive(:close)
+      stub_const("#{described_class}::RGAA_AXE_RULES", "mock rules")
     end
 
-    it "runs localized Axe checks on the provided URL, bypassing CSP" do
-      results = axe_check
+    it "runs and configures Axe with the right locale and rules" do
+      axe_check
 
-      expect(results).to be_a(Hash)
-      expect(results).to have_key("violations")
-      expect(results).to have_key("passes")
-      expect(results["violations"]).to be_an(Array)
-      expect(results["passes"]).to be_an(Array)
+      expect(Browser)
+        .to have_received(:run_script_on_html)
+        .with(
+          check.audit.home_page_html,
+          an_instance_of(String)
+            .and(matching(/locale: localized axe JSON/))
+            .and(matching(/values: mock rules/)),
+          "axe JS mock"
+        )
     end
   end
 
