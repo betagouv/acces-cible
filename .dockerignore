@@ -44,4 +44,4 @@
 
 # Ignore Docker-related files
 /.dockerignore
-/Dockerfile*
+/Dockerfile
