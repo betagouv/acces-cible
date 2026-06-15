@@ -12,18 +12,6 @@ RSpec.describe Audit do
     it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 
-  describe "validations" do
-    it { is_expected.to allow_value("https://example.com").for(:url) }
-    it { is_expected.not_to allow_value("not-a-url").for(:url) }
-  end
-
-  describe "normalization" do
-    it "normalizes URLs" do
-      audit.url = "HTTPS://EXAMPLE.COM/path/"
-      expect(audit.url).to eq("https://example.com/path/")
-    end
-  end
-
   describe "scopes" do
     before { site.audits.destroy_all }
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_082116) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_092126) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,10 +23,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082116) do
     t.string "home_page_url"
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
-    t.string "url", null: false
-    t.index "regexp_replace((url)::text, '^https?://(www.)?'::text, ''::text)", name: "index_audits_on_normalized_url"
     t.index ["site_id"], name: "index_audits_on_site_id"
-    t.index ["url"], name: "index_audits_on_url"
   end
 
   create_table "check_transitions", force: :cascade do |t|
@@ -82,12 +79,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082116) do
     t.datetime "created_at", null: false
     t.datetime "last_audited_at"
     t.string "name"
-    t.string "normalized_url"
+    t.string "normalized_url", null: false
     t.string "slug", null: false
     t.integer "tags_count", default: 0, null: false
     t.bigint "team_id", null: false
     t.datetime "updated_at", null: false
-    t.string "url"
+    t.string "url", null: false
     t.index ["slug", "team_id"], name: "index_sites_on_slug_and_team_id", unique: true
     t.index ["team_id"], name: "index_sites_on_team_id"
   end
