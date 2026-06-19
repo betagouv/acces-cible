@@ -11,7 +11,7 @@ class Browser
     .woff .woff2 .ttf .otf .eot
     .mp4 .avi .mov .mkv .webm
     .mp3 .ogg .wav .aac .flac
-    .jpg .jpeg .png .gif .bmp .svg .webp .avif
+    .jpg .jpeg .png .gif .bmp .svg .webp .avif .pdf
   ].freeze
 
   BLOCKED_FILE_PATTERN = Regexp.new(
