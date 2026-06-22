@@ -1,7 +1,5 @@
 class Page
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
-  DOCUMENT_EXTENSIONS = /\.(pdf|zip|odt|ods|odp|doc|docx|xls|xlsx|ppt|pptx)$/i
-  FILES_EXTENSIONS = /\.(xml|rss|atom|ics|ical|jpg|jpeg|png|gif|mp3|mp4|avi|mov)$/i
   INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
   LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
   MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
@@ -88,8 +86,8 @@ class Page
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
       uri = Link.parse(href)
-      next if uri.path && File.extname(uri.path).match?(FILES_EXTENSIONS)
-      next if skip_files && uri.path && File.extname(uri.path).match?(DOCUMENT_EXTENSIONS)
+      next if uri.path && Browser::FILE_EXTENSIONS.include?(File.extname(uri.path).downcase)
+      next if skip_files && uri.path && Browser::DOCUMENT_EXTENSIONS.include?(File.extname(uri.path).downcase)
 
       href = parsed_root.join(uri) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
