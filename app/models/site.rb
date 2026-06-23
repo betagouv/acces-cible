@@ -5,7 +5,7 @@ class Site < ApplicationRecord
 
   has_many :audits, -> { sort_by_newest }, dependent: :destroy
 
-  has_one :last_audit, -> { order(created_at: :desc) }, class_name: "Audit"
+  has_one :last_audit, -> { order(created_at: :desc).without_html }, class_name: "Audit"
 
   has_many :site_tags, dependent: :destroy
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
