@@ -4,7 +4,8 @@ class Browser
   SUCCESS_CODE = 200
 
   REQUEST_HEADERS = {
-    "Accept-Language" => "fr"
+    "Accept-Language" => "fr",
+    "User-Agent" => "AccesCible/1.0 (+https://acces-cible.beta.gouv.fr/)"
   }.freeze
 
   BLOCKED_FILE_EXTENSIONS = %w[
