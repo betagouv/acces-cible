@@ -143,16 +143,10 @@ class Browser
     end
 
     def with_page
-      page = create_page
-      yield(page)
-    ensure
-      page&.close
-    end
-
-    def create_page
-      browser.create_page.tap do |page|
+      browser.create_page(new_context: true) do |page|
         page.headers.set(request_headers)
         page.network.blocklist = BLOCKED_URL_PATTERNS
+        yield(page)
       end
     end
   end

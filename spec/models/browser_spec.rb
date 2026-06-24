@@ -153,7 +153,7 @@ RSpec.describe Browser do
 
     before do
       allow(described_class).to receive(:browser).and_return(browser_double)
-      allow(browser_double).to receive(:create_page).and_return(page_double)
+      allow(browser_double).to receive(:create_page).with(new_context: true).and_yield(page_double)
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
       allow(network_double).to receive(:wait_for_idle)
@@ -195,29 +195,6 @@ RSpec.describe Browser do
   end
 
   describe "#with_page" do
-    let(:page_double) { instance_double(Ferrum::Page) }
-
-    before do
-      allow(described_class).to receive(:create_page).and_return(page_double)
-      allow(page_double).to receive(:close)
-    end
-
-    it "yields the created page" do
-      expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
-    end
-
-    it "closes the page after yielding" do
-      described_class.send(:with_page) { |p| "result" }
-      expect(page_double).to have_received(:close)
-    end
-
-    it "returns the result of the yielded block" do
-      result = described_class.send(:with_page) { |p| "test_result" }
-      expect(result).to eq("test_result")
-    end
-  end
-
-  describe "#create_page" do
     let(:browser_double) { instance_double(Ferrum::Browser) }
     let(:headers_double) { instance_double(Ferrum::Headers) }
     let(:network_double) { instance_double(Ferrum::Network) }
@@ -225,32 +202,34 @@ RSpec.describe Browser do
 
     before do
       allow(described_class).to receive(:browser).and_return(browser_double)
-      allow(browser_double).to receive(:create_page).and_return(page_double)
+      allow(browser_double).to receive(:create_page).with(new_context: true).and_yield(page_double)
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
       allow(page_double).to receive_messages(headers: headers_double, network: network_double)
     end
 
-    it "creates a page from the browser" do
-      result = described_class.send(:create_page)
-
-      expect(browser_double).to have_received(:create_page)
-      expect(result).to eq(page_double)
-    end
-
-    it "sets the blocklist on the page's context" do
-      expect(network_double).to receive(:blocklist=).with(described_class::BLOCKED_URL_PATTERNS)
-
-      described_class.send(:create_page)
+    it "yields the created page" do
+      expect { |block| described_class.send(:with_page, &block) }.to yield_with_args(page_double)
     end
 
     it "sets request headers on the page" do
       request_headers = { "Accept-Language" => "fr" }
       allow(described_class).to receive(:request_headers).and_return(request_headers)
 
-      described_class.send(:create_page)
+      described_class.send(:with_page) { |p| "result" }
 
       expect(headers_double).to have_received(:set).with(request_headers)
+    end
+
+    it "sets the blocklist on the page" do
+      described_class.send(:with_page) { |p| "result" }
+
+      expect(network_double).to have_received(:blocklist=).with(described_class::BLOCKED_URL_PATTERNS)
+    end
+
+    it "returns the result of the yielded block" do
+      result = described_class.send(:with_page) { |p| "test_result" }
+      expect(result).to eq("test_result")
     end
   end
 end
