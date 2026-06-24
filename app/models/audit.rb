@@ -7,6 +7,7 @@ class Audit < ApplicationRecord
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
+  scope :without_html, -> { select(column_names - %w[home_page_html accessibility_page_html]) }
 
   Check.types.each do |name, klass|
     define_method(name) do
