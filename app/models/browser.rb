@@ -8,12 +8,28 @@ class Browser
     "User-Agent" => "AccesCible/1.0 (+https://acces-cible.beta.gouv.fr/)"
   }.freeze
 
-  BLOCKED_FILE_EXTENSIONS = %w[
-    .woff .woff2 .ttf .otf .eot
-    .mp4 .avi .mov .mkv .webm
-    .mp3 .ogg .wav .aac .flac
-    .jpg .jpeg .png .gif .bmp .svg .webp .avif
-  ].freeze
+  DOCUMENT_EXTENSIONS = [
+    # PDF and archives
+    %w[.pdf .zip],
+    # OpenDocument and Microsoft Office
+    %w[.odt .ods .odp .odg .doc .docx .xls .xlsx .ppt .pptx],
+    # Text, data, and Apple iWork
+    %w[.rtf .txt .csv .tsv .pages .numbers],
+  ].flatten.freeze
+
+  FILE_EXTENSIONS = [
+    # Fonts
+    %w[.woff .woff2 .ttf .otf .eot],
+    # Feeds, structured data, calendars, icons, and cursors
+    %w[.xml .rss .atom .ics .ical .ico .cur],
+    # Images
+    %w[.jpg .jpeg .png .gif .bmp .svg .webp .avif .tif .tiff .apng .heic .heif],
+    # Audio and video
+    %w[.mp3 .mp4 .avi .mov .mkv .webm .ogg .wav .aac .flac .m4a .opus],
+    %w[.ogv .m4v .mpg .mpeg],
+  ].flatten.freeze
+
+  BLOCKED_FILE_EXTENSIONS = (FILE_EXTENSIONS + DOCUMENT_EXTENSIONS).freeze
 
   BLOCKED_FILE_PATTERN = Regexp.new(
     "(#{Regexp.union(BLOCKED_FILE_EXTENSIONS).source})(?:\\?.*|#.*)?$",
@@ -23,16 +39,31 @@ class Browser
   TRACKING_DOMAINS = [
     "google-analytics.com",
     "googletagmanager.com",
-    "facebook.net",
-    "facebook.com",
+    /facebook\.(?:com|net)/i,
     "twitter.com",
     "linkedin.com",
     "doubleclick.net",
     "adservice.google.com",
+    "googleadservices.com",
+    "googlesyndication.com",
     "youtube.com",
     "play.google.com",
     "sites.statistiques.online",
     "googleapis.com",
+    /hotjar\.(?:com|io)/i,
+    "clarity.ms",
+    "segment.io",
+    "amplitude.com",
+    "mixpanel.com",
+    "matomo.cloud",
+    "plausible.io",
+    "fullstory.com",
+    /intercom(?:\.io|cdn\.com)/i,
+    /(?:nr-data\.net|newrelic\.com)/i,
+    /(?:browser-intake-datadoghq|datadoghq-browser-agent)\.com/i,
+    "bugsnag.com",
+    "rollbar.com",
+    /sentry(?:\.[a-z0-9-]+)+/i,
   ].freeze
 
   TRACKING_DOMAIN_PATTERN = Regexp.union(TRACKING_DOMAINS)
