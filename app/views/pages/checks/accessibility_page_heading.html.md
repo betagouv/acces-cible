@@ -26,11 +26,11 @@ Nous tolérons de légères variations d’intitulé.
       </tr>
       <tr>
         <td><p class="fr-badge fr-badge--warning">60%</p></td>
-        <td> <p>Avertissement - De 60% à 90%, certains titres sont présents, correctement hiérarchisés et ordonnés </p></td>
+        <td> <p>Avertissement - De 60% à 89%, certains titres sont présents, correctement hiérarchisés et ordonnés </p></td>
       </tr>
       <tr>
         <td><p class="fr-badge fr-badge--error">40%</p></td>
-        <td> <p>Échec - De 0% à 40%, peu de titres sont présents et/ou sont mal hiérarchisés et ordonnés </p></td>
+        <td> <p>Échec - De 0% à 59%, peu de titres sont présents et/ou sont mal hiérarchisés et ordonnés </p></td>
       </tr>
     </tbody>
   </table>
