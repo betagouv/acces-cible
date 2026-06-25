@@ -1,5 +1,7 @@
 module Checks
   class AnalyzeAccessibilityPage < Check
+    include AccessibilityDeclarationHeadings
+
     PRIORITY = 21
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
@@ -25,6 +27,7 @@ module Checks
     MAILTO_PREFIX = "mailto:".freeze
     LAW_DATE = Date.new(2005, 2, 11)
     HEADERS_SCOPE = ["Établissement de cette déclaration d’accessibilité", "État de conformité", "Déclaration d’accessibilité", "Résultats des tests"]
+    HEADING_COMPARISON_OPTIONS = { ignore_case: true, fuzzy: 0.65 }.freeze
 
     store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article, :contact_email, :contact_form
 
@@ -68,7 +71,7 @@ module Checks
       extracted_text = []
 
       HEADERS_SCOPE.each do |header_scope|
-        extracted_text << page.text(between_headings: [header_scope, :next])
+        extracted_text << declaration_section_text(header_scope)
       end
 
       extracted_text << page.text(between_headings: [:previous, "État de conformité"])
@@ -82,7 +85,7 @@ module Checks
     end
 
     def find_compliance_rate
-      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+      test_results_section = declaration_section_text("Résultats des tests")
       matches = test_results_section.scan(COMPLIANCE_PATTERN)
 
       return if matches.empty?
@@ -99,7 +102,7 @@ module Checks
     end
 
     def find_auditor
-      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+      test_results_section = declaration_section_text("Résultats des tests")
 
       match = test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
@@ -123,7 +126,7 @@ module Checks
 
       return email_in_text if email_in_text.present?
 
-      page.mailto_addresses(between_headings: ["Retour d'information et contact", :next]).first
+      declaration_section_mailto_addresses("Retour d'information et contact").first
     end
 
     def find_contact_form
@@ -135,11 +138,45 @@ module Checks
     private
 
     def contact_links
-      page.links(between_headings: ["Retour d'information et contact", :next])
+      declaration_section_links("Retour d'information et contact")
     end
 
     def contact_section_text
-      page.text(between_headings: ["Retour d'information et contact", :next])
+      declaration_section_text("Retour d'information et contact")
+    end
+
+    def declaration_section_text(start_heading)
+      page.text(between_headings: declaration_section_boundaries(start_heading))
+    end
+
+    def declaration_section_links(start_heading)
+      page.links(between_headings: declaration_section_boundaries(start_heading))
+    end
+
+    def declaration_section_mailto_addresses(start_heading)
+      page.mailto_addresses(between_headings: declaration_section_boundaries(start_heading))
+    end
+
+    def declaration_section_boundaries(start_heading)
+      [start_heading, next_declaration_heading(start_heading) || :next]
+    end
+
+    def next_declaration_heading(start_heading)
+      headings = page.headings
+      start_index = headings.find_index { |heading| heading_match?(start_heading, heading) }
+      return nil unless start_index
+
+      headings[(start_index + 1)..]&.find do |heading|
+        declaration_heading?(heading) && !heading_match?(start_heading, heading)
+      end
+    end
+
+    def declaration_heading?(text)
+      expected_declaration_heading_titles.any? { |heading| heading_match?(heading, text) }
+    end
+
+    def heading_match?(matcher, text)
+      StringComparison.match?(matcher, text, **HEADING_COMPARISON_OPTIONS)
     end
 
     def page
