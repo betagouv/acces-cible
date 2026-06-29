@@ -22,15 +22,17 @@ RSpec.describe Checks::RunAxeOnHomepage do
     before do
       allow(Browser).to receive(:run_script_on_html)
 
-      allow(File)
-        .to receive(:read)
-        .with(described_class.const_get("AXE_LOCALE_PATH"))
-        .and_return("localized axe JSON")
+      allow(File).to receive(:read).and_call_original
 
       allow(File)
         .to receive(:read)
-        .with(described_class.const_get("AXE_SOURCE_PATH"))
-        .and_return("axe JS mock")
+              .with(described_class.const_get("AXE_LOCALE_PATH"))
+              .and_return("localized axe JSON")
+
+      allow(File)
+        .to receive(:read)
+              .with(described_class.const_get("AXE_SOURCE_PATH"))
+              .and_return("axe JS mock")
 
       stub_const("#{described_class}::RGAA_AXE_RULES", "mock rules")
     end
@@ -40,13 +42,13 @@ RSpec.describe Checks::RunAxeOnHomepage do
 
       expect(Browser)
         .to have_received(:run_script_on_html)
-        .with(
-          check.audit.home_page_html,
-          an_instance_of(String)
-            .and(matching(/locale: localized axe JSON/))
-            .and(matching(/values: mock rules/)),
-          "axe JS mock"
-        )
+              .with(
+                check.audit.home_page_html,
+                an_instance_of(String)
+                  .and(matching(/locale: localized axe JSON/))
+                  .and(matching(/values: mock rules/)),
+                "axe JS mock"
+              )
     end
   end
 
