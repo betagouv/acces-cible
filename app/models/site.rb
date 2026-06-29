@@ -5,6 +5,7 @@ class Site < ApplicationRecord
 
   has_many :audits, -> { sort_by_newest }, dependent: :destroy
 
+  has_one :last_audit_without_html, -> { order(created_at: :desc).without_html }, class_name: "Audit"
   has_one :last_audit, -> { order(created_at: :desc) }, class_name: "Audit"
 
   has_many :site_tags, dependent: :destroy
@@ -12,7 +13,7 @@ class Site < ApplicationRecord
 
   accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  scope :preloaded, -> { preload(:tags, :slugs, last_audit: { checks: :check_transitions }) }
+  scope :preloaded, -> { preload(:tags, :slugs, last_audit_without_html: { checks: :check_transitions }) }
 
   before_validation :set_normalized_url, if: :will_save_change_to_url?
 
