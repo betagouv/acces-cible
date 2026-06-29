@@ -38,7 +38,7 @@ class SiteCsvExport
 
     sites.in_batches(of: 200) do |batch|
       batch.preloaded.each do |site|
-        audit = site.last_audit
+        audit = site.last_audit_without_html
 
         reachable = audit&.reachable
         language = audit&.language_indication
