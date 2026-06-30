@@ -152,8 +152,31 @@ class Browser
     def create_page
       browser.create_page.tap do |page|
         page.headers.set(request_headers)
-        page.network.blocklist = BLOCKED_URL_PATTERNS
+        block_unwanted_requests(page)
       end
+    end
+
+    def block_unwanted_requests(page)
+      page.network.intercept(handle_auth_requests: false)
+      page.on(:request) do |request|
+        if blocked_request?(page, request)
+          request.abort
+        else
+          request.continue
+        end
+      end
+    end
+
+    def blocked_request?(page, request)
+      blocked_url?(request.url) || iframe_document_request?(page, request)
+    end
+
+    def blocked_url?(url)
+      BLOCKED_URL_PATTERNS.any? { |pattern| url.to_s.match?(pattern) }
+    end
+
+    def iframe_document_request?(page, request)
+      request.resource_type == "Document" && request.frame_id != page.main_frame.id
     end
   end
 end
