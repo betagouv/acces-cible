@@ -86,8 +86,7 @@ class Page
       next if href.downcase.match?(/\A(?:javascript:|data:|blob:|void\s*\()/)
 
       uri = Link.parse(href)
-      next if uri.path && Browser::FILE_EXTENSIONS.include?(File.extname(uri.path).downcase)
-      next if skip_files && uri.path && Browser::DOCUMENT_EXTENSIONS.include?(File.extname(uri.path).downcase)
+      next if skipped_file_link?(uri, skip_files:)
 
       href = parsed_root.join(uri) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
@@ -104,6 +103,14 @@ class Page
   end
 
   private
+
+  def skipped_file_link?(uri, skip_files:)
+    return false unless uri.path
+
+    path_extension = File.extname(uri.path).downcase
+    Browser::FILE_EXTENSIONS.include?(path_extension) ||
+      skip_files && Browser::DOCUMENT_EXTENSIONS.include?(path_extension)
+  end
 
   def setup_page_data
     @actual_url = @url

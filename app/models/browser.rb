@@ -9,24 +9,24 @@ class Browser
 
   DOCUMENT_EXTENSIONS = [
     # PDF and archives
-    %w[.pdf .zip],
+    ".pdf", ".zip",
     # OpenDocument and Microsoft Office
-    %w[.odt .ods .odp .odg .doc .docx .xls .xlsx .ppt .pptx],
+    ".odt", ".ods", ".odp", ".odg", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
     # Text, data, and Apple iWork
-    %w[.rtf .txt .csv .tsv .pages .numbers],
-  ].flatten.freeze
+    ".rtf", ".txt", ".csv", ".tsv", ".pages", ".numbers",
+  ].freeze
 
   FILE_EXTENSIONS = [
     # Fonts
-    %w[.woff .woff2 .ttf .otf .eot],
+    ".woff", ".woff2", ".ttf", ".otf", ".eot",
     # Feeds, structured data, calendars, icons, and cursors
-    %w[.xml .rss .atom .ics .ical .ico .cur],
+    ".xml", ".rss", ".atom", ".ics", ".ical", ".ico", ".cur",
     # Images
-    %w[.jpg .jpeg .png .gif .bmp .svg .webp .avif .tif .tiff .apng .heic .heif],
+    ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".avif", ".tif", ".tiff", ".apng", ".heic", ".heif",
     # Audio and video
-    %w[.mp3 .mp4 .avi .mov .mkv .webm .ogg .wav .aac .flac .m4a .opus],
-    %w[.ogv .m4v .mpg .mpeg],
-  ].flatten.freeze
+    ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".webm", ".ogg", ".wav", ".aac", ".flac", ".m4a", ".opus",
+    ".ogv", ".m4v", ".mpg", ".mpeg",
+  ].freeze
 
   BLOCKED_FILE_EXTENSIONS = (FILE_EXTENSIONS + DOCUMENT_EXTENSIONS).freeze
 
