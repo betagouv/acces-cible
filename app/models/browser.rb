@@ -1,3 +1,6 @@
+require "fileutils"
+require "json"
+
 class Browser
   PAGE_TIMEOUT = 1.minute
   PROCESS_TIMEOUT = 30.seconds
@@ -75,6 +78,17 @@ class Browser
     "disable-features" => "TranslateUI,VizDisplayCompositor",
     "disable-gpu" => nil,
     "no-sandbox" => nil
+  }.freeze
+
+  CHROME_CONTENT_SETTING_BLOCK = 2
+
+  CHROME_PROFILE_PREFERENCES = {
+    profile: {
+      block_third_party_cookies: true,
+      default_content_setting_values: {
+        cookies: CHROME_CONTENT_SETTING_BLOCK
+      }
+    }
   }.freeze
 
   STEALTH_EXTENSION = Rails.root.join("vendor/javascript/stealth.min.js").freeze
@@ -160,6 +174,8 @@ class Browser
     private
 
     def browser
+      prepare_user_data_dir
+
       @browser ||= Ferrum::Browser.new(settings)
     end
 
@@ -171,6 +187,13 @@ class Browser
 
     def user_data_dir
       @user_data_dir ||= "/tmp/chrome-#{SecureRandom.hex(8)}"
+    end
+
+    def prepare_user_data_dir
+      preferences_path = File.join(user_data_dir, "Default", "Preferences")
+
+      FileUtils.mkdir_p(File.dirname(preferences_path))
+      File.write(preferences_path, JSON.generate(CHROME_PROFILE_PREFERENCES))
     end
 
     def with_page
