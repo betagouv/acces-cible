@@ -77,8 +77,9 @@ class FindAccessibilityPageService
 
     def declaration_term_count(link)
       normalized_text = I18n.transliterate(link.text).downcase
+      normalized_href = I18n.transliterate(link.href).downcase
 
-      DECLARATION_TERMS.count { |term| link.href.include?(term) || normalized_text&.include?(term) }.nonzero?
+      DECLARATION_TERMS.count { |term| normalized_href.include?(term) || normalized_text&.include?(term) }.nonzero?
     end
   end
 end

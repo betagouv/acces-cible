@@ -38,7 +38,7 @@ RSpec.describe FindAccessibilityPageService do
             <body>
               <a href="/contact">Contact</a>
               <a href="/accessibilite">Accessibilité</a>
-              <a href="/rgaa">RGAA</a>
+              <a href="/RGAA">Référentiel</a>
               <a href="/declaration">Déclaration d'accessibilité</a>
               <a href="/declaration-accessibilite">Accessibilité : non conforme</a>
             </body>
@@ -46,7 +46,7 @@ RSpec.describe FindAccessibilityPageService do
         HTML
       end
 
-      let(:expected_link_list) { %w[https://example.com/declaration-accessibilite https://example.com/declaration https://example.com/accessibilite https://example.com/rgaa] }
+      let(:expected_link_list) { %w[https://example.com/declaration-accessibilite https://example.com/declaration https://example.com/accessibilite https://example.com/RGAA] }
 
       it "prioritizes links correctly in the crawler" do
         allow(Crawler).to receive(:new).with(
