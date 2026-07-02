@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :audit do
+    user { association :user }
     site { association :site, audits: [instance] }
 
     trait :without_checks do

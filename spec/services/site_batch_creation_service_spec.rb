@@ -2,9 +2,10 @@ require "rails_helper"
 
 RSpec.describe SiteBatchCreationService do
   describe "#process" do
-    subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids).process(site_data) }
+    subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids, user:).process(site_data) }
 
     let(:team) { create(:team) }
+    let(:user) { create(:user) }
     let(:created_site) { Site.last }
     let(:site_tags) { created_site.tags.pluck(:name) }
     let(:url) { "https://example.com/" }
@@ -38,6 +39,12 @@ RSpec.describe SiteBatchCreationService do
 
       it "schedules an audit for the new site" do
         expect { process_site }.to change(Audit, :count).by(1)
+      end
+
+      it "assigns the user to the audit" do
+        process_site
+
+        expect(Site.last.last_audit.user).to eq(user)
       end
 
       context "with extra tags" do
@@ -79,6 +86,12 @@ RSpec.describe SiteBatchCreationService do
 
       it "schedules a new audit" do
         expect { process_site }.to change { existing_site.reload.audits.count }.by(1)
+      end
+
+      it "assigns the user to the new audit" do
+        process_site
+
+        expect(existing_site.last_audit.user).to eq(user)
       end
 
       context "when the site name is blank" do

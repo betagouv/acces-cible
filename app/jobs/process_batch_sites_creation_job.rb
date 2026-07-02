@@ -1,9 +1,10 @@
 class ProcessBatchSitesCreationJob < ApplicationJob
   include ActiveJob::Continuable
 
-  def perform(sites_data, team_id, tag_ids)
+  def perform(sites_data, team_id, tag_ids, user_id)
     team = Team.find(team_id)
-    site_batch_creation = SiteBatchCreationService.new(team:, tag_ids:)
+    user = User.find(user_id)
+    site_batch_creation = SiteBatchCreationService.new(team:, tag_ids:, user:)
 
     step :process_sites do |step|
       start_index = step.cursor || 0
