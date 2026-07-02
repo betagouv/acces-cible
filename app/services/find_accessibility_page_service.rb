@@ -1,6 +1,5 @@
 class FindAccessibilityPageService
-  DECLARATION = /\A(D[ée]claration d('|'))?accessibilit[ée]?/i
-  DECLARATION_URL = /(declaration-)?d?accessibilit[e|y]|rgaa/i
+  DECLARATION_TERMS = %w[rgaa conform declaration accessibilit].freeze
   REQUIRED_DECLARATION_HEADINGS = 2
 
   class << self
@@ -71,9 +70,16 @@ class FindAccessibilityPageService
     def links_by_priority(links)
       (
         links.select { |link| link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) } +
-          links.select { |link| link.text.match?(DECLARATION) } +
-          links.select { |link| link.href.match?(DECLARATION_URL) }
+          links.select { |link| declaration_term_count(link) }
+               .sort_by { |link| -declaration_term_count(link) }
       ).uniq
+    end
+
+    def declaration_term_count(link)
+      normalized_text = I18n.transliterate(link.text).downcase
+      normalized_href = I18n.transliterate(link.href).downcase
+
+      DECLARATION_TERMS.count { |term| normalized_href.include?(term) || normalized_text&.include?(term) }.nonzero?
     end
   end
 end

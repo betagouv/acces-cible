@@ -38,7 +38,7 @@ RSpec.describe FindAccessibilityPageService do
             <body>
               <a href="/contact">Contact</a>
               <a href="/accessibilite">Accessibilité</a>
-              <a href="/rgaa">RGAA</a>
+              <a href="/RGAA">Référentiel</a>
               <a href="/declaration">Déclaration d'accessibilité</a>
               <a href="/declaration-accessibilite">Accessibilité : non conforme</a>
             </body>
@@ -46,9 +46,77 @@ RSpec.describe FindAccessibilityPageService do
         HTML
       end
 
-      let(:expected_link_list) { %w[https://example.com/declaration-accessibilite https://example.com/accessibilite https://example.com/declaration https://example.com/rgaa] }
+      let(:expected_link_list) { %w[https://example.com/declaration-accessibilite https://example.com/declaration https://example.com/accessibilite https://example.com/RGAA] }
 
       it "prioritizes links correctly in the crawler" do
+        allow(Crawler).to receive(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        ).and_return(crawler)
+
+        allow(crawler).to receive(:find_page).and_return(nil)
+
+        described_class.call(audit)
+
+        expect(Crawler).to have_received(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        )
+      end
+    end
+
+    context "when multiple accessibility pages exist" do
+      let(:home_page_html) do
+        <<-HTML
+          <html lang="fr">
+            <body>
+              <a href="/accessibilite-et-inclusion">Accessibilité et inclusion</a>
+              <a href="/accessibilite-et-voirie">Accessibilité et voirie</a>
+              <a href="/accessibilite-conformite-partielle">Accessibilité - Conformité partielle</a>
+            </body>
+          </html>
+        HTML
+      end
+
+      let(:expected_link_list) { %w[https://example.com/accessibilite-conformite-partielle https://example.com/accessibilite-et-inclusion https://example.com/accessibilite-et-voirie] }
+
+      it "ranks the URLs matching the most terms first" do
+        allow(Crawler).to receive(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        ).and_return(crawler)
+
+        allow(crawler).to receive(:find_page).and_return(nil)
+
+        described_class.call(audit)
+
+        expect(Crawler).to have_received(:new).with(
+          root_url,
+          root_page_html: home_page_html,
+          queue: LinkList.new(expected_link_list)
+        )
+      end
+    end
+
+    context "when a link has accented French text but an unrelated href" do
+      let(:home_page_html) do
+        <<-HTML
+          <html lang="fr">
+            <body>
+              <a href="/mentions-legales">Voir notre déclaration</a>
+              <a href="/random">Voir notre déclaration accessibilité</a>
+              <a href="/contact">Contact</a>
+            </body>
+          </html>
+        HTML
+      end
+
+      let(:expected_link_list) { %w[https://example.com/random https://example.com/mentions-legales] }
+
+      it "includes the link based on its accented text" do
         allow(Crawler).to receive(:new).with(
           root_url,
           root_page_html: home_page_html,
