@@ -44,13 +44,13 @@ class SitesController < ApplicationController
     @site = current_user.team.sites.find_by(normalized_url:)
 
     if @site
-      @site.audit!
+      @site.audit!(user: current_user)
       redirect_to @site, notice: t(".new_audit")
     else
       @site = current_user.team.sites.build(site_params)
 
       if @site.save
-        @site.audit!
+        @site.audit!(user: current_user)
         redirect_to @site, notice: t(".created")
       else
         render :new, status: :unprocessable_content
@@ -130,7 +130,9 @@ class SitesController < ApplicationController
   end
 
   def site_upload_params
-    params.expect(site_upload: [:file, { tag_ids: [], tags_attributes: [:name] }]).merge(team: current_user.team)
+    params
+      .expect(site_upload: [:file, { tag_ids: [], tags_attributes: [:name] }])
+      .merge(team: current_user.team, user: current_user)
   end
 
   def site_ids

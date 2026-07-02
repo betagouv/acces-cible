@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe SiteUpload do
-  subject(:site_upload) { described_class.new(file:, team:, tag_ids:) }
+  subject(:site_upload) { described_class.new(file:, team:, user:, tag_ids:) }
 
   let(:team) { create(:team) }
+  let(:user) { create(:user) }
   let(:tag_ids) { [] }
   let(:parsed_sites_data) do
     [
@@ -32,11 +33,12 @@ RSpec.describe SiteUpload do
       expect(site_upload).to be_valid
     end
 
-    it "requires a file and a team" do
+    it "requires a file, a team and a user" do
       site_upload = described_class.new
       expect(site_upload).not_to be_valid
       expect(site_upload.errors[:file]).not_to be_empty
       expect(site_upload.errors[:team]).not_to be_empty
+      expect(site_upload.errors[:user]).not_to be_empty
     end
 
     context "when file is empty" do
@@ -157,7 +159,7 @@ RSpec.describe SiteUpload do
     context "when the upload is valid" do
       it "enqueues a site upload processing job" do
         expect { site_upload.save }
-          .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids)
+          .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids, user.id)
       end
 
       it "stores the number of parsed sites" do
@@ -171,7 +173,7 @@ RSpec.describe SiteUpload do
 
         it "passes tag_ids to the job" do
           expect { site_upload.save }
-            .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids)
+            .to have_enqueued_job(ProcessSiteUploadJob).with(parsed_sites_data, team.id, tag_ids, user.id)
         end
       end
     end

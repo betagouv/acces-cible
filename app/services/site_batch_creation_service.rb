@@ -1,7 +1,8 @@
 class SiteBatchCreationService
-  def initialize(team:, tag_ids:)
+  def initialize(team:, tag_ids:, user:)
     @team = team
     @tag_ids = tag_ids
+    @user = user
   end
 
   def process(site_data)
@@ -10,9 +11,9 @@ class SiteBatchCreationService
 
     if site
       update_site(site, site_data, tag_ids)
-      site.audit!
+      site.audit!(user: @user)
     else
-      Site.create!(url: site_data["url"], team: @team, name: site_data["name"], tag_ids:).audit!
+      Site.create!(url: site_data["url"], team: @team, name: site_data["name"], tag_ids:).audit!(user: @user)
     end
   end
 
