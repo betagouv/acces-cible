@@ -3,7 +3,10 @@ class ProcessBatchSitesCreationJob < ApplicationJob
 
   def perform(sites_data, team_id, tag_ids, user_id)
     team = Team.find(team_id)
-    user = User.find(user_id)
+    user = team.users.find(user_id)
+
+    return unless user.present?
+
     site_batch_creation = SiteBatchCreationService.new(team:, tag_ids:, user:)
 
     step :process_sites do |step|
