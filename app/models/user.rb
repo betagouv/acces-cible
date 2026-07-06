@@ -5,8 +5,6 @@ class User < ApplicationRecord
   has_many :sites, through: :team
   has_many :sessions, dependent: :destroy
 
-  scope :inactive, -> { where(updated_at: ...MAX_IDLE_TIME.ago) }
-
   validates :provider, :uid, :email, :name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }
   validates :email, uniqueness: { scope: :provider, if: :email_changed? }
