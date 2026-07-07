@@ -494,12 +494,11 @@ RSpec.describe Page do
 
   describe "#links" do
     it "returns an array of links" do
-      expected_links = [
-        Link.new("https://éxample.com/contact", "Contact"),
-        Link.new("https://external.com/", "External"),
-        Link.new("https://éxample.com/relative/path", "Relative"),
-      ]
-      expect(page.links).to eq(expected_links)
+      expect(page.links.map { |l| [l.href, l.text] }).to eq([
+        ["https://éxample.com/contact", "Contact"],
+        ["https://external.com/", "External"],
+        ["https://éxample.com/relative/path", "Relative"],
+      ])
     end
 
     it "excludes mailto and tel links" do
@@ -666,20 +665,16 @@ RSpec.describe Page do
 
   describe "#internal_links" do
     it "returns only links that start with the root URL" do
-      expected_internal_links = [
-        Link.new("https://éxample.com/contact", "Contact"),
-        Link.new("https://éxample.com/relative/path", "Relative"),
-      ]
-      expect(page.internal_links).to eq(expected_internal_links)
+      expect(page.internal_links.map(&:href)).to eq([
+        "https://éxample.com/contact",
+        "https://éxample.com/relative/path",
+      ])
     end
   end
 
   describe "#external_links" do
     it "returns only links that don't start with the root URL" do
-      expected_external_links = [
-        Link.new("https://external.com", "External")
-      ]
-      expect(page.external_links).to eq(expected_external_links)
+      expect(page.external_links.map(&:href)).to eq(["https://external.com/"])
     end
   end
 end

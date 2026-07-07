@@ -52,10 +52,10 @@ class CsvSiteParser
 
   def normalize_url(raw_url, line_number)
     parsed_url = Link.parse(raw_url)
-    raise Link::InvalidUriError.new(raw_url) if parsed_url.relative?
+    raise Addressable::URI::InvalidURIError.new(raw_url) if parsed_url.relative?
 
     Link.normalize(parsed_url)
-  rescue Link::InvalidUriError => error
+  rescue Addressable::URI::InvalidURIError => error
     report_invalid_url(error, raw_url, line_number)
     nil
   end
@@ -63,10 +63,10 @@ class CsvSiteParser
   def report_malformed_csv(error)
     Rails.logger.warn(
       "site_upload_malformed_csv " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
+        "team_id=#{team&.id} " \
+        "filename=#{file&.original_filename} " \
+        "error_class=#{error.class.name} " \
+        "error_message=#{error.message}"
     )
     errors.add(:file, :malformed_csv)
   end
@@ -74,12 +74,12 @@ class CsvSiteParser
   def report_invalid_url(error, raw_url, line_number)
     Rails.logger.warn(
       "site_upload_invalid_url " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "line_number=#{line_number} " \
-      "raw_url=#{raw_url} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
+        "team_id=#{team&.id} " \
+        "filename=#{file&.original_filename} " \
+        "line_number=#{line_number} " \
+        "raw_url=#{raw_url} " \
+        "error_class=#{error.class.name} " \
+        "error_message=#{error.message}"
     )
     errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
   end

@@ -49,21 +49,11 @@ RSpec.describe FindAccessibilityPageService do
       let(:expected_link_list) { %w[https://example.com/declaration-accessibilite https://example.com/declaration https://example.com/accessibilite https://example.com/RGAA] }
 
       it "prioritizes links correctly in the crawler" do
-        allow(Crawler).to receive(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        ).and_return(crawler)
-
         allow(crawler).to receive(:find_page).and_return(nil)
 
         described_class.call(audit)
 
-        expect(Crawler).to have_received(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        )
+        expect(Crawler).to have_received(:new).with(root_url, root_page_html: home_page_html, queue: expected_link_list)
       end
     end
 
@@ -83,21 +73,11 @@ RSpec.describe FindAccessibilityPageService do
       let(:expected_link_list) { %w[https://example.com/accessibilite-conformite-partielle https://example.com/accessibilite-et-inclusion https://example.com/accessibilite-et-voirie] }
 
       it "ranks the URLs matching the most terms first" do
-        allow(Crawler).to receive(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        ).and_return(crawler)
-
         allow(crawler).to receive(:find_page).and_return(nil)
 
         described_class.call(audit)
 
-        expect(Crawler).to have_received(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        )
+        expect(Crawler).to have_received(:new).with(root_url, root_page_html: home_page_html, queue: expected_link_list)
       end
     end
 
@@ -117,21 +97,11 @@ RSpec.describe FindAccessibilityPageService do
       let(:expected_link_list) { %w[https://example.com/random https://example.com/mentions-legales] }
 
       it "includes the link based on its accented text" do
-        allow(Crawler).to receive(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        ).and_return(crawler)
-
         allow(crawler).to receive(:find_page).and_return(nil)
 
         described_class.call(audit)
 
-        expect(Crawler).to have_received(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        )
+        expect(Crawler).to have_received(:new).with(root_url, root_page_html: home_page_html, queue: expected_link_list)
       end
     end
 
@@ -145,21 +115,11 @@ RSpec.describe FindAccessibilityPageService do
       end
 
       it "adds the external link to the prioritized queue" do
-        allow(Crawler).to receive(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        ).and_return(crawler)
-
         allow(crawler).to receive(:find_page).and_return(nil)
 
         described_class.call(audit)
 
-        expect(Crawler).to have_received(:new).with(
-          root_url,
-          root_page_html: home_page_html,
-          queue: LinkList.new(expected_link_list)
-        )
+        expect(Crawler).to have_received(:new).with(root_url, root_page_html: home_page_html, queue: expected_link_list)
       end
     end
 
@@ -174,7 +134,7 @@ RSpec.describe FindAccessibilityPageService do
 
   describe ".enqueue_children" do
     let(:audit) { build(:audit, site:, home_page_url: "https://www.example.com/redirection") }
-    let(:queue) { LinkList.new }
+    let(:queue) { [] }
     let(:page) { instance_double(Page, url: "https://example.com/a") }
     let(:links) do
       [
@@ -193,7 +153,7 @@ RSpec.describe FindAccessibilityPageService do
     it "does not enqueues home, redirection and page url" do
       described_class.send(:enqueue_children, page, queue, audit)
 
-      expect(queue.to_a).to eq(["https://example.com/a11y"])
+      expect(queue).to eq(["https://example.com/a11y"])
     end
   end
 end
