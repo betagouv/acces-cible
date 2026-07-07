@@ -9,10 +9,9 @@ Sentry.init do |config|
   # Enable structured logging
   # By default, Sentry captures :active_record, :action_controller
   # https://docs.sentry.io/platforms/ruby/guides/rails/logs/#structured-logging-subscribers
-  # This config enables :active_job too
+  # This config enables :active_job and removes :active_record
   config.enable_logs = true
   config.rails.structured_logging.subscribers = {
-    active_record: Sentry::Rails::LogSubscribers::ActiveRecordSubscriber,
     action_controller: Sentry::Rails::LogSubscribers::ActionControllerSubscriber,
     active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
   }
