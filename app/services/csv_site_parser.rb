@@ -52,10 +52,10 @@ class CsvSiteParser
 
   def normalize_url(raw_url, line_number)
     parsed_url = Link.parse(raw_url)
-    raise Link::InvalidUriError.new(raw_url) if parsed_url.relative?
+    raise Addressable::URI::InvalidURIError.new(raw_url) if parsed_url.relative?
 
     Link.normalize(parsed_url)
-  rescue Link::InvalidUriError => error
+  rescue Addressable::URI::InvalidURIError => error
     report_invalid_url(error, raw_url, line_number)
     nil
   end

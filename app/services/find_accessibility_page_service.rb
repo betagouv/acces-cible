@@ -39,7 +39,7 @@ class FindAccessibilityPageService
 
       children_links = links_by_priority(children_links).first(Crawler::MAX_CRAWLED_PAGES)
 
-      queue.add(*children_links)
+      queue.concat(children_links.map(&:href))
     end
 
     def required_headings_present?(current_page)
@@ -57,14 +57,14 @@ class FindAccessibilityPageService
     end
 
     def prioritize_queue!(url:, starting_html:)
-      root_link = Link.from(Link.root_from(url))
+      root = Link.root_from(url)
       links = if starting_html.present?
-        Page.new(url:, root: root_link.href, html: starting_html).links
+        Page.new(url:, root:, html: starting_html).links
       else
         []
       end
 
-      LinkList.new(links_by_priority(links))
+      links_by_priority(links).map(&:href)
     end
 
     def links_by_priority(links)
@@ -72,7 +72,7 @@ class FindAccessibilityPageService
         links.select { |link| link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) } +
           links.select { |link| declaration_term_count(link) }
                .sort_by { |link| -declaration_term_count(link) }
-      ).uniq
+      ).uniq(&:href)
     end
 
     def declaration_term_count(link)
