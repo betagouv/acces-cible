@@ -16,10 +16,10 @@ class SiteUpload
   MAX_FILE_SIZE = 5.megabytes
   REQUIRED_HEADERS = ["url"].freeze
 
-  attr_accessor :file, :team, :tag_ids, :tags
+  attr_accessor :file, :team, :user, :tag_ids, :tags
   attr_reader :count
 
-  validates :file, :team, presence: true
+  validates :file, :team, :user, presence: true
   validate :valid_file_size, :valid_file_format, :valid_headers, if: :file
 
   def initialize(attributes = {})
@@ -34,7 +34,7 @@ class SiteUpload
     return false if errors.any?
 
     @count = sites_data.count
-    ProcessSiteUploadJob.perform_later(sites_data, team.id, tag_ids)
+    ProcessSiteUploadJob.perform_later(sites_data, team.id, tag_ids, user.id)
 
     true
   end

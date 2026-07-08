@@ -2,9 +2,10 @@ require "rails_helper"
 
 RSpec.describe ProcessBatchSitesCreationJob do
   describe "#perform" do
-    subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids) }
+    subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids, user.id) }
 
-    let(:team) { create(:team) }
+    let(:user) { create(:user) }
+    let(:team) { create(:team, users: [user]) }
     let(:url) { "https://example.com/" }
     let(:sites_data) do
       [

@@ -46,8 +46,8 @@ class Site < ApplicationRecord
     new_record? || (slug != normalized_url.parameterize) || super
   end
 
-  def audit!
-    audits.create!
+  def audit!(user:)
+    audits.create!(user:)
   end
 
   def tags_list

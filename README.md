@@ -57,53 +57,6 @@ bin/scalingo prod
 bin/scalingo prod --sandbox
 ```
 
-### Nombre de connexions à la base de données
-
-Le projet utilise PostgreSQL et Rails avec SolidQueue, SolidCable, et SolidCache,
-chaque *thread* (Puma ou SolidQueue) se connecte donc à **4 bases de données**.
-
-De plus, le nombre de connexions utilisées dépend des variables d'environnement suivantes :
-
-- `WEB_CONCURRENCY` : nombre de workers Puma par dyno web (2 par défaut)
-- `RAILS_MAX_THREADS` : nombre de threads par worker Puma ET taille du pool de connexions (3 par défaut)
-- `JOB_CONCURRENCY` : nombre de workers SolidQueue par dyno worker (2 par défaut)
-- `JOB_THREADS` : nombre de threads par worker SolidQueue (4 par défaut)
-
-**Formule par dyno web :**
-
-```
-Connexions max = WEB_CONCURRENCY × RAILS_MAX_THREADS × 4 bases
-```
-
-**Formule par dyno worker :**
-
-```
-Connexions max = (JOB_CONCURRENCY × JOB_THREADS + (1 slow queue × 3 slow threads)) × 4 bases
-```
-
-#### Configuration actuelle
-
-##### Dynos web (Puma)
-
-- `WEB_CONCURRENCY=2`
-- `RAILS_MAX_THREADS=3`
-- **Par dyno : 2 × 3 × 4 = 24 connexions max**
-
-##### Dynos worker (SolidQueue)
-
-- Queue "slow" : 1 processus × 3 threads
-- Queues default/cable/background : 2 processus × 4 threads chacun
-- Total : (1×3) + (2×4) = 11 jobs concurrents max
-- **Par dyno : 11 × 4 DB = 44 connexions max**
-
-##### Notes
-
-- Scalingo réserve 1 connexion pour le rôle super-admin (donc le plan à 120 connexions n'en permet que 119 en réalité).
-- Les connexions sont créées à la demande (lazy loading)
-- Pour être sûr que chaque thread Puma puisse se connecter à la base, utiliser `RAILS_MAX_THREADS` dans `puma.rb` (`threads_count`) ET `database.yml` (`pool`).
-- Les dynos worker utilisent une configuration différente (2 processus × 4 threads) adaptée à leur charge mémoire.
-- Utiliser des requêtes asynchrones (`async_count` par exemple) augmente le nombre de connections utilisée par thread web.
-
 ## 🧰 Outils et technologies
 
 - Framework : Ruby on Rails, ViewComponents, SolidQueue
@@ -152,11 +105,16 @@ bin/rails vendor:update
 
 ## 🤝 Contribution
 
-- La branche principale (`main`) est déployée en production
-- La branche de préproduction (`staging`) est déployée en staging
-- Les commits poussés sur la branche principale
-  utilisent [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary)
-  Exemples de préfixes : `fix:`, `feat:`, `chore:`, `ci:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, etc.
+- La branche principale est `main`, elle est déployée en `staging` à chaque push.
+- Pas de push direct sur `production`.
+- Les messages de commit suivent la convention [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) (`fix:`, `feat:`, `chore:`, etc.).
+
+### Releases et déploiement en production
+
+Les releases sont gérées automatiquement par [release-please](https://github.com/googleapis/release-please) :
+
+1. Chaque push sur `main` met à jour (ou crée) une PR de release avec le changelog et le bump de version.
+2. Merger cette PR crée un tag GitHub et fast-forward merge `main` sur `production`, ce qui déclenche le déploiement en production.
 
 ## Particularités
 
@@ -171,7 +129,6 @@ Pour améliorer l'expérience développeur, des raccourcis et des outils ont ét
 
 ### Extensions ActiveRecord
 
-- `order_by` et `filter_by`. Ces méthodes sont injectées dans `ActiveRecord`, et gérées dans `app/queries/[model]_query.rb`. Grâce à cela, il est possible d'appeler `User.preloaded.filter_by(params[:filter]).order_by(params[:sort])` pour filtrer et trier les résultats.
 - `to_csv` et `to_csv_filename` sont injectées dans `ActiveRecord`, pour permettre d'exporter une requête en CSV avec un minimum de configuration.
 
 ### Composants

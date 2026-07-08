@@ -3,7 +3,6 @@ class Team < ApplicationRecord
   has_many :sites, dependent: :destroy
   has_many :tags, -> { in_alphabetical_order }, dependent: :destroy
 
-  scope :inactive, -> { where(updated_at: ..1.year.ago) }
   scope :without_users, -> { where.missing(:users) }
 
   validates :siret, presence: true, uniqueness: true

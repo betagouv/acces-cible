@@ -157,14 +157,14 @@ RSpec.describe "Sites" do
     subject(:post_site) { post sites_path, params: { site: { url: } } }
 
     let(:url) { "https://example.com" }
+    let(:site) { Site.last }
+    let(:audit) { site.last_audit }
 
     it "creates a site and schedules checks automatically" do
       expect { post_site }.to change(Site, :count).by(1)
                                                   .and change(Audit, :count).by(1)
                                                                             .and change(Check, :count).by(Check.names.count)
 
-      site = Site.last
-      audit = site.last_audit
       expect(audit).to be_present
       expect(audit).to be_pending
 
@@ -173,13 +173,26 @@ RSpec.describe "Sites" do
       expect(response).to have_http_status(:ok)
     end
 
-    context "when URL already exists" do
-      it "doesn't create a duplicate site" do
-        existing_site = create(:site, url:, team:)
+    it "assigns current user to the new audit" do
+      post_site
 
+      audit = Site.last.last_audit
+      expect(audit.user).to eq(user)
+    end
+
+    context "when URL already exists" do
+      let!(:existing_site) { create(:site, url:, team:) }
+
+      it "doesn't create a duplicate site" do
         expect { post_site }.not_to change(Site, :count)
 
         expect(response).to redirect_to(site_path(existing_site))
+      end
+
+      it "assigns current user to the new audit" do
+        post_site
+
+        expect(existing_site.last_audit.user).to eq(user)
       end
     end
 

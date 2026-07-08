@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_092126) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_02_124628) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,7 +23,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_092126) do
     t.string "home_page_url"
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["site_id"], name: "index_audits_on_site_id"
+    t.index ["user_id"], name: "index_audits_on_user_id"
   end
 
   create_table "check_transitions", force: :cascade do |t|
@@ -123,6 +125,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_092126) do
   end
 
   add_foreign_key "audits", "sites"
+  add_foreign_key "audits", "users"
   add_foreign_key "check_transitions", "checks"
   add_foreign_key "checks", "audits"
   add_foreign_key "sessions", "users"

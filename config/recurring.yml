@@ -7,15 +7,7 @@ production:
     class: RemoveOrphanTagsJob
     queue: background
     schedule: every day at 2am
-  remove_inactive_users:
-    class: RemoveInactiveUsersJob
-    queue: background
-    schedule: every month at 1am
   remove_inactive_sessions:
     class: RemoveInactiveSessionsJob
     queue: background
     schedule: every day at 1am
-  remove_inactive_teams:
-    class: RemoveInactiveTeamsJob
-    queue: background
-    schedule: every month at 2am
