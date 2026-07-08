@@ -170,7 +170,7 @@ class Browser
     def log_pending_requests(page, url)
       pending = page.network.traffic.select(&:pending?)
       details = pending.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
-      Rails.logger.warn("Browser.get: network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s on #{url}, #{pending.size} pending: #{details}")
+      Sentry.logger.warn("Browser.get: network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s on #{url}, #{pending.size} pending: #{details}")
     end
 
     def browser
