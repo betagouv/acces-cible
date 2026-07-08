@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/betagouv/acces-cible/compare/v1.1.0...v1.1.1) (2026-07-08)
+
+
+### Documentation
+
+* Clean up README ([#625](https://github.com/betagouv/acces-cible/issues/625)) ([e688747](https://github.com/betagouv/acces-cible/commit/e6887479fb18dc4a5ecc6849ede721ecbba09934))
+
 ## [1.1.0](https://github.com/betagouv/acces-cible/compare/v1.0.0...v1.1.0) (2026-07-08)
 
 
