@@ -1,6 +1,10 @@
 class Browser
-  PAGE_TIMEOUT = 1.minute
+  # Délai maximum par opération Ferrum (chaque go_to, evaluate, commande CDP…),
+  # remis à zéro à chaque appel — ce n'est pas un budget global de scraping
+  PAGE_TIMEOUT = 30.seconds
+  # Délai maximum pour le démarrage du processus Chrome, une seule fois à la création du browser
   PROCESS_TIMEOUT = 30.seconds
+  # Délai maximum d'attente pour que le réseau devienne inactif après le chargement d'une page
   NETWORK_IDLE_TIMEOUT = 10.seconds
   # Laisse le temps aux SPA de lancer leurs requêtes avant de mesurer l'idle
   NETWORK_IDLE_SETTLE_TIME = 1.second
@@ -133,17 +137,25 @@ class Browser
 
     def get(url)
       with_page do |page|
-        page.go_to(url)
-        sleep(NETWORK_IDLE_SETTLE_TIME)
-        unless page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
-          log_pending_requests(page, url)
+        # go_to retourne nil quand la navigation dépasse PAGE_TIMEOUT (Ferrum avale le TimeoutError) :
+        # inutile d'attendre l'idle, le réseau n'était déjà pas calme — on audite le DOM disponible
+        timed_out = page.go_to(url).nil?
+        if timed_out
+          log_pending_requests(page, url, reason: "navigation timed out after #{PAGE_TIMEOUT.to_i}s")
+        else
+          sleep(NETWORK_IDLE_SETTLE_TIME)
+          unless page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
+            log_pending_requests(page, url, reason: "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s")
+          end
         end
 
         {
           body: page.body,
           status: page.network.status,
-          content_type: page.network.response.content_type,
-          current_url: Link.normalize(page.current_url)
+          content_type: page.network.response&.content_type,
+          current_url: Link.normalize(page.current_url),
+          # ici on pourrait donner l'info que la page a timeout, et en informer l'utilisateur
+          timeout: timed_out
         }
       end
     end
@@ -167,10 +179,10 @@ class Browser
 
     private
 
-    def log_pending_requests(page, url)
+    def log_pending_requests(page, url, reason:)
       pending = page.network.traffic.select(&:pending?)
       details = pending.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
-      Sentry.logger.warn("Browser.get: network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s on #{url}, #{pending.size} pending: #{details}")
+      Sentry.logger.warn("Browser.get: #{reason} on #{url}, #{pending.size} pending: #{details}")
     end
 
     def browser
