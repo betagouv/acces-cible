@@ -1,12 +1,12 @@
 class Browser
-  # Délai maximum par opération Ferrum (chaque go_to, evaluate, commande CDP…),
-  # remis à zéro à chaque appel — ce n'est pas un budget global de scraping
+  # Maximum delay per Ferrum operation (each go_to, evaluate, CDP command…),
+  # reset on every call — this is not a global scraping budget
   PAGE_TIMEOUT = 30.seconds
-  # Délai maximum pour le démarrage du processus Chrome, une seule fois à la création du browser
+  # Maximum delay for the Chrome process to start, only once when the browser is created
   PROCESS_TIMEOUT = 30.seconds
-  # Délai maximum d'attente pour que le réseau devienne inactif après le chargement d'une page
+  # Maximum delay waiting for the network to become idle after a page load
   NETWORK_IDLE_TIMEOUT = 10.seconds
-  # Laisse le temps aux SPA de lancer leurs requêtes avant de mesurer l'idle
+  # Give SPAs time to fire their requests before measuring idleness
   NETWORK_IDLE_SETTLE_TIME = 1.second
   SUCCESS_CODE = 200
 
@@ -137,8 +137,6 @@ class Browser
 
     def get(url)
       with_page do |page|
-        # go_to retourne nil quand la navigation dépasse PAGE_TIMEOUT (Ferrum avale le TimeoutError) :
-        # inutile d'attendre l'idle, le réseau n'était déjà pas calme — on audite le DOM disponible
         timed_out = page.go_to(url).nil?
         if timed_out
           log_pending_requests(page, url, reason: "navigation timed out after #{PAGE_TIMEOUT.to_i}s")
@@ -152,10 +150,8 @@ class Browser
         {
           body: page.body,
           status: page.network.status,
-          content_type: page.network.response&.content_type,
-          current_url: Link.normalize(page.current_url),
-          # ici on pourrait donner l'info que la page a timeout, et en informer l'utilisateur
-          timeout: timed_out
+          content_type: page.network.response.content_type,
+          current_url: Link.normalize(page.current_url)
         }
       end
     end
@@ -180,9 +176,14 @@ class Browser
     private
 
     def log_pending_requests(page, url, reason:)
-      pending = page.network.traffic.select(&:pending?)
-      details = pending.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
-      Sentry.logger.warn("Browser.get: #{reason} on #{url}, #{pending.size} pending: #{details}")
+      pending_exchanges = page.network.traffic.select(&:pending?)
+      pending_details = pending_exchanges.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
+      message = "Browser.get: #{reason} on #{url}, #{pending_exchanges.size} pending: #{pending_details}"
+      if Sentry.initialized?
+        Sentry.logger.warn(message)
+      else
+        Rails.logger.warn(message)
+      end
     end
 
     def browser

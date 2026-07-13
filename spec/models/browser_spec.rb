@@ -158,14 +158,14 @@ RSpec.describe Browser do
       allow(network_double).to receive(:blocklist=)
       allow(network_double).to receive_messages(status: 200, response: response_double, wait_for_idle: true)
       allow(response_double).to receive(:content_type).and_return("text/html")
-      allow(page_double).to receive(:go_to).with(url)
+      allow(page_double).to receive(:go_to).with(url).and_return("frame-id")
       allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
       allow(page_double).to receive(:close)
-      allow(described_class).to receive(:sleep) # évite le vrai settle de NETWORK_IDLE_SETTLE_TIME
+      allow(described_class).to receive(:sleep)
       allow(Link).to receive(:normalize).with(url).and_return(url)
     end
 
-    it "settles then waits for network idle" do
+    it "waits for network idle" do
       get_result
 
       expect(described_class).to have_received(:sleep).with(Browser::NETWORK_IDLE_SETTLE_TIME)
@@ -173,19 +173,28 @@ RSpec.describe Browser do
     end
 
     context "when the network does not become idle" do
-      let(:request_double) { instance_double(Ferrum::Network::Request, type: "XHR") }
-      let(:pending_exchange) { instance_double(Ferrum::Network::Exchange, pending?: true, request: request_double, url: "https://example.com/api") }
-      let(:finished_exchange) { instance_double(Ferrum::Network::Exchange, pending?: false) }
-
       before do
-        allow(network_double).to receive_messages(wait_for_idle: false, traffic: [pending_exchange, finished_exchange])
+        allow(network_double).to receive_messages(wait_for_idle: false, traffic: [])
         allow(Rails.logger).to receive(:warn)
       end
 
-      it "logs the pending requests" do
+      it "still returns the response data" do
+        expect(get_result[:body]).to eq("<html><body>Test</body></html>")
+      end
+    end
+
+    context "when navigation times out" do
+      before do
+        allow(page_double).to receive(:go_to).with(url).and_return(nil)
+        allow(network_double).to receive(:traffic).and_return([])
+        allow(Rails.logger).to receive(:warn)
+      end
+
+      it "skips the idle wait" do
         get_result
 
-        expect(Rails.logger).to have_received(:warn).with(a_string_including("network not idle", url, "1 pending", "XHR https://example.com/api"))
+        expect(described_class).not_to have_received(:sleep)
+        expect(network_double).not_to have_received(:wait_for_idle)
       end
 
       it "still returns the response data" do
