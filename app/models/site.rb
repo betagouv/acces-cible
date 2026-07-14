@@ -3,12 +3,12 @@ class Site < ApplicationRecord
 
   belongs_to :team, touch: true
 
-  has_many :audits, -> { sort_by_newest }, dependent: :destroy
+  has_many :audits, -> { sort_by_newest }
 
   has_one :last_audit_without_html, -> { order(created_at: :desc).without_html }, class_name: "Audit"
   has_one :last_audit, -> { order(created_at: :desc) }, class_name: "Audit"
 
-  has_many :site_tags, dependent: :destroy
+  has_many :site_tags
   has_many :tags, -> { in_alphabetical_order }, through: :site_tags
 
   accepts_nested_attributes_for :tags, reject_if: :all_blank

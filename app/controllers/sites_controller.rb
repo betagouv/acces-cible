@@ -1,9 +1,8 @@
 class SitesController < ApplicationController
   include ActionController::Live
   include SitesFiltering
-  before_action :set_site, only: [:show, :edit, :update, :destroy]
+  before_action :set_site, only: [:show, :edit, :update]
   before_action :set_sites, only: [:index, :csv_export]
-  before_action :set_bulk_sites, only: :bulk_destroy
   before_action :redirect_old_slugs, except: [:index, :new, :create, :csv_export], if: :get_request?
 
   # GET /sites
@@ -77,19 +76,6 @@ class SitesController < ApplicationController
     end
   end
 
-  # DELETE /sites/1
-  def destroy
-    @site.destroy!
-    redirect_to sites_path, notice: t(".notice"), status: :see_other
-  end
-
-  # DELETE /sites
-  def bulk_destroy
-    count = @sites.count
-    @sites.in_batches(of: 100) { |batch| batch.destroy_all }
-    redirect_back fallback_location: sites_path, notice: t(".notice", count:), status: :see_other
-  end
-
   private
 
   def set_csv_headers
@@ -115,10 +101,6 @@ class SitesController < ApplicationController
 
   def set_sites
     @sites = filter_and_order_sites(sites_scope, ids: site_ids)
-  end
-
-  def set_bulk_sites
-    @sites = sites_scope.where(id: site_ids)
   end
 
   def redirect_old_slugs

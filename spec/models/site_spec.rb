@@ -19,9 +19,9 @@ RSpec.describe Site do
 
   describe "associations" do
     it { is_expected.to belong_to(:team).touch(true) }
-    it { is_expected.to have_many(:audits).dependent(:destroy) }
+    it { is_expected.to have_many(:audits) }
 
-    it { is_expected.to have_many(:site_tags).dependent(:destroy) }
+    it { is_expected.to have_many(:site_tags) }
     it { is_expected.to have_many(:tags).through(:site_tags) }
   end
 

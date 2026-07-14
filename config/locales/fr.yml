@@ -235,9 +235,7 @@ fr:
     back_to_home: "Revenir à la page d'accueil"
     back_to_list: "Revenir à la liste"
     cancel: Annuler
-    confirm: "Êtes-vous sûr ? Cette action ne peut pas être annulée."
     desc: décroissant
-    destroy_all: "Supprimer la sélection"
     filter: Filtrer
     help: Aide
     import: Importer
@@ -272,13 +270,6 @@ fr:
     create:
       created: Site ajouté
       new_audit: Site existant, nouvel audit programmé
-    destroy:
-      notice: Site supprimé
-    bulk_destroy:
-      notice:
-        one: Un site supprimé
-        other: "%{count} sites supprimés"
-        zero: Aucun site supprimé
     edit:
       title: Modifier le site
     form:
@@ -288,7 +279,6 @@ fr:
       url_hint: Saisissez une url valide, commençant par https:// ou http://
     index:
       caption: Tous les sites
-      deleting: Suppression…
       detail: Détails
       export_to_csv: Télécharger en CSV
       last_audit_at: Dernière vérification
@@ -306,7 +296,6 @@ fr:
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications
-      delete: Supprimer ce site
       edit: Modifier ce site
       new_audit: Nouvelle vérification
       no_tag: Aucune étiquette
@@ -328,8 +317,6 @@ fr:
         other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
-    destroy:
-      notice: Étiquette supprimée
     edit:
       title: Modifier l'étiquette
     index:
@@ -340,7 +327,6 @@ fr:
       sites: Sites
       title: Toutes les étiquettes
     show:
-      delete: Supprimer cette étiquette
       edit: Modifier cette étiquette
       name: Libellé
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"

@@ -221,44 +221,4 @@ RSpec.describe "Tags" do
       end
     end
   end
-
-  describe "DELETE /tags/:id" do
-    subject(:delete_tag) { delete tag_path(tag) }
-
-    let!(:tag) { create(:tag, team:) }
-
-    it "destroys the tag and redirects to index" do
-      expect { delete_tag }.to change(Tag, :count).by(-1)
-
-      expect(response).to redirect_to(tags_path)
-      expect(response).to have_http_status(:see_other)
-      follow_redirect!
-      expect(flash[:notice]).to be_present
-    end
-
-    context "when tag has associated sites" do
-      before do
-        site = create(:site, team:)
-        tag.sites << site
-      end
-
-      it "destroys the tag and its associations" do
-        expect { delete_tag }.to change(Tag, :count).by(-1)
-          .and change(SiteTag, :count).by(-1)
-
-        expect(response).to redirect_to(tags_path)
-      end
-    end
-
-    context "when tag belongs to another team" do
-      let(:other_team) { create(:team) }
-      let(:tag) { create(:tag, team: other_team) }
-
-      it "returns not found status" do
-        delete_tag
-
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-  end
 end
