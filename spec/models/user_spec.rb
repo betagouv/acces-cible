@@ -5,6 +5,8 @@ RSpec.describe User do
 
   it { is_expected.to be_valid }
 
+  it_behaves_like "a privileged model"
+
   describe "validations" do
     context "for uid" do
       it { is_expected.to allow_value("12345678901234").for(:uid) }
