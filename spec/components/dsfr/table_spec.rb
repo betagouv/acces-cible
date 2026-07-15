@@ -102,6 +102,26 @@ RSpec.describe Dsfr::TableComponent, type: :component do
     end
   end
 
+  describe "selectable" do
+    context "when selectable is true" do
+      let(:params) { { caption:, selectable: true } }
+
+      it "renders the selection counter detail block" do
+        expect(rendered_component).to have_css("div.fr-table__header div.fr-table__detail", visible: :all) do |detail|
+          expect(detail).to have_css("span[data-table-target=counter]", visible: :all)
+          expect(detail).to have_css("span[data-table-target=counterOne]", visible: :all)
+          expect(detail).to have_css("span[data-table-target=counterMany]", visible: :all)
+        end
+      end
+    end
+
+    context "when selectable is not set" do
+      it "does not render the selection counter detail block" do
+        expect(rendered_component).not_to have_css("div.fr-table__detail", visible: :all)
+      end
+    end
+  end
+
   describe "slots" do
     it "renders the head slot content" do
       render_inline(component) do |c|

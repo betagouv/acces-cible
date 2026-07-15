@@ -15,7 +15,7 @@
   <%= hidden_field_tag "filter[q]", params.dig(:filter, :q) %>
 <% end %>
 
-<%= dsfr_table(caption: t('.caption'), border: true, size: :lg) do |t| %>
+<%= dsfr_table(caption: t('.caption'), border: true, size: :lg, selectable: true) do |t| %>
 
   <% hidden_search_fields = flatten_params(:sort, :filter, :limit).except("filter[q]") %>
   <% t.with_search(url: url_for, name: "filter[q]", value: params.dig(:filter, :q), hidden_fields: hidden_search_fields) %>

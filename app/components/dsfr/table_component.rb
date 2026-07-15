@@ -24,7 +24,7 @@ module Dsfr
     private
 
     attr_reader :caption, :pagy, :html_attributes
-    store_accessor :options, :size, :border, :scroll, :caption_side
+    store_accessor :options, :size, :border, :scroll, :caption_side, :selectable
 
     def wrapper_attributes
       html_attributes.merge(class: table_classes, data: { controller: :table, table_hidden_class: "fr-hidden" })
@@ -50,8 +50,12 @@ module Dsfr
       header_actions.any?
     end
 
+    def selectable?
+      !!selectable
+    end
+
     def header?
-      search? || header_actions?
+      search? || header_actions? || selectable?
     end
   end
 end
