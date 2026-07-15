@@ -6,8 +6,6 @@ class Browser
   PROCESS_TIMEOUT = 30.seconds
   # Maximum delay waiting for the network to become idle after a page load
   NETWORK_IDLE_TIMEOUT = 10.seconds
-  # Give SPAs time to fire their requests before measuring idleness
-  NETWORK_IDLE_SETTLE_TIME = 1.second
   SUCCESS_CODE = 200
 
   REQUEST_HEADERS = {
@@ -137,15 +135,8 @@ class Browser
 
     def get(url)
       with_page do |page|
-        timed_out = page.go_to(url).nil?
-        if timed_out
-          log_pending_requests(page, url, reason: "navigation timed out after #{PAGE_TIMEOUT.to_i}s")
-        else
-          sleep(NETWORK_IDLE_SETTLE_TIME)
-          unless page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
-            log_pending_requests(page, url, reason: "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s")
-          end
-        end
+        issue = visit_and_wait_for_idle(page, url)
+        log_pending_requests(page, url, reason: issue) if issue
 
         {
           body: page.body,
@@ -175,15 +166,17 @@ class Browser
 
     private
 
+    def visit_and_wait_for_idle(page, url)
+      return "navigation timed out after #{PAGE_TIMEOUT.to_i}s" if page.go_to(url).nil?
+
+      idle = page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
+      "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s" unless idle
+    end
+
     def log_pending_requests(page, url, reason:)
       pending_exchanges = page.network.traffic.select(&:pending?)
       pending_details = pending_exchanges.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
-      message = "Browser.get: #{reason} on #{url}, #{pending_exchanges.size} pending: #{pending_details}"
-      if Sentry.initialized?
-        Sentry.logger.warn(message)
-      else
-        Rails.logger.warn(message)
-      end
+      Rails.logger.warn("Browser.get: #{reason} on #{url}, #{pending_exchanges.size} pending: #{pending_details}")
     end
 
     def browser
