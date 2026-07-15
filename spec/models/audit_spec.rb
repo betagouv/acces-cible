@@ -9,7 +9,7 @@ RSpec.describe Audit do
 
   describe "associations" do
     it { is_expected.to belong_to(:site) }
-    it { is_expected.to have_many(:checks) }
+    it { is_expected.to have_many(:checks).dependent(:destroy) }
   end
 
   describe "scopes" do

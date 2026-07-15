@@ -2,7 +2,7 @@ class Tag < ApplicationRecord
   extend FriendlyId
 
   belongs_to :team
-  has_many :site_tags
+  has_many :site_tags, dependent: :destroy
   has_many :sites, through: :site_tags
 
   friendly_id :name, use: [:slugged, :history, :scoped], scope: :team_id
