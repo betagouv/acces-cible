@@ -135,8 +135,7 @@ class Browser
 
     def get(url)
       with_page do |page|
-        issue = visit_and_wait_for_idle(page, url)
-        log_pending_requests(page, url, reason: issue) if issue
+        visit(page, url)
 
         {
           body: page.body,
@@ -166,17 +165,21 @@ class Browser
 
     private
 
-    def visit_and_wait_for_idle(page, url)
-      return "navigation timed out after #{PAGE_TIMEOUT.to_i}s" if page.go_to(url).nil?
-
-      idle = page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
-      "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s" unless idle
+    def visit(page, url)
+      navigation_issue =
+        if page.go_to(url).nil?
+          "navigation timed out after #{PAGE_TIMEOUT.to_i}s"
+        elsif !page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
+          "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s"
+        end
+      log_pending_requests(page, url, reason: navigation_issue) if navigation_issue
     end
 
     def log_pending_requests(page, url, reason:)
-      pending_exchanges = page.network.traffic.select(&:pending?)
-      pending_details = pending_exchanges.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
-      Rails.logger.warn("Browser.get: #{reason} on #{url}, #{pending_exchanges.size} pending: #{pending_details}")
+      pendings = page.network.traffic.select(&:pending?)
+      details = pendings.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
+
+      Rails.logger.warn("Browser.get: #{reason} on #{url}, #{pendings.size} pending: #{details}")
     end
 
     def browser
