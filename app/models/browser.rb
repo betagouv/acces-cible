@@ -140,7 +140,7 @@ class Browser
         {
           body: page.body,
           status: page.network.status,
-          content_type: page.network.response.content_type,
+          content_type: page.evaluate("document.contentType"),
           current_url: Link.normalize(page.current_url)
         }
       end

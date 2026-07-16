@@ -149,16 +149,15 @@ RSpec.describe Browser do
     let(:headers_double) { instance_double(Ferrum::Headers) }
     let(:network_double) { instance_double(Ferrum::Network) }
     let(:page_double) { instance_double(Ferrum::Page) }
-    let(:response_double) { instance_double(Ferrum::Network::Response) }
 
     before do
       allow(described_class).to receive(:browser).and_return(browser_double)
       allow(browser_double).to receive(:create_page).with(new_context: true).and_yield(page_double)
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
-      allow(network_double).to receive_messages(status: 200, response: response_double, wait_for_idle: true)
-      allow(response_double).to receive(:content_type).and_return("text/html")
+      allow(network_double).to receive_messages(status: 200, wait_for_idle: true)
       allow(page_double).to receive(:go_to).with(url).and_return("frame-id")
+      allow(page_double).to receive(:evaluate).with("document.contentType").and_return("text/html")
       allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
       allow(page_double).to receive(:close)
       allow(Link).to receive(:normalize).with(url).and_return(url)
@@ -215,6 +214,10 @@ RSpec.describe Browser do
 
     it "returns correct status code" do
       expect(get_result[:status]).to eq(200)
+    end
+
+    it "returns the document content type" do
+      expect(get_result[:content_type]).to eq("text/html")
     end
 
     it "returns normalized current URL" do

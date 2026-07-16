@@ -11,9 +11,6 @@ class Tag < ApplicationRecord
   validates :name, uniqueness: { scope: :team_id }, if: :name_changed?
 
   scope :in_alphabetical_order, -> { order(:name) }
-  scope :orphaned, -> { where.missing(:site_tags) }
-  scope :not_recently_used, -> { where(updated_at: ..1.day.ago) }
-
   def to_s
     name
   end

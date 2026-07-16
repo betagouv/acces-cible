@@ -5,6 +5,8 @@ RSpec.describe Team do
 
   it { is_expected.to be_valid }
 
+  it_behaves_like "a privileged model"
+
   describe "associations" do
     it { is_expected.to have_many(:users) }
     it { is_expected.to have_many(:sites) }

@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Privileged
+
   MAX_IDLE_TIME = 1.year
 
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
