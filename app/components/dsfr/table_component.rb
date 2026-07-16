@@ -50,12 +50,8 @@ module Dsfr
       header_actions.any?
     end
 
-    def selectable?
-      !!selectable
-    end
-
     def header?
-      search? || header_actions? || selectable?
+      search? || header_actions? || selectable
     end
   end
 end

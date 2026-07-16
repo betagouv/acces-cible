@@ -2,7 +2,7 @@
   <% if header? -%>
     <div class="fr-table__header">
       <%= search if search? %>
-      <% if selectable? %>
+      <% if selectable %>
         <div class="fr-table__detail fr-hidden" data-table-target="detail">
           <span data-table-target="counter"></span>
           <span data-table-target="counterOne"><%= t("shared.selected_lines", count: 1) %></span>
