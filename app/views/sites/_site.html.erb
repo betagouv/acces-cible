@@ -2,8 +2,8 @@
 
 <tr id="<%= dom_id(site, :sites_table) %>">
   <%= dsfr_row_check(site) %>
-  <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: site.name_with_fallback), url_for([site, last_audit]), title: t('.view_name', name: site.name_with_fallback), line: true, side: :left, sr_only: true) %></td>
   <% display_url = site.normalized_url %>
+  <td class="fr-cell--center"><%= link_icon(:article, t('.view_name', name: display_url), url_for([site, last_audit]), title: t('.view_name', name: display_url), line: true, side: :left, sr_only: true) %></td>
   <% truncated_url = display_url.truncate(ApplicationHelper::TRUNCATION_LENGTH, separator: /\W/) %>
   <% href = Link.safe_external_url(site.url) %>
   <td>

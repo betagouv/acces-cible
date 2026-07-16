@@ -97,7 +97,7 @@ RSpec.describe "Sites" do
   describe "GET /sites/:id" do
     subject(:get_site) { get site_path(site) }
 
-    let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+    let(:site) { create(:site, :with_data, team:) }
 
     it "returns success" do
       get_site
@@ -129,7 +129,7 @@ RSpec.describe "Sites" do
     end
 
     context "when redirected URLs contain HTML" do
-      let(:site) { create(:site, :with_data, team:, name: "Example Site") }
+      let(:site) { create(:site, :with_data, team:) }
       let(:reachable_check) { site.last_audit.reachable }
 
       before do

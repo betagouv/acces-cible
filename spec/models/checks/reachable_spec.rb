@@ -41,23 +41,6 @@ RSpec.describe Checks::Reachable do
     end
 
     context "when the site is reachable" do
-      context "when the site has a blank name" do
-        it "updates the site name" do
-          expect(site).to receive(:update).with(name: root_page.title)
-
-          check.send(:analyze!)
-        end
-      end
-
-      context "when the site already has a name" do
-        it "doesn't update site name" do
-          allow(site).to receive(:name).and_return("Site name already set")
-          expect(site).not_to receive(:update)
-
-          check.send(:analyze!)
-        end
-      end
-
       context "when the page does not redirect" do
         let(:home_page_url) { original_url }
 

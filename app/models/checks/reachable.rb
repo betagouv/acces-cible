@@ -30,8 +30,6 @@ module Checks
     def analyze!
       return unless root_page.success?
 
-      site.update(name: root_page.title) if site && site.name.blank?
-
       if redirected?
         { original_url: site.url, redirect_url: audit.home_page_url }
       else

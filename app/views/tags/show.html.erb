@@ -8,7 +8,7 @@
     <% t.with_body do %>
       <% @sites.each do |site| %>
         <tr>
-          <td><%= dsfr_link_to site.to_s, site %></td>
+          <td><%= dsfr_link_to site.normalized_url, site %></td>
         </tr>
       <% end %>
     <% end %>
