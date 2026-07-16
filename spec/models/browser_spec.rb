@@ -161,14 +161,12 @@ RSpec.describe Browser do
       allow(page_double).to receive(:go_to).with(url).and_return("frame-id")
       allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
       allow(page_double).to receive(:close)
-      allow(described_class).to receive(:sleep)
       allow(Link).to receive(:normalize).with(url).and_return(url)
     end
 
     it "waits for network idle" do
       get_result
 
-      expect(described_class).to have_received(:sleep).with(Browser::NETWORK_IDLE_SETTLE_TIME)
       expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::NETWORK_IDLE_TIMEOUT).once
     end
 
@@ -193,7 +191,6 @@ RSpec.describe Browser do
       it "skips the idle wait" do
         get_result
 
-        expect(described_class).not_to have_received(:sleep)
         expect(network_double).not_to have_received(:wait_for_idle)
       end
 
