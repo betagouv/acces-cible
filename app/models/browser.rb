@@ -114,7 +114,7 @@ class Browser
         headless: :new,
         timeout: PAGE_TIMEOUT,
         process_timeout: PROCESS_TIMEOUT,
-        pending_connection_errors: true,
+        pending_connection_errors: false,
         extensions: [STEALTH_EXTENSION],
         browser_options: browser_options
       }.tap do |options|
