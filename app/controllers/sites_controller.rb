@@ -1,9 +1,9 @@
 class SitesController < ApplicationController
   include ActionController::Live
   include SitesFiltering
-  before_action :set_site, only: [:show, :edit, :update]
+  before_action :set_site, only: :show
   before_action :set_sites, only: [:index, :csv_export]
-  before_action :redirect_old_slugs, except: [:index, :new, :create, :csv_export], if: :get_request?
+  before_action :redirect_old_slugs, only: :show
 
   # GET /sites
   def index
@@ -34,9 +34,6 @@ class SitesController < ApplicationController
   # GET /sites/new
   def new; end
 
-  # GET /sites/1/edit
-  def edit; end
-
   # POST /sites
   def create
     normalized_url = Link.url_without_scheme_and_www(site_params[:url])
@@ -64,15 +61,6 @@ class SitesController < ApplicationController
       redirect_to sites_path, notice: t(".started", count: @upload.count)
     else
       render :new, status: :unprocessable_content
-    end
-  end
-
-  # PATCH/PUT /sites/1
-  def update
-    if @site.update(site_params)
-      redirect_to @site, notice: t(".notice"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
     end
   end
 

@@ -5,5 +5,5 @@
 
   <%= render "tags_form", object: f.object %>
 
-  <%= f.submit t("shared.#{site.persisted? ? :save : :add}"), name: nil, class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
+  <%= f.submit t("shared.add"), name: nil, class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
 <% end %>

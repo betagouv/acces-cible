@@ -8,8 +8,8 @@ Rails.application.routes.draw do
     delete :logout, action: :destroy, as: :logout
   end
 
-  resources :tags, except: [:new, :destroy]
-  resources :sites, except: :destroy do
+  resources :tags, only: [:index, :create, :show]
+  resources :sites, only: [:index, :new, :create, :show] do
     collection do
       post :upload
       get :csv_export

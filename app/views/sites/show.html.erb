@@ -49,7 +49,6 @@
 
 <%= page_actions do %>
   <%= button_to t(".new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
-  <%= link_to t(".edit"), [:edit, @site], class: "fr-btn fr-btn--secondary" %>
   <%= link_to t("shared.see_help"), help_path, class: "fr-btn fr-btn--tertiary-no-outline" %>
   <%= link_to t("shared.back_to_list"), { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>

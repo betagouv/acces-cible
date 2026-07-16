@@ -252,7 +252,6 @@ fr:
         other: "%{count} lignes par page"
       per_page_label: Nombre de lignes par page
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
-    save: Enregistrer
     saving: Enregistrement…
     see_help: "Voir la page d'aide"
     select_name: "Sélectionner %{name}"
@@ -270,8 +269,6 @@ fr:
     create:
       created: Site ajouté
       new_audit: Site existant, nouvel audit programmé
-    edit:
-      title: Modifier le site
     form:
       name: Nom du site
       name_hint: "Nom utilisé pour l'affichage. S'il est laissé vide, il est récupéré automatiquement lors du prochain audit."
@@ -296,7 +293,6 @@ fr:
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications
-      edit: Modifier ce site
       new_audit: Nouvelle vérification
       no_tag: Aucune étiquette
       tag: Étiquette %{name}
@@ -307,8 +303,6 @@ fr:
       add: Créer une nouvelle étiquette
       all: Toutes les étiquettes
       new: Nouvelle étiquette
-    update:
-      notice: Site modifié
     upload:
       title: Importer des sites
       started:
@@ -317,8 +311,6 @@ fr:
         other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
-    edit:
-      title: Modifier l'étiquette
     index:
       caption: Toutes les étiquettes
       empty: Aucune étiquette
@@ -327,11 +319,8 @@ fr:
       sites: Sites
       title: Toutes les étiquettes
     show:
-      edit: Modifier cette étiquette
       name: Libellé
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
-    update:
-      notice: Étiquette modifiée
   time:
     formats:
       complete: "%d/%m/%Y à %H:%M"
