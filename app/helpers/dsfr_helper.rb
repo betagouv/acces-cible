@@ -1,6 +1,6 @@
 module DsfrHelper
-  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, **html_attributes, &block)
-    render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, html_attributes:), &block
+  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, selectable: false, **html_attributes, &block)
+    render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, selectable:, html_attributes:), &block
   end
 
   def dsfr_tooltip(text, title:, type: :button)

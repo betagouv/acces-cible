@@ -26,19 +26,21 @@ export default class extends Controller {
   }
 
   updateCounter() {
+    if (!this.hasCounterTarget) return
+
     const count = this.checkedCount
     this.counter = count
     switch(count) {
       case 0:
         this.toggleAllTarget.checked = false
-        this.hide(this.detailTarget, this.buttonTarget)
+        this.hide(this.detailTarget, ...this.buttonTargets)
         break
       case 1:
-        this.show(this.detailTarget, this.counterOneTarget, this.buttonTarget)
+        this.show(this.detailTarget, this.counterOneTarget, ...this.buttonTargets)
         this.hide(this.counterManyTarget)
         break
       default:
-        this.show(this.detailTarget, this.counterManyTarget, this.buttonTarget)
+        this.show(this.detailTarget, this.counterManyTarget, ...this.buttonTargets)
         this.hide(this.counterOneTarget)
     }
   }

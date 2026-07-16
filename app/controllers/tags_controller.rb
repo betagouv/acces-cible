@@ -1,5 +1,5 @@
 class TagsController < ApplicationController
-  before_action :set_tag, only: [:show, :edit, :update, :destroy]
+  before_action :set_tag, only: [:show, :edit, :update]
   before_action :redirect_old_slugs, only: [:show, :edit], if: :get_request?
 
   # GET /tags
@@ -36,12 +36,6 @@ class TagsController < ApplicationController
     else
       render :edit, status: :unprocessable_content
     end
-  end
-
-  # DELETE /tags/1
-  def destroy
-    @tag.destroy!
-    redirect_to tags_path, notice: t(".notice"), status: :see_other
   end
 
   private

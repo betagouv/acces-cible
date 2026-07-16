@@ -33,12 +33,6 @@ Fonctionnalité: Page des étiquettes
     Et la page contient "privé"
     Et la page ne contient pas "secret"
 
-  Scénario: Un agent peut supprimer un étiquette
-    Et que je clique sur "secret"
-    Quand je clique sur "Supprimer cette étiquette"
-    Alors la page contient "Étiquette supprimée"
-    Et la page ne contient pas "secret"
-
   Scénario: Un agent peut voir les sites associés à un tag sur sa page
     Et que je clique sur "secret"
     Et que je clique sur "Sites avec l'étiquette secret (2)"
