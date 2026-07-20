@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/betagouv/acces-cible/compare/v1.1.1...v1.2.0) (2026-07-20)
+
+
+### Features
+
+* Add `Privileged` concern to `Team` and `User` models ([#639](https://github.com/betagouv/acces-cible/issues/639)) ([5dfeb47](https://github.com/betagouv/acces-cible/commit/5dfeb476c96ac7fbd685eb637697e05ef00e3ab8))
+* Prevent site, audit and tag deletion from interface ([#637](https://github.com/betagouv/acces-cible/issues/637)) ([a5dd166](https://github.com/betagouv/acces-cible/commit/a5dd1667107f4542f9844ed8228849b39e80ab61))
+* Remove `name` column from `sites` ([#641](https://github.com/betagouv/acces-cible/issues/641)) ([0b0bf74](https://github.com/betagouv/acces-cible/commit/0b0bf74b206bdb253746c873c27a73344273f9a7))
+
+
+### Bug Fixes
+
+* content type nil error ([#614](https://github.com/betagouv/acces-cible/issues/614)) ([f0586eb](https://github.com/betagouv/acces-cible/commit/f0586eb82717ae4a238aabe36c7b4377f38105c5))
+* Network idling and timeout too long ([#627](https://github.com/betagouv/acces-cible/issues/627)) ([0074c45](https://github.com/betagouv/acces-cible/commit/0074c45d07e7db98032eda878af6531475ced11f))
+
 ## [1.1.1](https://github.com/betagouv/acces-cible/compare/v1.1.0...v1.1.1) (2026-07-08)
 
 
