@@ -60,7 +60,7 @@ class Page
   end
 
   def external_links
-    links - internal_links
+    links.reject { |link| Link.internal?(link.href, root) }
   end
 
   def inspect
@@ -91,7 +91,7 @@ class Page
       href = parsed_root.join(uri) unless uri.absolute?
       text = [link.text, link.at_css("img")&.attribute("alt")&.value].compact.join(" ").squish
       Link.new(href:, text:)
-    rescue Link::InvalidUriError
+    rescue Addressable::URI::InvalidURIError
       next
     end.compact
   end
