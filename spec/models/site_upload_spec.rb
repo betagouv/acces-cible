@@ -8,11 +8,11 @@ RSpec.describe SiteUpload do
   let(:tag_ids) { [] }
   let(:parsed_sites_data) do
     [
-      { "url" => "https://example.com/", "name" => "Example Site", "tag_names" => [] },
-      { "url" => "https://test.com/", "name" => "Test Site", "tag_names" => [] }
+      { "url" => "https://example.com/", "tag_names" => [] },
+      { "url" => "https://test.com/", "tag_names" => [] }
     ]
   end
-  let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttps://test.com/,Test Site" }
+  let(:csv_content) { "url\nhttps://example.com/\nhttps://test.com/" }
   let(:encoding) { Encoding::UTF_8 }
   let(:csv) do
     Tempfile.new(["sites", ".csv"], encoding:).tap do |f|
@@ -73,7 +73,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when headers are invalid" do
-      let(:csv_content) { "invalid_header,name\nhttps://example.com/,Example Site" }
+      let(:csv_content) { "invalid_header\nhttps://example.com/" }
 
       it "is invalid" do
         expect(site_upload).not_to be_valid
@@ -82,7 +82,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when headers are uppercase" do
-      let(:csv_content) { "URL,NAME\nhttps://example.com/,Example Site" }
+      let(:csv_content) { "URL\nhttps://example.com/" }
 
       it "ignores case" do
         expect(site_upload).to be_valid
@@ -100,7 +100,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when file uses semicolon separator" do
-      let(:csv_content) { "url;name\nhttps://example.com/;Example Site\nhttps://test.com/;Test Site" }
+      let(:csv_content) { "url;tags\nhttps://example.com/;coucou\nhttps://test.com/" }
 
       it "is valid" do
         expect(site_upload).to be_valid
@@ -108,7 +108,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when file uses semicolon separator with uppercase headers" do
-      let(:csv_content) { "URL;NAME\nhttps://example.com/;Example Site" }
+      let(:csv_content) { "URL;TAGS\nhttps://example.com/;coucou\nhttps://test.com/" }
 
       it "is valid" do
         expect(site_upload).to be_valid
@@ -201,7 +201,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when the CSV is malformed" do
-      let(:csv_content) { %(url,name\n"https://example.com/,Example Site) }
+      let(:csv_content) { %(url\n"https://example.com/) }
 
       it "returns false, adds an error, and logs the parsing failure" do
         allow(Rails.logger).to receive(:warn)
@@ -215,7 +215,7 @@ RSpec.describe SiteUpload do
     end
 
     context "when the CSV contains invalid URLs" do
-      let(:csv_content) { "url,name\nhttps://example.com/,Example Site\nhttp://,Broken" }
+      let(:csv_content) { "url\nhttps://example.com/\nhttp://" }
 
       before do
         allow(Rails.logger).to receive(:warn)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_02_124628) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_16_121525) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,7 +80,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_124628) do
     t.integer "audits_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "last_audited_at"
-    t.string "name"
     t.string "normalized_url", null: false
     t.string "slug", null: false
     t.integer "tags_count", default: 0, null: false

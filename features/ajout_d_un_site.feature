@@ -1,6 +1,7 @@
 # language: fr
 
 Fonctionnalité: Ajout d'un site
+
   Contexte:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
@@ -11,7 +12,6 @@ Fonctionnalité: Ajout d'un site
     Quand je clique sur "Ajouter"
     Alors la page contient "Adresse du site n'est pas valide"
     Quand je remplis "Adresse du site" avec "https://beta.gouv.fr/"
-    Et que je remplis "Nom du site" avec "beta.gouv.fr"
     Quand je clique sur "Ajouter"
     Alors la page contient "Site ajouté"
 

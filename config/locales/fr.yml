@@ -273,8 +273,6 @@ fr:
     edit:
       title: Modifier le site
     form:
-      name: Nom du site
-      name_hint: "Nom utilisé pour l'affichage. S'il est laissé vide, il est récupéré automatiquement lors du prochain audit."
       url: Adresse du site
       url_hint: Saisissez une url valide, commençant par https:// ou http://
     index:

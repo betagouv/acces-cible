@@ -13,7 +13,7 @@ class SiteBatchCreationService
       update_site(site, site_data, tag_ids)
       site.audit!(user: @user)
     else
-      Site.create!(url: site_data["url"], team: @team, name: site_data["name"], tag_ids:).audit!(user: @user)
+      Site.create!(url: site_data["url"], team: @team, tag_ids:).audit!(user: @user)
     end
   end
 
@@ -21,7 +21,6 @@ class SiteBatchCreationService
 
   def update_site(site, site_data, site_tag_ids)
     site.tag_ids = site_tag_ids.union(site.tag_ids)
-    site.name = site_data["name"] if site_data["name"].present? && site.name.blank?
     site.save!
   end
 

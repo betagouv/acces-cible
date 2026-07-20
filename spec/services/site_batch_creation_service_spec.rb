@@ -27,7 +27,6 @@ RSpec.describe SiteBatchCreationService do
         process_site
 
         expect(created_site.url).to eq(url)
-        expect(created_site.name).to eq("New Name")
         expect(created_site.team).to eq(team)
       end
 
@@ -57,22 +56,11 @@ RSpec.describe SiteBatchCreationService do
           expect(site_tags).to contain_exactly("tag_1", "tag_2", "extra_tag")
         end
       end
-
-      context "when the CSV name is missing" do
-        let(:site_data) { { "url" => url, "tag_names" => [] } }
-
-        it "creates the site without a name" do
-          process_site
-
-          expect(created_site.name).to be_nil
-        end
-      end
     end
 
     context "when the site already exists" do
       let(:existing_tag) { create(:tag, team:, name: "existing_tag") }
-      let(:site_name) { "Original Name" }
-      let!(:existing_site) { create(:site, team:, url:, name: site_name, tags: [existing_tag]) }
+      let!(:existing_site) { create(:site, team:, url:, tags: [existing_tag]) }
 
       it "does not create a new site" do
         expect { process_site }.not_to change(Site, :count)
@@ -92,20 +80,6 @@ RSpec.describe SiteBatchCreationService do
         process_site
 
         expect(existing_site.last_audit.user).to eq(user)
-      end
-
-      context "when the site name is blank" do
-        let(:site_name) { "" }
-
-        it "updates the name from the CSV" do
-          expect { process_site }.to change { existing_site.reload.name }.from("").to("New Name")
-        end
-      end
-
-      context "when the site name is already present" do
-        it "does not overwrite the existing name" do
-          expect { process_site }.not_to change { existing_site.reload.name }
-        end
       end
 
       context "when a selected tag is already attached and present in the CSV" do

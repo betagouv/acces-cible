@@ -25,7 +25,7 @@ module SitesFiltering
     term = "%#{search_query}%"
 
     scope.where(
-      "sites.name ILIKE ? OR sites.url ILIKE ?",
+      "sites.normalized_url ILIKE ? OR sites.url ILIKE ?",
       term,
       term
     )

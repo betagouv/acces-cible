@@ -2,13 +2,13 @@
   <%= dsfr_table(caption: t('tags.all', default: t('sites.index.caption'))) do |t| %>
     <% t.with_head do %>
       <tr>
-        <th scope="col" aria-sort="ascending"><%= t('.name', default: t('site.name')) %></th>
+        <th scope="col" aria-sort="ascending"><%= t('.name') %></th>
       </tr>
     <% end %>
     <% t.with_body do %>
       <% @sites.each do |site| %>
         <tr>
-          <td><%= dsfr_link_to site.to_s, site %></td>
+          <td><%= dsfr_link_to site.normalized_url, site %></td>
         </tr>
       <% end %>
     <% end %>

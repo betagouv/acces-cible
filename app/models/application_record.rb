@@ -39,8 +39,4 @@ class ApplicationRecord < ActiveRecord::Base
       "#{count} #{model_name.human(count:).downcase}"
     end
   end
-
-  def to_title
-    respond_to?(:name) ? name : to_s
-  end
 end

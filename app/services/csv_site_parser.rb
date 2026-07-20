@@ -63,10 +63,10 @@ class CsvSiteParser
   def report_malformed_csv(error)
     Rails.logger.warn(
       "site_upload_malformed_csv " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
+        "team_id=#{team&.id} " \
+        "filename=#{file&.original_filename} " \
+        "error_class=#{error.class.name} " \
+        "error_message=#{error.message}"
     )
     errors.add(:file, :malformed_csv)
   end
@@ -74,34 +74,27 @@ class CsvSiteParser
   def report_invalid_url(error, raw_url, line_number)
     Rails.logger.warn(
       "site_upload_invalid_url " \
-      "team_id=#{team&.id} " \
-      "filename=#{file&.original_filename} " \
-      "line_number=#{line_number} " \
-      "raw_url=#{raw_url} " \
-      "error_class=#{error.class.name} " \
-      "error_message=#{error.message}"
+        "team_id=#{team&.id} " \
+        "filename=#{file&.original_filename} " \
+        "line_number=#{line_number} " \
+        "raw_url=#{raw_url} " \
+        "error_class=#{error.class.name} " \
+        "error_message=#{error.message}"
     )
     errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
   end
 
   def merge_site_data!(sites_by_url, url, row)
-    name = extract_name(row)
     site_data = sites_by_url[url] || build_site_data(url, row)
     site_data["tag_names"] = (site_data["tag_names"] + extract_tag_names(row)).uniq
-    site_data["name"] = name if name.present?
     sites_by_url[url] = site_data
   end
 
   def build_site_data(url, row)
     {
       "url" => url,
-      "name" => extract_name(row),
       "tag_names" => []
     }
-  end
-
-  def extract_name(row)
-    row["nom"] || row["name"]
   end
 
   def extract_tag_names(row)
