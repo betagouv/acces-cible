@@ -271,7 +271,7 @@ fr:
       created: Site ajouté
       new_audit: Site existant, nouvel audit programmé
     edit:
-      title: Modifier le site
+      title: Modifier les étiquettes du site
     form:
       url: Adresse du site
       url_hint: Saisissez une url valide, commençant par https:// ou http://
@@ -294,7 +294,7 @@ fr:
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications
-      edit: Modifier ce site
+      edit_tags: Modifier les étiquettes
       new_audit: Nouvelle vérification
       no_tag: Aucune étiquette
       tag: Étiquette %{name}
@@ -306,7 +306,7 @@ fr:
       all: Toutes les étiquettes
       new: Nouvelle étiquette
     update:
-      notice: Site modifié
+      notice: Étiquettes modifiées
     upload:
       title: Importer des sites
       started:
@@ -315,8 +315,6 @@ fr:
         other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
-    edit:
-      title: Modifier l'étiquette
     index:
       caption: Toutes les étiquettes
       empty: Aucune étiquette
@@ -325,11 +323,8 @@ fr:
       sites: Sites
       title: Toutes les étiquettes
     show:
-      edit: Modifier cette étiquette
       name: Libellé
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
-    update:
-      notice: Étiquette modifiée
   time:
     formats:
       complete: "%d/%m/%Y à %H:%M"

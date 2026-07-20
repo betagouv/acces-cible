@@ -24,15 +24,6 @@ Fonctionnalité: Page des étiquettes
       | suresnes.fr       |
       | numerique.gouv.fr |
 
-  Scénario: Un agent peut modifier un étiquette
-    Et que je clique sur "secret"
-    Quand je clique sur "Modifier cette étiquette"
-    Et que je remplis "Libellé" avec "privé"
-    Et que je clique sur "Enregistrer"
-    Alors la page contient "Étiquette modifiée"
-    Et la page contient "privé"
-    Et la page ne contient pas "secret"
-
   Scénario: Un agent peut voir les sites associés à un tag sur sa page
     Et que je clique sur "secret"
     Et que je clique sur "Sites avec l'étiquette secret (2)"

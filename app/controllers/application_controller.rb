@@ -40,8 +40,4 @@ class ApplicationController < ActionController::Base
   def layout_selector
     "modal" if turbo_frame_request_id == "modal" # => link with "data-turbo-frame": :modal
   end
-
-  def get_request?
-    request.request_method_symbol == :get
-  end
 end

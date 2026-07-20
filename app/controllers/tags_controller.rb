@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
-  before_action :set_tag, only: [:show, :edit, :update]
-  before_action :redirect_old_slugs, only: [:show, :edit], if: :get_request?
+  before_action :set_tag, only: :show
+  before_action :redirect_old_slugs, only: :show
 
   # GET /tags
   def index
@@ -25,19 +25,6 @@ class TagsController < ApplicationController
     @pagy, @sites = pagy @tag.sites
   end
 
-  # GET /tags/1/edit
-  def edit
-  end
-
-  # PUT/PATCH /tags/1
-  def update
-    if @tag.update(tag_params)
-      redirect_to @tag, notice: t(".notice"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
-  end
-
   private
 
   def upload?
@@ -46,10 +33,6 @@ class TagsController < ApplicationController
 
   def template_object_klass
     upload? ? SiteUpload : Site
-  end
-
-  def tag_params
-    params.expect(tag: [:name])
   end
 
   def set_tag
