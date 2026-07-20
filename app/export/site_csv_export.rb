@@ -4,7 +4,6 @@ class SiteCsvExport
 
   HEADERS = [
     I18n.t("audit.site_url_address"),
-    I18n.t("site.name"),
     I18n.t("audit.url"),
     I18n.t("audit.redirect_url"),
     I18n.t("tags.all"),
@@ -52,7 +51,6 @@ class SiteCsvExport
 
         row = [
           site.normalized_url,
-          site.name,
           site.url,
           audit.reachable.redirect_url,
           site.tags_list,

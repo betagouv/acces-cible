@@ -4,7 +4,7 @@ module PageHelper
   def page_title
     return @title unless @title.blank?
     return content_for(:title) if content_for?(:title)
-    return resource.to_title if action_name == "show"
+    return resource.to_s if action_name == "show"
 
     action = case action_name.to_sym
     when :create then :new

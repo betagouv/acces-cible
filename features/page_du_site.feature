@@ -9,7 +9,6 @@ Fonctionnalité: Page du site
 
   Scénario: Un agent peut voir les détails d'un site
     Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr"
-    Et que je remplis "Nom du site" avec "beta.gouv.fr"
     Quand je clique sur "Ajouter"
     Alors la page contient "Site ajouté"
     Et la page contient "https://beta.gouv.fr"
@@ -17,7 +16,6 @@ Fonctionnalité: Page du site
 
   Scénario: Un agent peut demander une nouvelle vérification d'un site
     Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr"
-    Et que je remplis "Nom du site" avec "beta.gouv.fr"
     Quand je clique sur "Ajouter"
     Et que je clique sur "Nouvelle vérification"
     Alors la page contient "Historique des vérifications (2)"
