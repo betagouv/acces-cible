@@ -1,0 +1,7 @@
+<% use_centered_layout %>
+
+<%= form_with(model: @site) do |f| %>
+  <%= render "tags_form", object: f.object, focus: true %>
+
+  <%= f.submit t("shared.save"), class: "fr-btn", data: { turbo_submits_with: t("shared.saving") } %>
+<% end %>

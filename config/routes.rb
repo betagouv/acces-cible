@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   end
 
   resources :tags, only: [:index, :create, :show]
-  resources :sites, only: [:index, :new, :create, :show] do
+  resources :sites, only: [:index, :new, :create, :show, :edit, :update] do
     collection do
       post :upload
       get :csv_export

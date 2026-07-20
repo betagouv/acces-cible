@@ -252,6 +252,7 @@ fr:
         other: "%{count} lignes par page"
       per_page_label: Nombre de lignes par page
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
+    save: Enregistrer
     saving: Enregistrement…
     see_help: "Voir la page d'aide"
     select_name: "Sélectionner %{name}"
@@ -269,6 +270,8 @@ fr:
     create:
       created: Site ajouté
       new_audit: Site existant, nouvel audit programmé
+    edit:
+      title: Modifier les étiquettes du site
     form:
       url: Adresse du site
       url_hint: Saisissez une url valide, commençant par https:// ou http://
@@ -291,6 +294,7 @@ fr:
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications
+      edit_tags: Modifier les étiquettes
       new_audit: Nouvelle vérification
       no_tag: Aucune étiquette
       tag: Étiquette %{name}
@@ -301,6 +305,8 @@ fr:
       add: Créer une nouvelle étiquette
       all: Toutes les étiquettes
       new: Nouvelle étiquette
+    update:
+      notice: Étiquettes modifiées
     upload:
       title: Importer des sites
       started:

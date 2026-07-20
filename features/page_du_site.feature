@@ -36,6 +36,20 @@ Fonctionnalité: Page du site
     Et que je clique sur "Étiquette éticouette"
     Alors la page est titrée "éticouette"
 
+  Scénario: Un agent peut modifier les étiquettes d'un site
+    Sachant que je rajoute un site "https://example.gouv.fr"
+    Et que le site "https://example.gouv.fr" a les étiquettes "production, public"
+    Quand je clique sur "Tous les sites"
+    Et que je clique sur "Voir la fiche de example.gouv.fr"
+    Et que je clique sur "Modifier les étiquettes"
+    Et que je décoche "production"
+    Et que je remplis "Nouvelle étiquette" avec "éticouette"
+    Et que je clique sur "Enregistrer"
+    Alors la page contient "Étiquettes modifiées"
+    Et la page contient un lien vers l'étiquette "public"
+    Et la page contient un lien vers l'étiquette "éticouette"
+    Et la page ne contient pas "production"
+
   Scénario: Un agent peut voir un lien sur chaque étiquette associée au site
     Sachant que je rajoute un site "https://example.gouv.fr"
     Et que le site "https://example.gouv.fr" a les étiquettes "production, public"
