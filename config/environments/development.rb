@@ -8,6 +8,13 @@ Rails.application.configure do
 
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Log to STDOUT (visible in Docker) in addition to log/development.log.
+  # `rails server` does this broadcast itself, but bin/jobs (SolidQueue) does not.
+  # https://api.rubyonrails.org/classes/ActiveSupport/BroadcastLogger.html
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  file_logger   = ActiveSupport::Logger.new(Rails.root.join("log/development.log"))
+  config.logger = ActiveSupport::BroadcastLogger.new(stdout_logger, file_logger)
+
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 

@@ -155,9 +155,8 @@ RSpec.describe Browser do
       allow(browser_double).to receive(:create_page).with(new_context: true).and_yield(page_double)
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
-      allow(network_double).to receive(:wait_for_idle)
-      allow(network_double).to receive(:status).and_return(200)
-      allow(page_double).to receive(:go_to).with(url)
+      allow(network_double).to receive_messages(status: 200, wait_for_idle: true)
+      allow(page_double).to receive(:go_to).with(url).and_return("frame-id")
       allow(page_double).to receive(:evaluate).with("document.contentType").and_return("text/html")
       allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
       allow(page_double).to receive(:close)
@@ -167,7 +166,36 @@ RSpec.describe Browser do
     it "waits for network idle" do
       get_result
 
-      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::PAGE_TIMEOUT)
+      expect(network_double).to have_received(:wait_for_idle).with(timeout: Browser::NETWORK_IDLE_TIMEOUT).once
+    end
+
+    context "when the network does not become idle" do
+      before do
+        allow(network_double).to receive_messages(wait_for_idle: false, traffic: [])
+        allow(Rails.logger).to receive(:warn)
+      end
+
+      it "still returns the response data" do
+        expect(get_result[:body]).to eq("<html><body>Test</body></html>")
+      end
+    end
+
+    context "when navigation times out" do
+      before do
+        allow(page_double).to receive(:go_to).with(url).and_return(nil)
+        allow(network_double).to receive(:traffic).and_return([])
+        allow(Rails.logger).to receive(:warn)
+      end
+
+      it "skips the idle wait" do
+        get_result
+
+        expect(network_double).not_to have_received(:wait_for_idle)
+      end
+
+      it "still returns the response data" do
+        expect(get_result[:body]).to eq("<html><body>Test</body></html>")
+      end
     end
 
     it "returns response data hash" do

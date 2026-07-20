@@ -1,6 +1,11 @@
 class Browser
-  PAGE_TIMEOUT = 1.minute
+  # Maximum delay per Ferrum operation (each go_to, evaluate, CDP command…),
+  # reset on every call — this is not a global scraping budget
+  PAGE_TIMEOUT = 30.seconds
+  # Maximum delay for the Chrome process to start, only once when the browser is created
   PROCESS_TIMEOUT = 30.seconds
+  # Maximum delay waiting for the network to become idle after a page load
+  NETWORK_IDLE_TIMEOUT = 10.seconds
   SUCCESS_CODE = 200
 
   REQUEST_HEADERS = {
@@ -19,7 +24,7 @@ class Browser
 
   FILE_EXTENSIONS = [
     # Fonts
-    ".woff", ".woff2", ".ttf", ".otf", ".eot",
+    ".woff", ".woff2", ".ttf", ".otf", ".eot", ".css", ".less", ".scss", ".sass",
     # Feeds, structured data, calendars, icons, and cursors
     ".xml", ".rss", ".atom", ".ics", ".ical", ".ico", ".cur",
     # Images
@@ -36,7 +41,7 @@ class Browser
     Regexp::IGNORECASE
   )
 
-  TRACKING_DOMAINS = [
+  BLOCKED_DOMAINS = [
     "google-analytics.com",
     "googletagmanager.com",
     /facebook\.(?:com|net)/i,
@@ -48,6 +53,7 @@ class Browser
     "googlesyndication.com",
     "youtube.com",
     "play.google.com",
+    %r{(?:google\.com|gstatic\.com)/recaptcha}i,
     "sites.statistiques.online",
     "googleapis.com",
     /hotjar\.(?:com|io)/i,
@@ -66,8 +72,9 @@ class Browser
     /sentry(?:\.[a-z0-9-]+)+/i,
   ].freeze
 
-  TRACKING_DOMAIN_PATTERN = Regexp.union(TRACKING_DOMAINS)
-  BLOCKED_URL_PATTERNS = [BLOCKED_FILE_PATTERN, TRACKING_DOMAIN_PATTERN].freeze
+  BLOCKED_DOMAIN_PATTERN = Regexp.union(BLOCKED_DOMAINS)
+
+  BLOCKED_URL_PATTERNS = [BLOCKED_FILE_PATTERN, BLOCKED_DOMAIN_PATTERN].freeze
 
   BROWSER_OPTIONS = {
     "disable-blink-features" => "AutomationControlled",
@@ -128,8 +135,7 @@ class Browser
 
     def get(url)
       with_page do |page|
-        page.go_to(url)
-        page.network.wait_for_idle(timeout: PAGE_TIMEOUT)
+        visit(page, url)
 
         {
           body: page.body,
@@ -158,6 +164,23 @@ class Browser
     end
 
     private
+
+    def visit(page, url)
+      navigation_issue =
+        if page.go_to(url).nil?
+          "navigation timed out after #{PAGE_TIMEOUT.to_i}s"
+        elsif !page.network.wait_for_idle(timeout: NETWORK_IDLE_TIMEOUT)
+          "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s"
+        end
+      log_pending_requests(page, url, reason: navigation_issue) if navigation_issue
+    end
+
+    def log_pending_requests(page, url, reason:)
+      pendings = page.network.traffic.select(&:pending?)
+      details = pendings.map { |exchange| "#{exchange.request&.type} #{exchange.url}" }.join(", ")
+
+      Rails.logger.warn("Browser.get: #{reason} on #{url}, #{pendings.size} pending: #{details}")
+    end
 
     def browser
       @browser ||= Ferrum::Browser.new(settings)
