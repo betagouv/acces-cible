@@ -17,6 +17,10 @@ class User < ApplicationRecord
 
   before_validation :find_or_create_team, on: :create
 
+  def to_s
+    name
+  end
+
   class << self
     def from_omniauth(auth)
       data_source = auth.info

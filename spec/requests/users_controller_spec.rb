@@ -15,6 +15,10 @@ RSpec.describe UsersController do
       it "returns http success" do
         expect(response).to have_http_status(:success)
       end
+
+      it "displays the user name as the page title" do
+        expect(response.body).to have_selector("h1", exact_text: user.name)
+      end
     end
 
     context "when user is not authenticated" do
