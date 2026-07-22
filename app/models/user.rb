@@ -23,7 +23,7 @@ class User < ApplicationRecord
       siret = auth.provider == "developer" ? data_source.siret : auth.extra.raw_info.siret
 
       # TODO: Remove this log after checking temporarly on staging
-      Rails.logger.warn("Siret: #{siret}")
+      Rails.logger.warn("data_source: #{data_source.inspect}, siret: #{siret}, auth.extra.raw_info: #{auth.extra.raw_info.inspect}")
 
       user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
       user.assign_attributes(
