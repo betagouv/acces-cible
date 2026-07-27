@@ -7,6 +7,12 @@ RSpec.describe User do
 
   it_behaves_like "a privileged model"
 
+  describe "#to_s" do
+    it "returns the user name" do
+      expect(user.to_s).to eq(user.name)
+    end
+  end
+
   describe "validations" do
     context "for uid" do
       it { is_expected.to allow_value("12345678901234").for(:uid) }
