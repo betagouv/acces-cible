@@ -3,7 +3,7 @@ class SitesController < ApplicationController
   include SitesFiltering
   before_action :set_site, only: [:show, :edit, :update]
   before_action :set_sites, only: [:index, :csv_export]
-  before_action :redirect_old_slugs, except: [:index, :new, :create, :csv_export], if: :get_request?
+  before_action :redirect_old_slugs, only: [:show, :edit]
 
   # GET /sites
   def index
@@ -57,6 +57,15 @@ class SitesController < ApplicationController
     end
   end
 
+  # PATCH/PUT /sites/1
+  def update
+    if @site.update(site_tags_params)
+      redirect_to @site, notice: t(".notice"), status: :see_other
+    else
+      render :edit, status: :unprocessable_content
+    end
+  end
+
   # POST /sites/upload
   def upload
     @upload = SiteUpload.new(site_upload_params)
@@ -64,15 +73,6 @@ class SitesController < ApplicationController
       redirect_to sites_path, notice: t(".started", count: @upload.count)
     else
       render :new, status: :unprocessable_content
-    end
-  end
-
-  # PATCH/PUT /sites/1
-  def update
-    if @site.update(site_params)
-      redirect_to @site, notice: t(".notice"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
     end
   end
 
@@ -109,6 +109,11 @@ class SitesController < ApplicationController
 
   def site_params
     params.expect(site: [:url, :name, tag_ids: [], tags_attributes: [:name]])
+  end
+
+  # Only tags can be modified on an existing site
+  def site_tags_params
+    params.expect(site: [tag_ids: [], tags_attributes: [:name]])
   end
 
   def site_upload_params
