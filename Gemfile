@@ -24,6 +24,9 @@ gem "dartsass-rails"
 # Bundle CSV, since it is no longer in standard library
 gem "csv"
 
+# Rack middleware for blocking & throttling abusive requests
+gem "rack-attack", "~> 6.8"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
