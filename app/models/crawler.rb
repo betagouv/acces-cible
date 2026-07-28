@@ -28,7 +28,8 @@ class Crawler
   end
 
   def create_page!(href)
-    html = href == root && root_page_html.present? ? root_page_html : nil
+    html = root_page_html if href == root
+
     Page.new(url: href, root: root, html: html)
   end
 

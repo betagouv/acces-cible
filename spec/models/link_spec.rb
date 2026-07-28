@@ -4,84 +4,82 @@ RSpec.describe Link do
   describe ".normalize" do
     it "removes fragments from URLs" do
       normalized = described_class.normalize("http://example.com/page#section")
-      expect(normalized.to_s).not_to include("#section")
+      expect(normalized.to_s).to eq("http://example.com/page")
     end
 
     it "preserves query parameters" do
       normalized = described_class.normalize("http://example.com/page?param=value")
-      expect(normalized.to_s).to include("?param=value")
+      expect(normalized).to eq("http://example.com/page?param=value")
     end
 
     it "normalizes paths with doubled slashes" do
       normalized = described_class.normalize("http://example.com/folder//")
-      expect(normalized.to_s).to eq("http://example.com/folder/")
+      expect(normalized).to eq("http://example.com/folder/")
     end
 
     it "normalizes paths with parent directory references" do
       normalized = described_class.normalize("http://example.com/folder/../page.html")
-      expect(normalized.to_s).to eq("http://example.com/page.html")
+      expect(normalized).to eq("http://example.com/page.html")
     end
 
     it "normalizes paths with current directory references" do
       normalized = described_class.normalize("http://example.com/folder/./page.html")
-      expect(normalized.to_s).to eq("http://example.com/folder/page.html")
+      expect(normalized).to eq("http://example.com/folder/page.html")
     end
 
     it "normalizes paths with multiple parent directory references" do
       normalized = described_class.normalize("http://example.com/a/b/c/../../page.html")
-      expect(normalized.to_s).to eq("http://example.com/a/page.html")
+      expect(normalized).to eq("http://example.com/a/page.html")
     end
 
     it "normalizes complex paths with mixed parent and current directory references" do
       normalized = described_class.normalize("http://example.com/a/./b/../c/./d/../page.html")
-      expect(normalized.to_s).to eq("http://example.com/a/c/page.html")
+      expect(normalized).to eq("http://example.com/a/c/page.html")
     end
 
     it "handles non-standard ports" do
       normalized = described_class.normalize("http://example.com:8080/page.html")
-      expect(normalized.to_s).to include(":8080")
+      expect(normalized).to eq("http://example.com:8080/page.html")
     end
 
     it "doesn't include standard ports in the normalized URL" do
       normalized = described_class.normalize("http://example.com:80/page.html")
-      expect(normalized.to_s).not_to include(":80")
+      expect(normalized).to eq("http://example.com/page.html")
     end
 
     it "handles URLs with no path" do
       normalized = described_class.normalize("http://example.com")
-      expect(normalized.to_s).to eq("http://example.com/")
+      expect(normalized).to eq("http://example.com/")
     end
 
     it "handles accented URLs" do
       normalized = described_class.normalize("http://www.lucé.fr/./..///")
-      converted = "http://www.lucé.fr/"
-      expect(normalized.to_s).to eq(converted)
+      expect(normalized).to eq("http://www.lucé.fr/")
     end
 
     it "handles punycode" do
       normalized = described_class.normalize("https://xn--mairie-saint-l-epb.fr/")
-      converted = "https://mairie-saint-lô.fr/"
-      expect(normalized.to_s).to eq(converted)
+      expect(normalized).to eq("https://mairie-saint-lô.fr/")
     end
 
     it "normalizes redundant slashes" do
       normalized = described_class.normalize("http://example.com//folder///page.html")
-      expect(normalized.to_s).to eq("http://example.com/folder/page.html")
+      expect(normalized).to eq("http://example.com/folder/page.html")
     end
 
     it "handles URLs with paths that attempt to go above root" do
       normalized = described_class.normalize("http://example.com/a/../../../page.html")
-      expect(normalized.to_s).to eq("http://example.com/page.html")
+      expect(normalized).to eq("http://example.com/page.html")
     end
 
     it "normalizes URLs with encoded characters" do
       normalized = described_class.normalize("http://example.com/folder/page%20with%20spaces.html")
-      expect(normalized.to_s).to eq("http://example.com/folder/page%20with%20spaces.html")
+      expect(normalized).to eq("http://example.com/folder/page%20with%20spaces.html")
     end
 
     it "preserves URL-encoded characters in paths" do
       normalized = described_class.normalize("http://example.com/%C3%A9t%C3%A9.html")
-      expect(normalized.to_s).to eq("http://example.com/%C3%A9t%C3%A9.html")
+      expect(normalized).to eq("http://example.com/%C3%A9t%C3%A9.html")
     end
 
     it "preserves trailing slashes in paths" do
@@ -93,7 +91,7 @@ RSpec.describe Link do
 
     it "preserves the original scheme" do
       normalized = described_class.normalize("https://example.com/page.html")
-      expect(normalized.to_s).to start_with("https://")
+      expect(normalized).to eq("https://example.com/page.html")
     end
 
     context "when normalizing different URLs that refer to the same resource" do
@@ -116,12 +114,12 @@ RSpec.describe Link do
     end
 
     it "raises InvalidUriError for malformed URIs like maitlo:accueil@example.com" do
-      expect { described_class.normalize("maitlo:accueil@itxassou.fr") }.to raise_error(Addressable::URI::InvalidURIError)
+      expect { described_class.normalize("maitlo:accueil@example.com") }.to raise_error(Addressable::URI::InvalidURIError)
     end
 
     it "handles paths with a colon preceded by percent-encoded characters" do
-      normalized = described_class.normalize("https://www.ville-sussargues.fr/Accessibilit%c3%a9-:-partiellement-conforme/9/")
-      expect(normalized).to include("ville-sussargues.fr")
+      normalized = described_class.normalize("https://www.example.com/Accessibilit%c3%a9-:-partiellement-conforme/9/")
+      expect(normalized).to eq("https://www.example.com/Accessibilit%C3%A9-:-partiellement-conforme/9/")
     end
   end
 

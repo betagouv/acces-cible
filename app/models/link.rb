@@ -18,7 +18,7 @@ class Link
       uri.fragment = nil
       return uri.to_s if uri.relative?
 
-      uri.path = uri.path.gsub(%r{/+}, "/")
+      uri.path = uri.path.squeeze("/")
       uri.normalize.display_uri.to_s
     end
 
