@@ -25,7 +25,7 @@ RSpec.describe Crawler do
       let(:root_url) { "https://example.com/home" }
 
       it "returns path up to the last slash" do
-        expect(crawler.send(:root).href).to eq("https://example.com/")
+        expect(crawler.send(:root)).to eq("https://example.com/")
       end
     end
   end
@@ -68,7 +68,7 @@ RSpec.describe Crawler do
       end
 
       it "returns the first matching page and logs progress" do
-        crawler = described_class.new(root_url, queue: LinkList.new([root_url, link1.href]))
+        crawler = described_class.new(root_url, queue: [root_url, link1.href])
         page = crawler.find_page { |page| page.title == "Target" }
         expect(page).to eq(target_page)
       end
@@ -82,7 +82,7 @@ RSpec.describe Crawler do
       end
 
       it "returns nil and crawls unique pages only" do
-        crawler = described_class.new(root_url, queue: LinkList.new([root_url, link1.href, link2.href]))
+        crawler = described_class.new(root_url, queue: [root_url, link1.href, link2.href])
         expect(Page).to receive(:new)
                           .exactly(3).times # root + 2 unique links
                           .and_return(instance_double(Page, internal_links: [link1, link2], title: "Wrong"))
