@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   scope controller: :sessions do
     get :login, action: :new, as: :login
     get "auth/failure", action: :new
+    get "auth/proconnect/logout/callback", action: :logout_callback, as: :proconnect_logout_callback
     get "auth/:provider", action: :new, as: :omniauth
     get "auth/:provider/callback", action: :omniauth
     delete :logout, action: :destroy, as: :logout

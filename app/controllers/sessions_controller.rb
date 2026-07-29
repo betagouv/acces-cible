@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  allow_unauthenticated_access only: [:new, :omniauth]
+  allow_unauthenticated_access only: [:new, :omniauth, :logout_callback]
   redirect_if_authenticated only: [:new, :omniauth]
 
   def new
@@ -19,7 +19,33 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    terminate_session
-    redirect_to login_path
+    if proconnect_session?
+      session["omniauth.state"] = SecureRandom.hex(16)
+      redirect_to "/auth/proconnect/logout", status: :see_other
+    else
+      terminate_local_session
+      reset_session
+      redirect_to login_path
+    end
+  end
+
+  def logout_callback
+    expected_state = session["omniauth.state"]
+    returned_state = params[:state].to_s
+
+    if expected_state.present? && ActiveSupport::SecurityUtils.secure_compare(expected_state, returned_state)
+      terminate_local_session if authenticated?
+      reset_session
+      redirect_to login_path
+    else
+      Rails.logger.warn("State mismatch on ProConnect logout callback")
+      head :unprocessable_content
+    end
+  end
+
+  private
+
+  def proconnect_session?
+    current_user.provider == "proconnect" && session["omniauth.pc.id_token"].present?
   end
 end
