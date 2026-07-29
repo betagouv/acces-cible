@@ -19,13 +19,10 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    if proconnect_session?
-      session["omniauth.state"] = SecureRandom.hex(16)
-      redirect_to "/auth/proconnect/logout", status: :see_other
+    if current_user.provider == "proconnect"
+      proconnect_logout
     else
-      terminate_local_session
-      reset_session
-      redirect_to login_path
+      local_logout
     end
   end
 
@@ -45,7 +42,21 @@ class SessionsController < ApplicationController
 
   private
 
-  def proconnect_session?
-    current_user.provider == "proconnect" && session["omniauth.pc.id_token"].present?
+  def proconnect_logout
+    # Le gem n'envoie pas client_id au end_session_endpoint : sans id_token en
+    # session, la requête ne contient aucun identifiant, et ProConnect
+    # ferme la session SSO mais ne revient jamais à notre callback (testé).
+    # On se replie donc sur un logout local.
+    # voir 2.4.1.2 https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/implementation_technique
+    return local_logout if session["omniauth.pc.id_token"].blank?
+
+    session["omniauth.state"] = SecureRandom.hex(16)
+    redirect_to "/auth/proconnect/logout", status: :see_other
+  end
+
+  def local_logout
+    terminate_local_session
+    reset_session
+    redirect_to login_path
   end
 end
