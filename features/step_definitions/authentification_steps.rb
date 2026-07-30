@@ -9,11 +9,13 @@ def fake_auth_hash(email, siret, org)
       uid: user.uid,
       info: {
         email: user.email,
-        name: user.name,
-        organizational_unit: org
+        name: user.name
       },
       extra: {
-        raw_info: { siret: user.siret }
+        raw_info: {
+          siret: user.siret,
+          organization_label: org
+        }
       }
     }
   )

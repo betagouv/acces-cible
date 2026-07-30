@@ -4,10 +4,10 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     :email,
     :name,
     :siret,
-    :organizational_unit
+    :organization_label
   ], uid_field: :uid if Rails.env.local?
 
-  scope = "openid email given_name usual_name siret organizational_unit belonging_population"
+  scope = "openid email given_name usual_name siret organization_label"
 
   proconnect_options = Rails.application.credentials.dig(:proconnect, Rails.application.staging? ? :staging : Rails.env)
   provider :proconnect, proconnect_options.to_h.merge(scope:)

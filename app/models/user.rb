@@ -24,7 +24,8 @@ class User < ApplicationRecord
   class << self
     def from_omniauth(auth)
       data_source = auth.info
-      siret = auth.provider == "developer" ? data_source.siret : auth.extra.raw_info.siret
+      organization_data = auth.provider == "developer" ? data_source : auth.extra.raw_info
+      siret = organization_data.siret
 
       user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
       user.assign_attributes(
@@ -36,7 +37,7 @@ class User < ApplicationRecord
       user.team.save if user.valid?
       return unless user.save
 
-      user.team.update(organizational_unit: data_source.organizational_unit)
+      user.team.update(organization_label: organization_data.organization_label)
       user
     end
   end
