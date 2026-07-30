@@ -40,7 +40,7 @@ RSpec.describe User do
 
     let(:email) { "john.doe@example.com" }
     let(:siret) { "12345678901234" }
-    let(:organizational_unit) { "Engineering Department" }
+    let(:organization_label) { "Engineering Department" }
 
     let(:auth) do
       OmniAuth::AuthHash.new(
@@ -49,11 +49,13 @@ RSpec.describe User do
           uid: "123",
           info: {
             email:,
-            organizational_unit:,
             name: "Yan Zhu"
           },
           extra: {
-            raw_info: { siret: }
+            raw_info: {
+              siret:,
+              organization_label:
+            }
           }
         }
       )
@@ -67,7 +69,7 @@ RSpec.describe User do
             uid: "123",
             info: {
               email:,
-              organizational_unit:,
+              organization_label:,
               name: "Yan Zhu",
               siret:
             }
@@ -108,7 +110,7 @@ RSpec.describe User do
       it "creates a new team if it doesn't exist" do
         expect { from_omniauth }.to change(Team, :count).by(1)
 
-        expect(Team.last).to have_attributes(siret:, organizational_unit:)
+        expect(Team.last).to have_attributes(siret:, organization_label:)
       end
     end
 
@@ -165,11 +167,13 @@ RSpec.describe User do
               uid: "123",
               info: {
                 email:,
-                organizational_unit:,
                 name: "Yan Zhu"
               },
               extra: {
-                raw_info: { siret: new_siret }
+                raw_info: {
+                  siret: new_siret,
+                  organization_label:
+                }
               }
             }
           )
@@ -192,7 +196,7 @@ RSpec.describe User do
             user = from_omniauth
             new_team = Team.find_by(siret: new_siret)
             expect(new_team).not_to be_nil
-            expect(new_team.organizational_unit).to eq(organizational_unit)
+            expect(new_team.organization_label).to eq(organization_label)
             expect(user.team).to eq(new_team)
           end
         end
@@ -200,14 +204,15 @@ RSpec.describe User do
     end
 
     context "when team already exists" do
-      let!(:existing_team) { create(:team, siret:, organizational_unit: "Old Department") }
+      let!(:existing_team) { create(:team, siret:, organization_label: "Old Department") }
 
       it "does not create a new team" do
         expect { from_omniauth }.not_to change(Team, :count)
       end
 
-      it "updates the existing team's organizational_unit" do
-        expect { from_omniauth }.to change { existing_team.reload.organizational_unit }
+      it "updates the existing team's organization_label" do
+        expect { from_omniauth }.to change { existing_team.reload.organization_label }
+          .from("Old Department").to(organization_label)
       end
     end
 

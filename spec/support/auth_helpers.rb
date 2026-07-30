@@ -13,10 +13,13 @@ module AuthHelpers
       info: {
         email: user.email,
         name: user.name,
-        organizational_unit: user.team.organizational_unit
+        organization_label: user.team.organization_label
       },
       extra: {
-        raw_info: { siret: user.team.siret }
+        raw_info: {
+          siret: user.team.siret,
+          organization_label: user.team.organization_label
+        }
       }
     )
 
