@@ -43,17 +43,6 @@ RSpec.describe Check do
     end
   end
 
-  describe "#root_page" do
-    let(:site) { create(:site, url: "https://example.com/") }
-    let(:audit) { create(:audit, site:, home_page_url: "https://example.com/", accessibility_page_url: nil) }
-    let(:check) { build(:check, :accessibility_mention, audit:) }
-
-    it "returns a Page with the site URL" do
-      expect(Page).to receive(:new).with(url: audit.home_page_url, root: audit.home_page_url, html: nil)
-      check.root_page
-    end
-  end
-
   describe "#run" do
     let(:check) { create(:check, :accessibility_mention) }
 

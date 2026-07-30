@@ -7,6 +7,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
     subject(:axe_check) { check.send(:run_axe_check) }
 
     let(:html_content) { "<html><head><title>Test</title></head><body>Test</body></html>" }
+    let(:home_snapshot) { instance_double(PageSnapshot, html: html_content) }
     let(:axe_results) do
       {
         "violations" => [
@@ -20,6 +21,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
     end
 
     before do
+      allow(check.audit.page_snapshots).to receive(:find_by).with(kind: "home").and_return(home_snapshot)
       allow(Browser).to receive(:run_script_on_html)
 
       allow(File).to receive(:read).and_call_original
@@ -43,7 +45,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
       expect(Browser)
         .to have_received(:run_script_on_html)
               .with(
-                check.audit.home_page_html,
+                html_content,
                 an_instance_of(String)
                   .and(matching(/locale: localized axe JSON/))
                   .and(matching(/values: mock rules/)),

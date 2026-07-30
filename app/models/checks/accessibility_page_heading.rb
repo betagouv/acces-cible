@@ -78,9 +78,9 @@ module Checks
     private
 
     def analyze!
-      return unless page = audit.page(:accessibility)
+      return unless accessibility_page
 
-      self.page_headings = page.heading_levels
+      self.page_headings = accessibility_page.heading_levels
       {
         page_headings:,
         comparison: compare_headings

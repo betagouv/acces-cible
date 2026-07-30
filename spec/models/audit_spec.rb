@@ -10,6 +10,7 @@ RSpec.describe Audit do
   describe "associations" do
     it { is_expected.to belong_to(:site) }
     it { is_expected.to have_many(:checks).dependent(:destroy) }
+    it { is_expected.to have_many(:page_snapshots).dependent(:destroy) }
   end
 
   describe "scopes" do
@@ -24,75 +25,63 @@ RSpec.describe Audit do
     end
   end
 
-  describe "#page" do
-    subject(:page) { audit.page(kind) }
+  describe "#home_page" do
+    subject(:home_page) { audit.page_for(:home) }
 
     let(:site) { create(:site, url: "https://example.com") }
-    let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url, accessibility_page_url: nil) }
-    let(:mock_page) { instance_double(Page, html: nil) }
+    let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url) }
+    let(:mock_page) { instance_double(Page) }
 
-    before do
-      allow(Page).to receive(:new).and_return(mock_page)
-    end
+    context "when a home page snapshot exists" do
+      before do
+        create(:page_snapshot, audit:, kind: "home", current_url: site.url, html: "<html></html>")
+        allow(Page).to receive(:new).and_return(mock_page)
+      end
 
-    context "when kind is :home" do
-      let(:kind) { :home }
-
-      it "creates a Page with the site url" do
-        expect(Page).to receive(:new).with(url: site.url, root: site.url, html: nil)
-        page
+      it "creates a Page with the snapshot's url and html" do
+        expect(Page).to receive(:new).with(url: site.url, root: site.url, html: "<html></html>")
+        home_page
       end
 
       it "returns the Page instance" do
-        expect(page).to eq(mock_page)
+        expect(home_page).to eq(mock_page)
       end
     end
 
-    context "when kind is :accessibility" do
-      let(:kind) { :accessibility }
+    context "when no home page snapshot exists" do
+      it "returns nil" do
+        expect(home_page).to be_nil
+      end
+    end
+  end
 
-      context "when find_accessibility_page check has a url" do
-        let(:accessibility_url) { "https://example.com/accessibility" }
-        let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url, accessibility_page_url: accessibility_url) }
+  describe "#accessibility_page" do
+    subject(:accessibility_page) { audit.page_for(:accessibility) }
 
-        it "creates a Page with the accessibility page url" do
-          expect(Page).to receive(:new).with(url: accessibility_url, root: site.url, html: nil)
-          page
-        end
+    let(:site) { create(:site, url: "https://example.com") }
+    let(:audit) { create(:audit, :without_checks, site:, home_page_url: site.url) }
+    let(:mock_page) { instance_double(Page) }
+    let(:accessibility_url) { "https://example.com/accessibility" }
 
-        it "returns the Page instance" do
-          expect(page).to eq(mock_page)
-        end
+    context "when an accessibility page snapshot exists" do
+      before do
+        create(:page_snapshot, audit:, kind: "accessibility", current_url: accessibility_url, html: "<html></html>")
+        allow(Page).to receive(:new).and_return(mock_page)
       end
 
-      context "when find_accessibility_page check has no url" do
-        let(:accessibility_url) { nil }
-
-        it "returns nil" do
-          expect(page).to be_nil
-        end
+      it "creates a Page with the accessibility page url" do
+        expect(Page).to receive(:new).with(url: accessibility_url, root: site.url, html: "<html></html>")
+        accessibility_page
       end
 
-      context "when find_accessibility_page check does not exist" do
-        it "returns nil" do
-          expect(page).to be_nil
-        end
+      it "returns the Page instance" do
+        expect(accessibility_page).to eq(mock_page)
       end
     end
 
-    context "when kind is nil" do
-      let(:kind) { nil }
-
-      it "raises an ArgumentError" do
-        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind ''/)
-      end
-    end
-
-    context "when kind is unrecognised" do
-      let(:kind) { :hmoe }
-
-      it "raises an ArgumentError" do
-        expect { page }.to raise_error(ArgumentError, /Don't know how to find a page of kind 'hmoe'/)
+    context "when no accessibility page snapshot exists" do
+      it "returns nil" do
+        expect(accessibility_page).to be_nil
       end
     end
   end
@@ -216,17 +205,6 @@ RSpec.describe Audit do
       expect { audit.abort_dependent_checks!(original_check) }
         .to change { dependent_check.reload.current_state }
               .from("pending").to("aborted")
-    end
-  end
-
-  describe "update_home_page!" do
-    let(:url) { "https://example.com" }
-    let(:html) { "html_content" }
-
-    it "updates the home page HTML" do
-      expect { audit.update_home_page!(url, html) }
-        .to change(audit, :home_page_html).from(nil).to(html)
-                                          .and change(audit, :home_page_url).from(nil).to(url)
     end
   end
 end

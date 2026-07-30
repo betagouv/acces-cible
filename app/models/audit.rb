@@ -2,6 +2,7 @@ class Audit < ApplicationRecord
   belongs_to :site, counter_cache: true
   belongs_to :user
   has_many :checks, -> { prioritized }, dependent: :destroy
+  has_many :page_snapshots, dependent: :destroy
 
   after_create_commit :fetch_resources!, :create_checks
 
@@ -19,15 +20,6 @@ class Audit < ApplicationRecord
 
   def fetch_resources!
     FetchResourcesJob.perform_later(self)
-  end
-
-  def page(kind)
-    kind = kind.to_s.to_sym
-    page_url = page_url_for(kind)
-
-    return if page_url.nil?
-
-    build_page(kind, page_url)
   end
 
   def check_completed?(identifier)
@@ -79,43 +71,10 @@ class Audit < ApplicationRecord
       .each { |other_check| other_check.transition_to!(:aborted) }
   end
 
-  def update_home_page!(url, html)
-    update!(
-      home_page_url: url,
-      home_page_html: html
-    )
-  end
+  def page_for(kind)
+    snapshot = page_snapshots.find_by(kind:)
+    return unless snapshot
 
-  def update_accessibility_page!(url, html)
-    update!(
-      accessibility_page_url: url,
-      accessibility_page_html: html
-    )
-  end
-
-  private
-
-  def build_page(kind, page_url)
-    snapshot_html = html_for(kind)
-
-    Page.new(url: page_url, root: home_page_url, html: snapshot_html)
-  end
-
-  def page_url_for(kind)
-    case kind
-    when :home
-      home_page_url
-    when :accessibility
-      accessibility_page_url
-    else
-      raise ArgumentError, "Don't know how to find a page of kind '#{kind}'"
-    end
-  end
-
-  def html_for(kind)
-    case kind
-    when :home then home_page_html
-    when :accessibility then accessibility_page_html
-    end
+    @page_for ||= Page.new(url: snapshot.current_url, root: home_page_url, html: snapshot.html)
   end
 end

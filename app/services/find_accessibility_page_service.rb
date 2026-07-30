@@ -2,84 +2,94 @@ class FindAccessibilityPageService
   DECLARATION_TERMS = %w[rgaa conform declaration accessibilit].freeze
   REQUIRED_DECLARATION_HEADINGS = 2
 
-  class << self
-    def call(audit)
-      queue = prioritize_queue!(url: audit.home_page_url, starting_html: audit.home_page_html)
-      crawler = Crawler.new(audit.home_page_url, root_page_html: audit.home_page_html, queue: queue)
-      page = find_page(crawler, queue, audit)
+  def initialize(audit)
+    @audit = audit
 
-      Rails.logger.silence do
-        audit.update_accessibility_page!(page.url, page.html) unless page.nil?
-      end
+    call
+  end
+
+  def call
+    home_page_html = @audit.page_snapshots.find_by(kind: "home")&.html
+    queue = prioritize_queue!
+    crawler = Crawler.new(@audit.home_page_url, root_page_html: home_page_html, queue: queue)
+    page = find_page(crawler, queue, @audit)
+
+    return if page.nil?
+
+    Rails.logger.silence do
+      @audit.page_snapshots.create!(
+        kind: "accessibility",
+        requested_url: page.url,
+        current_url: page.actual_url,
+        html: page.html,
+        status: page.status
+      )
+
+      @audit.update(accessibility_page_url: page.actual_url)
     end
+  end
 
-    private
+  private
 
-    def find_page(crawler, queue, audit)
-      crawler.find_page do |current_page|
-        if required_headings_present?(current_page)
-          true
-        else
-          enqueue_children(current_page, queue, audit)
-          false
-        end
-      end
-    end
+  def prioritize_queue!
+    links = @audit.page_for(:home)&.links || []
 
-    def enqueue_children(page, queue, audit)
-      excluded_targets = [
-        page.url,
-        audit.site.url,
-        audit.home_page_url
-      ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
+    links_by_priority(links).map(&:href)
+  end
 
-      children_links = page.links.reject do |link|
-        excluded_targets.include?(Link.url_without_scheme_and_www(link.href))
-      end
-
-      children_links = links_by_priority(children_links).first(Crawler::MAX_CRAWLED_PAGES)
-
-      queue.concat(children_links.map(&:href))
-    end
-
-    def required_headings_present?(current_page)
-      matching_headings = current_page.headings.select do |heading|
-        Checks::AccessibilityPageHeading.expected_headings.any? do |required_heading|
-          fuzzy_match?(heading, required_heading)
-        end
-      end
-
-      matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
-    end
-
-    def fuzzy_match?(a, b)
-      StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.8)
-    end
-
-    def prioritize_queue!(url:, starting_html:)
-      root = Link.root_from(url)
-      links = if starting_html.present?
-        Page.new(url:, root:, html: starting_html).links
+  def find_page(crawler, queue, audit)
+    crawler.find_page do |current_page|
+      if required_headings_present?(current_page)
+        true
       else
-        []
+        enqueue_children(current_page, queue, audit)
+        false
       end
+    end
+  end
 
-      links_by_priority(links).map(&:href)
+  def enqueue_children(page, queue, audit)
+    excluded_targets = [
+      page.url,
+      audit.site.url,
+      audit.home_page_url
+    ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
+
+    children_links = page.links.reject do |link|
+      excluded_targets.include?(Link.url_without_scheme_and_www(link.href))
     end
 
-    def links_by_priority(links)
-      (
-        links.select { |link| link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) } +
-          links.select { |link| declaration_term_count(link) }
-               .sort_by { |link| -declaration_term_count(link) }
-      ).uniq(&:href)
+    children_links = links_by_priority(children_links).first(Crawler::MAX_CRAWLED_PAGES)
+
+    queue.concat(children_links.map(&:href))
+  end
+
+  def required_headings_present?(current_page)
+    matching_headings = current_page.headings.select do |heading|
+      Checks::AccessibilityPageHeading.expected_headings.any? do |required_heading|
+        fuzzy_match?(heading, required_heading)
+      end
     end
 
-    def declaration_term_count(link)
-      normalized_text = I18n.transliterate(link.text).downcase
-      normalized_href = I18n.transliterate(link.href).downcase
+    matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
+  end
 
-      DECLARATION_TERMS.count { |term| normalized_href.include?(term) || normalized_text&.include?(term) }.nonzero?
-    end
+  def fuzzy_match?(a, b)
+    StringComparison.match?(a, b, ignore_case: true, fuzzy: 0.8)
+  end
+
+  def links_by_priority(links)
+    (
+      links.select { |link| link.text.match?(Checks::AccessibilityMention::MENTION_REGEX) } +
+        links.select { |link| declaration_term_count(link) }
+             .sort_by { |link| -declaration_term_count(link) }
+    ).uniq(&:href)
+  end
+
+  def declaration_term_count(link)
+    normalized_text = I18n.transliterate(link.text).downcase
+    normalized_href = I18n.transliterate(link.href).downcase
+
+    DECLARATION_TERMS.count { |term| normalized_href.include?(term) || normalized_text&.include?(term) }.nonzero?
   end
 end

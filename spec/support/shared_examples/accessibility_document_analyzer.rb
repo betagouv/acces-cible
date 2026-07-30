@@ -1,12 +1,12 @@
 RSpec.shared_context "with analyzer setup" do
-  let(:audit) { build(:audit) }
+  let(:audit) { create(:audit, :without_checks) }
   let(:check) { described_class.new(audit:) }
   let(:body) { "<p>Parisa Tabriz</p>" }
   let(:links) { [] }
   let(:page) { build(:page, links:, body:) }
 
   before do
-    allow(audit).to receive(:page).with(:accessibility).and_return(page)
+    allow(audit).to receive(:page_for).with(:accessibility).and_return(page)
     allow(check).to receive(:link_between_headings).and_return(true)
     allow(Browser).to receive(:reachable?).and_return(true)
   end
@@ -17,9 +17,9 @@ RSpec.shared_examples "analyzes documents" do
 
   describe ".analyze!" do
     context "when there is no accessibility page" do
-      it "returns nil" do
-        allow(audit).to receive(:page).with(:accessibility).and_return(nil)
+      let(:page) { nil }
 
+      it "returns nil" do
         expect(check.send(:analyze!)).to be_nil
       end
     end
