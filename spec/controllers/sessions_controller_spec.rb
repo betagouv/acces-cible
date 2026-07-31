@@ -21,10 +21,12 @@ RSpec.describe SessionsController do
     end
 
     context "when the ProConnect id_token is missing" do
-      it "terminates the session locally" do
-        expect { delete :destroy }.to change(Session, :count).by(-1)
+      it "redirects to ProConnect" do
+        expect { delete :destroy }.not_to change(Session, :count)
 
-        expect(response).to redirect_to(login_path)
+        expect(response).to redirect_to("/auth/proconnect/logout")
+        expect(response).to have_http_status(:see_other)
+        expect(session["omniauth.state"]).to be_present
       end
     end
 
