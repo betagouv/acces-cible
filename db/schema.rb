@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_152859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,8 +19,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.string "accessibility_page_url"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.float "declaration_quality_score"
     t.text "home_page_html"
     t.string "home_page_url"
+    t.float "legal_obligation_score"
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -42,11 +44,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
 
   create_table "checks", force: :cascade do |t|
     t.bigint "audit_id", null: false
+    t.boolean "conform"
     t.datetime "created_at", null: false
     t.jsonb "data"
+    t.boolean "found"
     t.integer "priority", default: 100, null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
+    t.index "((data ->> 'mention'::text))", name: "index_checks_on_mention"
     t.index ["audit_id", "type"], name: "index_checks_on_audit_id_and_type", unique: true
   end
 
@@ -59,6 +64,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
+  end
+
+  create_table "page_snapshots", force: :cascade do |t|
+    t.bigint "audit_id", null: false
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "current_url"
+    t.text "html"
+    t.string "kind", null: false
+    t.string "requested_url"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.index ["audit_id", "kind"], name: "index_page_snapshots_on_audit_id_and_kind", unique: true
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -127,6 +145,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
   add_foreign_key "audits", "users"
   add_foreign_key "check_transitions", "checks"
   add_foreign_key "checks", "audits"
+  add_foreign_key "page_snapshots", "audits"
   add_foreign_key "sessions", "users"
   add_foreign_key "site_tags", "sites"
   add_foreign_key "site_tags", "tags"

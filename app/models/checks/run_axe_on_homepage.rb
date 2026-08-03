@@ -86,8 +86,16 @@ module Checks
         inapplicable: results["inapplicable"]&.count || 0,
         violations: results["violations"]&.count || 0,
         violation_data: format(results["violations"]),
-        issues_total: results["violations"]&.sum { |v| v["nodes"]&.count || 0 } || 0,
+        issues_total: results["violations"]&.sum { |v| v["nodes"]&.count || 0 } || 0
       }
+    end
+
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      compute_found && (passes + incomplete + violations).positive? && violations.zero?
     end
 
     def run_axe_check

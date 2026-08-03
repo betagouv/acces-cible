@@ -13,7 +13,7 @@ class CheckStateMachine
   state :aborted
 
   transition from: :pending, to: [:ready, :blocked, :aborted]
-  transition from: :ready,   to: [:running]
+  transition from: :ready, to: [:running]
   transition from: :running, to: [:errored, :failed, :completed]
   transition from: :blocked, to: [:ready, :aborted]
   transition from: :errored, to: [:failed, :completed]
@@ -33,6 +33,7 @@ class CheckStateMachine
   end
 
   after_transition(to: :completed) do |check|
+    check.finalize!
     check.audit.after_check_completed
   end
 end

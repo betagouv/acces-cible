@@ -38,5 +38,13 @@ module Checks
 
       { url: audit.accessibility_page_url, internal: } unless audit.accessibility_page_url.blank?
     end
+
+    def compute_found
+      found?
+    end
+
+    def compute_conform
+      internal == true
+    end
   end
 end

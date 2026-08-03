@@ -136,9 +136,21 @@ class Check < ApplicationRecord
     { error_type:, message:, backtrace: }
   end
 
+  def finalize!
+    update(conform: compute_conform, found: compute_found)
+  end
+
   private
 
   def analyze!
+    raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+  end
+
+  def compute_found
+    raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
+  end
+
+  def compute_conform
     raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")
   end
 

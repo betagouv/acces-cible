@@ -61,6 +61,14 @@ module AccessibilityDocumentAnalyzer
 
     private
 
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      all_passed?
+    end
+
     def page
       @page ||= audit.page(:accessibility)
     end
