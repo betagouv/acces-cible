@@ -31,7 +31,7 @@ class SessionsController < ApplicationController
     returned_state = params[:state].to_s
 
     if expected_state.present? && ActiveSupport::SecurityUtils.secure_compare(expected_state, returned_state)
-      terminate_local_session if authenticated?
+      terminate_local_session
       reset_session
       redirect_to login_path
     else
