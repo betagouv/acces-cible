@@ -28,7 +28,7 @@ module Checks
     private
 
     def analyze!
-      return unless root_page.success?
+      return unless home_page.success?
 
       if redirected?
         { original_url: site.url, redirect_url: audit.home_page_url }

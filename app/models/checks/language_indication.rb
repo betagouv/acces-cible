@@ -28,7 +28,7 @@ module Checks
     end
 
     def find_language_indication
-      root_page.dom.root.attributes["lang"]&.value&.strip
+      home_page.dom.root.attributes["lang"]&.value&.strip
     end
 
     def language_code
@@ -45,7 +45,7 @@ module Checks
 
     def detect_page_language
       # Renvoie le code de langue, ou "un" (pour "unknown")
-      CLD.detect_language(root_page.text)[:code].downcase
+      CLD.detect_language(home_page.text)[:code].downcase
     end
   end
 end

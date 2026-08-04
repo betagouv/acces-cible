@@ -93,10 +93,6 @@ class Check < ApplicationRecord
     model_name.i18n_key.to_s
   end
 
-  def root_page
-    @root_page ||= audit.page(:home)
-  end
-
   def requirements
     self.class::REQUIREMENTS
   end
@@ -141,6 +137,14 @@ class Check < ApplicationRecord
   end
 
   private
+
+  def accessibility_page
+    @accessibility_page ||= audit.page_for(:accessibility)
+  end
+
+  def home_page
+    @home_page ||= audit.page_for(:home)
+  end
 
   def analyze!
     raise NotImplementedError.new("#{model_name} needs to implement the `#{__method__}` private method")

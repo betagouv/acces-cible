@@ -8,7 +8,7 @@ RSpec.describe Checks::LanguageIndication do
 
     before do
       # rubocop:disable RSpec/MessageChain
-      allow(check).to receive_message_chain("root_page.dom.root.attributes").and_return(attributes)
+      allow(check).to receive_message_chain("home_page.dom.root.attributes").and_return(attributes)
       # rubocop:enable RSpec/MessageChain
     end
 
@@ -83,8 +83,8 @@ RSpec.describe Checks::LanguageIndication do
     subject(:detected_code) { check.send(:detect_page_language) }
 
     before do
-      root_page = double(text:) # rubocop:disable RSpec/VerifiedDoubles
-      allow(check).to receive(:root_page).and_return(root_page)
+      home_page = double(text:) # rubocop:disable RSpec/VerifiedDoubles
+      allow(check).to receive(:audit).and_return(instance_double(Audit, page_for: home_page))
     end
 
     {

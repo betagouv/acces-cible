@@ -68,10 +68,10 @@ module Checks
       extracted_text = []
 
       HEADERS_SCOPE.each do |header_scope|
-        extracted_text << page.text(between_headings: [header_scope, :next])
+        extracted_text << accessibility_page.text(between_headings: [header_scope, :next])
       end
 
-      extracted_text << page.text(between_headings: [:previous, "État de conformité"])
+      extracted_text << accessibility_page.text(between_headings: [:previous, "État de conformité"])
 
       extracted_text = extracted_text.compact.join(" ")
       matches = extracted_text.scan(pattern)
@@ -82,7 +82,7 @@ module Checks
     end
 
     def find_compliance_rate
-      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+      test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
       matches = test_results_section.scan(COMPLIANCE_PATTERN)
 
       return if matches.empty?
@@ -95,18 +95,18 @@ module Checks
     end
 
     def find_standard
-      page.text.scan(STANDARD_PATTERN).flatten.compact.sort_by(&:length).last
+      accessibility_page.text.scan(STANDARD_PATTERN).flatten.compact.sort_by(&:length).last
     end
 
     def find_auditor
-      test_results_section = page.text(between_headings: ["Résultats des tests", :next])
+      test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
 
       match = test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
       match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
     end
 
     def find_article_mention
-      page.text.match?(ARTICLE)
+      accessibility_page.text.match?(ARTICLE)
     end
 
     def custom_badge_status
@@ -123,7 +123,7 @@ module Checks
 
       return email_in_text if email_in_text.present?
 
-      page.mailto_addresses(between_headings: ["Retour d'information et contact", :next]).first
+      accessibility_page.mailto_addresses(between_headings: ["Retour d'information et contact", :next]).first
     end
 
     def find_contact_form
@@ -135,15 +135,11 @@ module Checks
     private
 
     def contact_links
-      page.links(between_headings: ["Retour d'information et contact", :next])
+      accessibility_page.links(between_headings: ["Retour d'information et contact", :next])
     end
 
     def contact_section_text
-      page.text(between_headings: ["Retour d'information et contact", :next])
-    end
-
-    def page
-      @page ||= audit.page(:accessibility)
+      accessibility_page.text(between_headings: ["Retour d'information et contact", :next])
     end
 
     def found_required?
@@ -159,7 +155,7 @@ module Checks
     end
 
     def analyze!
-      return unless page
+      return unless accessibility_page
 
       {
         audit_date: find_audit_date(AUDIT_DATE_PATTERN),

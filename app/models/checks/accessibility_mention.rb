@@ -14,7 +14,6 @@ module Checks
                     /iux # Case insensitive, Unicode, allow comments and whitespace
 
     store_accessor :data, :mention
-    delegate :text, to: :root_page, prefix: true
 
     def mention_text
       return "" unless completed?
@@ -49,7 +48,7 @@ module Checks
     end
 
     def find_mention
-      (root_page_text.match(MENTION_REGEX)&.named_captures || {})["level"]&.downcase
+      (home_page&.text&.match(MENTION_REGEX)&.named_captures || {})["level"]&.downcase
     end
   end
 end

@@ -104,7 +104,7 @@ module Checks
       script = "axe.configure({locale: #{locale} }); axe.run(document, \
                 { runOnly: { type: 'rule', values: #{RGAA_AXE_RULES} }, reporter: 'v2'}).then(results => __f(results))"
 
-      Browser.run_script_on_html(audit.home_page_html, script, script_tag)
+      Browser.run_script_on_html(audit.page_snapshots.find_by(kind: "home").html, script, script_tag)
     end
 
     def format(violations)

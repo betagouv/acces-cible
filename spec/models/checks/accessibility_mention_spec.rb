@@ -7,7 +7,7 @@ RSpec.describe Checks::AccessibilityMention do
     subject(:mention) { check.send(:find_mention) }
 
     before do
-      allow(check).to receive(:root_page_text).and_return(text)
+      allow(check).to receive(:home_page).and_return(instance_double(Page, text:))
     end
 
     {
