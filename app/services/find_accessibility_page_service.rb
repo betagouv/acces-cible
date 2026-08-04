@@ -17,7 +17,7 @@ class FindAccessibilityPageService
     return if page.nil?
 
     Rails.logger.silence do
-      @audit.page_snapshots.create!(
+      @audit.page_snapshots.find_or_create_by!(
         kind: "accessibility",
         requested_url: page.url,
         current_url: page.actual_url,
@@ -25,7 +25,7 @@ class FindAccessibilityPageService
         status: page.status
       )
 
-      @audit.update(accessibility_page_url: page.actual_url)
+      @audit.update!(accessibility_page_url: page.actual_url)
     end
   end
 

@@ -75,6 +75,6 @@ class Audit < ApplicationRecord
     snapshot = page_snapshots.find_by(kind:)
     return unless snapshot
 
-    @page_for ||= Page.new(url: snapshot.current_url, root: home_page_url, html: snapshot.html)
+    Page.new(url: snapshot.current_url, root: home_page_url, html: snapshot.html)
   end
 end

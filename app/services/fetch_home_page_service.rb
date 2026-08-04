@@ -11,7 +11,7 @@ class FetchHomePageService
     response = Browser.get(@audit.site.url)
 
     Rails.logger.silence do
-      @audit.page_snapshots.create!(
+      @audit.page_snapshots.find_or_create_by!(
         kind: "home",
         requested_url: @audit.site.url,
         current_url: response[:current_url],
@@ -20,7 +20,7 @@ class FetchHomePageService
         content_type: response[:content_type]
       )
 
-      @audit.update(home_page_url: response[:current_url])
+      @audit.update!(home_page_url: response[:current_url])
     end
   end
 end
