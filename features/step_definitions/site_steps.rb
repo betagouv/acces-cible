@@ -83,15 +83,13 @@ Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibili
 end
 
 Sachantque("le site {string} renvoie {string} à l'adresse {string} pour la déclaration d'accessibilité") do |_url, str, declaration_url|
-  allow(FindAccessibilityPageService)
-    .to receive(:find_page)
-    .and_return(Page.new(url: declaration_url, root: declaration_url, html: str))
+  page = Page.new(url: declaration_url, root: declaration_url, html: str)
+
+  allow(Crawler).to receive(:new).and_return(instance_double(Crawler, find_page: page))
 end
 
 Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
-  allow(FindAccessibilityPageService)
-    .to receive(:find_page)
-    .and_return(nil)
+  allow(Crawler).to receive(:new).and_return(instance_double(Crawler, find_page: nil))
 end
 
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|

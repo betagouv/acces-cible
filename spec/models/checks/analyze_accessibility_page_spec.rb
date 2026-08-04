@@ -2,10 +2,15 @@ require "rails_helper"
 
 RSpec.describe Checks::AnalyzeAccessibilityPage do
   let(:check) { described_class.new }
+  let(:body) { "" }
+  let(:accessibility_page) { build(:page, body:) }
+
+  before do
+    allow(check).to receive(:audit).and_return(instance_double(Audit, page_for: accessibility_page))
+  end
 
   describe ".analyze!" do
-    let(:page) { build(:page, body:) }
-    let(:text) do
+    let(:body) do
       <<~HTML
         <p>… s’engage à rendre ses sites internet accessibles conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
         <h2>Résultats des tests</h2>
@@ -15,7 +20,6 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     end
 
     it "returns complete accessibility information" do
-      allow(check).to receive(:page).and_return(build(:page, body: text))
       expect(check.send(:analyze!)).to include(
                                          audit_date: Date.new(2024, 3, 15),
                                          compliance_rate: 75,
@@ -35,9 +39,12 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
           "Contact : jessie@frazelle.com, emily@xie.com" => "jessie@frazelle.com",
           "Contact : @emilyxie.com" => nil,
         }.each do |text, expected_email|
-          it "extracts '#{expected_email}' from '#{text}'" do
-            allow(check).to receive(:page).and_return(build(:page, body: "<h1>Retour d'information et contact</h1><p>#{text}</p><h2>Autre</h2>"))
-            expect(check.find_contact_email).to eq(expected_email)
+          context "with '#{text}'" do
+            let(:body) { "<h1>Retour d'information et contact</h1><p>#{text}</p><h2>Autre</h2>" }
+
+            it "extracts '#{expected_email}'" do
+              expect(check.find_contact_email).to eq(expected_email)
+            end
           end
         end
       end
@@ -55,50 +62,64 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
             expected_result: nil
           }
         ].each do |test_case|
-          it "returns #{test_case[:expected_result]} for text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
-            body = <<~HTML
-              <h2>Retour d'information et contact</h2>
-              <a href="#{test_case[:href]}">#{test_case[:text]}</a>
-              <h2>Voies de recours</h2>
-            HTML
-            allow(check).to receive(:page).and_return(build(:page, body:))
+          context "with text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
+            let(:body) do
+              <<~HTML
+                <h2>Retour d'information et contact</h2>
+                <a href="#{test_case[:href]}">#{test_case[:text]}</a>
+                <h2>Voies de recours</h2>
+              HTML
+            end
 
-            expect(check.find_contact_email).to eq(test_case[:expected_result])
+            it "returns #{test_case[:expected_result]}" do
+              expect(check.find_contact_email).to eq(test_case[:expected_result])
+            end
           end
         end
       end
 
-      it "extracts an email from a mailto href without parameters" do
-        body = <<~HTML
-          <h2>Retour d'information et contact</h2>
-          <p><a href="mailto:jessie@frazelle.com?subject=Accessibilite">Nous ecrire</a></p>
-          <h2>Autre</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
+      context "when the mailto has no parameters" do
+        let(:body) do
+          <<~HTML
+            <h2>Retour d'information et contact</h2>
+            <p><a href="mailto:jessie@frazelle.com?subject=Accessibilite">Nous ecrire</a></p>
+            <h2>Autre</h2>
+          HTML
+        end
 
-        expect(check.find_contact_email).to eq("jessie@frazelle.com")
+        it "extracts an email from a mailto href" do
+          expect(check.find_contact_email).to eq("jessie@frazelle.com")
+        end
       end
     end
 
     context "when email is between the wrong headings" do
-      it "does not extract the email from the text" do
-        body = <<~HTML
-          <h2>État de conformité</h2>
-          <p>emily@xie.com</p>
-          <h2>Résultats des tests</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
-        expect(check.find_contact_email).to be_nil
+      context "when the email is in the text" do
+        let(:body) do
+          <<~HTML
+            <h2>État de conformité</h2>
+            <p>emily@xie.com</p>
+            <h2>Résultats des tests</h2>
+          HTML
+        end
+
+        it "does not extract the email from the text" do
+          expect(check.find_contact_email).to be_nil
+        end
       end
 
-      it "does not extract the email from the mailto" do
-        body = <<~HTML
-          <h2>État de conformité</h2>
-              <a href="mailto:emily@xie.com">Email de contact</a>
-          <h2>Résultats des tests</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
-        expect(check.find_contact_email).to be_nil
+      context "when the email is in a mailto" do
+        let(:body) do
+          <<~HTML
+            <h2>État de conformité</h2>
+                <a href="mailto:emily@xie.com">Email de contact</a>
+            <h2>Résultats des tests</h2>
+          HTML
+        end
+
+        it "does not extract the email from the mailto" do
+          expect(check.find_contact_email).to be_nil
+        end
       end
     end
   end
@@ -141,28 +162,34 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         expected_result: nil
       },
     ].each do |test_case|
-      it "returns #{test_case[:expected_result]} for text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
-        body = <<~HTML
-          <h2>Retour d'information et contact</h2>
-          <p><a href="#{test_case[:href]}">#{test_case[:text]}</a></p>
-          <h2>Voies de recours</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
+      context "with text='#{test_case[:text]}' and href='#{test_case[:href]}'" do
+        let(:body) do
+          <<~HTML
+            <h2>Retour d'information et contact</h2>
+            <p><a href="#{test_case[:href]}">#{test_case[:text]}</a></p>
+            <h2>Voies de recours</h2>
+          HTML
+        end
 
-        expect(check.find_contact_form).to eq(test_case[:expected_result])
+        it "returns #{test_case[:expected_result]}" do
+          expect(check.find_contact_form).to eq(test_case[:expected_result])
+        end
       end
     end
 
-    it "only searches links between the contact heading and the next heading" do
-      body = <<~HTML
-        <h2>Retour d'information et contact</h2>
-        <p>Emily Xie</p>
-        <h2>Voies de recours</h2>
-        <p><a href="/formulaire-contact">Formulaire de contact</a></p>
-      HTML
-      allow(check).to receive(:page).and_return(build(:page, body:))
+    context "when the link is after the next heading" do
+      let(:body) do
+        <<~HTML
+          <h2>Retour d'information et contact</h2>
+          <p>Emily Xie</p>
+          <h2>Voies de recours</h2>
+          <p><a href="/formulaire-contact">Formulaire de contact</a></p>
+        HTML
+      end
 
-      expect(check.find_contact_form).to be_nil
+      it "only searches links between the contact heading and the next heading" do
+        expect(check.find_contact_form).to be_nil
+      end
     end
   end
 
@@ -179,33 +206,44 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "du 35 mai 2024" => nil,
       "Cette déclaration d'accessibilité s'applique au site ac-amiens.fr. Elle a été réalisée le 23 septembre 2020, sur la base des contenus disponibles à cette date." => Date.new(2020, 9, 23)
     }.each do |text, expected_date|
-      it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}' from '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>"))
-        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(expected_date)
+      context "with '#{text}'" do
+        let(:body) { "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>" }
+
+        it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}'" do
+          expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(expected_date)
+        end
       end
     end
 
-    it "search for dates with headers" do
-      body = <<~HTML
-        <p>Conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
-        <h2>État de conformité</h2>
-        <p>La déclaration a été réalisée le 23 septembre 2020.</p>
-        <h2>Autre</h2>
-        <p>Informations diverses du 11 février 2005.</p>
-      HTML
-      allow(check).to receive(:page).and_return(build(:page, body:))
-      expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2020, 9, 23))
+    context "when dates are scattered under different headers" do
+      let(:body) do
+        <<~HTML
+          <p>Conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.</p>
+          <h2>État de conformité</h2>
+          <p>La déclaration a été réalisée le 23 septembre 2020.</p>
+          <h2>Autre</h2>
+          <p>Informations diverses du 11 février 2005.</p>
+        HTML
+      end
+
+      it "only searches for dates with headers" do
+        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2020, 9, 23))
+      end
     end
 
-    it "ignores the law's date" do
-      body = <<~HTML
-        <h2>État de conformité</h2>
-        <p>Conformément à la loi n° 2005-102 du 11 février 2005.</p>
-        <p>La déclaration a été réalisée le 1er mars 2024</p>
-        <h2>Autre</h2>
-      HTML
-      allow(check).to receive(:page).and_return(build(:page, body:))
-      expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2024, 3, 1))
+    context "when the law's date also appears" do
+      let(:body) do
+        <<~HTML
+          <h2>État de conformité</h2>
+          <p>Conformément à la loi n° 2005-102 du 11 février 2005.</p>
+          <p>La déclaration a été réalisée le 1er mars 2024</p>
+          <h2>Autre</h2>
+        HTML
+      end
+
+      it "ignores the law's date" do
+        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2024, 3, 1))
+      end
     end
   end
 
@@ -217,9 +255,16 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "Une mention de date qui n'a pas de mots-clés le 15 septembre 2024." => nil,
       "Une date invalide du 35 mai 2024 pour une mise à jour." => nil
     }.each do |text, expected_date|
-      it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}' from '#{text}'" do
-        allow(check).to receive_messages(page: build(:page, body: "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>"), audit_date: expected_date ? expected_date - 1.year : nil)
-        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_UPDATE_DATE_PATTERN)).to eq(expected_date)
+      context "with '#{text}'" do
+        let(:body) { "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>" }
+
+        before do
+          allow(check).to receive(:audit_date).and_return(expected_date ? expected_date - 1.year : nil)
+        end
+
+        it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}'" do
+          expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_UPDATE_DATE_PATTERN)).to eq(expected_date)
+        end
       end
     end
   end
@@ -241,14 +286,18 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       Le taux de conformité global est de 83,1 %.
       Le taux de conformité moyen est de 89 %." => 83.1
     }.each do |text, expected_rate|
-      it "extracts '#{expected_rate}%' from '#{text}'" do
-        body = <<~HTML
-          <h2>Résultats des tests</h2>
-          <p>#{text}</p>
-          <h2>Contenus non accessibles</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
-        expect(check.find_compliance_rate).to eq(expected_rate)
+      context "with '#{text}'" do
+        let(:body) do
+          <<~HTML
+            <h2>Résultats des tests</h2>
+            <p>#{text}</p>
+            <h2>Contenus non accessibles</h2>
+          HTML
+        end
+
+        it "extracts '#{expected_rate}%'" do
+          expect(check.find_compliance_rate).to eq(expected_rate)
+        end
       end
     end
   end
@@ -261,9 +310,12 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "au RGAA" => "RGAA",
       "des critères WCAG" => "WCAG"
     }.each do |text, expected_standard|
-      it "extracts '#{expected_standard}' from '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: text))
-        expect(check.find_standard).to eq(expected_standard)
+      context "with '#{text}'" do
+        let(:body) { text }
+
+        it "extracts '#{expected_standard}'" do
+          expect(check.find_standard).to eq(expected_standard)
+        end
       end
     end
   end
@@ -279,14 +331,18 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "réalisé par la société Empreinte Digitale" => "Empreinte Digitale",
       " l’ Agence Cosiweb" => "Cosiweb"
     }.each do |text, expected_auditor|
-      it "extracts '#{expected_auditor}' from '#{text}'" do
-        body = <<~HTML
-          <h2>Résultats des tests</h2>
-          <p>#{text}</p>
-          <h2>Contenus non accessibles</h2>
-        HTML
-        allow(check).to receive(:page).and_return(build(:page, body:))
-        expect(check.find_auditor).to eq(expected_auditor)
+      context "with '#{text}'" do
+        let(:body) do
+          <<~HTML
+            <h2>Résultats des tests</h2>
+            <p>#{text}</p>
+            <h2>Contenus non accessibles</h2>
+          HTML
+        end
+
+        it "extracts '#{expected_auditor}'" do
+          expect(check.find_auditor).to eq(expected_auditor)
+        end
       end
     end
   end
@@ -300,9 +356,12 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "Contactez-nous pour plus d'informations" => false,
       "" => false
     }.each do |text, expectation|
-      it "returns '#{expectation}' for '#{text}'" do
-        allow(check).to receive(:page).and_return(build(:page, body: text))
-        expect(check.find_article_mention).to eq(expectation)
+      context "with '#{text}'" do
+        let(:body) { text }
+
+        it "returns '#{expectation}'" do
+          expect(check.find_article_mention).to eq(expectation)
+        end
       end
     end
   end

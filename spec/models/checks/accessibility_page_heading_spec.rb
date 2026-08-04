@@ -6,21 +6,17 @@ RSpec.describe Checks::AccessibilityPageHeading do
   describe "#analyze!" do
     subject(:analyze) { check.send(:analyze!) }
 
-    let(:audit) { create(:audit) }
+    let(:audit) { create(:audit, checks: [check]) }
     let(:fixture_file_name) { :valid }
     let(:page) do
       html = file_fixture("declarations/#{fixture_file_name}.html").read
       Page.new(url: "http://example.com", html:)
     end
+    let!(:page_snapshot) { create(:page_snapshot, audit:, kind: "accessibility", html: page.html) }
 
     let(:page_headings) { analyze[:page_headings] }
     let(:comparison) { analyze[:comparison] }
     let(:expected_headings) { described_class::EXPECTED_HEADINGS }
-
-    before do
-      check.audit = audit
-      allow(audit).to receive(:page).with(:accessibility).and_return(page)
-    end
 
     it "returns page_headings and comparison data" do
       expect(page_headings).to eq page.heading_levels

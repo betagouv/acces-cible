@@ -12,20 +12,20 @@ describe FetchResourcesJob do
   let(:audit) { create(:audit) }
 
   before do
-    allow(FetchHomePageService).to receive(:call).with(audit)
-    allow(FindAccessibilityPageService).to receive(:call).with(audit)
+    allow(FetchHomePageService).to receive(:new).with(audit)
+    allow(FindAccessibilityPageService).to receive(:new).with(audit)
   end
 
   it "calls the service for the home page" do
     fetch_resources_job
 
-    expect(FetchHomePageService).to have_received(:call).with(audit)
+    expect(FetchHomePageService).to have_received(:new).with(audit)
   end
 
   it "calls the service for the accessibility page" do
     fetch_resources_job
 
-    expect(FindAccessibilityPageService).to have_received(:call).with(audit)
+    expect(FindAccessibilityPageService).to have_received(:new).with(audit)
   end
 
   it "enqueues a run of ProcessAuditJob" do

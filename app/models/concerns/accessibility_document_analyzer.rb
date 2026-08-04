@@ -6,29 +6,29 @@ module AccessibilityDocumentAnalyzer
 
   included do
     def find_link
-      return unless page
+      return unless accessibility_page
 
-      page.links(skip_files: false)
-          .select { |link| link.text.match? self.class::PATTERN }
-          .max_by { |link| extract_valid_years(link.text) }
+      accessibility_page.links(skip_files: false)
+                        .select { |link| link.text.match? self.class::PATTERN }
+                        .max_by { |link| extract_valid_years(link.text) }
     end
 
     def link_between_headings
-      return unless page
+      return unless accessibility_page
 
-      page.links(skip_files: false, between_headings: [:previous, "État de conformité"])
-          .select { |link| link.text.match? self.class::PATTERN }
-          .max_by { |link| extract_valid_years(link.text) }
+      accessibility_page.links(skip_files: false, between_headings: [:previous, "État de conformité"])
+                        .select { |link| link.text.match? self.class::PATTERN }
+                        .max_by { |link| extract_valid_years(link.text) }
     end
 
     def find_text_in_main
-      return unless page
+      return unless accessibility_page
 
-      page.text
-          .scan(self.class::PATTERN)
-          .flatten
-          .compact
-          .max_by { |match| extract_valid_years(match) }
+      accessibility_page.text
+                        .scan(self.class::PATTERN)
+                        .flatten
+                        .compact
+                        .max_by { |match| extract_valid_years(match) }
     end
 
     def all_passed?
@@ -60,10 +60,6 @@ module AccessibilityDocumentAnalyzer
     end
 
     private
-
-    def page
-      @page ||= audit.page(:accessibility)
-    end
 
     def extract_valid_years(*sources)
       sources

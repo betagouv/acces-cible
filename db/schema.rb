@@ -61,6 +61,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
+  create_table "page_snapshots", force: :cascade do |t|
+    t.bigint "audit_id", null: false
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "current_url"
+    t.text "html"
+    t.string "kind", null: false
+    t.string "requested_url"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.index ["audit_id", "kind"], name: "index_page_snapshots_on_audit_id_and_kind", unique: true
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -127,6 +140,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
   add_foreign_key "audits", "users"
   add_foreign_key "check_transitions", "checks"
   add_foreign_key "checks", "audits"
+  add_foreign_key "page_snapshots", "audits"
   add_foreign_key "sessions", "users"
   add_foreign_key "site_tags", "sites"
   add_foreign_key "site_tags", "tags"

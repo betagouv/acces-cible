@@ -16,13 +16,6 @@ def find_audit(audit_id)
   audit_id ? Audit.find(audit_id) : Audit.last
 end
 
-def html_for(audit, kind)
-  case kind
-  when "home" then audit.home_page_html
-  when "accessibility" then audit.accessibility_page_html
-  end
-end
-
 def create_preview(audit, kind, html)
   filename = "audit-#{audit.id}-#{kind}.html"
   container_path = Rails.root.join("tmp", filename)
@@ -51,7 +44,7 @@ puts "Start"
 audit = find_audit(audit_id)
 abort("No audits found.") if audit.nil?
 
-html = html_for(audit, kind)
+html = audit.page_snapshots.find_by(kind:)&.html
 abort("No preview HTML available for '#{kind}' on audit ##{audit.id}.") if html.blank?
 
 preview_path = create_preview(audit, kind, html)

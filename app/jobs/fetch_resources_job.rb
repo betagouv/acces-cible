@@ -14,8 +14,8 @@ class FetchResourcesJob < ApplicationJob
   retry_on Ferrum::ProcessTimeoutError
 
   def perform(audit)
-    FetchHomePageService.call(audit)
-    FindAccessibilityPageService.call(audit)
+    FetchHomePageService.new(audit)
+    FindAccessibilityPageService.new(audit)
   ensure
     ProcessAuditJob.perform_later(audit)
   end

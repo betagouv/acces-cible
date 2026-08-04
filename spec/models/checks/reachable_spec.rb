@@ -9,7 +9,8 @@ RSpec.describe Checks::Reachable do
   let(:audit) { build(:audit, site:, home_page_url:) }
 
   before do
-    allow(check).to receive_messages(audit:, root_page:, site:)
+    allow(check).to receive_messages(audit:, site:)
+    allow(audit).to receive(:page_for).with(:home).and_return(root_page)
   end
 
   describe "constants" do
