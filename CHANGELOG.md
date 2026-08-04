@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.0](https://github.com/betagouv/acces-cible/compare/v1.1.1...v1.2.0) (2026-07-30)
+
+
+### Features
+
+* Add `Privileged` concern to `Team` and `User` models ([#639](https://github.com/betagouv/acces-cible/issues/639)) ([5dfeb47](https://github.com/betagouv/acces-cible/commit/5dfeb476c96ac7fbd685eb637697e05ef00e3ab8))
+* Add `rack-attack` for request throttling and abuse prevention ([#659](https://github.com/betagouv/acces-cible/issues/659)) ([b626910](https://github.com/betagouv/acces-cible/commit/b626910be2dc4255fafe204449026d17f9976ceb))
+* Prevent site and tag editing from interface ([#643](https://github.com/betagouv/acces-cible/issues/643)) ([6ece5f0](https://github.com/betagouv/acces-cible/commit/6ece5f0b10223371af5c24a55ce7ec28d51eb877))
+* Prevent site, audit and tag deletion from interface ([#637](https://github.com/betagouv/acces-cible/issues/637)) ([a5dd166](https://github.com/betagouv/acces-cible/commit/a5dd1667107f4542f9844ed8228849b39e80ab61))
+* Remove `name` column from `sites` ([#641](https://github.com/betagouv/acces-cible/issues/641)) ([0b0bf74](https://github.com/betagouv/acces-cible/commit/0b0bf74b206bdb253746c873c27a73344273f9a7))
+* Use ProConnect organization label for teams ([#668](https://github.com/betagouv/acces-cible/issues/668)) ([f54a52e](https://github.com/betagouv/acces-cible/commit/f54a52e7bbac7e3f93180e7b9ae0f5c2aa37b36a))
+
+
+### Bug Fixes
+
+* content type nil error ([#614](https://github.com/betagouv/acces-cible/issues/614)) ([f0586eb](https://github.com/betagouv/acces-cible/commit/f0586eb82717ae4a238aabe36c7b4377f38105c5))
+* Link parsing, remove `LinkList` and refactor related code ([#636](https://github.com/betagouv/acces-cible/issues/636)) ([ab45952](https://github.com/betagouv/acces-cible/commit/ab45952e8d0ff8b097afe8398fba90a409193416))
+* Network idling and timeout too long ([#627](https://github.com/betagouv/acces-cible/issues/627)) ([0074c45](https://github.com/betagouv/acces-cible/commit/0074c45d07e7db98032eda878af6531475ced11f))
+* user name is now displayed on /user ([#646](https://github.com/betagouv/acces-cible/issues/646)) ([5d758c8](https://github.com/betagouv/acces-cible/commit/5d758c86060bc146e774317276593f646bafb26a))
+
 ## [1.1.1](https://github.com/betagouv/acces-cible/compare/v1.1.0...v1.1.1) (2026-07-08)
 
 
