@@ -33,8 +33,7 @@ class BackfillChecksConformAndPresent < ActiveRecord::Migration[8.1]
 
     # language_indication - we won't use the DCL gem here
     Checks::LanguageIndication.where("data ->> 'indication' IS NOT NULL").find_each do |check|
-      language_code = check.data["indication"].to_s.strip.downcase.split(/_|-/).first
-      conform = language_code.include?("fr")
+      conform = check.data["indication"].downcase.include?("fr")
 
       check.update_columns(found: true, conform:)
     end
