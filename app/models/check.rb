@@ -137,7 +137,7 @@ class Check < ApplicationRecord
   end
 
   def finalize!
-    update(conform: compute_conform, found: compute_found)
+    update!(conform: compute_conform, found: compute_found)
   end
 
   private

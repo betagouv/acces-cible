@@ -1,4 +1,4 @@
-class BackfillChecksConformAndPresent < ActiveRecord::Migration[8.1]
+class BackfillChecksConformAndFound < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
   def up
@@ -28,12 +28,14 @@ class BackfillChecksConformAndPresent < ActiveRecord::Migration[8.1]
     [Checks::AnalyzeSchema, Checks::AnalyzePlan].each do |klass|
       docs = klass.where("data ->> 'link_url' IS NOT NULL OR data ->> 'text' IS NOT NULL")
       docs.in_batches.update_all(found: true)
-      docs.where("(data ->> 'valid_years')::boolean IS TRUE AND (data ->> 'text') IS NULL").in_batches.update_all(conform: true)
+      docs.where("(data ->> 'valid_years')::boolean IS TRUE AND (data ->> 'text') IS NULL AND (data ->> 'reachable')::boolean IS true")
+          .in_batches
+          .update_all(conform: true)
     end
 
     # language_indication - we won't use the DCL gem here
     Checks::LanguageIndication.where("data ->> 'indication' IS NOT NULL").find_each do |check|
-      conform = check.data["indication"].downcase.include?("fr")
+      conform = ["fr", check.data["detected_code"].downcase].join.include?(check.data["indication"].downcase)
 
       check.update_columns(found: true, conform:)
     end
