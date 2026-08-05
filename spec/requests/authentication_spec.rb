@@ -35,10 +35,10 @@ RSpec.describe "Authentication" do
     end
 
     context "with an expired session" do
-      it "redirects to login page" do
-        updated_at = Session::MAX_IDLE_TIME.ago + 1.day
-        expired_session = create(:session, user:, updated_at:)
-        allow_any_instance_of(Authentication).to receive(:find_session_by_cookie).and_return(nil) # rubocop:disable RSpec/AnyInstance
+      before { feature_login_as(user) }
+
+      it "redirects to login page even though the user stayed active" do
+        user.sessions.last.update_columns(created_at: Session::MAX_LIFETIME.ago - 1.day, updated_at: Time.current)
 
         get_authenticated_root
         expect(response).to redirect_to(login_path)

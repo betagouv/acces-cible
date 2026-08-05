@@ -3,7 +3,7 @@ production:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     queue: background
     schedule: every day at 7:00 and 21:00
-  remove_inactive_sessions:
-    class: RemoveInactiveSessionsJob
+  remove_expired_sessions:
+    class: RemoveExpiredSessionsJob
     queue: background
     schedule: every day at 1am
