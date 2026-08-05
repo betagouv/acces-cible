@@ -3,29 +3,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "5d4399958a6343d1fe98752a5cdd03fb464e5d3bd8260c5d9ced1244fc8e645b",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/concerns/sites_filtering.rb",
-      "line": 56,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"REGEXP_REPLACE(audits.url, '^https?://(www\\\\.)?', '') #{sort_direction.upcase}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SitesFiltering",
-        "method": "order_by_url"
-      },
-      "user_input": "sort_direction.upcase",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "c4cad965475b6097943e188932e000414d4bc34d7a9b5826abdcf5ab14bd684e",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -45,7 +22,30 @@
         89
       ],
       "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "d237831a33590c5e6eec48b196b28509d682c53c81b935a947ced174fd4672e0",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/jobs/one_off/backfill_page_snapshots_job.rb",
+      "line": 12,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"INSERT INTO page_snapshots (audit_id, kind, requested_url, current_url, html, status, content_type, created_at, updated_at)\\nSELECT id, '#{:BRAKEMAN_SAFE_LITERAL}', #{:BRAKEMAN_SAFE_LITERAL}_page_url, #{:BRAKEMAN_SAFE_LITERAL}_page_url, #{:BRAKEMAN_SAFE_LITERAL}_page_html, 200, 'text/html', now(), now()\\nFROM audits\\nWHERE #{:BRAKEMAN_SAFE_LITERAL}_page_html IS NOT NULL\\nAND id IN (#{audit_ids.join(\",\")})\\n\\nON CONFLICT (audit_id, kind) DO UPDATE SET\\n  requested_url = EXCLUDED.requested_url,\\n  current_url = EXCLUDED.current_url,\\n  html = EXCLUDED.html,\\n  status = EXCLUDED.status,\\n  content_type = EXCLUDED.content_type,\\n  updated_at = EXCLUDED.updated_at\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneOff::BackfillPageSnapshotsJob",
+        "method": "perform"
+      },
+      "user_input": "audit_ids.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.0.5"
 }
