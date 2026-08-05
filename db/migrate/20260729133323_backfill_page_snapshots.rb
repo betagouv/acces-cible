@@ -1,14 +1,22 @@
 class BackfillPageSnapshots < ActiveRecord::Migration[8.1]
+  disable_ddl_transaction
+
   def up
-    Audit.find_in_batches do |audits|
-      audits.each do |audit|
-        if audit.home_page_html.present?
-          PageSnapshot.create!(audit:, kind: "home", requested_url: audit.home_page_url, current_url: audit.home_page_url, html: audit.home_page_html, status: 200, content_type: "text/html")
-        end
-        if audit.accessibility_page_html.present?
-          PageSnapshot.create!(audit:, kind: "accessibility", requested_url: audit.accessibility_page_url, current_url: audit.accessibility_page_url, html: audit.accessibility_page_html, status: 200, content_type: "text/html")
-        end
-      end
+    %w[home accessibility].each do |kind|
+      execute <<~SQL
+        INSERT INTO page_snapshots (audit_id, kind, requested_url, current_url, html, status, content_type, created_at, updated_at)
+        SELECT id, '#{kind}', #{kind}_page_url, #{kind}_page_url, #{kind}_page_html, 200, 'text/html', now(), now()
+        FROM audits
+        WHERE #{kind}_page_html IS NOT NULL
+
+        ON CONFLICT (audit_id, kind) DO UPDATE SET
+          requested_url = EXCLUDED.requested_url,
+          current_url = EXCLUDED.current_url,
+          html = EXCLUDED.html,
+          status = EXCLUDED.status,
+          content_type = EXCLUDED.content_type,
+          updated_at = EXCLUDED.updated_at
+      SQL
     end
   end
 end
