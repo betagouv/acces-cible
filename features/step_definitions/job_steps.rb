@@ -10,7 +10,7 @@ end
 
 Quand("l'import est terminé") do
   perform_enqueued_jobs(only: ProcessSiteUploadJob)
-  perform_enqueued_jobs(only: ProcessBatchSitesCreationJob)
+  perform_enqueued_jobs(only: ProcessAuditBatchCreationJob)
 end
 
 # ce step sert à délencher et épuiser toutes les tâches qu'une tâche

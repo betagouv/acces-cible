@@ -1,6 +1,7 @@
 class Audit < ApplicationRecord
   belongs_to :site, counter_cache: true
   belongs_to :user
+  belongs_to :audit_batch, optional: true
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
 

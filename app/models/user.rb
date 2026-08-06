@@ -6,6 +6,7 @@ class User < ApplicationRecord
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
   has_many :sites, through: :team
   has_many :sessions, dependent: :destroy
+  has_many :audit_batches, dependent: :destroy
 
   validates :provider, :uid, :email, :name, :siret, presence: true
   validates :uid, uniqueness: { scope: :provider, if: :uid_changed? }

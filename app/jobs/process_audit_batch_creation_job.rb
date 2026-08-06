@@ -1,4 +1,4 @@
-class ProcessBatchSitesCreationJob < ApplicationJob
+class ProcessAuditBatchCreationJob < ApplicationJob
   include ActiveJob::Continuable
 
   def perform(sites_data, team_id, tag_ids, user_id)
@@ -7,13 +7,13 @@ class ProcessBatchSitesCreationJob < ApplicationJob
 
     return unless user.present?
 
-    site_batch_creation = SiteBatchCreationService.new(team:, tag_ids:, user:)
+    audit_batch_creation = AuditBatchCreationService.new(team:, tag_ids:, user:)
 
     step :process_sites do |step|
       start_index = step.cursor || 0
 
       sites_data.drop(start_index).each_with_index do |site_data, index|
-        site_batch_creation.process(site_data)
+        audit_batch_creation.process(site_data)
         step.advance! from: start_index + index
       end
     end
