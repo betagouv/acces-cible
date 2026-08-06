@@ -15,7 +15,7 @@
             <a class="fr-footer__content-link" target="_blank" href="https://legifrance.gouv.fr">legifrance.gouv.fr</a>
           </li>
           <li class="fr-footer__content-item">
-            <a class="fr-footer__content-link" target="_blank" href="https://gouvernement.fr">gouvernement.fr</a>
+            <a class="fr-footer__content-link" target="_blank" href="https://info.gouv.fr">info.gouv.fr</a>
           </li>
           <li class="fr-footer__content-item">
             <a class="fr-footer__content-link" target="_blank" href="https://service-public.fr">service-public.fr</a>
@@ -48,6 +48,9 @@
         </li>
         <li class="fr-footer__bottom-item">
           <%= link_to "Code source (version #{current_version.first(10)})", commit_url(current_version), class: "fr-footer__bottom-link", target: :_blank %>
+        </li>
+        <li class="fr-footer__bottom-item">
+          <%= link_to t("pages.display_mode.title"), display_mode_path, class: class_names("fr-footer__bottom-link", icon_class(:theme, side: :left, size: :sm)), "data-turbo-frame": :modal %>
         </li>
       </ul>
       <div class="fr-footer__bottom-copy">
