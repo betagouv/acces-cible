@@ -46,9 +46,7 @@ RSpec.describe AuditBatch do
     end
   end
 
-  describe "kinds" do
-    subject { described_class.kinds.keys }
-
-    it { is_expected.to contain_exactly("manual", "csv_import") }
+  describe "enums" do
+    it { is_expected.to define_enum_for(:kind).with_values(manual: "manual", csv_import: "csv_import").backed_by_column_of_type(:string) }
   end
 end
