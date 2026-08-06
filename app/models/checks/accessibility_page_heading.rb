@@ -87,6 +87,14 @@ module Checks
       }
     end
 
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      score >= 90
+    end
+
     def indexed_expected_headings
       @indexed_expected_headings ||= EXPECTED_HEADINGS.each_with_index.map { |(level, heading), index| [index, heading, level] }
     end

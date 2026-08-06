@@ -35,6 +35,14 @@ module Checks
       indication.to_s.strip.downcase.split(/_|-/).first
     end
 
+    def compute_found
+      indication.present?
+    end
+
+    def compute_conform
+      compute_found && language_code == (detected_code || "fr")
+    end
+
     def detect_page_language
       # Renvoie le code de langue, ou "un" (pour "unknown")
       CLD.detect_language(home_page.text)[:code].downcase

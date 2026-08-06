@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_152831) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,8 +19,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.string "accessibility_page_url"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.float "declaration_quality_score"
     t.text "home_page_html"
     t.string "home_page_url"
+    t.float "legal_obligation_score"
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -42,8 +44,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
 
   create_table "checks", force: :cascade do |t|
     t.bigint "audit_id", null: false
+    t.boolean "conform", default: false
     t.datetime "created_at", null: false
     t.jsonb "data"
+    t.boolean "found", default: false
     t.integer "priority", default: 100, null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false

@@ -36,5 +36,13 @@ module Checks
         {}
       end
     end
+
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      compute_found
+    end
   end
 end

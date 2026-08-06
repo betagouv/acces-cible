@@ -39,6 +39,14 @@ module Checks
       { mention: find_mention }
     end
 
+    def compute_found
+      mention.present?
+    end
+
+    def compute_conform
+      compute_found
+    end
+
     def find_mention
       (home_page&.text&.match(MENTION_REGEX)&.named_captures || {})["level"]&.downcase
     end
