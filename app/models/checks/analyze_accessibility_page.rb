@@ -146,6 +146,14 @@ module Checks
       [:audit_date, :compliance_rate, :mentions_article].all? { send(it).present? }
     end
 
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      found_required?
+    end
+
     def analyze!
       return unless accessibility_page
 

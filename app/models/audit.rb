@@ -56,13 +56,38 @@ class Audit < ApplicationRecord
   end
 
   def after_check_completed
-    if complete?
-      current_timestamp = Time.zone.now
-      update!(completed_at: current_timestamp)
-      site.update!(last_audited_at: current_timestamp)
-    else
-      ProcessAuditJob.perform_later(self)
-    end
+    complete? ? finalize! : ProcessAuditJob.perform_later(self)
+  end
+
+  def finalize!
+    current_timestamp = Time.zone.now
+    update!(completed_at: current_timestamp,
+            legal_obligation_score: compute_legal_obligation_score,
+            declaration_quality_score: compute_declaration_quality_score)
+    site.update!(last_audited_at: current_timestamp)
+  end
+
+  def compute_legal_obligation_score
+    legal_obligation_checks = %i[analyze_accessibility_page accessibility_mention analyze_schema analyze_plan]
+
+    legal_obligation_checks.count { |check| self.send(check).found }
+  end
+
+  def compute_declaration_quality_score
+    declaration = analyze_accessibility_page&.data || {}
+
+    criteria = [
+      declaration["audit_date"].present?,
+      declaration["standard"].present?,
+      declaration["auditor"].present?,
+      declaration["mentions_article"].present?,
+      declaration["contact_email"].present? || declaration["contact_form"].present?,
+      accessibility_page_heading&.conform,
+      analyze_schema&.conform,
+      analyze_plan&.conform
+    ]
+
+    criteria.count { it } * 0.5
   end
 
   def abort_dependent_checks!(check)

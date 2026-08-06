@@ -61,6 +61,14 @@ module AccessibilityDocumentAnalyzer
 
     private
 
+    def compute_found
+      !data.nil?
+    end
+
+    def compute_conform
+      all_passed?
+    end
+
     def extract_valid_years(*sources)
       sources
         .compact
