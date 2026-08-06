@@ -10,13 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_170423) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "audit_batches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_audit_batches_on_user_id"
+  end
 
   create_table "audits", force: :cascade do |t|
     t.text "accessibility_page_html"
     t.string "accessibility_page_url"
+    t.bigint "audit_batch_id"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.text "home_page_html"
@@ -24,6 +33,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.bigint "site_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["audit_batch_id"], name: "index_audits_on_audit_batch_id"
     t.index ["site_id"], name: "index_audits_on_site_id"
     t.index ["user_id"], name: "index_audits_on_user_id"
   end
@@ -136,6 +146,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_084634) do
     t.index ["siret"], name: "index_users_on_siret"
   end
 
+  add_foreign_key "audit_batches", "users"
+  add_foreign_key "audits", "audit_batches"
   add_foreign_key "audits", "sites"
   add_foreign_key "audits", "users"
   add_foreign_key "check_transitions", "checks"

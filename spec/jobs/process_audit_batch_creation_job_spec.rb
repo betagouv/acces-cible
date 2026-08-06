@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ProcessBatchSitesCreationJob do
+RSpec.describe ProcessAuditBatchCreationJob do
   describe "#perform" do
     subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids, user.id) }
 

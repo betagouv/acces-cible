@@ -1,4 +1,4 @@
-class SiteBatchCreationService
+class AuditBatchCreationService
   def initialize(team:, tag_ids:, user:)
     @team = team
     @tag_ids = tag_ids

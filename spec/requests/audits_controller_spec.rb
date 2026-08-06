@@ -25,6 +25,12 @@ RSpec.describe "Audits" do
       expect(last_audit.user).to eq(user)
     end
 
+    it "doesn't create an audit batch for a single relaunch" do
+      expect { post_audit }.not_to change(AuditBatch, :count)
+
+      expect(last_audit.audit_batch).to be_nil
+    end
+
     context "when site belongs to another team" do
       let(:site) { create(:site, team: create(:team)) }
 

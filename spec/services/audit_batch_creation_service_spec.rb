@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SiteBatchCreationService do
+RSpec.describe AuditBatchCreationService do
   describe "#process" do
     subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids, user:).process(site_data) }
 
