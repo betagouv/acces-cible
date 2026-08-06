@@ -28,7 +28,7 @@ class SitesController < ApplicationController
 
   # GET /sites/1
   def show
-    @audit = @site.last_audit_without_html
+    @audit = @site.last_audit
   end
 
   # GET /sites/new
