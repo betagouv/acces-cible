@@ -54,7 +54,7 @@ module Authentication
   def start_new_session_for(user)
     user.sessions.create!.tap do |session|
       Current.session = session
-      cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+      cookies.signed[:session_id] = { value: session.id, expires: Session::MAX_LIFETIME.from_now, httponly: true, same_site: :lax }
     end
   end
 
