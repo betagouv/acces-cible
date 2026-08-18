@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.0.0](https://github.com/betagouv/acces-cible/compare/v1.2.0...v2.0.0) (2026-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add new attributes to checks and audits and backfill ([#672](https://github.com/betagouv/acces-cible/issues/672))
+
+### Features
+
+* Add a maximum session lifetime and shorten the idle timeout ([#674](https://github.com/betagouv/acces-cible/issues/674)) ([052830a](https://github.com/betagouv/acces-cible/commit/052830a8d980b8669c34255009d45e32433dfca8))
+* add AuditBatch and rename batch processing services and jobs ([#679](https://github.com/betagouv/acces-cible/issues/679)) ([955852f](https://github.com/betagouv/acces-cible/commit/955852faa7a6290b1364c7e150268644cb1a3333))
+* Add new attributes to checks and audits and backfill ([#672](https://github.com/betagouv/acces-cible/issues/672)) ([3aac1bc](https://github.com/betagouv/acces-cible/commit/3aac1bcc173a4a535d609823059fd4e64fac21e6))
+* Change header and footer links ([#680](https://github.com/betagouv/acces-cible/issues/680)) ([8ad7a1b](https://github.com/betagouv/acces-cible/commit/8ad7a1bf17da9bd0da83961c3571a039efd7e562))
+* Introduce `PageSnapshot` model and refactor page management ([#669](https://github.com/betagouv/acces-cible/issues/669)) ([b7eea5d](https://github.com/betagouv/acces-cible/commit/b7eea5dd3dd08314fff15bc7a44332ca971c68ad))
+
+
+### Bug Fixes
+
+* app not logging out from ProConnect ([#667](https://github.com/betagouv/acces-cible/issues/667)) ([e269e74](https://github.com/betagouv/acces-cible/commit/e269e74f48fa46f35ec653aa4181d8389fe0cbbe))
+* Page snapshots backfill ([#675](https://github.com/betagouv/acces-cible/issues/675)) ([a5528e3](https://github.com/betagouv/acces-cible/commit/a5528e3cc51d10b89d64de855cb8a119ed9ee77b))
+
+
+### Miscellaneous
+
+* Move backfill of page snapshots to a one-off job ([#676](https://github.com/betagouv/acces-cible/issues/676)) ([ee8afbe](https://github.com/betagouv/acces-cible/commit/ee8afbed0ed74eaa1e76972339d28ec4ff12c2df))
+
 ## [1.2.0](https://github.com/betagouv/acces-cible/compare/v1.1.1...v1.2.0) (2026-07-30)
 
 
