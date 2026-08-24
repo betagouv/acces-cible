@@ -92,7 +92,7 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites
+    current_user.team.sites.with_launched_audit
   end
 
   def set_site

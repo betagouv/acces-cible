@@ -29,6 +29,16 @@ RSpec.describe "Sites" do
       end
     end
 
+    context "when a site has no launched audit yet" do
+      let!(:draft_site) { create(:site, :draft, team:) }
+
+      it "does not list it" do
+        get_sites
+
+        expect(response.body).not_to include(draft_site.normalized_url)
+      end
+    end
+
     context "when requesting an empty page" do
       let!(:paged_sites) { create_list(:site, 10, team:) }
 
@@ -120,6 +130,16 @@ RSpec.describe "Sites" do
     context "when site belongs to another team" do
       let(:other_team) { create(:team) }
       let(:site) { create(:site, team: other_team) }
+
+      it "returns not found status" do
+        get_site
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when site has no launched audit yet" do
+      let(:site) { create(:site, :draft, team:) }
 
       it "returns not found status" do
         get_site
