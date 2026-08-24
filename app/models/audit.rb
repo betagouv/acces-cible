@@ -5,6 +5,8 @@ class Audit < ApplicationRecord
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
 
+  enum :status, { draft: "draft", launched: "launched" }
+
   after_create_commit :fetch_resources!, :create_checks
 
   scope :sort_by_newest, -> { order(created_at: :desc) }

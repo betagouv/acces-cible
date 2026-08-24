@@ -3,6 +3,7 @@ class AuditBatch < ApplicationRecord
   has_many :audits
 
   enum :kind, { manual: "manual", csv_import: "csv_import" }
+  enum :status, { draft: "draft", launched: "launched" }
 
   validates :kind, presence: true
 

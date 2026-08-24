@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_05_170423) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_144128) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "audit_batches", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "kind", null: false
+    t.string "status", default: "draft", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_audit_batches_on_user_id"
@@ -33,10 +34,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_170423) do
     t.string "home_page_url"
     t.float "legal_obligation_score"
     t.bigint "site_id", null: false
+    t.string "status", default: "draft", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["audit_batch_id"], name: "index_audits_on_audit_batch_id"
-    t.index ["site_id"], name: "index_audits_on_site_id"
+    t.index ["site_id", "status"], name: "index_audits_on_site_id_and_status"
     t.index ["user_id"], name: "index_audits_on_user_id"
   end
 
