@@ -44,7 +44,7 @@ class Site < ApplicationRecord
   end
 
   def audit!(user:)
-    audits.create!(user:)
+    audits.create!(user:, status: :launched)
   end
 
   def tags_list

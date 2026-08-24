@@ -6,7 +6,7 @@ RSpec.describe Checks::AccessibilityPageHeading do
   describe "#analyze!" do
     subject(:analyze) { check.send(:analyze!) }
 
-    let(:audit) { create(:audit, checks: [check]) }
+    let(:audit) { create(:audit, :draft, checks: [check]) }
     let(:fixture_file_name) { :valid }
     let(:page) do
       html = file_fixture("declarations/#{fixture_file_name}.html").read

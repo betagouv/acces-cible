@@ -2,6 +2,11 @@ FactoryBot.define do
   factory :audit do
     user { association :user }
     site { association :site, audits: [instance] }
+    status { :launched }
+
+    trait :draft do
+      status { :draft }
+    end
 
     trait :without_checks do
       after(:create) do |audit, _eval|

@@ -7,7 +7,7 @@ class Audit < ApplicationRecord
 
   enum :status, { draft: "draft", launched: "launched" }
 
-  after_create_commit :fetch_resources!, :create_checks
+  after_save_commit :start!, if: -> { saved_change_to_status?(to: :launched) }
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
@@ -19,6 +19,11 @@ class Audit < ApplicationRecord
       instance_variable_get("@#{name}") ||
         instance_variable_set("@#{name}", checks.to_a.find { |check| klass === check } || checks.build(type: klass))
     end
+  end
+
+  def start!
+    fetch_resources!
+    create_checks
   end
 
   def fetch_resources!
@@ -43,6 +48,7 @@ class Audit < ApplicationRecord
 
   def status_from_checks
     states = all_check_states
+    return :pending if states.empty?
 
     if states.uniq.one?
       states.first
@@ -54,7 +60,7 @@ class Audit < ApplicationRecord
   end
 
   def complete?
-    checks.remaining.none?
+    checks.any? && checks.remaining.none?
   end
 
   def after_check_completed

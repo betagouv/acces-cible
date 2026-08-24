@@ -115,6 +115,26 @@ RSpec.describe Audit do
 
       it { is_expected.to eq "testing" }
     end
+
+    context "without any check" do
+      it { is_expected.to eq :pending }
+    end
+  end
+
+  describe "#complete?" do
+    subject { audit }
+
+    context "without any check" do
+      let(:audit) { create(:audit, :without_checks) }
+
+      it { is_expected.not_to be_complete }
+    end
+
+    context "with checks left to run" do
+      let(:audit) { create(:audit) }
+
+      it { is_expected.not_to be_complete }
+    end
   end
 
   describe "#pending?" do
@@ -147,6 +167,33 @@ RSpec.describe Audit do
   describe "after_create callback" do
     it "creates checks when audit is created" do
       expect { create(:audit) }.to change(Check, :count).by(Check.types.size)
+    end
+  end
+
+  describe "a draft audit" do
+    subject(:draft) { create(:audit, :draft) }
+
+    it "creates no checks" do
+      expect { draft }.not_to change(Check, :count)
+    end
+
+    it "enqueues no job" do
+      expect { draft }.not_to have_enqueued_job(FetchResourcesJob)
+    end
+
+    it "creates its checks once launched" do
+      draft
+      expect { draft.launched! }.to change(Check, :count).by(Check.types.size)
+    end
+
+    it "enqueues its job once launched" do
+      draft
+      expect { draft.launched! }.to have_enqueued_job(FetchResourcesJob).with(draft).exactly(:once)
+    end
+
+    it "does not start again when saved after launching" do
+      draft.launched!
+      expect { draft.update!(completed_at: Time.current) }.not_to change(Check, :count)
     end
   end
 
