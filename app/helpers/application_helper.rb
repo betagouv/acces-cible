@@ -4,10 +4,36 @@ module ApplicationHelper
   include IconHelper
   include JdmaHelper
 
+  EXTERNAL_LINK_CLASSES = "fr-link fr-link--sm fr-link--icon-right fr-icon-external-link-line".freeze
   TRUNCATION_LENGTH = 35.freeze
 
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
+  end
+
+  def external_link_to(url, text)
+    content = safe_join([text, tag.span(t("shared.new_window"), class: "fr-sr-only")])
+    link_to(content, url, class: EXTERNAL_LINK_CLASSES, target: "_blank", rel: "noopener noreferrer")
+  end
+
+  def email_link_to(email)
+    mail_to(email, class: "fr-link fr-link--sm fr-link--icon-right fr-icon-mail-line")
+  end
+
+  def card_with_header(title:, description: nil, &block)
+    tag.section(class: "rounded audit-card fr-mb-3w") do
+      header = capture do
+        concat tag.h3(title, class: "fr-h4 fr-mb-0")
+        concat tag.p(description, class: "fr-text--sm fr-mb-0 fr-mt-1v") if description
+      end
+
+      concat tag.div(header, class: "header")
+      concat tag.div(capture(&block), class: "body")
+    end
+  end
+
+  def muted_dash
+    tag.span(t("shared.dash"), class: "fr-text-mention--grey")
   end
 
   def badge(status, text = nil, link: nil, tooltip: false, &block)

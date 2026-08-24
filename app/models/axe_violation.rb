@@ -1,4 +1,4 @@
-class AxeViolation < Data.define(:id, :impact, :description, :help, :help_url, :nodes)
+class AxeViolation < Data.define(:id, :status, :impact, :description, :help, :help_url, :nodes)
   def description
     "#{super}."
   end

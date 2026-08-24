@@ -85,9 +85,10 @@ FactoryBot.define do
             incomplete: 2,
             inapplicable: 10,
             violations: 3,
-            violation_data: [
+            axe_rule_results: [
               {
                 id: "color-contrast",
+                status: :violations,
                 impact: "serious",
                 description: "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
                 help: "Elements must have sufficient color contrast",

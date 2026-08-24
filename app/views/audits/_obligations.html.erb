@@ -1,0 +1,8 @@
+<% if audit.find_accessibility_page.found? %>
+  <%= render "audits/summary", audit: %>
+  <%= render "audits/declared_level", audit: %>
+  <%= render "audits/legal_obligations", audit: %>
+  <%= render "audits/declaration_quality", audit: %>
+<% else %>
+  <%= render "audits/declaration_not_found", audit: %>
+<% end %>
