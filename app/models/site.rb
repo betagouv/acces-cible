@@ -44,8 +44,8 @@ class Site < ApplicationRecord
     new_record? || (slug != normalized_url.parameterize) || super
   end
 
-  def audit!(user:)
-    audits.create!(user:, status: :launched)
+  def audit!(user:, audit_batch: nil)
+    audits.create!(user:, audit_batch:, status: :launched)
   end
 
   def tags_list
