@@ -31,17 +31,8 @@ fr:
         one: Équipe
         other: Équipes
   audit:
-    completed_at: Executé le
     redirect_url: URL de redirection
     site_url_address: Adresse du site
-    state: État
-    status:
-      failed: Échoué
-      mixed: Mixte
-      passed: Effectué
-      pending: Planifié
-      retryable: À retenter
-      running: En cours
     url: URL
   audits:
     create:
@@ -104,7 +95,6 @@ fr:
       legend_violations:
         one: "%{count} en échec"
         other: "%{count} en échec"
-      new_audit: Lancer une évaluation
       overall_score: Note globale
       page_tested: "Page testée :"
       pending_text: "Cette évaluation n'est pas encore terminée."
@@ -370,6 +360,7 @@ fr:
     invalid_url: URL invalide
     login: Se connecter
     logout: Se déconnecter
+    new_audit: Lancer une évaluation
     new_window: " (nouvelle fenêtre)"
     or: ou
     page_unavailable: Cette page n'est pas disponible.
@@ -420,12 +411,11 @@ fr:
       title: Ajouter un site
     show:
       audit_history: Historique des vérifications (%{total})
-      audits: Toutes les vérifications
-      edit_tags: Modifier les étiquettes
-      new_audit: Nouvelle vérification
-      no_tag: Aucune étiquette
-      tag: Étiquette %{name}
-      url: Adresse du site
+      audit_history_hint: "Chaque vérification reste consultable. Sélectionnez-en une pour afficher son résultat détaillé."
+      legal_obligations: Obligations légales
+      most_recent: La plus récente
+      relaunch: Ré-évaluer
+      see_result: Voir le résultat
     site:
       view_name: Voir la fiche de %{name}
     tags_form:
