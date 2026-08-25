@@ -70,12 +70,10 @@ module AuditsHelper
     end
   end
 
-  def results_bar_segment_width_class(segment_count, total_count)
-    return "width-0" if total_count.zero?
+  def results_bar_segment_widths(counts_by_status, total_count)
+    return {} if total_count.zero?
 
-    percentage = segment_count.to_f / total_count * 100
-    percentage_rounded = (percentage / 5.0).round * 5
-    "width-#{percentage_rounded.clamp(0, 100)}"
+    counts_by_status.transform_values { |count| (count.fdiv(total_count) * 20).round * 5 }
   end
 
   def star_rating(filled:, total:, color:, label:)

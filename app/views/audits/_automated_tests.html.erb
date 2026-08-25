@@ -10,10 +10,6 @@
       description: t("audits.show.automated_tests_description", site: audit.site.normalized_url, total: Checks::RunAxeOnHomepage::AXE_RULE_TO_RGAA_CRITERION.size)
     ) do %>
   <% if check.completed? %>
-    <% automated_test_results = check.automated_test_results %>
-    <% total_test_count = automated_test_results.size %>
-    <% counts_by_status = automated_test_results.pluck(:status).tally %>
-
     <p class="fr-text--sm fr-mb-2w">
       <span class="fr-text--bold"><%= t("audits.show.page_tested") %></span>
       <% if tested_url %>
@@ -23,59 +19,66 @@
       <% end %>
     </p>
 
+    <% automated_test_results = check.automated_test_results %>
+    <% counts_by_status = check.counts_by_status %>
+    <% total_test_count = counts_by_status.values.sum %>
+    <% segment_widths = results_bar_segment_widths(counts_by_status, total_test_count) %>
+
     <div class="audit-results-summary fr-mb-3w">
       <p class="fr-text--bold fr-mb-0"><%= t("audits.show.automated_tests_results", count: counts_by_status[:passes], total: total_test_count) %></p>
       <div class="rounded audit-results-bar" role="img" aria-label="<%= t("audits.show.stackbar_label", total: total_test_count, passes: counts_by_status[:passes], violations: counts_by_status[:violations], inapplicable: counts_by_status[:inapplicable], incomplete: counts_by_status[:incomplete]) %>">
-        <% counts_by_status.each do |status, count| %>
-          <% if count.positive? %>
-            <span class="segment status-fill <%= results_bar_segment_width_class(count, total_test_count) %>" data-status="<%= status %>"></span>
-          <% end %>
+        <% counts_by_status.each_key do |status| %>
+          <span class="segment status-fill width-<%= segment_widths[status] %>" data-status="<%= status %>"></span>
         <% end %>
       </div>
       <ul class="audit-results-legend">
         <% counts_by_status.each do |status, count| %>
-          <% if count.positive? %>
-            <li>
-              <span class="swatch status-fill" data-status="<%= status %>" aria-hidden="true"></span><%= t("audits.show.legend_#{status}", count:) %>
-            </li>
-          <% end %>
+          <li>
+            <span class="swatch status-fill" data-status="<%= status %>" aria-hidden="true"></span><%= t("audits.show.legend_#{status}", count:) %>
+          </li>
         <% end %>
       </ul>
     </div>
 
-    <% automated_test_results.each do |result| %>
-      <div class="rounded audit-test-result fr-mb-2w" data-status="<%= result[:status] %>">
-        <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-1v">
-          <div class="fr-col">
-            <%= dsfr_badge(status: "no-icon", html_attributes: { class: "fr-badge--sm" }) { result[:position].to_s } %>
-            <strong><%= result[:title] %></strong>
+    <% if check.rule_details_unavailable? %>
+      <%= dsfr_callout(title: t("audits.show.automated_tests_incomplete_title"), html_attributes: { class: "fr-mb-3w" }) do %>
+        <%= t("audits.show.automated_tests_incomplete_text") %>
+      <% end %>
+    <% else %>
+      <% automated_test_results.each do |result| %>
+        <div class="rounded audit-test-result fr-mb-2w" data-status="<%= result[:status] %>">
+          <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-1v">
+            <div class="fr-col">
+              <%= dsfr_badge(status: "no-icon", html_attributes: { class: "fr-badge--sm" }) { result[:position].to_s } %>
+              <strong><%= result[:title] %></strong>
+            </div>
+            <div class="fr-col-auto">
+              <%= automated_test_status_badge(result) %>
+            </div>
           </div>
-          <div class="fr-col-auto">
-            <%= automated_test_status_badge(result) %>
-          </div>
-        </div>
-        <p class="fr-text--sm fr-mb-0">
-          <%= external_link_to(check.rgaa_criterion_documentation_url(result[:criterion]), "#{t("audits.show.criterion_prefix")} #{result[:criterion]}") %>
-          <%= external_link_to(result[:help_url], t("audits.show.documentation_axe_core")) if result[:help_url] %>
-        </p>
+          <p class="fr-text--sm fr-mb-0">
+            <%= external_link_to(check.rgaa_criterion_documentation_url(result[:criterion]), "#{t("audits.show.criterion_prefix")} #{result[:criterion]}") %>
+            <%= external_link_to(result[:help_url], t("audits.show.documentation_axe_core")) if result[:help_url] %>
+          </p>
 
-        <% if result[:status] == :violations %>
-          <div class="rounded fr-background-alt--blue-france fr-p-2w fr-mt-2w">
-            <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.how_to_fix") %></p>
-            <p class="fr-text--sm fr-mb-0"><%= result[:violation].description %></p>
-            <% if result[:violation].nodes_html.first %>
-              <details class="fr-mt-1v fr-mb-2w">
-                <summary class="fr-text--sm"><%= t("audits.show.see_code_html") %></summary>
-                <div class="rounded fr-background-default--grey fr-p-2w fr-mt-2w">
-                  <code>
-                    <%= result[:violation].nodes_html.first %>
-                  </code>
-                </div>
-              </details>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
+          <% if result[:status] == :violations %>
+            <div class="rounded fr-background-alt--blue-france fr-p-2w fr-mt-2w">
+              <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.how_to_fix") %></p>
+              <p class="fr-text--sm fr-mb-0"><%= result[:violation].description %></p>
+              <% if result[:violation].nodes_html.first %>
+                <details class="fr-mt-1v fr-mb-2w">
+                  <summary class="fr-text--sm"><%= t("audits.show.see_code_html") %></summary>
+                  <div class="rounded fr-background-default--grey fr-p-2w fr-mt-2w">
+                    <code>
+                      <%= result[:violation].nodes_html.first %>
+                    </code>
+                  </div>
+                </details>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   <% else %>
     <%= dsfr_badge(status: :info) { t("check.status.#{check.current_state}") } %>

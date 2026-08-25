@@ -2,9 +2,9 @@
 <% audit_date = l(accessibility_page_analysis.audit_date) if accessibility_page_analysis.audit_date %>
 <% compliance_rate = accessibility_page_analysis.human_compliance_rate.presence %>
 
-<h3 class="fr-h4 fr-mb-2w">
+<h2 class="fr-h4 fr-mb-2w">
   <%= t("audits.show.summary_title") %> <%= link_to audit.site.normalized_url, site_path(audit.site), class: "fr-link" %>
-</h3>
+</h2>
 <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
   <div class="fr-col-12 fr-col-md-4">
     <div class="audit-card fr-p-3w">

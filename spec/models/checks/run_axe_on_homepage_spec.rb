@@ -97,7 +97,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
 
       before { check.data = { "axe_rule_results" => [violation_hash] } }
 
-      it "maps it to an AxeViolation with a symbolized status" do
+      it "maps it to an AxeRule with a symbolized status" do
         expect(violation_data).to contain_exactly(have_attributes(id: "color-contrast", status: :violations))
       end
     end

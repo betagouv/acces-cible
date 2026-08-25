@@ -35,7 +35,8 @@ module Checks
     }.freeze
     RGAA_AXE_RULES = AXE_RULE_TO_RGAA_CRITERION.keys.to_json.freeze
     RGAA_CRITERION_DOCUMENTATION_BASE_URL = "https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests".freeze
-    LEGACY_STATUSES = { "violation" => "violations", "passed" => "passes", "unknown" => "incomplete" }.freeze
+    LEGACY_STATUSES = { "passed" => "passes", "violation" => "violations", "unknown" => "incomplete", "inapplicable" => "inapplicable" }.freeze
+    STATUSES = LEGACY_STATUSES.values.freeze
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :violations, :issues_total, :axe_rule_results
 
@@ -71,20 +72,30 @@ module Checks
     def axe_rule_results
       (super.presence || data["violation_data"] || []).map do |rule|
         status = LEGACY_STATUSES[rule["status"]] || rule["status"] || "violations"
-        AxeViolation.new(
+        nodes = rule["nodes"] if status == "violations"
+
+        AxeRule.new(
           id: rule["id"],
-          status: status&.to_sym,
+          status: status.to_sym,
           impact: rule["impact"],
           description: rule["description"],
           help: rule["help"],
           help_url: rule["help_url"],
-          nodes: rule["nodes"]
+          nodes: nodes,
         )
       end
     end
 
     def violation_data
       axe_rule_results.select { it.status == :violations }
+    end
+
+    def counts_by_status
+      { passes:, violations:, inapplicable:, incomplete: }.select { |_, count| count.positive? }
+    end
+
+    def rule_details_unavailable?
+      data["axe_rule_results"].blank?
     end
 
     def automated_test_results
@@ -150,8 +161,9 @@ module Checks
     end
 
     def format_axe_rule_results(results)
-      %w[violations passes incomplete inapplicable].flat_map do |status|
+      STATUSES.flat_map do |status|
         (results[status] || []).map do |rule|
+          nodes = rule["nodes"] if status == "violations"
           {
             id: rule["id"],
             status: status.to_sym,
@@ -159,7 +171,7 @@ module Checks
             description: rule["description"],
             help: rule["help"],
             help_url: rule["helpUrl"],
-            nodes: (rule["nodes"] || []).map do |node|
+            nodes: nodes&.map do |node|
               {
                 html: node["html"],
                 impact: node["impact"],

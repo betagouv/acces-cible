@@ -50,6 +50,8 @@ fr:
       accessibility_rate: Taux d'accessibilité
       audit_date: Date de l'audit
       automated_tests_description: "Tests techniques exécutés automatiquement sur %{site} à l'aide du moteur de test Axe-core. Le nombre de tests applicables peut être inférieur à %{total} selon le contenu du site."
+      automated_tests_incomplete_text: "Les résultats détaillés de ce test ne sont plus disponibles. Relancez une évaluation pour obtenir un résultat détaillé."
+      automated_tests_incomplete_title: Résultats détaillés indisponibles
       automated_tests_results: "%{count} / %{total} réussis"
       automated_tests_title: Tests automatiques du RGAA
       automated_tests_warning_text: "Les tests automatiques du RGAA ne couvrent que 44 des 105 critères du RGAA. Les critères non couverts doivent être vérifiés par un auditeur agréé. Les tests automatiques ne se substituent pas à un audit d'accessibilité complet."
@@ -125,7 +127,7 @@ fr:
       summary_legal_obligations_detail:
         one: "%{count} obligation sur %{total} remplie"
         other: "%{count} obligations sur %{total} remplies"
-      summary_mention_details: "Taux RGAA %{compliance_rate}% - audit du %{audit_date}"
+      summary_mention_details: "Taux RGAA %{compliance_rate} - audit du %{audit_date}"
       summary_title: "Résumé de l'évaluation du site"
       tab_automated_tests: Tests automatiques RGAA
       tab_obligations: Obligations & déclaration
