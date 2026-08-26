@@ -43,6 +43,28 @@ fr:
       retryable: À retenter
       running: En cours
     url: URL
+  audit_batches:
+    cancel: Abandonner
+    destroy:
+      cancelled: Évaluation abandonnée
+    new:
+      intro: "Chaque adresse donne lieu à une nouvelle évaluation : niveau d'accessibilité déclaré, respect des obligations légales, qualité de la déclaration et, en option, une série de tests automatiques du RGAA."
+      title: Lancer une évaluation
+    steps:
+      wip: Cet écran est en cours de construction.
+      checks:
+        title: Tests automatiques
+      method:
+        title: Méthode d'ajout
+        legend: Comment souhaitez-vous ajouter les sites ?
+        manual: Saisir des adresses
+        manual_hint: Saisissez de 1 à 10 adresses, une par champ.
+        csv_import: Importer un CSV
+        csv_import_hint: Bientôt disponible.
+      summary:
+        title: Récapitulatif et étiquettes
+      urls:
+        title: Adresses à évaluer
   audits:
     create:
       notice: Vérification créée
@@ -229,13 +251,16 @@ fr:
     actions: Actions
     add: Ajouter
     help_and_resources: Aides et ressources
+    home: Accueil
     all_lines: "toutes les lignes"
     apply: Appliquer
     applying: Appliquer…
     asc: croissant
+    back: Retour
     back_to_home: "Revenir à la page d'accueil"
     back_to_list: "Revenir à la liste"
     cancel: Annuler
+    continue: Continuer
     desc: décroissant
     filter: Filtrer
     help: Aide

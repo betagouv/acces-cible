@@ -10,6 +10,12 @@ Rails.application.routes.draw do
   end
 
   resources :tags, only: [:index, :create, :show]
+  resources :audit_batches, only: [:new, :create, :destroy] do
+    member do
+      get "steps/:step", action: :show_step, as: :step
+      patch "steps/:step", action: :update_step
+    end
+  end
   resources :sites, only: [:index, :new, :create, :show, :edit, :update] do
     collection do
       post :upload

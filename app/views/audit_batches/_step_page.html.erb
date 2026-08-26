@@ -1,0 +1,27 @@
+<%# locals: (audit_batch:, step:) %>
+<% use_centered_layout(boxed: false) %>
+<% next_step = audit_batch.next_step(step) %>
+
+<%= dsfr_breadcrumbs do |breadcrumbs| %>
+  <%= breadcrumbs.with_breadcrumb(label: t("shared.home"), href: authenticated_root_path) %>
+  <%= breadcrumbs.with_breadcrumb(label: t("audit_batches.new.title")) %>
+<% end %>
+
+<p><%= t("audit_batches.new.intro") %></p>
+
+<div class="fr-border-default--grey fr-p-4w fr-mt-4w">
+  <%= dsfr_stepper(
+        title: t("audit_batches.steps.#{step}.title"),
+        value: audit_batch.steps.index(step) + 1,
+        max: audit_batch.steps.size,
+        next_title: (t("audit_batches.steps.#{next_step}.title") if next_step),
+        header_level: 2) %>
+
+  <%= render "audit_batches/steps/#{step}", audit_batch:, step: %>
+
+  <% if audit_batch.persisted? %>
+    <%= button_to t("audit_batches.cancel"), audit_batch_path(audit_batch),
+          method: :delete,
+          class: "fr-btn fr-btn--tertiary-no-outline fr-mt-2w" %>
+  <% end %>
+</div>
