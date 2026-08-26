@@ -1,0 +1,23 @@
+<%= card_with_header(title: t("audits.show.declaration_obligations_title")) do %>
+  <%= dsfr_table(caption: t("audits.show.declaration_and_mention_caption"), html_attributes: { class: "fr-mb-3w" }) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col"><%= t("audits.show.element_checked") %></th>
+        <th scope="col"><%= t("audits.show.result") %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <% [audit.find_accessibility_page, audit.accessibility_mention].each do |check| %>
+        <tr>
+          <th scope="row"><%= check.human_type %></th>
+          <td><%= badge obligation_badge(check) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+  <%= dsfr_callout(title: t("audits.show.declaration_not_found_title"), icon_name: :none, accent: "brown-caramel", header_level: 4, html_attributes: { class: "fr-mb-0" }) do %>
+    <%= t("audits.show.declaration_not_found_text") %>
+    <br/>
+    <%= external_link_to(jdma_form_url, t("audits.show.report_incorrect_result")) %>
+  <% end %>
+<% end %>

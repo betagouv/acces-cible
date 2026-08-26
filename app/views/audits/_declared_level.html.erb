@@ -1,0 +1,22 @@
+<% accessibility_page_analysis = audit.analyze_accessibility_page %>
+
+<%= card_with_header(title: t("audits.show.declared_level_title")) do %>
+  <%= dsfr_table(caption: t("audits.show.declared_level_caption"), html_attributes: { class: "fr-mb-0" }) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col"><%= t("audits.show.element") %></th>
+        <th scope="col"><%= t("audits.show.value_found") %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <tr>
+        <th scope="row"><%= t("audits.show.accessibility_rate") %></th>
+        <td><%= accessibility_page_analysis.human_compliance_rate.presence || muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("audits.show.audit_date") %></th>
+        <td><%= accessibility_page_analysis.audit_date ? l(accessibility_page_analysis.audit_date) : muted_dash %></td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>

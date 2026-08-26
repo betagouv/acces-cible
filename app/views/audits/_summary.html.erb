@@ -1,0 +1,34 @@
+<% accessibility_page_analysis = audit.analyze_accessibility_page %>
+<% audit_date = l(accessibility_page_analysis.audit_date) if accessibility_page_analysis.audit_date %>
+<% compliance_rate = accessibility_page_analysis.human_compliance_rate.presence %>
+
+<h2 class="fr-h4 fr-mb-2w">
+  <%= t("audits.show.summary_title") %> <%= link_to audit.site.normalized_url, site_path(audit.site), class: "fr-link" %>
+</h2>
+<div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+  <div class="fr-col-12 fr-col-md-4">
+    <div class="audit-card fr-p-3w">
+      <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.summary_declared_level") %></p>
+      <div class="fr-mt-2w fr-mb-1w">
+        <%= badge to_badge(audit.accessibility_mention) %>
+      </div>
+      <% if accessibility_page_analysis.conform %>
+        <p class="fr-text--xs fr-text-mention--grey"><%= t("audits.show.summary_mention_details", audit_date: audit_date, compliance_rate: compliance_rate) %></p>
+      <% end %>
+    </div>
+  </div>
+  <div class="fr-col-12 fr-col-md-4">
+    <div class="audit-card fr-p-3w">
+      <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.summary_legal_obligations") %></p>
+      <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.summary_legal_obligations")) %>
+      <p class="fr-text--xs fr-text-mention--grey fr-mb-0"><%= t("audits.show.summary_legal_obligations_detail", count: audit.legal_obligation_score.to_i, total: 4) %></p>
+    </div>
+  </div>
+  <div class="fr-col-12 fr-col-md-4">
+    <div class="audit-card fr-p-3w">
+      <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.summary_declaration_quality") %></p>
+      <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality")) %>
+      <p class="fr-text--xs fr-text-mention--grey fr-mb-0"><%= t("audits.show.summary_declaration_quality_detail", count: audit.declaration_quality_issues_count, total: audit.declaration_quality_criteria.size) %></p>
+    </div>
+  </div>
+</div>
