@@ -1,0 +1,13 @@
+<%= dsfr_callout(title: t("audits.show.unreachable_title"), icon_name: :none, accent: "pink-tuile", html_attributes: { class: "fr-mb-3w" }) do %>
+  <%= t("audits.show.unreachable_intro", site: audit.site.normalized_url) %>
+<% end %>
+
+<h2 class="fr-h4 fr-mb-1w"><%= t("audits.show.unreachable_no_checks_title") %></h2>
+<p class="fr-mb-3w"><%= t("audits.show.unreachable_no_checks_text") %></p>
+
+<h2 class="fr-h4 fr-mb-1w"><%= t("audits.show.unreachable_what_to_do_title") %></h2>
+<p class="fr-mb-2w"><%= t("audits.show.unreachable_what_to_do_text") %></p>
+
+<p class="fr-text--sm fr-mb-2w">
+  <%= external_link_to(jdma_form_url, t("audits.show.report_incorrect_result")) %>
+</p>

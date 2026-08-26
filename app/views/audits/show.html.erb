@@ -23,18 +23,22 @@
 </p>
 
 <% if @audit.completed_at %>
-  <% if @audit.reachable.completed? && @audit.reachable.redirected? %>
-    <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
-      <%= t("checks.reachable.redirect_message", original: @audit.reachable.original_url, redirected: @audit.reachable.redirect_url) %>
-    <% end %>
-  <% end %>
 
-  <%= dsfr_tabs(label: t(".tabs_label")) do |tabs| %>
-    <% tabs.with_tab(title: t(".tab_obligations"), active: true) do %>
-      <%= render "audits/obligations", audit: @audit %>
+  <% if !@audit.reachable.found %>
+    <%= render "audits/unreachable", audit: @audit %>
+  <% else %>
+    <% if @audit.reachable.completed? && @audit.reachable.redirected? %>
+      <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
+        <%= t("checks.reachable.redirect_message", original: @audit.reachable.original_url, redirected: @audit.reachable.redirect_url) %>
+      <% end %>
     <% end %>
-    <% tabs.with_tab(title: t(".tab_automated_tests")) do %>
-      <%= render "audits/automated_tests", audit: @audit %>
+    <%= dsfr_tabs(label: t(".tabs_label")) do |tabs| %>
+      <% tabs.with_tab(title: t(".tab_obligations"), active: true) do %>
+        <%= render "audits/obligations", audit: @audit %>
+      <% end %>
+      <% tabs.with_tab(title: t(".tab_automated_tests")) do %>
+        <%= render "audits/automated_tests", audit: @audit %>
+      <% end %>
     <% end %>
   <% end %>
 <% else %>
