@@ -56,6 +56,7 @@ fr:
       automated_tests_title: Tests automatiques du RGAA
       automated_tests_warning_text: "Les tests automatiques du RGAA ne couvrent que 44 des 105 critères du RGAA. Les critères non couverts doivent être vérifiés par un auditeur agréé. Les tests automatiques ne se substituent pas à un audit d'accessibilité complet."
       automated_tests_warning_title: Attention
+      bar_label: "Sur %{total} tests : %{details}"
       breadcrumb_current: "Évaluation du %{date}"
       breadcrumb_sites: Annuaire
       comment: Commentaire
@@ -113,7 +114,6 @@ fr:
       result: Résultat
       see_code_html: Voir le code HTML en cause
       see_headings: Voir la hiérarchie des titres
-      stackbar_label: "Sur %{total} tests : %{passes} réussis, %{violations} en échec, %{inapplicable} non applicables, %{incomplete} inconnus"
       status_inapplicable: Non applicable
       status_incomplete: Inconnu
       status_passes: Réussi

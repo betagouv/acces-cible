@@ -23,10 +23,11 @@
     <% counts_by_status = check.counts_by_status %>
     <% total_test_count = counts_by_status.values.sum %>
     <% segment_widths = results_bar_segment_widths(counts_by_status, total_test_count) %>
+    <% bar_details = counts_by_status.filter_map { |status, count| t("audits.show.legend_#{status}", count:) if count.positive? }.to_sentence %>
 
     <div class="audit-results-summary fr-mb-3w">
       <p class="fr-text--bold fr-mb-0"><%= t("audits.show.automated_tests_results", count: counts_by_status[:passes], total: total_test_count) %></p>
-      <div class="rounded audit-results-bar" role="img" aria-label="<%= t("audits.show.stackbar_label", total: total_test_count, passes: counts_by_status[:passes], violations: counts_by_status[:violations], inapplicable: counts_by_status[:inapplicable], incomplete: counts_by_status[:incomplete]) %>">
+      <div class="rounded audit-results-bar" role="img" aria-label="<%= t("audits.show.bar_label", total: total_test_count, details: bar_details) %>">
         <% counts_by_status.each_key do |status| %>
           <span class="segment status-fill width-<%= segment_widths[status] %>" data-status="<%= status %>"></span>
         <% end %>
