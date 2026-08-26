@@ -12,13 +12,14 @@ Fonctionnalité: Vérifications du schéma pluriannuel d'accessibilité
     Sachant que le site "https://foobar.com/" renvoie "<contenu>" pour la déclaration d'accessibilité
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
-    Alors la section "Schéma pluriannuel d'accessibilité" indique "<résultat>"
+    Et que je clique sur "Voir le résultat"
+    Alors la vérification "Schéma pluriannuel d'accessibilité" de la carte "Qualité de la déclaration" indique "<résultat>"
 
     Exemples:
-      | contenu                                        | résultat                    |
-      | schéma pluriannuel d'accessibilité 2020 - 2026 | Années invalides            |
-      | schéma annuel d'accessibilité 2025 - 2026      | 2025-2026                   |
-      | schéma plurianneul 1998 2000                   | Non trouvé                  |
-      | schéma annuel d'accessibilité 1998 - 2000      | Années invalides            |
-      | schéma bizarre d'accessibilité                 | Non trouvé                  |
-      | schéma annuel d'accessibilité 0946-0943        | Années valides non trouvées |
+      | contenu                                        | résultat         |
+      | schéma pluriannuel d'accessibilité 2020 - 2026 | Années invalides |
+      | schéma annuel d'accessibilité 2025 - 2026      | 2025-2026        |
+      | schéma plurianneul 1998 2000                   | Absent           |
+      | schéma annuel d'accessibilité 1998 - 2000      | Années invalides |
+      | schéma bizarre d'accessibilité                 | Absent           |
+      | schéma annuel d'accessibilité 0946-0943        | Années invalides |

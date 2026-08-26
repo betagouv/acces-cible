@@ -12,8 +12,9 @@ Fonctionnalité: Vérifications de la présence d'une déclaration d'accessibili
     Sachant que le site "<url>" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
-    Alors la vérification "Présence d'une déclaration d'accessibilité" indique "Déclaration d'accessibilité"
-    Et la section "Présence d'une déclaration d'accessibilité" indique "<résultat>"
+    Et que je clique sur "Voir le résultat"
+    Alors la vérification "Présence d'une déclaration d'accessibilité" de la carte "Obligations légales" indique "Déclaration d'accessibilité"
+    Et la vérification "Présence d'une déclaration d'accessibilité" de la carte "Obligations légales" indique "<résultat>"
 
     Exemples:
       | contenu                                                                              | url                                        | résultat                                           |
@@ -24,5 +25,6 @@ Fonctionnalité: Vérifications de la présence d'une déclaration d'accessibili
     Sachant que le site "https://foobar.com/" renvoie "<p>Bienvenue</p>" pour la page d'accueil
     Et que toutes les tâches de fond sont terminées
     Et que je recharge la page
-    Alors la vérification "Présence d'une déclaration d'accessibilité" indique "Non trouvé"
-    Et la section "Présence d'une déclaration d'accessibilité" n'indique pas "Cette déclaration est hébergée hors du site audité"
+    Et que je clique sur "Voir le résultat"
+    Alors la vérification "Présence d'une déclaration d'accessibilité" de la carte "Obligations déclaratives" indique "Absent"
+    Et la carte "Obligations déclaratives" n'indique pas "Cette déclaration est hébergée hors du site audité"
