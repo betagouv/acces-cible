@@ -24,36 +24,6 @@ form.button_to {
   box-shadow: none;
 }
 
-// Ajuste les badges pour permettre de n'afficher que l'icône
-.fr-badge {
-  // Ajoute un outline quand il contient un lien caché qui a le focus
-  &:has(a:focus) {
-    outline-color: #0a76f6;
-    outline-style: solid;
-    outline-width: 2px;
-
-    a {
-      outline: none;
-    }
-  }
-
-  &[role=tooltip] {
-    outline-offset: 0;
-
-    &::before {
-      margin-right: -.125rem; // Centre l'icône quand le badge n'a pas de texte visible
-    }
-
-    &:not(a) {
-      cursor: help;
-    }
-
-    &[target=_blank]::after {
-      display: none; // Masque l'icône nouvelle fenêtre en mode tooltip
-    }
-  }
-}
-
 .link--icon-only {
   background-image: none; // Underline uses a background-image
   &.fr-link--icon-left::before,
@@ -61,11 +31,6 @@ form.button_to {
     margin-right: 0;
     margin-left: 0;
   }
-}
-
-// Increase button spacing for clarity (particularly useful to place primary/secondary apart)
-.fr-btns-group--space-between {
-  justify-content: space-between;
 }
 
 // Improve file upload group affordance
@@ -83,9 +48,35 @@ form.button_to {
 }
 
 
-.fr-table__footer--start,
-.fr-table__footer--end {
+.fr-table__footer--start {
   flex: 1;
+}
+
+.fr-table__wrapper {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.8;
+    box-shadow: inset 0 0 0 0 var(--grey-200-850-active);
+    transition: box-shadow .3s;
+  }
+
+  &.is-scroll-left::after {
+    box-shadow: inset 2rem 0 1rem -2rem var(--grey-200-850-active);
+  }
+
+  &.is-scroll-right::after {
+    box-shadow: inset -2rem 0 1rem -2rem var(--grey-200-850-active);
+  }
+
+  &.is-scroll-left.is-scroll-right::after {
+    box-shadow: inset 2rem 0 1rem -2rem var(--grey-200-850-active), inset -2rem 0 1rem -2rem var(--grey-200-850-active);
+  }
 }
 
 // Basic Pagy nav styling to align with DSFR pagination look
@@ -153,39 +144,13 @@ form.button_to {
   }
 }
 
-// Style indeterminate checkboxes
-.fr-checkbox-group input[type="checkbox"]:indeterminate + label::before {
-  background-color: var(--border-action-high-blue-france) !important;
-  background-image: linear-gradient(to right, var(--background-default-grey) 0%, var(--background-default-grey) 100%) !important;
-  background-size: 0.7rem 0.095rem !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-}
+.ac-row-link {
+  cursor: pointer;
 
-// Allow enlarging clickable inputs (radio, checkboxes)
-.fr-enlarge-input {
-  position: relative;
-
-  .fr-radio-group .fr-label::after,
-  .fr-checkbox-group .fr-label::after {
-    content: "";
-    inset: 0;
-    position: absolute;
-    pointer-events: auto;
-    z-index: 1;
+  &:hover > *,
+  &:focus-within > * {
+    background-color: var(--hover);
   }
-
-  &.fr-cell--fixed {
-    .fr-radio-group .fr-label::after,
-    .fr-checkbox-group .fr-label::after {
-      margin: -.5rem -1rem -.5rem -2.5rem;
-    }
-  }
-}
-
-// Fix vertical alignment of table actions
-.fr-table__header .fr-btns-group li:last-child .fr-btn {
-  margin-bottom: 0;
 }
 
 // Add visual distinction for dev & staging environments
@@ -206,23 +171,6 @@ form.button_to {
   &.development::before {
     content: "Environnement de développement";
     background-color: #87ec87;
-  }
-}
-
-// Fix vertical alignment of search and counter on narrow screens
-@media (max-width: 47.999em) {
-  .fr-search-bar + .fr-table__detail {
-    margin-top: .5rem;
-  }
-}
-
-// Fix spacing between table header elements on larger screens
-@media (min-width: 48em) {
-  .fr-table__header .fr-table__detail {
-    margin-bottom: 0;
-  }
-  .fr-search-bar + .fr-table__detail {
-    margin-left: .5rem;
   }
 }
 

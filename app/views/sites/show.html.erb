@@ -2,7 +2,7 @@
 
 <% content_for :breadcrumb do %>
   <%= dsfr_breadcrumbs do |b| %>
-    <% b.with_breadcrumb(label: t("audits.show.breadcrumb_sites"), href: sites_path) %>
+    <% b.with_breadcrumb(label: t("audits.show.breadcrumb_sites"), href: audits_path) %>
     <% b.with_breadcrumb(label: @site.normalized_url) %>
   <% end %>
 <% end %>
@@ -27,15 +27,16 @@
   <% end %>
 </div>
 
-<% if @last_audit %>
-  <% if @last_audit.reachable.completed? && @last_audit.reachable.redirected? %>
+<% last_audit = @audits.first %>
+<% if last_audit %>
+  <% if last_audit.reachable.completed? && last_audit.reachable.redirected? %>
     <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
-      <%= t("checks.reachable.redirect_message", original: @last_audit.reachable.original_url, redirected: @last_audit.reachable.redirect_url) %>
+      <%= t("checks.reachable.redirect_message", original: last_audit.reachable.original_url, redirected: last_audit.reachable.redirect_url) %>
     <% end %>
   <% end %>
 
-  <% if @last_audit.completed_at %>
-    <%= render "audits/summary", audit: @last_audit %>
+  <% if last_audit.completed_at %>
+    <%= render "audits/summary", audit: last_audit %>
   <% else %>
     <%= dsfr_callout(title: t("audits.show.pending_title"), html_attributes: { class: "fr-mb-3w" }) do %>
       <%= t("audits.show.pending_text") %>

@@ -110,7 +110,7 @@ module Checks
     end
 
     def custom_badge_status
-      found_required? ? :success : :warning
+      found_required? ? :success : :new
     end
 
     def custom_badge_text

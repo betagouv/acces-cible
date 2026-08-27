@@ -1,0 +1,87 @@
+<%= turbo_stream_from [current_user.team, :sites] %>
+<% scope_options = [[t(".scope_me"), "me"], [t(".scope_team", organization: current_user.team.organization_label), "team"]] %>
+
+<% content_for :breadcrumb do %>
+  <div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters fr-mb-2w">
+    <div class="fr-col">
+      <h1 class="fr-mb-0"><%= t(".title") %></h1>
+    </div>
+    <div class="fr-col-auto">
+      <%= link_to t("shared.new_audit"), new_site_path, class: "fr-btn" %>
+    </div>
+  </div>
+<% end %>
+
+<%= form_with(url: url_for, method: :get, html: { role: "search" }, data: { controller: :autosubmit }) do |f| %>
+  <% flatten_params(:sort, :limit).each do |name, value| %>
+    <%= hidden_field_tag name, value %>
+  <% end %>
+
+  <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
+    <div class="fr-col-12 fr-col-md-3">
+      <div class="fr-search-bar">
+        <label class="fr-label" for="filter_q"><%= t(".search") %></label>
+        <%= f.search_field "filter[q]", id: "filter_q", value: params.dig(:filter, :q), class: "fr-input", placeholder: t(".search") %>
+        <%= f.button t(".search"), type: :submit, name: nil, class: "fr-btn" %>
+      </div>
+    </div>
+
+    <div class="fr-col-12 fr-col-md-3">
+      <div class="fr-select-group">
+        <label class="fr-label fr-sr-only" for="filter_scope"><%= t(".scope_filter") %></label>
+        <%= select_tag "filter[scope]",
+                       options_for_select(scope_options, params.dig(:filter, :scope) || "me"),
+                       id: "filter_scope", class: "fr-select", data: { action: "change->autosubmit#submit" } %>
+      </div>
+    </div>
+
+    <div class="fr-col-12 fr-col-md-3">
+      <div class="fr-select-group">
+        <label class="fr-label fr-sr-only" for="filter_tag_id"><%= t(".tag_filter") %></label>
+        <%= select_tag "filter[tag_id]",
+                       options_from_collection_for_select(@tags, :id, :name, params.dig(:filter, :tag_id)),
+                       include_blank: t("tags.index.caption"),
+                       id: "filter_tag_id", class: "fr-select", data: { action: "change->autosubmit#submit" } %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="fr-grid-row fr-mb-2w">
+  <div class="fr-col">
+    <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
+  </div>
+</div>
+
+<%= dsfr_table(caption: t('.caption'), border: true, size: :lg) do |t| %>
+  <% t.with_head do %>
+    <tr>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
+      <th scope="col" class="fr-cell--center"><%= t('checks.reachable.type') %></th>
+      <th scope="col" class="fr-cell--center"><%= t('.compliance_rate') %></th>
+      <th scope="col" class="fr-cell--center"><%= t('.declared_level') %></th>
+      <th scope="col" class="fr-cell--center"><%= t('.legal_obligations') %></th>
+      <th scope="col" class="fr-cell--center"><%= t('.declaration_quality') %></th>
+      <th scope="col"><%= t('.evaluator') %></th>
+      <th scope="col"><%= t('.organization_label') %></th>
+      <th scope="col" class="fr-cell--sort" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.last_audit_at'), :last_audited_at %></th>
+      <th scope="col"><%= t('.tags') %></th>
+    </tr>
+  <% end %>
+
+  <% t.with_body do %>
+    <% if @audits.any? %>
+      <%= render partial: "audit", collection: @audits, as: :audit %>
+    <% else %>
+      <tr>
+        <td colspan="10">
+          <% if params.dig(:filter, :q).present? %>
+            <%= t(".no_search_results") %>
+          <% else %>
+            <%= t(".no_results") %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>
