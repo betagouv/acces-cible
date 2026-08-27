@@ -23,10 +23,7 @@
 </p>
 
 <% if @audit.completed_at %>
-
-  <% if !@audit.reachable.found %>
-    <%= render "audits/unreachable", audit: @audit %>
-  <% else %>
+  <% if @audit.reachable.found %>
     <% if @audit.reachable.completed? && @audit.reachable.redirected? %>
       <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
         <%= t("checks.reachable.redirect_message", original: @audit.reachable.original_url, redirected: @audit.reachable.redirect_url) %>
@@ -40,6 +37,8 @@
         <%= render "audits/automated_tests", audit: @audit %>
       <% end %>
     <% end %>
+  <% else %>
+    <%= render "audits/unreachable", audit: @audit %>
   <% end %>
 <% else %>
   <%= dsfr_callout(title: t(".pending_title"), html_attributes: { class: "fr-mb-3w" }) do %>

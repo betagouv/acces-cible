@@ -1,4 +1,4 @@
-<%= dsfr_callout(title: t("audits.show.unreachable_title"), icon_name: :none, accent: "pink-tuile", html_attributes: { class: "fr-mb-3w" }) do %>
+<%= dsfr_callout(title: t("audits.show.unreachable_title"), header_level: 2, icon_name: :none, accent: "pink-tuile", html_attributes: { class: "fr-mb-3w" }) do %>
   <%= t("audits.show.unreachable_intro", site: audit.site.normalized_url) %>
 <% end %>
 
