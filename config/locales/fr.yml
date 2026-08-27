@@ -133,6 +133,12 @@ fr:
       tab_obligations: Obligations & déclaration
       tabs_label: Résultat de l'évaluation
       title: Résultat de l'évaluation
+      unreachable_intro: "Le site %{site} n'est pas joignable actuellement. Aucune évaluation n'a pu être exécutée."
+      unreachable_no_checks_text: "Le site n'étant pas joignable, aucune des quatre catégories (niveau déclaré, obligations légales, qualité de la déclaration, tests automatiques) n'a pu être évaluée."
+      unreachable_no_checks_title: Aucune évaluation exécutée
+      unreachable_title: Site injoignable
+      unreachable_what_to_do_text: "Vérifiez que l'adresse est correcte et que le site est en ligne, puis relancez l'évaluation. Si le site est temporairement indisponible, réessayez plus tard."
+      unreachable_what_to_do_title: Que faire ?
       value_found: Valeur trouvée
   check:
     completed_at: Vérification effectuée le
