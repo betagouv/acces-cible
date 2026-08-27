@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
   has_many :sites, through: :team
+  has_many :audits
   has_many :sessions, dependent: :destroy
   has_many :audit_batches, dependent: :destroy
 

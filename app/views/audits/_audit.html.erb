@@ -1,0 +1,22 @@
+<% site = audit.site %>
+<% audit_path = site_audit_path(site, audit) %>
+
+<tr id="<%= dom_id(site, :audits_table) %>" class="ac-row-link" data-controller="row-link" data-row-link-url-value="<%= audit_path %>">
+  <th scope="row"><%= link_to(site.normalized_url.truncate(ApplicationHelper::TRUNCATION_LENGTH), site_path(site), class: "fr-link", "aria-label": t('.row_label', url: site.normalized_url)) %></th>
+  <td class="fr-cell--center"><%= check_badge(audit.reachable, hover: false, no_icon: true) %></td>
+  <td class="fr-cell--center"><%= audit.analyze_accessibility_page&.human_compliance_rate || check_badge(audit.analyze_accessibility_page, hover: false, no_icon: true) %></td>
+  <td class="fr-cell--center"><%= check_badge(audit.accessibility_mention, hover: false, no_icon: true) %></td>
+  <td class="fr-cell--center"><%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t('.legal_obligations')) %></td>
+  <td class="fr-cell--center"><%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t('.declaration_quality')) %></td>
+  <td><%= audit.user %></td>
+  <td><%= audit.team.organization_label %></td>
+  <td>
+    <% local_time = audit.created_at.in_time_zone %>
+    <%= time_tag local_time, l(local_time, format: :complete), title: l(local_time, format: :long) %>
+  </td>
+  <td class="fr-cell--multiline">
+    <% tags = site.tags.collect(&:name) %>
+    <%= safe_join tags.take(3).map { dsfr_tag(title: it.truncate(ApplicationHelper::TRUNCATION_LENGTH), size: :sm) } %>
+    <%= dsfr_tooltip(t("shared.x_more", x: tags.size - 3), type: :link, title: tags[3..].to_sentence) if tags.size > 3 %>
+  </td>
+</tr>

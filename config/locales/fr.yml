@@ -35,8 +35,32 @@ fr:
     site_url_address: Adresse du site
     url: URL
   audits:
+    audit:
+      declaration_quality: Qualité de la déclaration
+      legal_obligations: Respect des obligations légales
+      row_label: "Voir l'audit de %{url}"
     create:
       notice: Vérification créée
+    index:
+      caption: Mes évaluations
+      compliance_rate: Taux d'accessibilité déclaré
+      declaration_quality: Qualité de la déclaration
+      declared_level: Niveau d'accessibilité déclaré
+      evaluator: Évaluateur
+      export_to_csv: Export CSV
+      last_audit_at: Lancée le
+      legal_obligations: Respect des obligations légales
+      no_results: Aucune évaluation à afficher.
+      no_search_results: Aucune évaluation ne correspond à votre recherche.
+      organization_label: Organisation
+      search: Rechercher un site
+      scope_filter: Périmètre des évaluations affichées
+      scope_me: Mes évaluations
+      scope_team: "Mon organisation (%{organization})"
+      site: Site
+      tag_filter: Filtrer par étiquette
+      tags: Étiquettes
+      title: Mes évaluations
     show:
       accessibility_rate: Taux d'accessibilité
       audit_date: Date de l'audit
@@ -226,9 +250,10 @@ fr:
       table_header: Langue
       type: Indication de la langue
     reachable:
-      reachable: Joignable à l'adresse indiquée
+      reachable: Oui
       redirect_message: Le site %{original} est redirigé vers %{redirected}. Le site %{redirected} a été évalué par Accès cible.
       redirected: Redirection
+      not_found: Non
       type: Site joignable
     run_axe_on_homepage:
       elements_count:
@@ -399,17 +424,6 @@ fr:
     form:
       url: Adresse du site
       url_hint: Saisissez une url valide, commençant par https:// ou http://
-    index:
-      caption: Tous les sites
-      detail: Détails
-      export_to_csv: Télécharger en CSV
-      last_audit_at: Dernière vérification
-      no_results: Aucun site à afficher.
-      no_search_results: Aucun site ne correspond à votre recherche.
-      tag_filter: Filtrer par étiquette
-      tags: Toutes les étiquettes
-      title: Tous les sites
-      url: Adresse du site
     new:
       file: Fichier CSV
       file_hint: "Format attendu : fichier CSV avec une colonne obligatoire 'URL', une colonne 'Tags' optionnelle avec les tags séparés par une virgule, et une colonne optionnelle 'Nom'. Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
@@ -420,7 +434,6 @@ fr:
       audit_history_hint: "Chaque vérification reste consultable. Sélectionnez-en une pour afficher son résultat détaillé."
       legal_obligations: Obligations légales
       most_recent: La plus récente
-      relaunch: Ré-évaluer
       see_result: Voir le résultat
       tag: Étiquette %{name}
     site:
@@ -447,7 +460,9 @@ fr:
       sites: Sites
       title: Toutes les étiquettes
     show:
+      caption: Toutes les étiquettes
       name: Libellé
+      no_sites: Aucun site
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
   time:
     formats:

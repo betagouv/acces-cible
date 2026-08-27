@@ -14,7 +14,7 @@ module CheckHelper
   }
 
   def status_to_badge_text(check)
-    if check.completed? && check.respond_to?(:custom_badge_text)
+    if (check.completed? || check.errored?) && check.respond_to?(:custom_badge_text)
       check.custom_badge_text
     else
       check.human_status
@@ -22,7 +22,7 @@ module CheckHelper
   end
 
   def status_link(check)
-    return nil if not check.completed?
+    return nil unless check.completed?
 
     check.custom_badge_link if check.respond_to?(:custom_badge_link)
   end
