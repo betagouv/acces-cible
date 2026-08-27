@@ -23,6 +23,12 @@ fr:
       attributes:
         url:
           invalid: "n'est pas valide"
+      models:
+        audit_batch:
+          attributes:
+            urls:
+              too_long: Vous ne pouvez pas évaluer plus de %{count} adresses à la fois.
+              too_short: Saisissez au moins une adresse.
     models:
       site:
         one: Site
@@ -65,6 +71,11 @@ fr:
         title: Récapitulatif et étiquettes
       urls:
         title: Adresses à évaluer
+        legend: Adresses des sites à évaluer
+        hint: Une adresse par champ (https://…). Jusqu'à %{max} sites.
+        label: Adresse du site
+        add: Ajouter un site
+        remove: Supprimer cette adresse
   audits:
     create:
       notice: Vérification créée

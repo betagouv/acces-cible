@@ -12,7 +12,8 @@ class AuditBatch < ApplicationRecord
 
   validates :kind, presence: true
   validates :kind, inclusion: { in: AVAILABLE_KINDS }, on: :method_step
-  validates :submitted_sites, length: { minimum: 1, maximum: MAX_SITES }, associated: true, on: :urls_step
+  validates :urls, length: { minimum: 1, maximum: MAX_SITES }, on: :urls_step
+  validates :submitted_sites, associated: true, on: :urls_step
 
   after_save :replace_audits, if: :urls_submitted?
 

@@ -72,6 +72,7 @@ class AuditBatchesController < ApplicationController
   def step_params
     case @step
     when "method" then params.expect(audit_batch: [:kind])
+    when "urls" then params.expect(audit_batch: [urls: []])
     else {}
     end
   end
