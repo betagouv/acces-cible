@@ -16,8 +16,13 @@ class AuditBatch < ApplicationRecord
   validates :submitted_sites, associated: true, on: :urls_step
 
   after_save :replace_audits, if: :urls_submitted?
+  after_save :apply_site_tags, if: :site_tags_submitted?
 
   delegate :team, to: :user
+
+  def self.site_tags_scope(site)
+    "#{model_name.param_key}[site_tags][#{site.id}]"
+  end
 
   def urls=(list)
     @submitted_sites = Array(list)
@@ -31,8 +36,12 @@ class AuditBatch < ApplicationRecord
     submitted_sites.map(&:url)
   end
 
+  def site_tags=(attributes)
+    @site_tags = attributes.to_h
+  end
+
   def submitted_sites
-    @submitted_sites ||= sites.to_a
+    @submitted_sites ||= audits.order(:id).includes(:site).map(&:site).uniq
   end
 
   def launch!
@@ -91,6 +100,23 @@ class AuditBatch < ApplicationRecord
 
   def urls_submitted?
     !@submitted_sites.nil?
+  end
+
+  def site_tags_submitted?
+    !@site_tags.nil?
+  end
+
+  def apply_site_tags
+    sites.each do |site|
+      next unless (attributes = @site_tags[site.id.to_s])
+
+      site.update!(
+        tag_ids: team.tags.where(id: attributes[:tag_ids].to_a.compact_blank).ids,
+        tags_attributes: attributes[:tags_attributes] || {}
+      )
+    end
+
+    @site_tags = nil
   end
 
   def find_or_build_site(url)

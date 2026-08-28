@@ -59,7 +59,7 @@ fr:
     steps:
       wip: Cet écran est en cours de construction.
       checks:
-        title: Tests automatiques
+        title: Tests automatiques (optionnel)
       method:
         title: Méthode d'ajout
         legend: Comment souhaitez-vous ajouter les sites ?
@@ -69,6 +69,11 @@ fr:
         csv_import_hint: Bientôt disponible.
       summary:
         title: Récapitulatif et étiquettes
+        heading: Récapitulatif
+        intro_html:
+          one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>, vous pouvez lui ajouter des étiquettes.
+          other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>, vous pouvez leur ajouter des étiquettes.
+        tags: Étiquettes de %{site}
       urls:
         title: Adresses à évaluer
         legend: Adresses des sites à évaluer

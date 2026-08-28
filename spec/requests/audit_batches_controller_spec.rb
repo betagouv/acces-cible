@@ -73,6 +73,17 @@ RSpec.describe "AuditBatches" do
       expect(response).to redirect_to(step_audit_batch_path(audit_batch, "urls"))
     end
 
+    it "recaps the deduplicated addresses, each with its own tag fields" do
+      create(:tag, team: user.team)
+      audit_batch.update!(urls: ["https://example.com", "https://www.example.com/"])
+
+      get step_audit_batch_path(audit_batch, "summary")
+
+      site = audit_batch.sites.first
+      expect(response.body).to include(I18n.t("audit_batches.steps.summary.intro_html", count: 1))
+      expect(response.body).to have_css("input[name='audit_batch[site_tags][#{site.id}][tag_ids][]']")
+    end
+
     it "does not know a step that is not in the funnel" do
       get step_audit_batch_path(audit_batch, "payment")
 
@@ -152,6 +163,44 @@ RSpec.describe "AuditBatches" do
 
         expect(rows.css("input").map { it[:value] }).to eq(["https://example.com/", "not a url"])
         expect(rows.map { it.at_css(".fr-input-group")[:class].include?("fr-input-group--error") }).to eq([false, true])
+      end
+    end
+  end
+
+  describe "PATCH /audit_batches/:id/steps/summary" do
+    subject(:submit_summary) { patch step_audit_batch_path(audit_batch, "summary"), params: { audit_batch: { site_tags: } } }
+
+    let(:audit_batch) { create(:audit_batch, user:).tap { it.update!(urls: ["https://example.com"]) } }
+    let(:site) { audit_batch.sites.first }
+
+    context "with a tag of the team" do
+      let(:tag) { create(:tag, team: user.team) }
+      let(:site_tags) { { site.id => { tag_ids: [tag.id] } } }
+
+      it "tags the site and moves on to the checks" do
+        expect { submit_summary }.to change { site.tags.reload.to_a }.from([]).to([tag])
+
+        expect(response).to redirect_to(step_audit_batch_path(audit_batch, "checks"))
+      end
+    end
+
+    context "with a tag that is being created" do
+      let(:site_tags) { { site.id => { tags_attributes: { name: "Ministère" } } } }
+
+      it "creates it for the team and tags the site with it" do
+        expect { submit_summary }.to change(Tag, :count).by(1)
+
+        expect(site.tags.reload.map(&:name)).to eq(["Ministère"])
+      end
+    end
+
+    context "with a tag belonging to another team" do
+      let(:site_tags) { { site.id => { tag_ids: [create(:tag, team: create(:team)).id] } } }
+
+      it "does not tag the site with it" do
+        submit_summary
+
+        expect(site.tags.reload).to be_empty
       end
     end
   end

@@ -73,6 +73,7 @@ class AuditBatchesController < ApplicationController
     case @step
     when "method" then params.expect(audit_batch: [:kind])
     when "urls" then params.expect(audit_batch: [urls: []])
+    when "summary" then params.expect(audit_batch: [site_tags: {}])
     else {}
     end
   end

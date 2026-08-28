@@ -90,6 +90,29 @@ RSpec.describe "Tags" do
       end
     end
 
+    context "when creating a tag from the evaluation funnel" do
+      subject(:create_tag) { post tags_path(site_id: site.id), params: }
+
+      let(:site) { create(:site, team:) }
+      let(:params) { { audit_batch: { site_tags: { site.id => { tags_attributes: { name: "funnel tag" }, tag_ids: [] } } } } }
+
+      it "creates the tag and replaces that site's own frame, without tagging it yet" do
+        expect { create_tag }.to change(Tag, :count).by(1)
+
+        expect(site.tags).to be_empty
+        expect(response.body).to have_css("turbo-stream[action='replace'][target='tags_site_#{site.id}']")
+        expect(response.body).to include("audit_batch[site_tags][#{site.id}][tag_ids][]")
+      end
+
+      it "does not expose a site belonging to another team" do
+        other_site = create(:site, team: create(:team))
+
+        post tags_path(site_id: other_site.id), params: { audit_batch: { site_tags: { other_site.id => { tags_attributes: { name: "funnel tag" } } } } }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context "when creating a tag from SiteUpload form" do
       let(:params) { { site_upload: { tags_attributes: { name: "upload tag" }, tag_ids: [] } } }
       let(:frame_id) { "tags_site_upload" }

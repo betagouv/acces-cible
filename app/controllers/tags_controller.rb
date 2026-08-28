@@ -9,15 +9,16 @@ class TagsController < ApplicationController
 
   # POST /tags
   def create
-    tag_params = params.require(upload? ? :site_upload : :site).permit(tag_ids: [], tags_attributes: :name)
     name = tag_params.dig(:tags_attributes, :name)
     return head :unprocessable_content if name.blank?
 
     tag = current_user.team.tags.find_or_create_by(name:)
     tag_ids = (tag_params[:tag_ids] || []).push(tag.id).compact
     object = template_object_klass.new(tag_ids:, team: current_user.team)
-    frame_id = dom_class(object, :tags)
-    render turbo_stream: turbo_stream.replace(frame_id, partial: "sites/tags_form", locals: { object:, focus: true })
+
+    locals = tags_form_locals.merge(object:, focus: true)
+
+    render turbo_stream: turbo_stream.replace(locals[:id], partial: "sites/tags_form", locals:)
   end
 
   # GET /tags/1
@@ -29,6 +30,36 @@ class TagsController < ApplicationController
 
   def upload?
     params.key?(:site_upload)
+  end
+
+  def funnel_site
+    @funnel_site ||= current_user.team.sites.find(params[:site_id]) if params[:site_id]
+  end
+
+  def tag_params
+    scoped_params.permit(tag_ids: [], tags_attributes: :name)
+  end
+
+  def scoped_params
+    if funnel_site
+      params.require(:audit_batch).require(:site_tags).require(funnel_site.id.to_s)
+    elsif upload?
+      params.require(:site_upload)
+    else
+      params.require(:site)
+    end
+  end
+
+  def tags_form_locals
+    @tags_form_locals ||= if funnel_site
+      { id: dom_id(funnel_site, :tags),
+        url: tags_path(site_id: funnel_site.id),
+        scope: AuditBatch.site_tags_scope(funnel_site),
+        title: t("audit_batches.steps.summary.tags", site: funnel_site.normalized_url),
+        collapsible: false }
+    else
+      { id: dom_class(template_object_klass, :tags) }
+    end
   end
 
   def template_object_klass
