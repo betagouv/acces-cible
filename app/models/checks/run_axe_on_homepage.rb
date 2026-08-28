@@ -32,7 +32,7 @@ module Checks
       "table-fake-caption",
       "td-has-header",
       "valid-lang"
-    ].to_json.freeze
+    ].freeze
 
     store_accessor :data, :passes, :incomplete, :inapplicable, :failures, :violations, :violation_data, :issues_total
 
@@ -102,7 +102,7 @@ module Checks
       locale = File.read(AXE_LOCALE_PATH)
       script_tag = File.read(AXE_SOURCE_PATH)
       script = "axe.configure({locale: #{locale} }); axe.run(document, \
-                { runOnly: { type: 'rule', values: #{RGAA_AXE_RULES} }, reporter: 'v2'}).then(results => __f(results))"
+                { runOnly: { type: 'rule', values: #{RGAA_AXE_RULES.to_json} }, reporter: 'v2'}).then(results => __f(results))"
 
       Browser.run_script_on_html(audit.page_snapshots.find_by(kind: "home").html, script, script_tag)
     end

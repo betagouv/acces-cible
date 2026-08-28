@@ -51,15 +51,27 @@ fr:
     url: URL
   audit_batches:
     cancel: Abandonner
+    launch: Lancer l'évaluation
+    launching: Lancement…
     destroy:
       cancelled: Évaluation abandonnée
+    update_step:
+      launched:
+        one: Évaluation lancée. Les résultats arriveront dans quelques minutes.
+        other: "%{count} évaluations lancées. Les résultats arriveront dans quelques minutes."
     new:
       intro: "Chaque adresse donne lieu à une nouvelle évaluation : niveau d'accessibilité déclaré, respect des obligations légales, qualité de la déclaration et, en option, une série de tests automatiques du RGAA."
       title: Lancer une évaluation
     steps:
-      wip: Cet écran est en cours de construction.
       checks:
         title: Tests automatiques (optionnel)
+        heading: Tests automatiques du RGAA
+        optional: Optionnel
+        intro_html: En complément de l'analyse de la déclaration, Accès cible peut exécuter une série de <strong>%{count} tests automatiques</strong> couvrant <strong>1/3 des critères du RGAA</strong> sur la page d'accueil de chaque site.
+        toggle: Lancer les tests automatiques sur la page d'accueil
+        enabled: Activés
+        disabled: Désactivés
+        hint: Ces tests sont lancés systématiquement. Le choix arrivera dans une prochaine version.
       method:
         title: Méthode d'ajout
         legend: Comment souhaitez-vous ajouter les sites ?

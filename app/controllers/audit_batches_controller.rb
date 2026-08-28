@@ -2,7 +2,7 @@ class AuditBatchesController < ApplicationController
   before_action :set_audit_batch, only: [:show_step, :update_step, :destroy]
   before_action :set_step, only: [:new, :create, :show_step, :update_step]
   before_action :set_title, only: [:show_step, :update_step]
-  before_action :enforce_progression, only: [:show_step]
+  before_action :enforce_progression, only: [:show_step, :update_step]
 
   # GET /audit_batches/new
   def new
@@ -28,7 +28,7 @@ class AuditBatchesController < ApplicationController
     @audit_batch.assign_attributes(step_params)
 
     if @audit_batch.save(context: step_context)
-      redirect_to next_step_path
+      last_step? ? launch : redirect_to(next_step_path)
     else
       render :show_step, status: :unprocessable_content
     end
@@ -63,6 +63,15 @@ class AuditBatchesController < ApplicationController
 
   def step_context
     :"#{@step}_step"
+  end
+
+  def last_step?
+    @audit_batch.next_step(@step).nil?
+  end
+
+  def launch
+    @audit_batch.launch!
+    redirect_to sites_path, notice: t(".launched", count: @audit_batch.audits.size)
   end
 
   def next_step_path

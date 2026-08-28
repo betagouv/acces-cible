@@ -84,6 +84,18 @@ RSpec.describe "AuditBatches" do
       expect(response.body).to have_css("input[name='audit_batch[site_tags][#{site.id}][tag_ids][]']")
     end
 
+    it "shows the automatic tests as always on and out of reach" do
+      audit_batch.update!(urls: ["https://example.com"])
+
+      get step_audit_batch_path(audit_batch, "checks")
+
+      toggle = Nokogiri::HTML(response.body).at_css(".fr-toggle__input")
+
+      expect(toggle[:checked]).to be_present
+      expect(toggle[:disabled]).to be_present
+      expect(response.body).to include(I18n.t("audit_batches.steps.checks.hint"))
+    end
+
     it "does not know a step that is not in the funnel" do
       get step_audit_batch_path(audit_batch, "payment")
 
@@ -202,6 +214,28 @@ RSpec.describe "AuditBatches" do
 
         expect(site.tags.reload).to be_empty
       end
+    end
+  end
+
+  describe "PATCH /audit_batches/:id/steps/checks" do
+    subject(:launch) { patch step_audit_batch_path(audit_batch, "checks") }
+
+    let(:audit_batch) { create(:audit_batch, user:).tap { it.update!(urls: ["https://example.com"]) } }
+
+    it "launches the batch and its audits, then returns to the site list" do
+      expect { launch }.to change { audit_batch.reload.status }.from("draft").to("launched")
+
+      expect(audit_batch.audits).to all(be_launched)
+      expect(response).to redirect_to(sites_path)
+    end
+
+    it "sends a batch without addresses back to them, without launching it" do
+      empty = create(:audit_batch, user:)
+
+      patch step_audit_batch_path(empty, "checks")
+
+      expect(empty.reload).to be_draft
+      expect(response).to redirect_to(step_audit_batch_path(empty, "urls"))
     end
   end
 

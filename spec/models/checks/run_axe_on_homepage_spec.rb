@@ -36,7 +36,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
               .with(described_class.const_get("AXE_SOURCE_PATH"))
               .and_return("axe JS mock")
 
-      stub_const("#{described_class}::RGAA_AXE_RULES", "mock rules")
+      stub_const("#{described_class}::RGAA_AXE_RULES", ["mock rule"])
     end
 
     it "runs and configures Axe with the right locale and rules" do
@@ -48,7 +48,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
                 html_content,
                 an_instance_of(String)
                   .and(matching(/locale: localized axe JSON/))
-                  .and(matching(/values: mock rules/)),
+                  .and(matching(/values: \["mock rule"\]/)),
                 "axe JS mock"
               )
     end

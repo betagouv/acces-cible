@@ -1,2 +1,20 @@
 <%# locals: (audit_batch:, step:) %>
-<p><%= t("audit_batches.steps.wip") %></p>
+<%= form_with(model: audit_batch, url: step_audit_batch_path(audit_batch, step)) do %>
+  <h3 class="fr-h5 fr-mb-1w">
+    <%= t(".heading") %>
+    <span class="fr-badge fr-badge--info fr-badge--sm fr-ml-1v"><%= t(".optional") %></span>
+  </h3>
+
+  <p><%= t(".intro_html", count: Checks::RunAxeOnHomepage::RGAA_AXE_RULES.size) %></p>
+
+  <div class="fr-toggle fr-toggle--label-left">
+    <input type="checkbox" class="fr-toggle__input" id="audit_batch_axe"
+           checked disabled aria-describedby="audit_batch_axe_hint">
+    <label class="fr-toggle__label" for="audit_batch_axe"
+           data-fr-checked-label="<%= t(".enabled") %>"
+           data-fr-unchecked-label="<%= t(".disabled") %>"><%= t(".toggle") %></label>
+    <p class="fr-hint-text" id="audit_batch_axe_hint"><%= t(".hint") %></p>
+  </div>
+
+  <%= render "audit_batches/step_actions", audit_batch:, step: %>
+<% end %>
