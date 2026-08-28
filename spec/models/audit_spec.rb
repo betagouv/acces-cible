@@ -183,16 +183,16 @@ RSpec.describe Audit do
 
     it "creates its checks once launched" do
       draft
-      expect { draft.launched! }.to change(Check, :count).by(Check.types.size)
+      expect { draft.audit_batch.launched! }.to change(Check, :count).by(Check.types.size)
     end
 
     it "enqueues its job once launched" do
       draft
-      expect { draft.launched! }.to have_enqueued_job(FetchResourcesJob).with(draft).exactly(:once)
+      expect { draft.audit_batch.launched! }.to have_enqueued_job(FetchResourcesJob).with(draft).exactly(:once)
     end
 
     it "does not start again when saved after launching" do
-      draft.launched!
+      draft.audit_batch.launched!
       expect { draft.update!(completed_at: Time.current) }.not_to change(Check, :count)
     end
   end

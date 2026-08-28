@@ -60,7 +60,7 @@ RSpec.describe AuditBatch do
     it "creates a site and a draft audit" do
       expect(submit("https://example.com")).to be true
       expect(audit_batch.sites.map(&:normalized_url)).to eq(["example.com"])
-      expect(audit_batch.audits.map(&:status)).to eq(["draft"])
+      expect(audit_batch.audits).to all(be_draft)
     end
 
     it "reuses a site the team already has" do
@@ -133,7 +133,7 @@ RSpec.describe AuditBatch do
     end
   end
 
-  describe "#launch!" do
+  describe "launching" do
     subject(:audit_batch) { create(:audit_batch) }
 
     before do
@@ -141,11 +141,10 @@ RSpec.describe AuditBatch do
       create(:audit, :draft, audit_batch:)
     end
 
-    it "launches the batch and every audit it holds" do
-      audit_batch.launch!
+    it "starts every audit it holds" do
+      expect { audit_batch.launched! }.to change(Check, :count).by(2 * Check.types.size)
 
-      expect(audit_batch).to be_launched
-      expect(audit_batch.audits.reload.map(&:status)).to eq(%w[launched launched])
+      expect(audit_batch.audits.reload).to all(be_launched)
     end
   end
 

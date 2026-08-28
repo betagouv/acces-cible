@@ -70,7 +70,7 @@ class AuditBatchesController < ApplicationController
   end
 
   def launch
-    @audit_batch.launch!
+    @audit_batch.launched!
     redirect_to sites_path, notice: t(".launched", count: @audit_batch.audits.size)
   end
 

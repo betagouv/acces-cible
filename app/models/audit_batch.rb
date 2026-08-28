@@ -17,6 +17,7 @@ class AuditBatch < ApplicationRecord
 
   after_save :replace_audits, if: :urls_submitted?
   after_save :apply_site_tags, if: :site_tags_submitted?
+  after_save_commit :start_audits, if: -> { saved_change_to_status?(to: :launched) }
 
   delegate :team, to: :user
 
@@ -42,13 +43,6 @@ class AuditBatch < ApplicationRecord
 
   def submitted_sites
     @submitted_sites ||= audits.order(:id).includes(:site).map(&:site).uniq
-  end
-
-  def launch!
-    transaction do
-      launched!
-      audits.each(&:launched!)
-    end
   end
 
   def abandon!
@@ -97,6 +91,10 @@ class AuditBatch < ApplicationRecord
   end
 
   private
+
+  def start_audits
+    audits.each(&:start!)
+  end
 
   def urls_submitted?
     !@submitted_sites.nil?

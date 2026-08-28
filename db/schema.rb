@@ -34,11 +34,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_144128) do
     t.string "home_page_url"
     t.float "legal_obligation_score"
     t.bigint "site_id", null: false
-    t.string "status", default: "draft", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["audit_batch_id"], name: "index_audits_on_audit_batch_id"
-    t.index ["site_id", "status"], name: "index_audits_on_site_id_and_status"
+    t.index ["site_id"], name: "index_audits_on_site_id"
     t.index ["user_id"], name: "index_audits_on_user_id"
   end
 

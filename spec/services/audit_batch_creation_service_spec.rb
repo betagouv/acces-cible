@@ -109,7 +109,7 @@ RSpec.describe AuditBatchCreationService do
       it "attaches the audit to it" do
         process_site
 
-        expect(created_site.last_audit.audit_batch).to eq(audit_batch)
+        expect(created_site.audits.last.audit_batch).to eq(audit_batch)
       end
     end
 

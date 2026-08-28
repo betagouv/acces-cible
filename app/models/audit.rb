@@ -5,12 +5,12 @@ class Audit < ApplicationRecord
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
 
-  enum :status, { draft: "draft", launched: "launched" }
-
-  after_save_commit :start!, if: -> { saved_change_to_status?(to: :launched) }
+  after_create_commit :start!, if: :launched?
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
+  scope :draft, -> { where(audit_batch_id: AuditBatch.draft) }
+  scope :launched, -> { where(audit_batch_id: nil).or(where(audit_batch_id: AuditBatch.launched)) }
   scope :with_check_transitions, -> { includes(checks: :check_transitions) }
   scope :without_html, -> { select(column_names - %w[home_page_html accessibility_page_html]) }
 
@@ -19,6 +19,14 @@ class Audit < ApplicationRecord
       instance_variable_get("@#{name}") ||
         instance_variable_set("@#{name}", checks.to_a.find { |check| klass === check } || checks.build(type: klass))
     end
+  end
+
+  def launched?
+    audit_batch.nil? || audit_batch.launched?
+  end
+
+  def draft?
+    !launched?
   end
 
   def start!
