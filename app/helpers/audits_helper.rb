@@ -1,8 +1,8 @@
 module AuditsHelper
   def obligation_badge(check)
-    return [:error, t("shared.absent")] unless check.found?
+    return badge(status: :error, text: t("shared.absent")) unless check.found?
 
-    [check.conform? ? :success : :info, t("shared.present")]
+    badge(status: check.conform? ? :success : :info, text: t("shared.present"))
   end
 
   def obligation_comment(check)
@@ -37,15 +37,15 @@ module AuditsHelper
   end
 
   def presence_badge(present)
-    present ? [:success, t("shared.present")] : [:error, t("shared.absent")]
+    present ? badge(status: :success, text: t("shared.present")) : badge(status: :error, text: t("shared.absent"))
   end
 
   def validity_badge(check)
-    return [:error, t("shared.absent")] unless check.found?
+    return badge(status: :error, text: t("shared.absent")) unless check.found?
 
     conform = check.conform
 
-    [conform ? :success : :warning, conform ? t("shared.valid") : t("shared.invalid")]
+    badge(status: conform ? :success : :warning, text: conform ? t("shared.valid") : t("shared.invalid"))
   end
 
   def validity_comment(check)

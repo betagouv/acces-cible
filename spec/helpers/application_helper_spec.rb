@@ -10,32 +10,30 @@ RSpec.describe ApplicationHelper do
   end
 
   describe "#badge" do
-    it "renders basic badge" do
-      result = helper.badge(:success, "Success message")
-      expect(result).to have_selector(".fr-badge.fr-badge--success", text: "Success message")
+    it "colours the badge from a system status" do
+      result = helper.badge(status: :success, text: "Fait")
+      expect(result).to have_selector("p.fr-badge.fr-badge--success", text: "Fait")
     end
 
-    it "uses block content when no text provided" do
-      result = helper.badge(:warning) { "Block content" }
-      expect(result).to have_selector(".fr-badge.fr-badge--warning", text: "Block content")
+    it "drops the status icon on request" do
+      result = helper.badge(status: :success, text: "Fait", no_icon: true)
+      expect(result).to have_selector("p.fr-badge.fr-badge--success.fr-badge--no-icon", text: "Fait")
     end
 
-    it "renders tooltip badge when tooltip: true" do
-      result = helper.badge(:info, "Tooltip text", tooltip: true)
-      expect(result).to have_selector(".fr-badge.fr-badge--info[role='tooltip']")
-      expect(result).to have_selector("[title='Tooltip text']")
+    it "links the label" do
+      result = helper.badge(status: :success, text: "Voir la page", link: "/page")
+      expect(result).to have_selector("p.fr-badge--success a[href='/page']", text: "Voir la page")
     end
 
-    it "renders badge with link when link provided" do
-      result = helper.badge(:success, "Link text", link: "/link")
-      expect(result).to have_selector(".fr-badge.fr-badge--success")
-      expect(result).to have_selector("a[href='/link']", text: "Link text")
+    it "keeps the label for hover and screen readers only" do
+      result = helper.badge(status: :info, text: "En attente", hover: true)
+      expect(result).to have_selector("p.fr-badge--info[role='tooltip'][title='En attente']")
+      expect(result).to have_selector(".fr-sr-only", text: "En attente")
     end
 
-    it "renders external link" do
-      result = helper.badge(:info, "External link", link: "/external", tooltip: true)
-      expect(result).to have_selector("a[href='/external'][target='_blank']")
-      expect(result).to have_selector("[role='tooltip']")
+    it "renders a hovered linked badge as an external link" do
+      result = helper.badge(status: :info, text: "Voir la page", link: "/page", hover: true)
+      expect(result).to have_selector("a.fr-badge.fr-badge--info[href='/page'][target='_blank'][role='tooltip']")
     end
   end
 

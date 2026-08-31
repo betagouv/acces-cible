@@ -13,7 +13,7 @@ class Site < ApplicationRecord
 
   accepts_nested_attributes_for :tags, reject_if: :all_blank
 
-  scope :preloaded, -> { preload(:tags, :slugs, last_audit_without_html: { checks: :check_transitions }) }
+  scope :preloaded, -> { preload(:tags, :slugs, last_audit_without_html: { user: :team, checks: :check_transitions }) }
 
   before_validation :set_normalized_url, if: :will_save_change_to_url?
 

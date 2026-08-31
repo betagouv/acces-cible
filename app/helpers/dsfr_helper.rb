@@ -33,8 +33,8 @@ module DsfrHelper
     end
   end
 
-  def dsfr_badge(status:, html_attributes: {}, &block)
-    html_attributes[:class] = class_names("fr-badge", "fr-badge--#{status}", html_attributes[:class])
+  def dsfr_badge(status: nil, no_icon: false, html_attributes: {}, &block)
+    html_attributes[:class] = class_names("fr-badge", ("fr-badge--#{status}" if status), ("fr-badge--no-icon" if no_icon), html_attributes[:class])
     tag.p(**html_attributes, &block)
   end
 end

@@ -20,7 +20,9 @@
   <% if @site.tags.present? %>
     <%= muted_dash %>
     <% @site.tags.each do |tag| %>
-      <%= dsfr_tag(title: tag.name, size: :sm) %>
+      <%= dsfr_tag(title: tag.name.truncate(ApplicationHelper::TRUNCATION_LENGTH),
+                   size: :sm,
+                   html_attributes: { title: t(".tag", name: tag.name) }) %>
     <% end %>
   <% end %>
 </div>
@@ -76,9 +78,6 @@
 
       <div class="audit-timeline__actions">
         <%= link_to t(".see_result"), site_audit_path(@site, audit), class: "fr-btn fr-btn--secondary fr-btn--sm" %>
-        <%= button_to [@site, :audits], method: :post, class: icon_class(:refresh, line: true, btn: :tertiary, size: :sm) do %>
-          <span class="fr-sr-only"><%= t(".relaunch") %></span>
-        <% end %>
       </div>
     </div>
   <% end %>

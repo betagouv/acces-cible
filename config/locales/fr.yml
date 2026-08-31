@@ -416,6 +416,7 @@ fr:
       most_recent: La plus récente
       relaunch: Ré-évaluer
       see_result: Voir le résultat
+      tag: Étiquette %{name}
     site:
       view_name: Voir la fiche de %{name}
     tags_form:

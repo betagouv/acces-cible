@@ -93,11 +93,11 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites
+    current_user.team.sites.preloaded
   end
 
   def set_site
-    @site = sites_scope.friendly.find(params.expect(:id))
+    @site = sites_scope.friendly.find(site_ids)
   end
 
   def set_sites

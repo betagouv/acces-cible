@@ -11,11 +11,7 @@
   <% Check.names.each do |check_name| %>
     <% check = last_audit&.send(check_name) %>
     <%= tag.td class: "fr-cell--center" do %>
-      <% if check %>
-        <%= badge(to_badge(check), tooltip: check.tooltip?) %>
-      <% else %>
-        <%= badge(:info, t("check.status.pending"), tooltip: true) %>
-      <% end %>
+      <%= check ? check_badge(check) : badge(status: :info, text: t("check.status.pending"), hover: true) %>
     <% end %>
   <% end %>
   <td class="fr-cell--multiline">
