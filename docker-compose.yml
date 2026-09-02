@@ -16,6 +16,7 @@ services:
       - "/app/node_modules"
     depends_on:
       - db
+      - chrome
   css-watcher:
     <<: *server
     command: ["bin/rails", "dartsass:watch"]
@@ -24,12 +25,17 @@ services:
   jobs:
     <<: *server
     command: "bin/jobs"
+    network_mode: service:chrome
     entrypoint: ''
     ports: []
     environment:
       DATABASE_URL: 'postgresql://postgres:dummy@db:5433'
       RUBY_DEBUG_PORT: 3500
       RUBY_DEBUG_PORT_RANGE: 10
+      CHROME_URL: http://localhost:9222 # funnily enough only the workers need it
+    depends_on:
+      - db
+      - chrome
   db:
     image: postgres:16
     environment:
@@ -39,3 +45,8 @@ services:
       - "./tmp/db:/var/lib/postgresql/data"
     ports:
       - "5433:5433"
+  chrome:
+    build:
+      dockerfile: Dockerfile.chrome
+    ports:
+      - "9222:9222"
