@@ -319,16 +319,9 @@ fr:
   site:
     name: "Nom du site"
   sites:
-    add: Ajouter un site
     all: Tous les sites
-    create:
-      created: Site ajouté
-      new_audit: Site existant, nouvel audit programmé
     edit:
       title: Modifier les étiquettes du site
-    form:
-      url: Adresse du site
-      url_hint: Saisissez une url valide, commençant par https:// ou http://
     index:
       caption: Tous les sites
       detail: Détails
@@ -340,11 +333,6 @@ fr:
       tags: Toutes les étiquettes
       title: Tous les sites
       url: Adresse du site
-    new:
-      file: Fichier CSV
-      file_hint: "Format attendu : fichier CSV avec une colonne obligatoire 'URL', une colonne 'Tags' optionnelle avec les tags séparés par une virgule, et une colonne optionnelle 'Nom'. Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
-      import: Importer des sites depuis un fichier
-      title: Ajouter un site
     show:
       audit_history: Historique des vérifications (%{total})
       audits: Toutes les vérifications

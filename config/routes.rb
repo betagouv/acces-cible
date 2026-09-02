@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       patch "steps/:step", action: :update_step
     end
   end
-  resources :sites, only: [:index, :new, :create, :show, :edit, :update] do
+  resources :sites, only: [:index, :show, :edit, :update] do
     collection do
       post :upload
       get :csv_export

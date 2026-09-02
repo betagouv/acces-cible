@@ -63,6 +63,12 @@ RSpec.describe AuditBatch do
       expect(audit_batch.audits).to all(be_draft)
     end
 
+    it "assigns its user to the audits it creates" do
+      submit("https://example.com")
+
+      expect(audit_batch.audits.sole.user).to eq(user)
+    end
+
     it "reuses a site the team already has" do
       existing = create(:site, team:, url: "https://www.example.com")
 

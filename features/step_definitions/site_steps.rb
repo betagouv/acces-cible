@@ -121,9 +121,14 @@ end
 
 Quand("je rajoute un site {string}") do |url|
   steps %(
-    Quand je clique sur "Ajouter un site"
+    Quand je clique sur "Lancer une évaluation"
+    Et que je choisis "Saisir des adresses"
+    Et que je clique sur "Continuer"
     Et que je remplis "Adresse du site" avec "#{url}"
-    Et que je clique sur "Ajouter"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Lancer l'évaluation"
+    Et que je clique sur "Voir la fiche de #{Link.url_without_scheme_and_www(url)}"
   )
 end
 
