@@ -33,49 +33,49 @@ end
 # NICE and we should do something about it soon.
 Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'accueil") do |url|
   fake_html = <<~HTML
-        <html>
-          <head>
-            <title>Site title</title>
-          </head>
-          <body>
-            <h1>Hello</h1>
-          </body>
-        </html>
-      HTML
+    <html>
+      <head>
+        <title>Site title</title>
+      </head>
+      <body>
+        <h1>Hello</h1>
+      </body>
+    </html>
+  HTML
 
   allow(Browser)
     .to receive(:get)
-    .with(url)
-    .and_return(
-      body: fake_html,
-      status: 200,
-      content_type: "text/html",
-      current_url: url
-    )
+          .with(url)
+          .and_return(
+            body: fake_html,
+            status: 200,
+            content_type: "text/html",
+            current_url: url
+          )
 end
 
 Sachantque("le site {string} renvoie {string} pour la page d'accueil") do |url, html|
   allow(Browser)
     .to receive(:get)
-    .with(url)
-    .and_return(
-      body: html,
-      status: 200,
-      content_type: "text/html",
-      current_url: url
-    )
+          .with(url)
+          .and_return(
+            body: html,
+            status: 200,
+            content_type: "text/html",
+            current_url: url
+          )
 end
 
 Sachantque("l'adresse {string} renvoie {string}") do |url, html|
   allow(Browser)
     .to receive(:get)
-    .with(url)
-    .and_return(
-      body: html,
-      status: 200,
-      content_type: "text/html",
-      current_url: url
-    )
+          .with(url)
+          .and_return(
+            body: html,
+            status: 200,
+            content_type: "text/html",
+            current_url: url
+          )
 end
 
 Sachantque("le site {string} renvoie {string} pour la déclaration d'accessibilité") do |url, str|
@@ -94,15 +94,15 @@ end
 
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
   fake_html = <<~HTML
-        <html>
-          <head>
-            <title>Site title</title>
-          </head>
-          <body>
-            <h1>Hello</h1>
-          </body>
-        </html>
-      HTML
+    <html>
+      <head>
+        <title>Site title</title>
+      </head>
+      <body>
+        <h1>Hello</h1>
+      </body>
+    </html>
+  HTML
 
   step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end
@@ -151,11 +151,6 @@ Alors("la page contient un lien vers {string}") do |url|
   expect(page).to have_content(url_without_scheme_and_www)
 end
 
-Alors("la page contient un lien vers l'étiquette {string}") do |name|
-  tag = team.tags.find_by(name:)
-  expect(page).to have_link(href: tag_path(tag))
-end
-
 Alors("la page contient un tableau") do
   expect(page).to have_css("table")
 end
@@ -176,29 +171,26 @@ Alors("la page contient un tableau avec toutes les vérifications du site {strin
   end
 end
 
-Alors("la page contient toutes les vérifications du site {string}") do |url|
-  site = team.sites.find_by(url:)
-  site.last_audit.checks.each do |check|
-    expect(page).to have_content(check.human_type)
-  end
+Alors('la carte {string} indique {string}') do |title, str|
+  expect(find("section.audit-card", text: title)).to have_content(str)
 end
 
-Alors('la section {string} indique {string}') do |name, str|
-  within(find('h2', text: name).ancestor('div', id: /checks_/)) do |section|
-    expect(section).to have_content(str)
-  end
+Alors('la carte {string} n\'indique pas {string}') do |title, str|
+  expect(find("section.audit-card", text: title)).not_to have_content(str)
 end
 
-Alors('la section {string} n\'indique pas {string}') do |name, str|
-  within(find('h2', text: name).ancestor('div', id: /checks_/)) do |section|
-    expect(section).not_to have_content(str)
-  end
+Alors('le résumé {string} indique {string}') do |label, str|
+  expect(find(".summary-section", text: label)).to have_content(str)
 end
 
-Alors('la vérification {string} indique {string}') do |name, state|
-  within(find('h2', text: name).sibling('.fr-badge')) do |badge|
-    expect(badge).to have_content state
-  end
+Alors('la vérification {string} de la carte {string} indique {string}') do |check_name, card_title, str|
+  card = find("section.audit-card", text: card_title)
+  expect(card.find("th", text: check_name).ancestor("tr")).to have_content(str)
+end
+
+Alors('la vérification {string} de la carte {string} contient un lien vers {string}') do |check_name, card_title, href|
+  card = find("section.audit-card", text: card_title)
+  expect(card.find("th", text: check_name).ancestor("tr")).to have_link(href: href)
 end
 
 Quand("je choisis {string} dans le menu principal") do |item|

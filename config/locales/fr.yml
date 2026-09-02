@@ -37,17 +37,8 @@ fr:
         one: Équipe
         other: Équipes
   audit:
-    completed_at: Executé le
     redirect_url: URL de redirection
     site_url_address: Adresse du site
-    state: État
-    status:
-      failed: Échoué
-      mixed: Mixte
-      passed: Effectué
-      pending: Planifié
-      retryable: À retenter
-      running: En cours
     url: URL
   audit_batches:
     cancel: Abandonner
@@ -96,6 +87,99 @@ fr:
   audits:
     create:
       notice: Vérification créée
+    show:
+      accessibility_rate: Taux d'accessibilité
+      audit_date: Date de l'audit
+      automated_tests_description: "Tests techniques exécutés automatiquement sur %{site} à l'aide du moteur de test Axe-core. Le nombre de tests applicables peut être inférieur à %{total} selon le contenu du site."
+      automated_tests_incomplete_text: "Les résultats détaillés de ce test ne sont plus disponibles. Relancez une évaluation pour obtenir un résultat détaillé."
+      automated_tests_incomplete_title: Résultats détaillés indisponibles
+      automated_tests_results: "%{count} / %{total} réussis"
+      automated_tests_title: Tests automatiques du RGAA
+      automated_tests_warning_text: "Les tests automatiques du RGAA ne couvrent que 44 des 105 critères du RGAA. Les critères non couverts doivent être vérifiés par un auditeur agréé. Les tests automatiques ne se substituent pas à un audit d'accessibilité complet."
+      automated_tests_warning_title: Attention
+      bar_label: "Sur %{total} tests : %{details}"
+      breadcrumb_current: "Évaluation du %{date}"
+      breadcrumb_sites: Annuaire
+      comment: Commentaire
+      conclusion_title: Conclusion de l'évaluation
+      criterion_prefix: Critère
+      declaration_and_mention_caption: Déclaration et mention d'accessibilité
+      declaration_not_found_text: "La déclaration d'accessibilité n'a pas été trouvée sur le site. L'analyse des obligations déclaratives a donc été annulée pour cette évaluation."
+      declaration_not_found_title: Déclaration d'accessibilité non trouvée
+      declaration_obligations_title: Obligations déclaratives
+      declaration_quality_comment:
+        one: "%{count} élément sur %{total} nécessite des corrections."
+        other: "%{count} éléments sur %{total} nécessitent des corrections."
+      declaration_quality_conclusion_caption: "Évaluation Accès cible : qualité de la déclaration"
+      declaration_quality_details_caption: "Qualité de la déclaration : validité de chaque élément"
+      declaration_quality_element: Élément de la déclaration
+      declaration_quality_title: Qualité de la déclaration
+      declared_level_caption: Niveau d'accessibilité déclaré
+      declared_level_title: Niveau d'accessibilité déclaré
+      declared_level_undetermined: "Niveau d'accessibilité déclaré : non déterminé"
+      declared_level_undetermined_text: "Aucune déclaration d'accessibilité n'a été trouvée sur le site. Le niveau déclaré, le respect des obligations légales et la qualité de la déclaration n'ont pas pu être évalués."
+      details_title: Détails de l'évaluation
+      documentation_axe_core: Documentation axe-core
+      element: Élément
+      element_checked: Élément vérifié
+      form: Formulaire de contact
+      general_comment: Commentaire général
+      headings_fix_hint: "Corrigez l'ordre et le niveau des titres de la page."
+      how_to_fix: Comment corriger
+      launched_by: "évaluation lancée par un membre de %{team}"
+      legal_obligations_comment:
+        one: "%{count} obligation légale sur %{total} est remplie."
+        other: "%{count} obligations légales sur %{total} sont remplies."
+      legal_obligations_conclusion_caption: "Évaluation Accès cible : respect des obligations légales"
+      legal_obligations_details_caption: "Obligations légales : éléments trouvés sur le site"
+      legal_obligations_title: Obligations légales
+      legend_inapplicable:
+        one: "%{count} non applicable"
+        other: "%{count} non applicables"
+      legend_incomplete:
+        one: "%{count} inconnu"
+        other: "%{count} inconnus"
+      legend_passes:
+        one: "%{count} réussi"
+        other: "%{count} réussis"
+      legend_violations:
+        one: "%{count} en échec"
+        other: "%{count} en échec"
+      overall_score: Note globale
+      page_tested: "Page testée :"
+      pending_text: "Cette évaluation n'est pas encore terminée."
+      pending_title: Évaluation en cours
+      rating_aria_label: "%{label} : %{filled} sur %{total}"
+      report_incorrect_result: "Ce résultat vous paraît incorrect ? Signalez-le en cliquant ici."
+      result: Résultat
+      see_code_html: Voir le code HTML en cause
+      see_headings: Voir la hiérarchie des titres
+      status_inapplicable: Non applicable
+      status_incomplete: Inconnu
+      status_passes: Réussi
+      status_violations: Échec
+      summary_declaration_quality: Qualité de la déclaration
+      summary_declaration_quality_detail:
+        one: "%{count} élément à corriger sur %{total}"
+        other: "%{count} éléments à corriger sur %{total}"
+      summary_declared_level: Niveau d'accessibilité déclaré
+      summary_legal_obligations: Respect des obligations légales
+      summary_legal_obligations_detail:
+        one: "%{count} obligation sur %{total} remplie"
+        other: "%{count} obligations sur %{total} remplies"
+      summary_mention_details: "Taux RGAA %{compliance_rate} - audit du %{audit_date}"
+      summary_title: "Résumé de l'évaluation du site"
+      tab_automated_tests: Tests automatiques RGAA
+      tab_obligations: Obligations & déclaration
+      tabs_label: Résultat de l'évaluation
+      title: Résultat de l'évaluation
+      unreachable_intro: "Le site %{site} n'est pas joignable actuellement. Aucune évaluation n'a pu être exécutée."
+      unreachable_no_checks_text: "Le site n'étant pas joignable, aucune des quatre catégories (niveau déclaré, obligations légales, qualité de la déclaration, tests automatiques) n'a pu être évaluée."
+      unreachable_no_checks_title: Aucune évaluation exécutée
+      unreachable_title: Site injoignable
+      unreachable_what_to_do_text: "Vérifiez que l'adresse est correcte et que le site est en ligne, puis relancez l'évaluation. Si le site est temporairement indisponible, réessayez plus tard."
+      unreachable_what_to_do_title: Que faire ?
+      value_found: Valeur trouvée
   check:
     completed_at: Vérification effectuée le
     status:
@@ -122,9 +206,12 @@ fr:
         Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
       expectations: "Voici la hiérarchie attendue :"
       explanation:
-        one: "Un seul problème relevé sur %{total} titres attendus (%{error})."
-        other: "Sur la page controlée, %{count} problèmes ont été relevés sur un total de %{total} titres attendus."
-        zero: "Tous les titres attendus ont été trouvé, dans le bon ordre et avec la bonne hiérarchie. C'est bien !"
+        one: "%{found_titles} sur %{total} - %{count} au mauvais niveau"
+        other: "%{found_titles} sur %{total} - %{count} au mauvais niveau"
+        zero: "Tous les titres attendus ont été trouvés, dans le bon ordre et avec la bonne hiérarchie."
+      found_titles:
+        one: "%{count} titre trouvé"
+        other: "%{count} titres trouvés"
       retained: "Titre retenu :"
       statuses:
         incorrect_level: niveau de titre incorrect
@@ -139,6 +226,7 @@ fr:
       auditor: Audit réalisé par
       contact_email: Adresse email de contact
       contact_form: Formulaire de contact
+      contact_email_or_form: Adresse email ou formulaire de contact
       compliance_rate: Taux de conformité
       mentions_article: Mentionne l'article de loi
       missing_data: Déclaration incomplète
@@ -189,7 +277,7 @@ fr:
       type: Indication de la langue
     reachable:
       reachable: Joignable à l'adresse indiquée
-      redirect_message: Le site redirige de %{original} vers %{redirected}.
+      redirect_message: Le site %{original} est redirigé vers %{redirected}. Le site %{redirected} a été évalué par Accès cible.
       redirected: Redirection
       type: Site joignable
     run_axe_on_homepage:
@@ -202,6 +290,35 @@ fr:
         minor: impact mineur
         moderate: impact modéré
         serious: impact important
+      rules:
+        aria-conditional-attr: Attributs ARIA cohérents avec le rôle
+        aria-deprecated-role: Aucun rôle ARIA obsolète
+        aria-hidden-body: Page non masquée aux lecteurs d’écran
+        aria-required-attr: Attributs ARIA obligatoires présents
+        aria-required-parent: Rôles ARIA correctement imbriqués
+        aria-roles: Rôles ARIA valides
+        aria-valid-attr: Attributs ARIA reconnus
+        avoid-inline-spacing: Espacement du texte personnalisable
+        blink: Aucun texte clignotant
+        definition-list: Listes de définitions bien structurées
+        dlitem: Termes et définitions bien placés
+        document-title: Titre de page présent
+        html-has-lang: Langue de la page déclarée
+        html-lang-valid: Code de langue valide
+        html-xml-lang-mismatch: Langues HTML et XML cohérentes
+        label-content-name-mismatch: Libellé visible cohérent avec le nom vocalisé
+        landmark-no-duplicate-banner: Un seul en-tête de page
+        landmark-no-duplicate-contentinfo: Un seul pied de page
+        landmark-one-main: Zone de contenu principale présente
+        list: Listes correctement structurées
+        listitem: Éléments de liste bien utilisés
+        marquee: Aucun texte défilant
+        meta-refresh: Aucune redirection automatique
+        meta-viewport: Zoom de la page autorisé
+        scrollable-region-focusable: Zones défilantes accessibles au clavier
+        table-fake-caption: Tableaux dotés d’une vraie légende
+        td-has-header: Cellules de tableau reliées à leurs en-têtes
+        valid-lang: Codes de langue valides dans le texte
       success_rate: Taux de réussite
       table_header: "🤖 : Accueil"
       type: "Contrôles automatiques : page d'accueil"
@@ -276,6 +393,7 @@ fr:
   shared:
     "no": Non
     "yes": Oui
+    absent: Absent
     actions: Actions
     add: Ajouter
     help_and_resources: Aides et ressources
@@ -289,14 +407,19 @@ fr:
     back_to_list: "Revenir à la liste"
     cancel: Annuler
     continue: Continuer
+    dash: "-"
     desc: décroissant
     filter: Filtrer
     help: Aide
+    invalid: Invalide
+    present: Présent
+    valid: Valide
     import: Importer
     importing: Import en cours…
     invalid_url: URL invalide
     login: Se connecter
     logout: Se déconnecter
+    new_audit: Relancer une évaluation
     new_window: " (nouvelle fenêtre)"
     or: ou
     page_unavailable: Cette page n'est pas disponible.
@@ -335,12 +458,12 @@ fr:
       url: Adresse du site
     show:
       audit_history: Historique des vérifications (%{total})
-      audits: Toutes les vérifications
-      edit_tags: Modifier les étiquettes
-      new_audit: Nouvelle vérification
-      no_tag: Aucune étiquette
+      audit_history_hint: "Chaque vérification reste consultable. Sélectionnez-en une pour afficher son résultat détaillé."
+      legal_obligations: Obligations légales
+      most_recent: La plus récente
+      relaunch: Ré-évaluer
+      see_result: Voir le résultat
       tag: Étiquette %{name}
-      url: Adresse du site
     site:
       view_name: Voir la fiche de %{name}
     tags_form:

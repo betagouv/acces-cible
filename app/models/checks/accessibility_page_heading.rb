@@ -45,6 +45,10 @@ module Checks
       heading_statuses.filter { it.error? }
     end
 
+    def found_count
+      heading_statuses.count(&:ok?)
+    end
+
     def score
       points = heading_statuses.sum do |heading_status|
         case
@@ -62,7 +66,8 @@ module Checks
     end
 
     def human_explanation
-      t("checks.accessibility_page_heading.explanation", total:, count: failures.count, error: failures.first&.message)
+      found_titles = t("checks.accessibility_page_heading.found_titles", count: found_count)
+      t("checks.accessibility_page_heading.explanation", found_titles:, total:, count: failures.count)
     end
 
     alias custom_badge_text human_success_rate

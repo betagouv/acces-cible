@@ -45,7 +45,11 @@
       </div>
     <% else %>
       <%= render "shared/flash" %>
-      <h1><%= page_title %></h1>
+      <% if content_for?(:breadcrumb) %>
+        <%= yield :breadcrumb %>
+      <% else %>
+        <h1><%= page_title %></h1>
+      <% end %>
       <%= yield %>
     <% end %>
   </main>

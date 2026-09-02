@@ -1,0 +1,47 @@
+<%= turbo_stream_from @site %>
+
+<% content_for :breadcrumb do %>
+  <%= dsfr_breadcrumbs do |b| %>
+    <% b.with_breadcrumb(label: t(".breadcrumb_sites"), href: sites_path) %>
+    <% b.with_breadcrumb(label: @site.normalized_url, href: site_path(@site)) %>
+    <% b.with_breadcrumb(label: t(".breadcrumb_current", date: @audit.created_at.strftime("%d/%m/%Y"))) %>
+  <% end %>
+<% end %>
+
+<div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters fr-mb-1w">
+  <div class="fr-col">
+    <h1 class="fr-mb-0"><%= t(".title") %> <%= @site.normalized_url %> </h1>
+  </div>
+  <div class="fr-col-auto">
+    <%= button_to t("shared.new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
+  </div>
+</div>
+<p class="fr-text--sm fr-mb-3w">
+  <%= @site.normalized_url %> - <%= l(@audit.created_at, format: :long) %>
+  <% if @audit.user %> - <%= t(".launched_by", team: @audit.team.organization_label) %>
+  <% end %>
+</p>
+
+<% if @audit.completed_at %>
+  <% if @audit.reachable.found %>
+    <% if @audit.reachable.completed? && @audit.reachable.redirected? %>
+      <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
+        <%= t("checks.reachable.redirect_message", original: @audit.reachable.original_url, redirected: @audit.reachable.redirect_url) %>
+      <% end %>
+    <% end %>
+    <%= dsfr_tabs(label: t(".tabs_label")) do |tabs| %>
+      <% tabs.with_tab(title: t(".tab_obligations"), active: true) do %>
+        <%= render "audits/obligations", audit: @audit %>
+      <% end %>
+      <% tabs.with_tab(title: t(".tab_automated_tests")) do %>
+        <%= render "audits/automated_tests", audit: @audit %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <%= render "audits/unreachable", audit: @audit %>
+  <% end %>
+<% else %>
+  <%= dsfr_callout(title: t(".pending_title"), html_attributes: { class: "fr-mb-3w" }) do %>
+    <%= t(".pending_text") %>
+  <% end %>
+<% end %>

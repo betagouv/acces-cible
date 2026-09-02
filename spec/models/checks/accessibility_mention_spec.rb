@@ -52,7 +52,7 @@ RSpec.describe Checks::AccessibilityMention do
   end
 
   describe "#custom_badge_status" do
-    subject(:badge_status) { check.send(:custom_badge_status) }
+    subject(:badge_status) { check.custom_badge_status }
 
     {
       nil => :error,

@@ -5,7 +5,7 @@ class AuditsController < ApplicationController
   def create
     @audit = @site.audit!(user: current_user)
     if @audit.persisted?
-      redirect_to [@site, @audit], notice: t(".notice")
+      redirect_to @site, notice: t(".notice")
     else
       render "sites/show", status: :unprocessable_entity
     end
@@ -15,8 +15,6 @@ class AuditsController < ApplicationController
   def show
     @audit = @site.audits.launched.with_check_transitions.find(params[:id])
     @title = @site.normalized_url
-
-    render "sites/show"
   end
 
   private

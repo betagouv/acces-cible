@@ -13,10 +13,10 @@ RSpec.describe "Audits" do
   describe "POST /sites/:site_id/audits" do
     subject(:post_audit) { post site_audits_path(site) }
 
-    it "creates an audit and redirects to it" do
+    it "creates an audit and redirects to the site" do
       expect { post_audit }.to change(Audit, :count).by(1)
 
-      expect(response).to redirect_to([site, last_audit])
+      expect(response).to redirect_to(site)
     end
 
     it "assigns the current user to the audit" do

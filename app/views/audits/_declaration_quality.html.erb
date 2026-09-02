@@ -1,0 +1,97 @@
+<% accessibility_page_analysis = audit.analyze_accessibility_page %>
+<% heading_check = audit.accessibility_page_heading %>
+<% schema_check = audit.analyze_schema %>
+<% plan_check = audit.analyze_plan %>
+
+<%= card_with_header(title: t("audits.show.declaration_quality_title")) do %>
+  <h4 class="fr-h6 fr-mb-1w"><%= t("audits.show.conclusion_title") %></h4>
+  <%= dsfr_table(caption: t("audits.show.declaration_quality_conclusion_caption"), border: true, html_attributes: { class: "fr-mb-4w" }) do |t| %>
+    <% t.with_body do %>
+      <tr>
+        <th scope="row"><%= t("audits.show.overall_score") %></th>
+        <td><%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.declaration_quality_title")) %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("audits.show.general_comment") %></th>
+        <td><%= t("audits.show.declaration_quality_comment", count: audit.declaration_quality_issues_count, total: audit.declaration_quality_criteria.size) %></td>
+      </tr>
+    <% end %>
+  <% end %>
+
+  <h4 class="fr-h6 fr-mb-1w"><%= t("audits.show.details_title") %></h4>
+  <%= dsfr_table(caption: t("audits.show.declaration_quality_details_caption"), html_attributes: { class: "fr-mb-0" }) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col"><%= t("audits.show.declaration_quality_element") %></th>
+        <th scope="col"><%= t("audits.show.value_found") %></th>
+        <th scope="col"><%= t("audits.show.result") %></th>
+        <th scope="col"><%= t("audits.show.how_to_fix") %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <tr>
+        <th scope="row"><%= t("checks.analyze_accessibility_page.audit_date") %></th>
+        <td><%= accessibility_page_analysis.audit_date ? l(accessibility_page_analysis.audit_date) : muted_dash %></td>
+        <td><%= presence_badge(accessibility_page_analysis.audit_date.present?) %></td>
+        <td><%= muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("checks.analyze_accessibility_page.standard") %></th>
+        <td><%= accessibility_page_analysis.standard.presence || muted_dash %></td>
+        <td><%= presence_badge(accessibility_page_analysis.standard.present?) %></td>
+        <td><%= muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("checks.analyze_accessibility_page.auditor") %></th>
+        <td><%= accessibility_page_analysis.auditor.presence || muted_dash %></td>
+        <td><%= presence_badge(accessibility_page_analysis.auditor.present?) %></td>
+        <td><%= muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("checks.analyze_accessibility_page.mentions_article") %></th>
+        <td><%= accessibility_page_analysis.mentions_article ? t("shared.yes") : t("shared.no") %></td>
+        <td><%= presence_badge(accessibility_page_analysis.mentions_article) %></td>
+        <td><%= muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("checks.analyze_accessibility_page.contact_email_or_form") %></th>
+        <td>
+          <% if accessibility_page_analysis.contact_email.present? %>
+            <%= tag.div email_link_to(accessibility_page_analysis.contact_email), class: "fr-mb-1v" %>
+          <% end %>
+          <% if accessibility_page_analysis.contact_form.present? %>
+            <%= tag.div external_link_to(accessibility_page_analysis.contact_form, t("audits.show.form")) %>
+          <% end %>
+          <% if accessibility_page_analysis.contact_email.blank? && accessibility_page_analysis.contact_form.blank? %>
+            <%= muted_dash %>
+          <% end %>
+        </td>
+        <td><%= presence_badge(accessibility_page_analysis.contact_email.present? || accessibility_page_analysis.contact_form.present?) %></td>
+        <td><%= muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= heading_check.human_type %></th>
+        <td><%= heading_check.completed? && heading_check.comparison.present? ? heading_check.human_explanation : muted_dash %></td>
+        <td><%= validity_badge(heading_check) %></td>
+        <td>
+          <% unless heading_check.conform? %>
+            <%= t("audits.show.headings_fix_hint") %><br>
+          <% end %>
+          <%= tag.button t("audits.show.see_headings"), type: "button", class: "fr-btn fr-btn--secondary fr-btn--sm fr-icon-table-line fr-btn--icon-left fr-mt-1w", disabled: true %>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row"><%= schema_check.human_type %></th>
+        <td><%= schema_check.years.present? ? schema_check.years.join("-") : muted_dash %></td>
+        <td><%= validity_badge(schema_check) %></td>
+        <td><%= validity_comment(schema_check) || muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= plan_check.human_type %></th>
+        <td><%= plan_check.years.present? ? plan_check.years.join("-") : muted_dash %></td>
+        <td><%= validity_badge(plan_check) %></td>
+        <td><%= validity_comment(plan_check) || muted_dash %></td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>

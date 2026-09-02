@@ -4,26 +4,42 @@ module ApplicationHelper
   include IconHelper
   include JdmaHelper
 
+  EXTERNAL_LINK_CLASSES = "fr-link fr-link--sm fr-link--icon-right fr-icon-external-link-line".freeze
   TRUNCATION_LENGTH = 35.freeze
 
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
   end
 
-  def badge(status, text = nil, link: nil, tooltip: false, &block)
-    status, text, link = *status if status.is_a?(Array)
-    text ||= yield(block)
-    case
-    when tooltip && link
-      link_to link, class: class_names("fr-badge", "fr-badge--#{status}"), role: :tooltip, title: text + t("shared.new_window"), target: :_blank, rel: :noopenner do
-        tag.span(class: "fr-sr-only") { text }
+  def external_link_to(url, text)
+    content = safe_join([text, tag.span(t("shared.new_window"), class: "fr-sr-only")])
+    link_to(content, url, class: EXTERNAL_LINK_CLASSES, target: "_blank", rel: "noopener noreferrer")
+  end
+
+  def email_link_to(email)
+    mail_to(email, class: "fr-link fr-link--sm fr-link--icon-right fr-icon-mail-line")
+  end
+
+  def card_with_header(title:, description: nil, &block)
+    tag.section(class: "rounded audit-card fr-mb-3w") do
+      header = capture do
+        concat tag.h3(title, class: "fr-h4 fr-mb-0")
+        concat tag.p(description, class: "fr-text--sm fr-mb-0 fr-mt-1v") if description
       end
-    when tooltip
-      dsfr_badge(status:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { tag.span(class: "fr-sr-only") { text } }
-    when link then dsfr_badge(status:) { link_to text, link }
-    else
-      dsfr_badge(status:) { text }
+
+      concat tag.div(header, class: "header")
+      concat tag.div(capture(&block), class: "body")
     end
+  end
+
+  def muted_dash
+    tag.span(t("shared.dash"), class: "fr-text-mention--grey")
+  end
+
+  def badge(status:, text: nil, link: nil, hover: false, no_icon: false)
+    return hover_badge(status, text, link, no_icon) if hover
+
+    dsfr_badge(status:, no_icon:) { link ? link_to(text, link) : text }
   end
 
   def sortable_header(text, param, **options)
@@ -68,6 +84,15 @@ module ApplicationHelper
   end
 
   private
+
+  def hover_badge(status, text, link, no_icon)
+    label = tag.span(class: "fr-sr-only") { text }
+    return dsfr_badge(status:, no_icon:, html_attributes: { role: :tooltip, tabindex: 0, title: text }) { label } unless link
+
+    link_to link, class: class_names("fr-badge", "fr-badge--#{status}", ("fr-badge--no-icon" if no_icon)), role: :tooltip, title: text + t("shared.new_window"), target: :_blank, rel: :noopener do
+      label
+    end
+  end
 
   def flatten_params_hash(prefix, value)
     if value.is_a?(Hash) || value.is_a?(ActionController::Parameters)

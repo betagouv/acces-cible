@@ -1,55 +1,84 @@
 <%= turbo_stream_from @site %>
-<% site_url = Link.safe_external_url(@site.url) %>
 
-<div class="fr-grid-row">
-  <div class="fr-col-12 fr-col-md-8">
-    <p>
-      <strong><%= t(".url") %> :</strong>
-      <% if site_url %>
-        <%= link_to @site.url, site_url, target: :_blank %>
-      <% else %>
-        <%= t("shared.invalid_url") %>
-      <% end %>
-    </p>
-    <p>
-      <strong><%= t("tags.all") %> :</strong>
-      <% if @site.tags.load.any? %>
-        <% @site.tags.each do |tag| %>
-          <%= dsfr_tag(title: tag.name.truncate(ApplicationHelper::TRUNCATION_LENGTH), url: tag_path(tag), size: :sm, html_attributes: { title: t(".tag", name: tag.name) }) %>
-        <% end %>
-      <% else %>
-        <%= t(".no_tag") %>
-      <% end %>
-    </p>
-    <% if @audit.completed_at %>
-      <p>
-        <strong><%= t("audit.completed_at") %> :</strong>
-        <% completed_at = @audit.completed_at %>
-        <%= time_tag completed_at, l(completed_at, format: :long) %>
-      </p>
-    <% else %>
-      <p>
-        <strong><%= t("audit.state") %> :</strong>
-        <%= t("audit.status.#{@audit.status_from_checks}") %>
-      </p>
-    <% end %>
-    <%= render(partial: @audit.checks, as: :check) %>
+<% content_for :breadcrumb do %>
+  <%= dsfr_breadcrumbs do |b| %>
+    <% b.with_breadcrumb(label: t("audits.show.breadcrumb_sites"), href: sites_path) %>
+    <% b.with_breadcrumb(label: @site.normalized_url) %>
+  <% end %>
+<% end %>
+
+<div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters fr-mb-1w">
+  <div class="fr-col">
+    <h1 class="fr-mb-0"><%= @site.normalized_url %> </h1>
   </div>
-  <div class="fr-col-12 fr-col-md-4">
-    <% audits = @site.audits.launched.sort_by_newest.load %>
-    <%= dsfr_side_menu(title: t(".audit_history", total: audits.count), html_attributes: { class: "fr-sidemenu--right" }) do |sidemenu| %>
-      <% audits.each do |audit| %>
-        <% sidemenu.with_item title: l(audit.created_at.in_time_zone, format: :long).upcase_first, path: url_for([@site, audit]), current_page: @audit == audit %>
-      <% end %>
-    <% end %>
+  <div class="fr-col-auto">
+    <%= button_to t("shared.new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
   </div>
 </div>
+<div class="fr-text--sm fr-mb-3w">
+  <%= external_link_to(@site.url, @site.url) %>
+  <% if @site.tags.present? %>
+    <%= muted_dash %>
+    <% @site.tags.each do |tag| %>
+      <%= dsfr_tag(title: tag.name.truncate(ApplicationHelper::TRUNCATION_LENGTH),
+                   size: :sm,
+                   html_attributes: { title: t(".tag", name: tag.name) }) %>
+    <% end %>
+  <% end %>
+</div>
 
-<br>
+<% if @last_audit %>
+  <% if @last_audit.reachable.completed? && @last_audit.reachable.redirected? %>
+    <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
+      <%= t("checks.reachable.redirect_message", original: @last_audit.reachable.original_url, redirected: @last_audit.reachable.redirect_url) %>
+    <% end %>
+  <% end %>
 
-<%= page_actions do %>
-  <%= button_to t(".new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
-  <%= link_to t(".edit_tags"), [:edit, @site], class: "fr-btn fr-btn--secondary" %>
-  <%= link_to t("shared.see_help"), help_path, class: "fr-btn fr-btn--tertiary-no-outline" %>
-  <%= link_to t("shared.back_to_list"), { controller: :sites, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
+  <% if @last_audit.completed_at %>
+    <%= render "audits/summary", audit: @last_audit %>
+  <% else %>
+    <%= dsfr_callout(title: t("audits.show.pending_title"), html_attributes: { class: "fr-mb-3w" }) do %>
+      <%= t("audits.show.pending_text") %>
+    <% end %>
+  <% end %>
 <% end %>
+
+<h2 class="fr-h4"><%= t(".audit_history", total: @audits.size) %></h2>
+<p class="fr-text--sm fr-mb-3w"><%= t(".audit_history_hint") %></p>
+
+<div class="audit-timeline">
+  <% @audits.each do |audit| %>
+    <div class="audit-card fr-p-3w fr-mb-2w audit-timeline__row">
+      <div class="audit-timeline__main">
+        <p class="audit-timeline__date">
+          <%= l(audit.created_at.in_time_zone, format: :long).upcase_first %>
+          <% if audit == @audits.first %>
+            <span class="fr-badge fr-badge--info fr-badge--sm fr-badge--no-icon"><%= t(".most_recent") %></span>
+          <% end %>
+        </p>
+        <% if audit.user %>
+          <p class="audit-timeline__team"><%= t("audits.show.launched_by", team: audit.user.team.organization_label) %></p>
+        <% end %>
+      </div>
+
+      <% if audit.completed_at %>
+        <div class="audit-timeline__stats">
+          <div class="audit-timeline__stat">
+            <span class="audit-timeline__stat-label"><%= t(".legal_obligations") %></span>
+            <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t(".legal_obligations")) %>
+          </div>
+          <div class="audit-timeline__stat">
+            <span class="audit-timeline__stat-label"><%= t("audits.show.summary_declaration_quality") %></span>
+            <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality")) %>
+          </div>
+        </div>
+      <% else %>
+        <p class="fr-badge fr-badge--info fr-badge--sm fr-badge--no-icon fr-mb-0"><%= t("audits.show.pending_title") %></p>
+      <% end %>
+
+      <div class="audit-timeline__actions">
+        <%= link_to t(".see_result"), site_audit_path(@site, audit), class: "fr-btn fr-btn--secondary fr-btn--sm" %>
+      </div>
+    </div>
+  <% end %>
+</div>

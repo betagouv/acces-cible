@@ -28,7 +28,8 @@ class SitesController < ApplicationController
 
   # GET /sites/1
   def show
-    @audit = @site.last_audit_without_html
+    @audits = @site.audits.launched.without_html
+    @last_audit = @site.last_audit_without_html
   end
 
   # GET /sites/1/edit
@@ -69,11 +70,11 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites.with_launched_audit
+    current_user.team.sites.with_launched_audit.preloaded
   end
 
   def set_site
-    @site = sites_scope.friendly.find(params.expect(:id))
+    @site = sites_scope.friendly.find(site_ids)
   end
 
   def set_sites

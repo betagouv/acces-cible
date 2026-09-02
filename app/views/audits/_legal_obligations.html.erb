@@ -1,0 +1,37 @@
+<%= card_with_header(title: t("audits.show.legal_obligations_title")) do %>
+  <h4 class="fr-h6 fr-mb-1w"><%= t("audits.show.conclusion_title") %></h4>
+  <%= dsfr_table(caption: t("audits.show.legal_obligations_conclusion_caption"), border: true, html_attributes: { class: "fr-mb-4w" }) do |t| %>
+    <% t.with_body do %>
+      <tr>
+        <th scope="row"><%= t("audits.show.overall_score") %></th>
+        <td><%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.legal_obligations_title")) %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("audits.show.general_comment") %></th>
+        <td><%= t("audits.show.legal_obligations_comment", count: audit.legal_obligation_score.to_i, total: 4) %></td>
+      </tr>
+    <% end %>
+  <% end %>
+
+  <h4 class="fr-h6 fr-mb-1w"><%= t("audits.show.details_title") %></h4>
+  <%= dsfr_table(caption: t("audits.show.legal_obligations_details_caption"), html_attributes: { class: "fr-mb-0" }) do |t| %>
+    <% t.with_head do %>
+      <tr>
+        <th scope="col"><%= t("audits.show.element") %></th>
+        <th scope="col"><%= t("audits.show.value_found") %></th>
+        <th scope="col"><%= t("audits.show.result") %></th>
+        <th scope="col"><%= t("audits.show.comment") %></th>
+      </tr>
+    <% end %>
+    <% t.with_body do %>
+      <% [audit.find_accessibility_page, audit.accessibility_mention, audit.analyze_schema, audit.analyze_plan].each do |check| %>
+        <tr>
+          <th scope="row"><%= check.human_type %></th>
+          <td><%= obligation_value(check) %></td>
+          <td><%= obligation_badge(check) %></td>
+          <td class="fr-text--sm"><%= obligation_comment(check) || muted_dash %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

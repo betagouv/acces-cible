@@ -4,6 +4,7 @@ class Audit < ApplicationRecord
   belongs_to :audit_batch, optional: true
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
+  has_one :team, through: :user
 
   after_create_commit :start!, if: :launched?
 
@@ -90,9 +91,13 @@ class Audit < ApplicationRecord
   end
 
   def compute_declaration_quality_score
+    declaration_quality_criteria.count { it } * 0.5
+  end
+
+  def declaration_quality_criteria
     declaration = analyze_accessibility_page&.data || {}
 
-    criteria = [
+    [
       declaration["audit_date"].present?,
       declaration["standard"].present?,
       declaration["auditor"].present?,
@@ -102,8 +107,10 @@ class Audit < ApplicationRecord
       analyze_schema&.conform,
       analyze_plan&.conform
     ]
+  end
 
-    criteria.count { it } * 0.5
+  def declaration_quality_issues_count
+    declaration_quality_criteria.count { !it }
   end
 
   def abort_dependent_checks!(check)

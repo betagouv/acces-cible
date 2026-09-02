@@ -36,7 +36,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
               .with(described_class.const_get("AXE_SOURCE_PATH"))
               .and_return("axe JS mock")
 
-      stub_const("#{described_class}::RGAA_AXE_RULES", ["mock rule"])
+      stub_const("#{described_class}::RGAA_AXE_RULES", "mock rules")
     end
 
     it "runs and configures Axe with the right locale and rules" do
@@ -48,7 +48,7 @@ RSpec.describe Checks::RunAxeOnHomepage do
                 html_content,
                 an_instance_of(String)
                   .and(matching(/locale: localized axe JSON/))
-                  .and(matching(/values: \["mock rule"\]/)),
+                  .and(matching(/values: mock rules/)),
                 "axe JS mock"
               )
     end
@@ -65,9 +65,9 @@ RSpec.describe Checks::RunAxeOnHomepage do
       end
     end
 
-    context "when stored violation_data is empty" do
+    context "when stored axe_rule_results is empty" do
       before do
-        check.data = { "violation_data" => [] }
+        check.data = { "axe_rule_results" => [] }
       end
 
       it "returns empty array" do
@@ -75,10 +75,11 @@ RSpec.describe Checks::RunAxeOnHomepage do
       end
     end
 
-    context "when stored violation_data has violations" do
+    context "when stored axe_rule_results has a violation" do
       let(:violation_hash) do
         {
           "id" => "color-contrast",
+          "status" => "violations",
           "impact" => "serious",
           "description" => "Color contrast issue",
           "help" => "Fix color contrast",
@@ -94,14 +95,32 @@ RSpec.describe Checks::RunAxeOnHomepage do
         }
       end
 
+      before { check.data = { "axe_rule_results" => [violation_hash] } }
+
+      it "maps it to an AxeRule with a symbolized status" do
+        expect(violation_data).to contain_exactly(have_attributes(id: "color-contrast", status: :violations))
+      end
+    end
+
+    context "when stored axe_rule_results has no violation" do
       before do
-        check.data = { "violation_data" => [violation_hash] }
-        allow(AxeViolation).to receive(:new).and_return(instance_double(AxeViolation))
+        check.data = {
+          "axe_rule_results" => [
+            {
+              "id" => "document-title",
+              "status" => "passes",
+              "impact" => nil,
+              "description" => "Document has a title",
+              "help" => "Documents must have a title",
+              "help_url" => "https://example.com/help",
+              "nodes" => []
+            }
+          ]
+        }
       end
 
-      it "maps violation data to AxeViolation objects" do
-        expect(AxeViolation).to receive(:new).with(violation_hash)
-        violation_data
+      it "returns empty array" do
+        expect(violation_data).to eq([])
       end
     end
   end
@@ -127,29 +146,6 @@ RSpec.describe Checks::RunAxeOnHomepage do
 
       it "returns sum of passes, incomplete, and violations" do
         expect(applicable_total).to eq(18)
-      end
-    end
-  end
-
-  describe "#checks_total" do
-    subject(:checks_total) { check.checks_total }
-
-    context "when check is not completed" do
-      before { allow(check).to receive(:completed?).and_return(false) }
-
-      it "returns nil" do
-        expect(checks_total).to be_nil
-      end
-    end
-
-    context "when check is completed" do
-      before do
-        allow(check).to receive_messages(completed?: true, applicable_total: 18)
-        check.inapplicable = 2
-      end
-
-      it "returns sum of applicable_total and inapplicable" do
-        expect(checks_total).to eq(20)
       end
     end
   end

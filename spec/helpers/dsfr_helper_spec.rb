@@ -28,5 +28,11 @@ RSpec.describe DsfrHelper do
       expect(result).to include('class="fr-badge fr-badge--success"')
       expect(result).to include("Content")
     end
+
+    it "renders badge without the status icon" do
+      result = helper.dsfr_badge(status: "success", no_icon: true) { "Content" }
+
+      expect(result).to include('class="fr-badge fr-badge--success fr-badge--no-icon"')
+    end
   end
 end
