@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690))
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689))
+
+### Features
+
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689)) ([b51e819](https://github.com/betagouv/acces-cible/commit/b51e819deea130d3a3f5922b4f724305b0702128))
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690)) ([5b1bce1](https://github.com/betagouv/acces-cible/commit/5b1bce131957dc82cba01f2678244700e7c3cd94))
+* Handle unreachable audit case ([#694](https://github.com/betagouv/acces-cible/issues/694)) ([ef1379a](https://github.com/betagouv/acces-cible/commit/ef1379a413c587f05851990c2b6bc2ef9754fdaa))
+
 ## [2.0.0](https://github.com/betagouv/acces-cible/compare/v1.2.0...v2.0.0) (2026-08-18)
 
 
