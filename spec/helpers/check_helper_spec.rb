@@ -95,19 +95,15 @@ RSpec.describe CheckHelper do
     end
   end
 
-  describe "#to_badge" do
-    subject(:to_badge) { helper.to_badge(check) }
+  describe "#check_badge" do
+    let(:check) { create(:check, :accessibility_mention) }
 
-    let(:state) { :pending }
-
-    before do
-      allow(helper).to receive(:status_to_badge_level).with(check).and_return(:level)
-      allow(helper).to receive(:status_to_badge_text).with(check).and_return(:text)
-      allow(helper).to receive(:status_link).with(check).and_return(:link)
+    it "colours a pending check from its status level" do
+      expect(helper.check_badge(check)).to have_selector(".fr-badge.fr-badge--info")
     end
 
-    it "concatenates the other helpers" do
-      expect(to_badge).to eq [:level, :text, :link]
+    it "drops the status icon" do
+      expect(helper.check_badge(check, no_icon: true)).to have_selector(".fr-badge--no-icon")
     end
   end
 end

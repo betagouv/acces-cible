@@ -50,7 +50,7 @@
         <div class="rounded audit-test-result fr-mb-2w" data-status="<%= result[:status] %>">
           <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-1v">
             <div class="fr-col">
-              <%= dsfr_badge(status: "no-icon", html_attributes: { class: "fr-badge--sm" }) { result[:position].to_s } %>
+              <%= dsfr_badge(no_icon: true, html_attributes: { class: "fr-badge--sm" }) { result[:position].to_s } %>
               <strong><%= result[:title] %></strong>
             </div>
             <div class="fr-col-auto">

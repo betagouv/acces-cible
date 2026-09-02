@@ -12,15 +12,16 @@ Fonctionnalité: Vérifications du plan d'accessibilité
     Sachant que le site "https://foobar.com/" renvoie "<contenu>" pour la déclaration d'accessibilité
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
-    Alors la section "Plan d'action" indique "<résultat>"
+    Et que je clique sur "Voir le résultat"
+    Alors la vérification "Plan d'action" de la carte "Qualité de la déclaration" indique "<résultat>"
 
     Exemples:
-      | contenu                                 | résultat                        |
-      | plan annuel d'accessibilité 2020 - 2024 | Année(s) invalide(s)            |
-      | plan annuel d'accessibilité 2024 - 2025 | 2024-2025                       |
-      | plan annuel 2024 - 2025                 | 2024-2025                       |
-      | plan d'action 2024 - 2025               | 2024-2025                       |
-      | plan d'action 1998 - 2000               | Année(s) invalide(s)            |
-      | plan d'action 0946                      | Année(s) valides non trouvée(s) |
-      | plann d'accessibilité 2024 - 2025       | Non trouvé                      |
-      | plan d'accessibilité                    | Non trouvé                      |
+      | contenu                                 | résultat              |
+      | plan annuel d'accessibilité 2020 - 2024 | Année(s) invalide(s)  |
+      | plan annuel d'accessibilité 2024 - 2025 | 2024-2025             |
+      | plan annuel 2024 - 2025                 | 2024-2025             |
+      | plan d'action 2024 - 2025               | 2024-2025             |
+      | plan d'action 1998 - 2000               | Année(s) invalide(s)  |
+      | plan d'action 0946                      | Année(s) invalide(s)  |
+      | plann d'accessibilité 2024 - 2025       | Absent                |
+      | plan d'accessibilité                    | Absent                |

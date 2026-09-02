@@ -10,7 +10,7 @@
       <% [audit.find_accessibility_page, audit.accessibility_mention].each do |check| %>
         <tr>
           <th scope="row"><%= check.human_type %></th>
-          <td><%= badge obligation_badge(check) %></td>
+          <td><%= obligation_badge(check) %></td>
         </tr>
       <% end %>
     <% end %>

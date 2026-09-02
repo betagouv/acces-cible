@@ -3,14 +3,14 @@ module CheckHelper
   # but in some kind of decorator/presenter/facade pattern thing
 
   STATUS_TO_BADGE_LEVEL = {
-    pending:   :info,
-    blocked:   :info,
-    ready:     :info,
-    running:   :new,
+    pending: :info,
+    blocked: :info,
+    ready: :info,
+    running: :new,
     completed: :success,
-    errored:   :error,
-    failed:    :error,
-    aborted:   :error,
+    errored: :error,
+    failed: :error,
+    aborted: :error,
   }
 
   def status_to_badge_text(check)
@@ -35,11 +35,13 @@ module CheckHelper
     end
   end
 
-  def to_badge(check)
-    [
-      status_to_badge_level(check),
-      status_to_badge_text(check),
-      status_link(check)
-    ].compact
+  def check_badge(check, hover: check.tooltip?, no_icon: false)
+    badge(
+      status: status_to_badge_level(check),
+      text: status_to_badge_text(check),
+      link: status_link(check),
+      hover:,
+      no_icon:
+    )
   end
 end

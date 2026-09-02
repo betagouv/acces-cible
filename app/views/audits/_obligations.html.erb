@@ -1,4 +1,8 @@
 <% if audit.find_accessibility_page.found? %>
+  <h3 class="fr-h4 fr-mb-2w">
+    <%= t("audits.show.summary_title") %> <%= link_to audit.site.normalized_url, site_path(audit.site), class: "fr-link" %>
+  </h3>
+
   <%= render "audits/summary", audit: %>
   <%= render "audits/declared_level", audit: %>
   <%= render "audits/legal_obligations", audit: %>
