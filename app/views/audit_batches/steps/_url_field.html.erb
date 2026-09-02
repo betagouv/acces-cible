@@ -13,8 +13,9 @@
           html_attributes: {
             type: "button",
             title: t("audit_batches.steps.urls.remove"),
+            aria: { label: t("audit_batches.steps.urls.remove") },
             disabled: true,
-            class: "fr-btn--tertiary-no-outline",
+            class: "fr-btn--secondary",
             data: { repeatable_fields_target: "remove", action: "repeatable-fields#remove" }
           }) %>
   </div>
