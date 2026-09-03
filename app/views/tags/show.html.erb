@@ -1,5 +1,5 @@
 <% if @sites.load.any? %>
-  <%= dsfr_table(caption: t('tags.all', default: t('sites.index.caption'))) do |t| %>
+  <%= dsfr_table(caption: t('.caption')) do |t| %>
     <% t.with_head do %>
       <tr>
         <th scope="col" aria-sort="ascending"><%= t('.name') %></th>
@@ -14,10 +14,10 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= dsfr_alert(type: :info, title: t('sites.index.uploaded.other', count: @tag.sites_count, default: t('sites.index.title')), html_attributes: { class: "fr-mb-4w" }) %>
+  <%= dsfr_alert(type: :info, title: t('.no_sites', count: @tag.sites_count), html_attributes: { class: "fr-mb-4w" }) %>
 <% end %>
 
 <%= page_actions do %>
-  <%= dsfr_link_to t('.see_sites', tag: @tag.name, count: @tag.sites_count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
+  <%= dsfr_link_to t('.see_sites', tag: @tag.name, count: @tag.sites_count), audits_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
   <%= dsfr_link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>
