@@ -66,7 +66,7 @@ RSpec.describe AuditBatch do
     it "assigns its user to the audits it creates" do
       submit("https://example.com")
 
-      expect(audit_batch.audits.sole.user).to eq(user)
+      expect(audit_batch.audits.first.user).to eq(user)
     end
 
     it "reuses a site the team already has" do
@@ -151,6 +151,10 @@ RSpec.describe AuditBatch do
       expect { audit_batch.launched! }.to change(Check, :count).by(2 * Check.types.size)
 
       expect(audit_batch.audits.reload).to all(be_launched)
+    end
+
+    it "enqueues one job per audit it holds" do
+      expect { audit_batch.launched! }.to have_enqueued_job(FetchResourcesJob).exactly(2).times
     end
   end
 

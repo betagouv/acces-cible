@@ -50,11 +50,18 @@ RSpec.describe Site do
   describe "#last_audit" do
     subject(:site) { create(:site) }
 
-    it "ignores draft audits" do
-      launched = site.last_audit
-      create(:audit, :draft, site:)
+    context "when a draft audit is more recent" do
+      let!(:launched) { site.last_audit }
 
-      expect(site.reload.last_audit).to eq(launched)
+      before do
+        create(:audit, :draft, site:)
+        site.reload
+      end
+
+      it "is ignored by both readers" do
+        expect(site.last_audit).to eq(launched)
+        expect(site.last_audit_without_html).to eq(launched)
+      end
     end
   end
 

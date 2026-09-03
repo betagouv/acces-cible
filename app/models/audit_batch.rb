@@ -5,7 +5,7 @@ class AuditBatch < ApplicationRecord
 
   belongs_to :user
   has_many :audits, dependent: :destroy
-  has_many :sites, -> { distinct }, through: :audits
+  has_many :sites, through: :audits
 
   enum :kind, { manual: "manual", csv_import: "csv_import" }, validate: true
   enum :status, { draft: "draft", launched: "launched" }
@@ -82,6 +82,8 @@ class AuditBatch < ApplicationRecord
     steps.take(steps.index(step)).all? { step_complete?(it) }
   end
 
+  private
+
   def step_complete?(step)
     case step
     when "method" then persisted?
@@ -89,8 +91,6 @@ class AuditBatch < ApplicationRecord
     else true
     end
   end
-
-  private
 
   def start_audits
     audits.each(&:start!)

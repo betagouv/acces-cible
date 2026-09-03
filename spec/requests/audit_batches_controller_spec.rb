@@ -20,10 +20,7 @@ RSpec.describe "AuditBatches" do
     it "sends the back button to the site list on the first step" do
       get_new
 
-      back = Nokogiri::HTML(response.body).at_css("main a.fr-btn--secondary")
-
-      expect(back.text).to eq(I18n.t("shared.back"))
-      expect(back["href"]).to eq(sites_path)
+      expect(response.body).to have_link(I18n.t("shared.back"), href: sites_path)
     end
   end
 
@@ -73,15 +70,21 @@ RSpec.describe "AuditBatches" do
       expect(response).to redirect_to(step_audit_batch_path(audit_batch, "urls"))
     end
 
-    it "recaps the deduplicated addresses, each with its own tag fields" do
-      create(:tag, team: user.team)
+    it "recaps the deduplicated addresses" do
       audit_batch.update!(urls: ["https://example.com", "https://www.example.com/"])
 
       get step_audit_batch_path(audit_batch, "summary")
 
-      site = audit_batch.sites.first
       expect(response.body).to include(I18n.t("audit_batches.steps.summary.intro_html", count: 1))
-      expect(response.body).to have_css("input[name='audit_batch[site_tags][#{site.id}][tag_ids][]']")
+    end
+
+    it "gives each site its own tag fields" do
+      create(:tag, team: user.team)
+      audit_batch.update!(urls: ["https://example.com"])
+
+      get step_audit_batch_path(audit_batch, "summary")
+
+      expect(response.body).to have_css("input[name='audit_batch[site_tags][#{audit_batch.sites.first.id}][tag_ids][]']")
     end
 
     it "shows the automatic tests as always on and out of reach" do
@@ -89,10 +92,7 @@ RSpec.describe "AuditBatches" do
 
       get step_audit_batch_path(audit_batch, "checks")
 
-      toggle = Nokogiri::HTML(response.body).at_css(".fr-toggle__input")
-
-      expect(toggle[:checked]).to be_present
-      expect(toggle[:disabled]).to be_present
+      expect(response.body).to have_field(I18n.t("audit_batches.steps.checks.toggle"), checked: true, disabled: true)
       expect(response.body).to include(I18n.t("audit_batches.steps.checks.hint"))
     end
 
@@ -167,6 +167,7 @@ RSpec.describe "AuditBatches" do
 
     context "with an invalid address" do
       let(:urls) { ["https://example.com", "not a url"] }
+      let(:message) { Site.new(url: "not a url").tap(&:validate).errors.full_messages_for(:url).first }
 
       it "reports the error on its own field without losing the other address" do
         expect { submit_urls }.not_to change(Site, :count)
@@ -174,7 +175,7 @@ RSpec.describe "AuditBatches" do
         rows = Nokogiri::HTML(response.body).css("form ol li")
 
         expect(rows.css("input").map { it[:value] }).to eq(["https://example.com/", "not a url"])
-        expect(rows.map { it.at_css(".fr-input-group")[:class].include?("fr-input-group--error") }).to eq([false, true])
+        expect(rows.map { it.text.include?(message) }).to eq([false, true])
       end
     end
   end

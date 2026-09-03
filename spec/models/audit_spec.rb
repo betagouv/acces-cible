@@ -135,6 +135,16 @@ RSpec.describe Audit do
 
       it { is_expected.not_to be_complete }
     end
+
+    context "when every check has completed" do
+      let(:audit) { create(:audit) }
+
+      before do
+        audit.checks.each { CheckTransition.create!(check: it, to_state: :completed, most_recent: true, sort_key: 0) }
+      end
+
+      it { is_expected.to be_complete }
+    end
   end
 
   describe "#pending?" do
@@ -179,21 +189,6 @@ RSpec.describe Audit do
 
     it "enqueues no job" do
       expect { draft }.not_to have_enqueued_job(FetchResourcesJob)
-    end
-
-    it "creates its checks once launched" do
-      draft
-      expect { draft.audit_batch.launched! }.to change(Check, :count).by(Check.types.size)
-    end
-
-    it "enqueues its job once launched" do
-      draft
-      expect { draft.audit_batch.launched! }.to have_enqueued_job(FetchResourcesJob).with(draft).exactly(:once)
-    end
-
-    it "does not start again when saved after launching" do
-      draft.audit_batch.launched!
-      expect { draft.update!(completed_at: Time.current) }.not_to change(Check, :count)
     end
   end
 

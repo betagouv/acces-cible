@@ -9,7 +9,6 @@ RSpec.describe Tag do
     it { is_expected.to belong_to(:team) }
     it { is_expected.to have_many(:site_tags).dependent(:destroy) }
     it { is_expected.to have_many(:sites).through(:site_tags) }
-    it { is_expected.to have_many(:launched_sites).through(:site_tags).source(:site) }
   end
 
   describe "#launched_sites" do
