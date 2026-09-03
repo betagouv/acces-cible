@@ -6,5 +6,9 @@ FactoryBot.define do
     trait :csv_import do
       kind { :csv_import }
     end
+
+    trait :launched do
+      status { :launched }
+    end
   end
 end

@@ -13,13 +13,13 @@ class AuditsController < ApplicationController
 
   # GET /sites/1/audits/1
   def show
-    @audit = @site.audits.with_check_transitions.find(params[:id])
+    @audit = @site.audits.launched.with_check_transitions.find(params[:id])
     @title = @site.normalized_url
   end
 
   private
 
   def set_site
-    @site = current_user.team.sites.preloaded.friendly.find(params.expect(:site_id))
+    @site = current_user.team.sites.with_launched_audit.preloaded.friendly.find(params.expect(:site_id))
   end
 end

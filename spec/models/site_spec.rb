@@ -25,6 +25,46 @@ RSpec.describe Site do
     it { is_expected.to have_many(:tags).through(:site_tags) }
   end
 
+  describe ".with_launched_audit" do
+    subject(:with_launched_audit) { described_class.with_launched_audit }
+
+    let!(:site) { create(:site) }
+
+    context "when another site has only draft audits" do
+      before { create(:site, :draft) }
+
+      it "excludes it" do
+        expect(with_launched_audit).to eq([site])
+      end
+    end
+
+    context "when the site also has a draft audit" do
+      before { create(:audit, :draft, site:) }
+
+      it "still includes it" do
+        expect(with_launched_audit).to eq([site])
+      end
+    end
+  end
+
+  describe "#last_audit" do
+    subject(:site) { create(:site) }
+
+    context "when a draft audit is more recent" do
+      let!(:launched) { site.last_audit }
+
+      before do
+        create(:audit, :draft, site:)
+        site.reload
+      end
+
+      it "is ignored by both readers" do
+        expect(site.last_audit).to eq(launched)
+        expect(site.last_audit_without_html).to eq(launched)
+      end
+    end
+  end
+
   describe "friendly_id" do
     let(:url) { "https://example.com/path?query=1" }
     let(:site) { create(:site, url:) }

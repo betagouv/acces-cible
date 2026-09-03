@@ -1,0 +1,22 @@
+<%# locals: (f:, site:, index:) %>
+<li class="fr-grid-row fr-mb-1w" data-repeatable-fields-target="row">
+  <div class="fr-col">
+    <%= f.fields_for :submitted_sites, site, index: do |sf| %>
+      <%= sf.dsfr_url_field :url,
+            name: "audit_batch[urls][]",
+            label: tag.span(t("audit_batches.steps.urls.label"), class: "fr-sr-only") %>
+    <% end %>
+  </div>
+  <div class="fr-col-auto fr-ml-1w fr-mt-1w">
+    <%= dsfr_button(
+          icon: "delete-line",
+          html_attributes: {
+            type: "button",
+            title: t("audit_batches.steps.urls.remove"),
+            aria: { label: t("audit_batches.steps.urls.remove") },
+            disabled: true,
+            class: "fr-btn--secondary",
+            data: { repeatable_fields_target: "remove", action: "repeatable-fields#remove" }
+          }) %>
+  </div>
+</li>

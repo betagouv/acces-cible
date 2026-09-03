@@ -115,6 +115,36 @@ RSpec.describe Audit do
 
       it { is_expected.to eq "testing" }
     end
+
+    context "without any check" do
+      it { is_expected.to eq :pending }
+    end
+  end
+
+  describe "#complete?" do
+    subject { audit }
+
+    context "without any check" do
+      let(:audit) { create(:audit, :without_checks) }
+
+      it { is_expected.not_to be_complete }
+    end
+
+    context "with checks left to run" do
+      let(:audit) { create(:audit) }
+
+      it { is_expected.not_to be_complete }
+    end
+
+    context "when every check has completed" do
+      let(:audit) { create(:audit) }
+
+      before do
+        audit.checks.each { CheckTransition.create!(check: it, to_state: :completed, most_recent: true, sort_key: 0) }
+      end
+
+      it { is_expected.to be_complete }
+    end
   end
 
   describe "#pending?" do
@@ -147,6 +177,18 @@ RSpec.describe Audit do
   describe "after_create callback" do
     it "creates checks when audit is created" do
       expect { create(:audit) }.to change(Check, :count).by(Check.types.size)
+    end
+  end
+
+  describe "a draft audit" do
+    subject(:draft) { create(:audit, :draft) }
+
+    it "creates no checks" do
+      expect { draft }.not_to change(Check, :count)
+    end
+
+    it "enqueues no job" do
+      expect { draft }.not_to have_enqueued_job(FetchResourcesJob)
     end
   end
 

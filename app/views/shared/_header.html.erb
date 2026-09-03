@@ -16,7 +16,7 @@
     <% end %>
 
     <%= header.with_direct_link_simple title: t("sites.index.title"), path: sites_path, active: current_page?(controller: :sites, action: :index) %>
-    <%= header.with_direct_link_simple title: t("sites.new.title"), path: new_site_path, active: current_page?(controller: :sites, action: :new) %>
+    <%= header.with_direct_link_simple title: t("audit_batches.new.title"), path: new_audit_batch_path, active: controller_name == "audit_batches" %>
     <%= header.with_direct_link_simple title: t("tags.index.title"), path: tags_path, active: current_page?(controller: :tags, action: :index) %>
   <% else %>
     <%= header.with_tool_link title: t("shared.login"), path: login_path, html_attributes: { class: [icon_class(:account, :circle, btn: :secondary)] } %>

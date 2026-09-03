@@ -64,5 +64,15 @@ RSpec.describe "Audits" do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context "when the audit is still a draft" do
+      let(:audit) { create(:audit, :draft, site:) }
+
+      it "returns not found" do
+        get_audit
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 end

@@ -5,6 +5,10 @@ FactoryBot.define do
     team { association :team }
     audits { [association(:audit)] }
 
+    trait :draft do
+      audits { [association(:audit, :draft)] }
+    end
+
     trait :completed do
       after(:create) do |site|
         site.audits.first.update!(completed_at: 1.day.ago)

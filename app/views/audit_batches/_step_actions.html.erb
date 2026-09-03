@@ -1,0 +1,34 @@
+<%# locals: (audit_batch:, step:) %>
+<% previous_step = audit_batch.previous_step(step) %>
+<% last_step = audit_batch.next_step(step).nil? %>
+<div class="fr-mt-4w">
+  <div class="fr-grid-row fr-grid-row--gutters">
+    <div class="fr-col">
+      <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--icon-left">
+        <li>
+          <%= link_to t("shared.back"),
+                previous_step ? step_audit_batch_path(audit_batch, previous_step) : sites_path,
+                class: icon_class("arrow-left", line: true, btn: :secondary) %>
+        </li>
+      </ul>
+    </div>
+    <div class="fr-col">
+      <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--right fr-btns-group--icon-<%= last_step ? "left" : "right" %>">
+        <li>
+          <% if last_step %>
+            <%= dsfr_button(
+                  label: t("audit_batches.launch"),
+                  icon: "play-circle-line",
+                  html_attributes: { type: "submit", data: { turbo_submits_with: t("audit_batches.launching") } }) %>
+          <% else %>
+            <%= dsfr_button(
+                  label: t("shared.continue"),
+                  icon: "arrow-right-line",
+                  icon_position: :right,
+                  html_attributes: { type: "submit", data: { turbo_submits_with: t("shared.saving") } }) %>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

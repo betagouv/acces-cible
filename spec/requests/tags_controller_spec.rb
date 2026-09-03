@@ -33,6 +33,33 @@ RSpec.describe "Tags" do
       expect(response.body).to have_link(own_tag.name, href: tag_path(own_tag))
       expect(response.body).not_to have_link(other_tag.name, href: tag_path(other_tag))
     end
+
+    context "when a tag contains launched and draft sites" do
+      let(:tag) { create(:tag, name: "Public", team:) }
+
+      before do
+        create(:site, team:, tags: [tag])
+        create(:site, :draft, team:, tags: [tag])
+      end
+
+      it "only includes launched sites in the count" do
+        get_tags
+
+        expect(response.body).to have_link("Sites avec l'étiquette Public (1)")
+      end
+    end
+
+    context "when a tag only contains draft sites" do
+      let(:tag) { create(:tag, name: "Draft", team:) }
+
+      before { create(:site, :draft, team:, tags: [tag]) }
+
+      it "shows a count of zero" do
+        get_tags
+
+        expect(response.body).to have_link("Sites avec l'étiquette Draft (0)")
+      end
+    end
   end
 
   describe "POST /tags" do
@@ -90,6 +117,29 @@ RSpec.describe "Tags" do
       end
     end
 
+    context "when creating a tag from the evaluation funnel" do
+      subject(:create_tag) { post tags_path(site_id: site.id), params: }
+
+      let(:site) { create(:site, team:) }
+      let(:params) { { audit_batch: { site_tags: { site.id => { tags_attributes: { name: "funnel tag" }, tag_ids: [] } } } } }
+
+      it "creates the tag and replaces that site's own frame, without tagging it yet" do
+        expect { create_tag }.to change(Tag, :count).by(1)
+
+        expect(site.tags).to be_empty
+        expect(response.body).to have_css("turbo-stream[action='replace'][target='tags_site_#{site.id}']")
+        expect(response.body).to include("audit_batch[site_tags][#{site.id}][tag_ids][]")
+      end
+
+      it "does not expose a site belonging to another team" do
+        other_site = create(:site, team: create(:team))
+
+        post tags_path(site_id: other_site.id), params: { audit_batch: { site_tags: { other_site.id => { tags_attributes: { name: "funnel tag" } } } } }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context "when creating a tag from SiteUpload form" do
       let(:params) { { site_upload: { tags_attributes: { name: "upload tag" }, tag_ids: [] } } }
       let(:frame_id) { "tags_site_upload" }
@@ -126,6 +176,17 @@ RSpec.describe "Tags" do
 
       expect(response).to have_http_status(:ok)
       expect(tag.sites.count).to eq(2)
+    end
+
+    it "does not show sites that only have draft audits" do
+      launched_site = create(:site, team:, tags: [tag])
+      draft_site = create(:site, :draft, team:, tags: [tag])
+
+      get_tag
+
+      expect(response.body).to include(launched_site.normalized_url)
+      expect(response.body).not_to include(draft_site.normalized_url)
+      expect(response.body).to have_link("Sites avec l'étiquette #{tag.name} (1)")
     end
 
     context "when accessing with old slug" do

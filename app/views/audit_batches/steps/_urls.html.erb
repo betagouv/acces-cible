@@ -1,0 +1,45 @@
+<%# locals: (audit_batch:, step:) %>
+<% sites = audit_batch.submitted_sites.presence || [Site.new] %>
+
+<%= form_with(model: audit_batch, url: step_audit_batch_path(audit_batch, step)) do |f| %>
+  <fieldset class="fr-fieldset fr-pb-0">
+    <legend class="fr-fieldset__legend fr-h5 fr-mb-0">
+      <%= t(".legend") %>
+    </legend>
+
+    <p class="fr-fieldset__element"><%= t(".hint", max: AuditBatch::MAX_SITES) %></p>
+
+    <div class="fr-fieldset__element fr-mb-0"
+         data-controller="repeatable-fields"
+         data-repeatable-fields-max-value="<%= AuditBatch::MAX_SITES %>">
+      <ol class="fr-raw-list" data-repeatable-fields-target="list">
+        <% sites.each_with_index do |site, index| %>
+          <%= render "audit_batches/steps/url_field", f:, site:, index: %>
+        <% end %>
+      </ol>
+
+      <template data-repeatable-fields-target="template">
+        <%= render "audit_batches/steps/url_field", f:, site: Site.new, index: "NEW_INDEX" %>
+      </template>
+
+      <%= dsfr_button(
+            label: t(".add"),
+            icon: "add-line",
+            level: :tertiary,
+            html_attributes: {
+              type: "button",
+              disabled: true,
+              class: "fr-mt-1w",
+              data: { repeatable_fields_target: "add", action: "repeatable-fields#add" }
+            }) %>
+    </div>
+
+    <% if audit_batch.errors[:urls].any? %>
+      <div class="fr-messages-group" role="alert">
+        <p class="fr-message fr-message--error"><%= audit_batch.errors[:urls].to_sentence %></p>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <%= render "audit_batches/step_actions", audit_batch:, step: %>
+<% end %>

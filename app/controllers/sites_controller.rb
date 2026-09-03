@@ -28,35 +28,12 @@ class SitesController < ApplicationController
 
   # GET /sites/1
   def show
-    @audits = @site.audits.without_html
+    @audits = @site.audits.launched.without_html
     @last_audit = @site.last_audit_without_html
   end
 
-  # GET /sites/new
-  def new; end
-
   # GET /sites/1/edit
   def edit; end
-
-  # POST /sites
-  def create
-    normalized_url = Link.url_without_scheme_and_www(site_params[:url])
-    @site = current_user.team.sites.find_by(normalized_url:)
-
-    if @site
-      @site.audit!(user: current_user)
-      redirect_to @site, notice: t(".new_audit")
-    else
-      @site = current_user.team.sites.build(site_params)
-
-      if @site.save
-        @site.audit!(user: current_user)
-        redirect_to @site, notice: t(".created")
-      else
-        render :new, status: :unprocessable_content
-      end
-    end
-  end
 
   # PATCH/PUT /sites/1
   def update
@@ -93,7 +70,7 @@ class SitesController < ApplicationController
   end
 
   def sites_scope
-    current_user.team.sites.preloaded
+    current_user.team.sites.with_launched_audit.preloaded
   end
 
   def set_site
@@ -106,10 +83,6 @@ class SitesController < ApplicationController
 
   def redirect_old_slugs
     redirect_to(@site, status: :moved_permanently) unless @site.slug == params[:id]
-  end
-
-  def site_params
-    params.expect(site: [:url, :name, tag_ids: [], tags_attributes: [:name]])
   end
 
   # Only tags can be modified on an existing site

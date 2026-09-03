@@ -1,0 +1,26 @@
+<%# locals: (audit_batch:, step:) %>
+<% sites = audit_batch.submitted_sites %>
+
+<%= form_with(model: audit_batch, url: step_audit_batch_path(audit_batch, step)) do %>
+  <h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
+  <p><%= t(".intro_html", count: sites.size) %></p>
+
+  <ol class="fr-raw-list">
+    <% sites.each do |site| %>
+      <li class="fr-border-default--grey fr-p-2w fr-mb-2w">
+        <p class="fr-text--bold fr-mb-2w">
+          <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
+        </p>
+        <%= render "sites/tags_form",
+              object: site,
+              scope: AuditBatch.site_tags_scope(site),
+              id: dom_id(site, :tags),
+              url: tags_path(site_id: site.id),
+              title: t(".tags", site: site.normalized_url),
+              collapsible: false %>
+      </li>
+    <% end %>
+  </ol>
+
+  <%= render "audit_batches/step_actions", audit_batch:, step: %>
+<% end %>
