@@ -4,6 +4,7 @@ class Tag < ApplicationRecord
   belongs_to :team
   has_many :site_tags, dependent: :destroy
   has_many :sites, through: :site_tags
+  has_many :launched_sites, -> { with_launched_audit }, through: :site_tags, source: :site
 
   friendly_id :name, use: [:slugged, :history, :scoped], scope: :team_id
 

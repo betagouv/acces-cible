@@ -4,7 +4,7 @@ class TagsController < ApplicationController
 
   # GET /tags
   def index
-    @pagy, @tags = pagy current_user.team.tags.in_alphabetical_order
+    @pagy, @tags = pagy current_user.team.tags.includes(:launched_sites).in_alphabetical_order
   end
 
   # POST /tags
@@ -23,7 +23,7 @@ class TagsController < ApplicationController
 
   # GET /tags/1
   def show
-    @pagy, @sites = pagy @tag.sites
+    @pagy, @sites = pagy @tag.launched_sites
   end
 
   private

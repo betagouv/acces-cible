@@ -14,10 +14,10 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= dsfr_alert(type: :info, title: t('sites.index.uploaded.other', count: @tag.sites_count, default: t('sites.index.title')), html_attributes: { class: "fr-mb-4w" }) %>
+  <%= dsfr_alert(type: :info, title: t('sites.index.uploaded.other', count: @pagy.count, default: t('sites.index.title')), html_attributes: { class: "fr-mb-4w" }) %>
 <% end %>
 
 <%= page_actions do %>
-  <%= dsfr_link_to t('.see_sites', tag: @tag.name, count: @tag.sites_count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
+  <%= dsfr_link_to t('.see_sites', tag: @tag.name, count: @pagy.count), sites_path(filter: { tag_id: @tag.id }), class: "fr-btn fr-btn--tertiary" %>
   <%= dsfr_link_to t("shared.back_to_list"), { controller: :tags, action: :index }, class: "fr-btn fr-btn--tertiary-no-outline" %>
 <% end %>

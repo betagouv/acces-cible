@@ -33,6 +33,33 @@ RSpec.describe "Tags" do
       expect(response.body).to have_link(own_tag.name, href: tag_path(own_tag))
       expect(response.body).not_to have_link(other_tag.name, href: tag_path(other_tag))
     end
+
+    context "when a tag contains launched and draft sites" do
+      let(:tag) { create(:tag, name: "Public", team:) }
+
+      before do
+        create(:site, team:, tags: [tag])
+        create(:site, :draft, team:, tags: [tag])
+      end
+
+      it "only includes launched sites in the count" do
+        get_tags
+
+        expect(response.body).to have_link("Sites avec l'étiquette Public (1)")
+      end
+    end
+
+    context "when a tag only contains draft sites" do
+      let(:tag) { create(:tag, name: "Draft", team:) }
+
+      before { create(:site, :draft, team:, tags: [tag]) }
+
+      it "shows a count of zero" do
+        get_tags
+
+        expect(response.body).to have_link("Sites avec l'étiquette Draft (0)")
+      end
+    end
   end
 
   describe "POST /tags" do
@@ -149,6 +176,17 @@ RSpec.describe "Tags" do
 
       expect(response).to have_http_status(:ok)
       expect(tag.sites.count).to eq(2)
+    end
+
+    it "does not show sites that only have draft audits" do
+      launched_site = create(:site, team:, tags: [tag])
+      draft_site = create(:site, :draft, team:, tags: [tag])
+
+      get_tag
+
+      expect(response.body).to include(launched_site.normalized_url)
+      expect(response.body).not_to include(draft_site.normalized_url)
+      expect(response.body).to have_link("Sites avec l'étiquette #{tag.name} (1)")
     end
 
     context "when accessing with old slug" do
