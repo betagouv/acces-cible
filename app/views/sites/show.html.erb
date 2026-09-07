@@ -48,7 +48,7 @@
 
 <div class="audit-timeline">
   <% @audits.each do |audit| %>
-    <div class="audit-card fr-p-3w fr-mb-2w audit-timeline__row">
+    <div class="bordered-card fr-p-3w fr-mb-2w audit-timeline__row">
       <div class="audit-timeline__main">
         <p class="audit-timeline__date">
           <%= l(audit.created_at.in_time_zone, format: :long).upcase_first %>

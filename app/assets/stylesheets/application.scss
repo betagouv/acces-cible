@@ -265,7 +265,7 @@ form.button_to {
   }
 }
 
-.audit-card {
+.bordered-card {
   @extend .rounded;
   height: 100%;
   border: 1px solid var(--border-default-grey);
@@ -431,4 +431,18 @@ form.button_to {
     margin-right: .35rem;
     vertical-align: -.1rem;
   }
+}
+
+.home-stat__label {
+  text-transform: uppercase;
+}
+
+.home-feature__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-weight: 700;
 }

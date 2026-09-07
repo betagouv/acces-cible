@@ -6,7 +6,7 @@
         id: :nav,
         class: class_names(development: Rails.env.development?, staging: Rails.application.staging?)
       }) do |header| %>
-  <%= header.with_direct_link_simple title: t("pages.accueil.title"), path: root_path, active: current_page?(root_path) %>
+  <%= header.with_direct_link_simple title: t("pages.home.title"), path: root_path, active: current_page?(root_path) %>
 
   <% if authenticated? %>
     <%= header.with_tool_link title: t("shared.help_and_resources"), path: help_path, html_attributes: { class: icon_class(:question, btn: :tertiary) } %>

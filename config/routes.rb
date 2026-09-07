@@ -23,7 +23,7 @@ Rails.application.routes.draw do
 
   # Static pages
   scope controller: :pages do
-    root action: :accueil
+    root action: :home
     get "accessibilite", as: :accessibilite
     get "plan", as: :plan
     get "contact", as: :contact

@@ -1,0 +1,44 @@
+<% content_for :hero do %>
+  <div class="fr-background-alt--blue-france fr-py-6w">
+    <div class="fr-container">
+      <h1 class="fr-mb-1w"><%= page_title %></h1>
+      <p class="fr-text--lead fr-mb-3w"><%= t(".intro") %></p>
+
+      <div class="fr-grid-row fr-grid-row--gutters">
+        <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+          <dl class="bordered-card fr-p-3w fr-m-0 fr-background-default--grey">
+            <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".audits_count_label") %></dt>
+            <dd class="fr-h2 fr-ml-0 fr-mb-1v"><%= @audits_count %></dd>
+            <% if @audits_this_week_count.positive? %>
+              <dd class="fr-text--xs fr-text-mention--grey fr-ml-0 fr-mb-0"><%= t(".audits_count_detail", count: @audits_this_week_count) %></dd>
+            <% end %>
+          </dl>
+        </div>
+        <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+          <dl class="bordered-card fr-p-3w fr-m-0 fr-background-default--grey">
+            <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".sites_count_label") %></dt>
+            <dd class="fr-h2 fr-ml-0 fr-mb-1v"><%= @audited_sites_count %></dd>
+            <dd class="fr-text--xs fr-text-mention--grey fr-ml-0 fr-mb-0"><%= t(".sites_count_detail") %></dd>
+          </dl>
+        </div>
+      </div>
+
+      <% if authenticated? %>
+        <ul class="fr-btns-group fr-btns-group--inline-md fr-mt-3w">
+          <li><%= link_to t(".new_audit"), new_site_path, class: "fr-btn" %></li>
+          <li><%= link_to t(".all_audits"), sites_path, class: "fr-btn fr-btn--secondary" %></li>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<h2 class="fr-h4"><%= t(".what_title") %></h2>
+<p class="fr-text--sm fr-mb-3w"><%= t(".what_intro") %></p>
+
+<div class="fr-grid-row fr-grid-row--gutters">
+  <%= render "pages/feature", number: 1, title: t(".declared_level_title"), description: t(".declared_level_description") %>
+  <%= render "pages/feature", number: 2, title: t(".legal_obligations_title"), description: t(".legal_obligations_description") %>
+  <%= render "pages/feature", number: 3, title: t(".declaration_quality_title"), description: t(".declaration_quality_description") %>
+  <%= render "pages/feature", number: 4, title: t(".automated_tests_title"), description: t(".automated_tests_description"), optional: false %>
+</div>
