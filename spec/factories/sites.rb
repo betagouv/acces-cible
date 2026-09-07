@@ -23,6 +23,7 @@ FactoryBot.define do
 
           transition = check.check_transitions.find_or_initialize_by(most_recent: true)
           transition.update!(to_state: :completed, sort_key: 0)
+          check.finalize!
         end
       end
     end

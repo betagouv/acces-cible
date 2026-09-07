@@ -28,7 +28,7 @@ class AuditCsvExport
   ].freeze
 
   def self.filename
-    "sites_#{I18n.l(Time.zone.now, format: :file)}.csv"
+    "audits_#{I18n.l(Time.zone.now, format: :file)}.csv"
   end
 
   def self.stream_csv_to(output_stream, audits)

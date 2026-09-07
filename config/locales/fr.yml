@@ -36,9 +36,10 @@ fr:
     url: URL
   audits:
     audit:
+      audit_label: "Voir l'audit de %{url} du %{date}"
       declaration_quality: Qualité de la déclaration
       legal_obligations: Respect des obligations légales
-      row_label: "Voir l'audit de %{url}"
+      row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
     index:

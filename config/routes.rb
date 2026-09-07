@@ -11,7 +11,9 @@ Rails.application.routes.draw do
 
   resources :tags, only: [:index, :create, :show]
   resources :audits, only: [:index] do
-    get :csv_export, on: :collection
+    collection do
+      get :csv_export
+    end
   end
   resources :sites, only: [:new, :create, :show, :edit, :update] do
     collection do

@@ -60,12 +60,13 @@ RSpec.describe "Audits" do
         expect(response.body).to include(site.normalized_url)
       end
 
-      it "makes the row navigate to that audit" do
+      it "links to the site and to that audit" do
         get_audits
 
         row = Nokogiri::HTML(response.body).at_css("tbody tr")
 
-        expect(row["data-row-link-url-value"]).to eq(site_audit_path(site, audit))
+
+        expect(row.css("a").pluck("href")).to contain_exactly(site_path(site), site_audit_path(site, audit))
       end
     end
 
@@ -90,8 +91,8 @@ RSpec.describe "Audits" do
 
         row = Nokogiri::HTML(response.body).at_css("tbody tr")
 
-        expect(row.text).to include(I18n.l(my_audit.completed_at.in_time_zone, format: :complete))
-        expect(row.text).not_to include(I18n.l(teammate_audit.completed_at.in_time_zone, format: :complete))
+        expect(row.text).to include(I18n.l(my_audit.completed_at.in_time_zone.to_date))
+        expect(row.text).not_to include(I18n.l(teammate_audit.completed_at.in_time_zone.to_date))
       end
     end
 
@@ -133,8 +134,8 @@ RSpec.describe "Audits" do
 
           row = Nokogiri::HTML(response.body).at_css("tbody tr")
 
-          expect(row.text).to include(I18n.l(teammate_audit.completed_at.in_time_zone, format: :complete))
-          expect(row.text).not_to include(I18n.l(my_audit.completed_at.in_time_zone, format: :complete))
+          expect(row.text).to include(I18n.l(teammate_audit.completed_at.in_time_zone.to_date))
+          expect(row.text).not_to include(I18n.l(my_audit.completed_at.in_time_zone.to_date))
         end
       end
 
@@ -168,7 +169,7 @@ RSpec.describe "Audits" do
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to include("text/csv")
       expect(response.headers["Content-Disposition"]).to include("attachment")
-      expect(response.headers["Content-Disposition"]).to include("sites_")
+      expect(response.headers["Content-Disposition"]).to include("audits_")
       expect(response.body).to start_with(AuditCsvExport::UTF8_BOM)
     end
 
@@ -177,20 +178,8 @@ RSpec.describe "Audits" do
 
       csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
       expect(csv.count).to eq(2)
-      expect(csv[0]["Adresse du site"]).to eq(other_site.normalized_url)
-      expect(csv[1]["Adresse du site"]).to eq(site.normalized_url)
-    end
-
-    context "when filtering by site ids" do
-      let(:request_params) { { id: [other_site.id] } }
-
-      it "returns only selected sites" do
-        get_csv
-
-        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
-        expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
-      end
+      expect(csv[0]["Adresse du site"]).to eq(site.normalized_url)
+      expect(csv[1]["Adresse du site"]).to eq(other_site.normalized_url)
     end
 
     context "when filtering by tag id" do

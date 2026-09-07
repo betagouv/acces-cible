@@ -13,7 +13,7 @@ class AuditsController < ApplicationController
   # GET /audits/csv_export
   def csv_export
     set_csv_headers
-    AuditCsvExport.stream_csv_to(response.stream, scoped_audits(ids: params[:id] || []).displayable)
+    AuditCsvExport.stream_csv_to(response.stream, scoped_audits.displayable)
   ensure
     response.stream.close
   end

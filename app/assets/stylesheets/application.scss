@@ -144,12 +144,25 @@ form.button_to {
   }
 }
 
+// Same technique as DSFR's .fr-enlarge-link (used by .fr-card), applied to a table row
 .ac-row-link {
-  cursor: pointer;
+  position: relative;
 
   &:hover > *,
   &:focus-within > * {
     background-color: var(--hover);
+  }
+
+  &__stretched::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  &__above {
+    position: relative;
+    z-index: 2;
   }
 }
 
@@ -189,7 +202,7 @@ form.button_to {
 
   i {
     font-style: normal;
-    font-size: 3rem;
+    font-size: var(--star-rating-size);
     color: var(--border-contrast-grey);
   }
 
@@ -210,6 +223,18 @@ form.button_to {
 
   &--gold {
     --star-rating-color: #fcc63a;
+  }
+
+  &--l {
+    --star-rating-size: 3rem;
+  }
+
+  &--m {
+    --star-rating-size: 2rem;
+  }
+
+  &--s {
+    --star-rating-size: 1.5rem;
   }
 }
 

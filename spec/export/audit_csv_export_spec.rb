@@ -9,7 +9,7 @@ RSpec.describe AuditCsvExport do
   describe ".filename" do
     it "generates filename with current date" do
       travel_to Time.zone.local(2024, 3, 15, 10, 30) do
-        expect(described_class.filename).to match(/^sites_.*\.csv$/)
+        expect(described_class.filename).to match(/^audits_.*\.csv$/)
       end
     end
   end

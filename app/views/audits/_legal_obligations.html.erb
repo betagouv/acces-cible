@@ -4,7 +4,7 @@
     <% t.with_body do %>
       <tr>
         <th scope="row"><%= t("audits.show.overall_score") %></th>
-        <td><%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.legal_obligations_title")) %></td>
+        <td><%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.legal_obligations_title"), size: :l) %></td>
       </tr>
       <tr>
         <th scope="row"><%= t("audits.show.general_comment") %></th>

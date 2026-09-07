@@ -66,11 +66,11 @@
         <div class="audit-timeline__stats">
           <div class="audit-timeline__stat">
             <span class="audit-timeline__stat-label"><%= t(".legal_obligations") %></span>
-            <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t(".legal_obligations")) %>
+            <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t(".legal_obligations"), size: :s) %>
           </div>
           <div class="audit-timeline__stat">
             <span class="audit-timeline__stat-label"><%= t("audits.show.summary_declaration_quality") %></span>
-            <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality")) %>
+            <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality"), size: :s) %>
           </div>
         </div>
       <% else %>

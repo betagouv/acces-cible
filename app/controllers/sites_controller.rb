@@ -2,8 +2,6 @@ class SitesController < ApplicationController
   before_action :set_site, only: [:show, :edit, :update]
   before_action :redirect_old_slugs, only: [:show, :edit]
 
-  # GET /sites
-
   # GET /sites/1
   def show
     @audits = @site.audits.displayable
