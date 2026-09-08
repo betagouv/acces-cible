@@ -10,14 +10,18 @@ Rails.application.routes.draw do
   end
 
   resources :tags, only: [:index, :create, :show]
-  resources :sites, only: [:index, :new, :create, :show, :edit, :update] do
+  resources :audits, only: [:index] do
+    collection do
+      get :csv_export
+    end
+  end
+  resources :sites, only: [:new, :create, :show, :edit, :update] do
     collection do
       post :upload
-      get :csv_export
     end
     resources :audits, only: [:create, :show]
   end
-  get "/sites", to: "sites#index", as: :authenticated_root
+  get "/audits", to: "audits#index", as: :authenticated_root
 
   resource :user, only: [:show]
 

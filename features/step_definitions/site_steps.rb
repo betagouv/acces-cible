@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+def current_user
+  @current_user ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email])
+end
+
 def team
-  @team ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email]).team
+  current_user.team
 end
 
 Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
@@ -110,13 +114,13 @@ end
 Quand("je filtre par étiquette {string}") do |tag|
   steps %(
     Quand je sélectionne "#{tag}" pour "Filtrer par étiquette"
-    Et que je clique sur "Filtrer"
+    Et que je clique sur "Rechercher un site"
   )
 end
 
 Quand("je recherche {string}") do |term|
-  fill_in "Rechercher", with: term
-  click_button "Rechercher"
+  fill_in "Rechercher un site", with: term
+  click_button "Rechercher un site"
 end
 
 Quand("je rajoute un site {string}") do |url|
@@ -129,7 +133,7 @@ end
 
 Quand("je possède un site {string} avec des données") do |url|
   site = FactoryBot.create(:site, :with_data, url:, team:)
-  site.reload
+  site.last_audit.update!(user: current_user)
 end
 
 Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
@@ -148,22 +152,6 @@ end
 
 Alors("la page contient un tableau") do
   expect(page).to have_css("table")
-end
-
-Alors("la page contient toutes les vérifications du site {string} avec le préfixe {string}") do |url, prefix|
-  site = team.sites.find_by(url:)
-  expect(page).to have_css("table") if prefix.present?
-  site.last_audit.checks.each do |check|
-    expect(page).to have_content(check.class.table_header)
-  end
-end
-
-Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
-  site = team.sites.find_by(url:)
-  expect(page).to have_css("table")
-  site.last_audit.checks.each do |check|
-    expect(page).to have_content(check.table_header)
-  end
 end
 
 Alors('la carte {string} indique {string}') do |title, str|

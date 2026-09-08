@@ -10,8 +10,11 @@ class Audit < ApplicationRecord
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
-  scope :with_check_transitions, -> { includes(checks: :check_transitions) }
   scope :without_html, -> { select(column_names - %w[home_page_html accessibility_page_html]) }
+  scope :displayable, -> { without_html.preload(:site, { user: :team, checks: :check_transitions }) }
+  scope :last_per_site, -> { where(id: reselect("DISTINCT ON (audits.site_id) audits.id").reorder(site_id: :asc, created_at: :desc)) }
+  scope :for_user, ->(user) { where(user:) }
+  scope :for_team, ->(team) { joins(:site).where(sites: { team: }) }
 
   Check.types.each do |name, klass|
     define_method(name) do
