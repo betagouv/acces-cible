@@ -3,7 +3,8 @@
 
 <tr id="<%= dom_id(site, :audits_table) %>" class="ac-row-link">
   <th scope="row">
-    <%= link_to(site.normalized_url.truncate(ApplicationHelper::TRUNCATION_LENGTH), site_path(site), class: "fr-link ac-row-link__above", "aria-label": t('.row_label', url: site.normalized_url)) %>
+    <% site_label = t('.row_label', url: site.normalized_url) %>
+    <%= dsfr_link_to(site.normalized_url.truncate(ApplicationHelper::TRUNCATION_LENGTH), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label) %>
   </th>
   <td class="fr-cell--center"><%= check_badge(audit.reachable, hover: false, no_icon: true) %></td>
   <td class="fr-cell--center"><%= audit.analyze_accessibility_page&.human_compliance_rate || check_badge(audit.analyze_accessibility_page, hover: false, no_icon: true) %></td>
@@ -14,7 +15,8 @@
   <td><%= audit.team.organization_label %></td>
   <td>
     <% local_time = audit.created_at.in_time_zone %>
-    <%= link_to audit_path, class: "fr-link ac-row-link__stretched", "aria-label": t('.audit_label', url: site.normalized_url, date: l(local_time.to_date)) do %>
+    <% audit_label = t('.audit_label', url: site.normalized_url, date: l(local_time.to_date)) %>
+    <%= dsfr_link_to audit_path, class: "ac-row-link__stretched", "aria-label": audit_label, title: audit_label do %>
       <%= time_tag local_time, l(local_time.to_date), title: l(local_time, format: :long) %>
     <% end %>
   </td>

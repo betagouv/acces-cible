@@ -4,20 +4,19 @@ module ApplicationHelper
   include IconHelper
   include JdmaHelper
 
-  EXTERNAL_LINK_CLASSES = "fr-link fr-link--sm fr-link--icon-right fr-icon-external-link-line".freeze
   TRUNCATION_LENGTH = 35.freeze
 
   def or_separator
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
   end
 
-  def external_link_to(url, text)
-    content = safe_join([text, tag.span(t("shared.new_window"), class: "fr-sr-only")])
-    link_to(content, url, class: EXTERNAL_LINK_CLASSES, target: "_blank", rel: "noopener noreferrer")
+  def external_link_to(url, text, **options)
+    label = text + t("shared.new_window")
+    dsfr_link_to(text, url, icon_right: "external-link-line", title: label, "aria-label": label, target: "_blank", rel: "noopener noreferrer", **options)
   end
 
   def email_link_to(email)
-    mail_to(email, class: "fr-link fr-link--sm fr-link--icon-right fr-icon-mail-line")
+    dsfr_link_to(email, "mailto:#{email}", size: "sm", icon_right: "mail-line", title: email)
   end
 
   def card_with_header(title:, description: nil, &block)
