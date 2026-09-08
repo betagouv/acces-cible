@@ -128,7 +128,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
         c.with_head { "<tr><th>Header</th></tr>".html_safe }
       end
 
-      expect(rendered_component).to have_css("thead tr th", text: "Header")
+      expect(page).to have_css("thead tr th", text: "Header")
     end
 
     it "renders the body slot content" do
@@ -136,7 +136,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
         c.with_body { "<tr><td>Data</td></tr>".html_safe }
       end
 
-      expect(rendered_component).to have_css("tbody tr td", text: "Data")
+      expect(page).to have_css("tbody tr td", text: "Data")
     end
   end
 
@@ -147,7 +147,7 @@ RSpec.describe Dsfr::TableComponent, type: :component do
         c.with_footer_action { '<button class="fr-btn">Action 2</button>'.html_safe }
       end
 
-      expect(rendered_component).to have_css("div.fr-table__footer--end") do |footer_end|
+      expect(page).to have_css("div.fr-table__footer--end") do |footer_end|
         expect(footer_end).to have_css("ul.fr-btns-group") do |buttons_group|
           expect(buttons_group).to have_css("li button.fr-btn", text: "Action 1")
           expect(buttons_group).to have_css("li button.fr-btn", text: "Action 2")

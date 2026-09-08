@@ -6,6 +6,10 @@ ruby file: ".ruby-version"
 gem "rails", "~> 8.1.3"
 gem "rails-i18n"
 
+# unpin when Rails fixes ActiveSupport::JSON.decode for json 3
+# https://github.com/rails/rails/issues/58685
+gem "json", "~> 2.21"
+
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record

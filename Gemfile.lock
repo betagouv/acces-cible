@@ -284,7 +284,7 @@ GEM
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (3.0.1)
+    json (2.21.2)
     json-jwt (1.17.1)
       activesupport (>= 4.2)
       aes_key_wrap
@@ -674,6 +674,7 @@ DEPENDENCIES
   http
   i18n-tasks (~> 1.1.2)
   importmap-rails
+  json (~> 2.21)
   markdown_views
   memory_profiler
   mission_control-jobs (~> 1.2)
