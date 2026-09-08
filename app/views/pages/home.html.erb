@@ -1,7 +1,7 @@
 <% content_for :hero do %>
   <div class="fr-background-alt--blue-france fr-py-6w">
     <div class="fr-container">
-      <h1 class="fr-mb-1w"><%= page_title %></h1>
+      <h1 class="fr-mb-1w"><%= authenticated? ? t(".greeting", name: current_user.name) : t(".welcome") %></h1>
       <p class="fr-text--lead fr-mb-3w"><%= t(".intro") %></p>
 
       <div class="fr-grid-row fr-grid-row--gutters">
@@ -29,7 +29,7 @@
 
       <% if authenticated? %>
         <ul class="fr-btns-group fr-btns-group--inline-md fr-mt-3w">
-          <li><%= link_to t(".new_audit"), new_site_path, class: "fr-btn" %></li>
+          <li><%= link_to t("shared.new_audit"), new_site_path, class: "fr-btn" %></li>
           <li><%= link_to t(".all_audits"), audits_path, class: "fr-btn fr-btn--secondary" %></li>
         </ul>
       <% end %>

@@ -1,16 +1,9 @@
 class PagesController < ApplicationController
   allow_unauthenticated_access
   before_action :set_check_pages, only: :help
+  before_action :set_home_stats, only: :home
 
-  def home
-    if authenticated?
-      @title = t(".greeting", name: current_user.name)
-      set_home_stats(current_user.team.audits, current_user.team.sites)
-    else
-      @title = t(".welcome")
-      set_home_stats(Audit.all, Site.all)
-    end
-  end
+  def home; end
 
   def help
     available_pages = @check_pages.map { |page| page[:file_name] }
@@ -19,10 +12,10 @@ class PagesController < ApplicationController
 
   private
 
-  def set_home_stats(audits, sites)
-    @audits_count = audits.count
-    @audits_this_week_count = audits.where(created_at: Time.zone.today.all_week).count
-    @audited_sites_count = sites.where.not(audits_count: 0).count
+  def set_home_stats
+    @audits_count = Audit.count
+    @audits_this_week_count = Audit.where(created_at: Time.zone.today.all_week).count
+    @audited_sites_count = Site.where.not(audits_count: 0).count
   end
 
   def set_check_pages
