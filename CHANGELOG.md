@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add new audits index to replace sites index ([#704](https://github.com/betagouv/acces-cible/issues/704))
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690))
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689))
+
+### Features
+
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689)) ([b51e819](https://github.com/betagouv/acces-cible/commit/b51e819deea130d3a3f5922b4f724305b0702128))
+* Add new audits index to replace sites index ([#704](https://github.com/betagouv/acces-cible/issues/704)) ([160fed5](https://github.com/betagouv/acces-cible/commit/160fed52f843cae01ec47e8ddbc660629c5a84fc))
+* add new home page ([#706](https://github.com/betagouv/acces-cible/issues/706)) ([9530bde](https://github.com/betagouv/acces-cible/commit/9530bde1a057ba3bc4432d51cfe3fbcefcc26c5e))
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690)) ([5b1bce1](https://github.com/betagouv/acces-cible/commit/5b1bce131957dc82cba01f2678244700e7c3cd94))
+* Handle unreachable audit case ([#694](https://github.com/betagouv/acces-cible/issues/694)) ([ef1379a](https://github.com/betagouv/acces-cible/commit/ef1379a413c587f05851990c2b6bc2ef9754fdaa))
+
 ## [2.0.0](https://github.com/betagouv/acces-cible/compare/v1.2.0...v2.0.0) (2026-08-18)
 
 
