@@ -75,11 +75,11 @@ RSpec.describe Dsfr::TableComponent, type: :component do
 
         if border
           it "has the border class" do
-            expect(rendered_component).to have_css("div.fr-table--border")
+            expect(rendered_component).to have_css("div.fr-table--bordered")
           end
         else
           it "doesn't have the border class" do
-            expect(rendered_component).not_to have_css("div.fr-table--border")
+            expect(rendered_component).not_to have_css("div.fr-table--bordered")
           end
         end
       end

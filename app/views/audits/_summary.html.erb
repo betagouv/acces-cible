@@ -18,14 +18,14 @@
     <div class="fr-col-12 fr-col-md-4">
       <div class="audit-card fr-p-3w">
         <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.summary_legal_obligations") %></p>
-        <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.summary_legal_obligations")) %>
+        <%= star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.show.summary_legal_obligations"), size: :l) %>
         <p class="fr-text--xs fr-text-mention--grey fr-mb-0"><%= t("audits.show.summary_legal_obligations_detail", count: audit.legal_obligation_score.to_i, total: 4) %></p>
       </div>
     </div>
     <div class="fr-col-12 fr-col-md-4">
       <div class="audit-card fr-p-3w">
         <p class="fr-text--sm fr-text--bold fr-mb-1v"><%= t("audits.show.summary_declaration_quality") %></p>
-        <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality")) %>
+        <%= star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.show.summary_declaration_quality"), size: :l) %>
         <p class="fr-text--xs fr-text-mention--grey fr-mb-0"><%= t("audits.show.summary_declaration_quality_detail", count: audit.declaration_quality_issues_count, total: audit.declaration_quality_criteria.size) %></p>
       </div>
     </div>

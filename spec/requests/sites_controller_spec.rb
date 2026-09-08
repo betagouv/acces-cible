@@ -6,94 +6,6 @@ RSpec.describe "Sites" do
 
   before { login_as(user) }
 
-  describe "GET /sites" do
-    subject(:get_sites) { get sites_path }
-
-    it "returns success" do
-      get_sites
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    context "when an audit has not created its checks yet" do
-      let!(:site) { create(:site, team:) }
-      let!(:audit) { create(:audit, :without_checks, site:) }
-
-      it "renders a pending badge for every expected check" do
-        get_sites
-
-        row = Nokogiri::HTML(response.body).at_css("tbody tr")
-
-        expect(row.css("td .fr-badge--info").count).to eq(Check.classes.size)
-        expect(row.text).to include("Planifié")
-      end
-    end
-
-    context "when requesting an empty page" do
-      let!(:paged_sites) { create_list(:site, 10, team:) }
-
-      it "redirects to the first page while keeping other params" do
-        get sites_path(page: 2, limit: 10)
-
-        expect(response).to redirect_to("/sites?page=1")
-      end
-    end
-  end
-
-  describe "GET /sites/csv_export" do
-    subject(:get_csv) { get csv_export_sites_path(format: :csv), params: request_params }
-
-    let(:tag) { create(:tag, team:) }
-    let!(:site) { create(:site, :completed, team:) }
-    let!(:other_site) { create(:site, :completed, team:, tag_ids: [tag.id]) }
-
-    let(:request_params) { {} }
-    let(:csv_without_bom) { response.body.delete_prefix(SiteCsvExport::UTF8_BOM) }
-
-    it "returns CSV content" do
-      get_csv
-
-      expect(response).to have_http_status(:ok)
-      expect(response.content_type).to include("text/csv")
-      expect(response.headers["Content-Disposition"]).to include("attachment")
-      expect(response.headers["Content-Disposition"]).to include("sites_")
-      expect(response.body).to start_with(SiteCsvExport::UTF8_BOM)
-    end
-
-    it "includes sites data in CSV" do
-      get_csv
-
-      csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
-      expect(csv.count).to eq(2)
-      expect(csv[0]["Adresse du site"]).to eq(other_site.normalized_url)
-      expect(csv[1]["Adresse du site"]).to eq(site.normalized_url)
-    end
-
-    context "when filtering by site ids" do
-      let(:request_params) { { id: [other_site.id] } }
-
-      it "returns only selected sites" do
-        get_csv
-
-        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
-        expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
-      end
-    end
-
-    context "when filtering by tag id" do
-      let(:request_params) { { filter: { tag_id: tag.id } } }
-
-      it "returns only tagged sites" do
-        get_csv
-
-        csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
-        expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
-      end
-    end
-  end
-
   describe "GET /sites/:id" do
     subject(:get_site) { get site_path(site) }
 
@@ -219,7 +131,7 @@ RSpec.describe "Sites" do
 
       upload_sites
 
-      expect(response).to redirect_to(sites_path)
+      expect(response).to redirect_to(audits_path)
       follow_redirect!
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to eq("L'import du fichier CSV a commencé. 2 sites seront ajoutés progressivement.")

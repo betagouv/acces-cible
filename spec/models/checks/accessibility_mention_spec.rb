@@ -56,7 +56,7 @@ RSpec.describe Checks::AccessibilityMention do
 
     {
       nil => :error,
-      non: :warning,
+      non: :error,
       partiellement: :new,
       totalement: :success
     }.each do |mention, status|

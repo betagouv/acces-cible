@@ -15,7 +15,7 @@
       <%= button_to t("shared.logout"), logout_path, method: :delete, class: [icon_class("logout-box-r", btn: :secondary)], form: { data: { turbo: false } } %>
     <% end %>
 
-    <%= header.with_direct_link_simple title: t("sites.index.title"), path: sites_path, active: current_page?(controller: :sites, action: :index) %>
+    <%= header.with_direct_link_simple title: t("audits.index.title"), path: audits_path, active: current_page?(controller: :audits, action: :index) %>
     <%= header.with_direct_link_simple title: t("sites.new.title"), path: new_site_path, active: current_page?(controller: :sites, action: :new) %>
     <%= header.with_direct_link_simple title: t("tags.index.title"), path: tags_path, active: current_page?(controller: :tags, action: :index) %>
   <% else %>

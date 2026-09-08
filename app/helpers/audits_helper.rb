@@ -76,11 +76,11 @@ module AuditsHelper
     counts_by_status.transform_values { |count| (count.fdiv(total_count) * 20).round * 5 }
   end
 
-  def star_rating(filled:, total:, color:, label:)
+  def star_rating(filled:, total:, color:, label:, size: :m)
     filled_star_count = filled.floor
     has_half_star = filled - filled_star_count >= 0.5
 
-    tag.span(class: "star-rating star-rating--#{color}", role: "img", "aria-label": t("audits.show.rating_aria_label", label:, filled:, total:)) do
+    tag.span(class: "star-rating star-rating--#{color} star-rating--#{size}", role: "img", "aria-label": t("audits.show.rating_aria_label", label:, filled:, total:)) do
       safe_join(Array.new(total) { |position| tag.i("★", class: star_modifier_class(position, filled_star_count, has_half_star)) })
     end
   end

@@ -36,8 +36,8 @@ Fonctionnalité: Page du site
   Scénario: Un agent peut voir les étiquettes associées à un site
     Sachant que je rajoute un site "https://example.gouv.fr"
     Et que le site "https://example.gouv.fr" a les étiquettes "production, public"
-    Quand je clique sur "Tous les sites"
-    Et que je clique sur "Voir la fiche de example.gouv.fr"
+    Quand je clique sur "Mes évaluations"
+    Et que je clique sur "example.gouv.fr"
     Alors la page contient un lien vers "https://example.gouv.fr"
     Et la page contient "production"
     Et la page contient "public"

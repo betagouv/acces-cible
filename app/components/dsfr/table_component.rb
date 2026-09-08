@@ -27,7 +27,7 @@ module Dsfr
     store_accessor :options, :size, :border, :scroll, :caption_side, :selectable
 
     def wrapper_attributes
-      html_attributes.merge(class: table_classes, data: { controller: :table, table_hidden_class: "fr-hidden" })
+      html_attributes.merge(class: table_classes, data: { controller: "table scroll-shadow", table_hidden_class: "fr-hidden" })
     end
 
     def table_classes
@@ -35,7 +35,7 @@ module Dsfr
         html_attributes.delete(:class),
         "fr-table",
         "fr-table--#{size}" => [:sm, :lg].include?(size),
-        "fr-table--border" => border,
+        "fr-table--bordered" => border,
         "fr-table--no-scroll" => !scroll,
         "fr-table--no-caption" => caption_side == :hidden,
         "fr-table--caption-bottom" => caption_side == :bottom,
