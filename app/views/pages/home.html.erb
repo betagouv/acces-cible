@@ -30,7 +30,7 @@
       <% if authenticated? %>
         <ul class="fr-btns-group fr-btns-group--inline-md fr-mt-3w">
           <li><%= link_to t(".new_audit"), new_site_path, class: "fr-btn" %></li>
-          <li><%= link_to t(".all_audits"), sites_path, class: "fr-btn fr-btn--secondary" %></li>
+          <li><%= link_to t(".all_audits"), audits_path, class: "fr-btn fr-btn--secondary" %></li>
         </ul>
       <% end %>
     </div>
