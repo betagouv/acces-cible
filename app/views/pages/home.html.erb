@@ -21,7 +21,7 @@
             <dl class="fr-m-0">
               <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".sites_count_label") %></dt>
               <dd class="fr-h2 fr-pl-0 fr-mb-1v"><%= @audited_sites_count %></dd>
-              <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".sites_count_detail") %></dd>
+              <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".sites_count_detail", count: @audited_sites_count) %></dd>
             </dl>
           </section>
         </div>

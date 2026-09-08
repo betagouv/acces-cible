@@ -348,7 +348,9 @@ fr:
       legal_obligations_description: "Évalue la présence des éléments obligatoires : déclaration, mention d’accessibilité, schéma pluriannuel et plan d’action."
       legal_obligations_title: Respect des obligations légales
       optional: Optionnel
-      sites_count_detail: sites distincts
+      sites_count_detail:
+        one: site distinct
+        other: sites distincts
       sites_count_label: Sites évalués
       title: Accueil
       welcome: Bienvenue sur Accès cible
