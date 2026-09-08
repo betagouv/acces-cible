@@ -6,20 +6,24 @@
 
       <div class="fr-grid-row fr-grid-row--gutters">
         <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
-          <dl class="bordered-card fr-p-3w fr-m-0 fr-background-default--grey">
-            <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".audits_count_label") %></dt>
-            <dd class="fr-h2 fr-pl-0 fr-mb-1v"><%= @audits_count %></dd>
-            <% if @audits_this_week_count.positive? %>
-              <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".audits_count_detail", count: @audits_this_week_count) %></dd>
-            <% end %>
-          </dl>
+          <section class="bordered-card fr-p-3w fr-background-default--grey">
+            <dl class="fr-m-0">
+              <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".audits_count_label") %></dt>
+              <dd class="fr-h2 fr-pl-0 fr-mb-1v"><%= @audits_count %></dd>
+              <% if @audits_this_week_count.positive? %>
+                <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".audits_count_detail", count: @audits_this_week_count) %></dd>
+              <% end %>
+            </dl>
+          </section>
         </div>
         <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
-          <dl class="bordered-card fr-p-3w fr-m-0 fr-background-default--grey">
-            <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".sites_count_label") %></dt>
-            <dd class="fr-h2 fr-pl-0 fr-mb-1v"><%= @audited_sites_count %></dd>
-            <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".sites_count_detail") %></dd>
-          </dl>
+          <section class="bordered-card fr-p-3w fr-background-default--grey">
+            <dl class="fr-m-0">
+              <dt class="home-stat__label fr-text--xs fr-text-mention--grey fr-mb-1v"><%= t(".sites_count_label") %></dt>
+              <dd class="fr-h2 fr-pl-0 fr-mb-1v"><%= @audited_sites_count %></dd>
+              <dd class="fr-text--xs fr-text-mention--grey fr-pl-0 fr-mb-0"><%= t(".sites_count_detail") %></dd>
+            </dl>
+          </section>
         </div>
       </div>
 

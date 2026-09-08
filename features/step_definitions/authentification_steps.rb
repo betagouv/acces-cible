@@ -25,6 +25,10 @@ Quand("je suis {string} avec le SIRET {int} de l'organisation {string}") do |ema
   OmniAuth.config.mock_auth[:proconnect] = fake_auth_hash(email, siret, org)
 end
 
+Quand("je me déconnecte") do
+  step(%(je clique sur "Se déconnecter"))
+end
+
 Quand("je me pro-connecte") do
   steps %(
     Quand je me rends sur la page d'accueil
