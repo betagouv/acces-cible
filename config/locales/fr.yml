@@ -315,8 +315,6 @@ fr:
   pages:
     accessibilite:
       title: Déclaration d’accessibilité
-    accueil:
-      title: Présentation
     contact:
       title: Contact
     cookies:
@@ -335,6 +333,29 @@ fr:
       need_help_description: Sélectionnez une section dans le menu de gauche pour en savoir plus.
       need_help_title: Besoin d’aide ?
       title: Aide
+    home:
+      all_audits: Voir toutes mes évaluations
+      audits_count_detail: dont %{count} cette semaine
+      audits_count_label: Évaluations lancées
+      automated_tests_description: Exécute une série de 28 tests automatiques du RGAA sur la page d’accueil du site.
+      automated_tests_title: Tests automatiques RGAA
+      declaration_quality_description: "Vérifie la validité de chaque élément de la déclaration : chacun est jugé valide, invalide ou absent."
+      declaration_quality_title: Qualité de la déclaration
+      declared_level_description: Détecte le niveau annoncé par le site (non / partiellement / totalement conforme) et le taux RGAA associé.
+      declared_level_title: Niveau d’accessibilité déclaré
+      greeting: Bonjour %{name}
+      intro: Évaluez et suivez l’amélioration de l’accessibilité de vos services numériques en vous conformant aux textes de loi et au référentiel RGAA.
+      legal_obligations_description: "Évalue la présence des éléments obligatoires : déclaration, mention d’accessibilité, schéma pluriannuel et plan d’action."
+      legal_obligations_title: Respect des obligations légales
+      optional: Optionnel
+      sites_count_detail:
+        one: site distinct
+        other: sites distincts
+      sites_count_label: Sites évalués
+      title: Accueil
+      welcome: Bienvenue sur Accès cible
+      what_intro: Pour chaque site évalué, Accès cible analyse quatre dimensions distinctes de l’accessibilité numérique.
+      what_title: Que fait Accès cible ?
     mentions_legales:
       title: Mentions légales
     plan:

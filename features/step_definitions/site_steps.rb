@@ -155,11 +155,11 @@ Alors("la page contient un tableau") do
 end
 
 Alors('la carte {string} indique {string}') do |title, str|
-  expect(find("section.audit-card", text: title)).to have_content(str)
+  expect(find("section.bordered-card", text: title)).to have_content(str)
 end
 
 Alors('la carte {string} n\'indique pas {string}') do |title, str|
-  expect(find("section.audit-card", text: title)).not_to have_content(str)
+  expect(find("section.bordered-card", text: title)).not_to have_content(str)
 end
 
 Alors('le résumé {string} indique {string}') do |label, str|
@@ -167,12 +167,12 @@ Alors('le résumé {string} indique {string}') do |label, str|
 end
 
 Alors('la vérification {string} de la carte {string} indique {string}') do |check_name, card_title, str|
-  card = find("section.audit-card", text: card_title)
+  card = find("section.bordered-card", text: card_title)
   expect(card.find("th", text: check_name).ancestor("tr")).to have_content(str)
 end
 
 Alors('la vérification {string} de la carte {string} contient un lien vers {string}') do |check_name, card_title, href|
-  card = find("section.audit-card", text: card_title)
+  card = find("section.bordered-card", text: card_title)
   expect(card.find("th", text: check_name).ancestor("tr")).to have_link(href: href)
 end
 
