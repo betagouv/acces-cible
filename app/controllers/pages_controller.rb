@@ -13,9 +13,11 @@ class PagesController < ApplicationController
   private
 
   def set_home_stats
-    @audits_count = Audit.count
-    @audits_this_week_count = Audit.where(created_at: Time.zone.today.all_week).count
-    @audited_sites_count = Site.where.not(audits_count: 0).count
+    audit = authenticated? ? current_user.team.audits : Audit.all
+    site = authenticated? ? current_user.team.sites : Site.all
+    @audits_count = audit.count
+    @audits_this_week_count = audit.where(created_at: Time.zone.today.all_week).count
+    @audited_sites_count = site.where.not(audits_count: 0).count
   end
 
   def set_check_pages
