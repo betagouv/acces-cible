@@ -59,8 +59,15 @@ module AuditsHelper
     end
   end
 
-  def found_heading_levels(check)
+  def page_heading_levels(check)
     check.page_headings.to_h { |level, heading| [heading, level] }
+  end
+
+  def declaration_level_offset_notice(check)
+    return if check.heading_offset.zero?
+
+    section_level = check.heading_statuses.map(&:expected_level).min
+    t("audits.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
   end
 
   def heading_status_badge(heading_status)
@@ -79,10 +86,10 @@ module AuditsHelper
     badge(status: nil, text: "H#{level}", no_icon: true)
   end
 
-  def expected_level_badge(heading_status)
-    return muted_dash if heading_status.ok?
+  def expected_level_badge(heading_status, offset:)
+    return muted_dash unless heading_status.missing? || heading_status.incorrect_level?
 
-    badge(status: :error, text: "H#{heading_status.expected_level}")
+    badge(status: :error, text: "H#{heading_status.expected_level + offset}")
   end
 
   def automated_test_status_badge(automated_test_result)

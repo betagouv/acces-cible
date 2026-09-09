@@ -37,7 +37,7 @@ class AuditsController < ApplicationController
   # GET /sites/1/audits/1/headings
   def headings
     @check = @audit.accessibility_page_heading
-    raise ActiveRecord::RecordNotFound unless @check.completed? && @check.comparison.present?
+    raise ActiveRecord::RecordNotFound unless @check.completed? && @check.heading_offset
   end
 
   private

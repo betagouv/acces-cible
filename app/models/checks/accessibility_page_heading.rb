@@ -27,7 +27,7 @@ module Checks
       end
     end
 
-    store_accessor :data, :page_headings, :comparison
+    store_accessor :data, :page_headings, :comparison, :heading_offset
 
     def tooltip?
       audit.pending? || heading_statuses.empty?
@@ -88,7 +88,8 @@ module Checks
       self.page_headings = accessibility_page.heading_levels
       {
         page_headings:,
-        comparison: compare_headings
+        comparison: compare_headings,
+        heading_offset: first_heading_offset
       }
     end
 

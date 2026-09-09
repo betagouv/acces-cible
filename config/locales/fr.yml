@@ -44,8 +44,10 @@ fr:
       notice: Vérification créée
     headings:
       caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
+      description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
       expected_level: Niveau attendu
       found_level: Niveau trouvé
+      level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
       status: État
       title: Hiérarchie des titres de la déclaration
     index:
@@ -182,9 +184,6 @@ fr:
       table_header: Mention
       type: Mention du niveau d'accessibilité
     accessibility_page_heading:
-      allowed_level_differences: |
-        Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
-        Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
       expectations: "Voici la hiérarchie attendue :"
       explanation:
         one: "%{found_titles} sur %{total} - %{count} problème relevé"

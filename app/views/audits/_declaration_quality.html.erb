@@ -77,7 +77,7 @@
           <% unless heading_check.conform? %>
             <%= t("audits.show.headings_fix_hint") %><br>
           <% end %>
-          <% if heading_check.completed? && heading_check.comparison.present? %>
+          <% if heading_check.completed? && heading_check.heading_offset %>
             <%= link_to t("audits.show.see_headings"), headings_site_audit_path(audit.site, audit), class: "fr-btn fr-btn--secondary fr-btn--sm fr-icon-table-line fr-btn--icon-left fr-mt-1w", data: { turbo_frame: :modal } %>
           <% end %>
         </td>

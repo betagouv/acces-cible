@@ -1,9 +1,14 @@
 <% content_for :wide_modal, true %>
 
-<p class="fr-mb-1w"><%= @check.human_explanation %></p>
-<p class="fr-text--sm fr-text-mention--grey"><%= t("checks.accessibility_page_heading.allowed_level_differences") %></p>
+<% page_levels = page_heading_levels(@check) %>
 
-<% found_levels = found_heading_levels(@check) %>
+<p class="fr-mb-1w"><%= @check.human_explanation %></p>
+<p class="fr-text--sm fr-text-mention--grey">
+  <%= t(".description") %>
+</p>
+<% if notice = declaration_level_offset_notice(@check) %>
+  <p class="fr-text--sm fr-text-mention--grey"><%= notice %></p>
+<% end %>
 
 <%= dsfr_table(caption: t(".caption"), html_attributes: { class: "fr-mb-0" }) do |table| %>
   <% table.with_head do %>
@@ -26,8 +31,8 @@
             </p>
           <% end %>
         </th>
-        <td><%= found_level_badge(found_levels[heading_status.actual_heading]) %></td>
-        <td><%= expected_level_badge(heading_status) %></td>
+        <td><%= found_level_badge(page_levels[heading_status.actual_heading]) %></td>
+        <td><%= expected_level_badge(heading_status, offset: @check.heading_offset) %></td>
         <td><%= heading_status_badge(heading_status) %></td>
       </tr>
     <% end %>
