@@ -42,6 +42,12 @@ fr:
       row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
+    headings:
+      caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
+      expected_level: Niveau attendu
+      found_level: Niveau trouvé
+      status: État
+      title: Hiérarchie des titres de la déclaration
     index:
       caption: Mes évaluations
       compliance_rate: Taux d'accessibilité déclaré
@@ -181,18 +187,18 @@ fr:
         Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
       expectations: "Voici la hiérarchie attendue :"
       explanation:
-        one: "%{found_titles} sur %{total} - %{count} au mauvais niveau"
-        other: "%{found_titles} sur %{total} - %{count} au mauvais niveau"
+        one: "%{found_titles} sur %{total} - %{count} problème relevé"
+        other: "%{found_titles} sur %{total} - %{count} problèmes relevés"
         zero: "Tous les titres attendus ont été trouvés, dans le bon ordre et avec la bonne hiérarchie."
       found_titles:
         one: "%{count} titre trouvé"
         other: "%{count} titres trouvés"
       retained: "Titre retenu :"
       statuses:
-        incorrect_level: niveau de titre incorrect
-        incorrect_order: ordre incorrect
-        missing: non trouvé
-        ok: valide
+        incorrect_level: À corriger
+        incorrect_order: À corriger
+        missing: Non trouvé
+        ok: Conforme
       table_header: Titres
       type: Titres de la déclaration d'accessibilité
     analyze_accessibility_page:

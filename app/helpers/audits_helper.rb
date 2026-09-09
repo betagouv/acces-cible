@@ -59,6 +59,32 @@ module AuditsHelper
     end
   end
 
+  def found_heading_levels(check)
+    check.page_headings.to_h { |level, heading| [heading, level] }
+  end
+
+  def heading_status_badge(heading_status)
+    status = case
+    when heading_status.ok? then :success
+    when heading_status.warning? then :warning
+    else :error
+    end
+
+    badge(status:, text: heading_status.message)
+  end
+
+  def found_level_badge(level)
+    return muted_dash unless level
+
+    badge(status: nil, text: "H#{level}", no_icon: true)
+  end
+
+  def expected_level_badge(heading_status)
+    return muted_dash if heading_status.ok?
+
+    badge(status: :error, text: "H#{heading_status.expected_level}")
+  end
+
   def automated_test_status_badge(automated_test_result)
     status = automated_test_result[:status]
     label = t("audits.show.status_#{status}")
