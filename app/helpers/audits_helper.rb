@@ -70,14 +70,16 @@ module AuditsHelper
     t("audits.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
   end
 
-  def heading_status_badge(heading_status)
-    status = case
+  def heading_severity(heading_status)
+    case
     when heading_status.ok? then :success
     when heading_status.warning? then :warning
     else :error
     end
+  end
 
-    badge(status:, text: heading_status.message)
+  def heading_status_badge(heading_status)
+    badge(status: heading_severity(heading_status), text: heading_status.message)
   end
 
   def found_level_badge(level)
@@ -89,7 +91,7 @@ module AuditsHelper
   def expected_level_badge(heading_status, offset:)
     return muted_dash unless heading_status.missing? || heading_status.incorrect_level?
 
-    badge(status: :error, text: "H#{heading_status.expected_level + offset}")
+    badge(status: heading_severity(heading_status), text: "H#{heading_status.expected_level + offset}", no_icon: true)
   end
 
   def automated_test_status_badge(automated_test_result)
