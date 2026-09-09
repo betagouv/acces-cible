@@ -78,7 +78,7 @@
             <%= t("audits.show.headings_fix_hint") %><br>
           <% end %>
           <% if heading_check.completed? && heading_check.heading_offset %>
-            <%= link_to t("audits.show.see_headings"), headings_site_audit_path(audit.site, audit), class: "fr-btn fr-btn--secondary fr-btn--sm fr-icon-table-line fr-btn--icon-left fr-mt-1w", data: { turbo_frame: :modal } %>
+            <%= dsfr_button(label: t("audits.show.see_headings"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "headings-modal" }) %>
           <% end %>
         </td>
       </tr>
@@ -95,5 +95,9 @@
         <td><%= validity_comment(plan_check) || muted_dash %></td>
       </tr>
     <% end %>
+  <% end %>
+
+  <% if heading_check.completed? && heading_check.heading_offset %>
+    <%= render "audits/headings", check: heading_check %>
   <% end %>
 <% end %>

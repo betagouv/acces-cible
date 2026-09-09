@@ -19,11 +19,7 @@ Rails.application.routes.draw do
     collection do
       post :upload
     end
-    resources :audits, only: [:create, :show] do
-      member do
-        get :headings
-      end
-    end
+    resources :audits, only: [:create, :show]
   end
   get "/audits", to: "audits#index", as: :authenticated_root
 

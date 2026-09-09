@@ -1,8 +1,7 @@
 class AuditsController < ApplicationController
   include ActionController::Live
   include AuditsFiltering
-  before_action :set_site, only: [:create, :show, :headings]
-  before_action :set_audit, only: [:show, :headings]
+  before_action :set_site, only: [:create, :show]
 
   # GET /audits
   def index
@@ -31,23 +30,14 @@ class AuditsController < ApplicationController
 
   # GET /sites/1/audits/1
   def show
+    @audit = @site.audits.displayable.find(params[:id])
     @title = @site.normalized_url
-  end
-
-  # GET /sites/1/audits/1/headings
-  def headings
-    @check = @audit.accessibility_page_heading
-    raise ActiveRecord::RecordNotFound unless @check.completed? && @check.heading_offset
   end
 
   private
 
   def set_site
     @site = current_user.team.sites.preloaded.friendly.find(params.expect(:site_id))
-  end
-
-  def set_audit
-    @audit = @site.audits.displayable.find(params.expect(:id))
   end
 
   def set_csv_headers
