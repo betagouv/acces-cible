@@ -36,7 +36,9 @@ RSpec.describe Checks::AccessibilityPageHeading do
       end
 
       it "returns no level shift" do
-        expect(analyze[:heading_offset]).to eq 0
+        analyze
+
+        expect(check.heading_offset).to eq 0
       end
     end
 
@@ -53,7 +55,9 @@ RSpec.describe Checks::AccessibilityPageHeading do
       end
 
       it "returns the level shift" do
-        expect(analyze[:heading_offset]).to eq 1
+        analyze
+
+        expect(check.heading_offset).to eq 1
       end
     end
 

@@ -71,7 +71,7 @@
       </tr>
       <tr>
         <th scope="row"><%= heading_check.human_type %></th>
-        <td><%= heading_check.completed? && heading_check.comparison.present? ? heading_check.human_explanation : muted_dash %></td>
+        <td><%= heading_check.completed? ? heading_check.human_explanation : muted_dash %></td>
         <td><%= validity_badge(heading_check) %></td>
         <td>
           <% unless heading_check.conform? %>
@@ -81,7 +81,7 @@
               <% end %>
             </ul>
           <% end %>
-          <% if heading_check.completed? && heading_check.heading_offset %>
+          <% if heading_check.completed? %>
             <%= dsfr_button(label: t("audits.show.see_headings"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "headings-modal" }) %>
           <% end %>
         </td>
@@ -101,7 +101,7 @@
     <% end %>
   <% end %>
 
-  <% if heading_check.completed? && heading_check.heading_offset %>
+  <% if heading_check.completed? %>
     <%= render "audits/headings", check: heading_check %>
   <% end %>
 <% end %>

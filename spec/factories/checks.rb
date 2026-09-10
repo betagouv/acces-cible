@@ -60,8 +60,7 @@ FactoryBot.define do
               ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"],
               ["État de conformité", 2, :ok, "État de conformité"],
               ["Résultats des tests", 3, :ok, "Résultats des tests"]
-            ],
-            heading_offset: 0
+            ]
           }
         when Checks::AnalyzeSchema
           {
