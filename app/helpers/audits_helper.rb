@@ -63,14 +63,27 @@ module AuditsHelper
     check.page_headings.to_h { |level, heading| [heading, level] }
   end
 
-  def headings_fix_hint(check)
+  def headings_fix_hints(check)
     statuses = check.heading_statuses
     hints = []
     hints << t("audits.show.headings_fix.missing") if statuses.any?(&:missing?)
     hints << t("audits.show.headings_fix.incorrect_level") if statuses.any?(&:incorrect_level?)
     hints << t("audits.show.headings_fix.incorrect_order") if statuses.any?(&:incorrect_order?)
 
-    hints.join(" ") if hints.any?
+    hints
+  end
+
+  def heading_issues(check)
+    statuses = check.heading_statuses
+    missing = statuses.count(&:missing?)
+    levels = statuses.count(&:incorrect_level?)
+    orders = statuses.count(&:incorrect_order?)
+
+    issues = []
+    issues << t("audits.headings.missing_alert", count: missing) if missing.positive?
+    issues << t("audits.headings.incorrect_level_alert", count: levels) if levels.positive?
+    issues << t("audits.headings.incorrect_order_alert", count: orders) if orders.positive?
+    issues
   end
 
   def declaration_template_link

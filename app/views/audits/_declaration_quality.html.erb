@@ -75,7 +75,11 @@
         <td><%= validity_badge(heading_check) %></td>
         <td>
           <% unless heading_check.conform? %>
-            <%= headings_fix_hint(heading_check) %><br>
+            <ul class="fr-list">
+              <% headings_fix_hints(heading_check).each do |hint| %>
+                <li><%= hint %></li>
+              <% end %>
+            </ul>
           <% end %>
           <% if heading_check.completed? && heading_check.heading_offset %>
             <%= dsfr_button(label: t("audits.show.see_headings"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "headings-modal" }) %>

@@ -92,7 +92,7 @@ Fonctionnalité: Vérifications de l'analyse de la page d'accessibilité
       | Contenus non accessibles | -             | H2             | Non trouvé |
     Et la rangée "Voies de recours" contient "Titre retenu : Voies de recours utiles"
     Et la page ne contient pas "Ce décalage est toléré"
-    Et la page contient "Un titre n'est pas au bon niveau de hiérarchie."
+    Et la page contient "10 titres sont manquants et un titre n'est pas au bon niveau de hiérarchie."
 
   Scénario: tient compte du décalage de niveau de la déclaration
     Sachant que le site "https://foobar.com/" renvoie "<h1>Site</h1><h2>Déclaration d'accessibilité</h2><h3>État de conformité</h3><h3>Contenus non accessibles</h3><h4>Non-conformités</h4>" pour la déclaration d'accessibilité
@@ -124,5 +124,5 @@ Fonctionnalité: Vérifications de l'analyse de la page d'accessibilité
       | Titres             | Niveau trouvé | Niveau attendu | État       |
       | État de conformité | H2            | -              | Conforme   |
       | Voies de recours   | H2            | -              | À corriger |
-    Et la page contient "Un titre n'est pas dans le bon ordre."
+    Et la page contient "un titre n'est pas dans le bon ordre."
     Et la page contient "Consulter le modèle de déclaration d'accessibilité"

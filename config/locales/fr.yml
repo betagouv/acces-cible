@@ -48,11 +48,14 @@ fr:
       expected_level: Niveau attendu
       found_level: Niveau trouvé
       incorrect_level_alert:
-        one: Un titre n'est pas au bon niveau de hiérarchie.
-        other: "%{count} titres ne sont pas au bon niveau de hiérarchie."
+        one: "un titre n'est pas au bon niveau de hiérarchie"
+        other: "%{count} titres ne sont pas au bon niveau de hiérarchie"
       incorrect_order_alert:
-        one: Un titre n'est pas dans le bon ordre.
-        other: "%{count} titres ne sont pas dans le bon ordre."
+        one: "un titre n'est pas dans le bon ordre"
+        other: "%{count} titres ne sont pas dans le bon ordre"
+      missing_alert:
+        one: un titre est manquant
+        other: "%{count} titres sont manquants"
       level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
       status: État
       template_link: Consulter le modèle de déclaration d'accessibilité
