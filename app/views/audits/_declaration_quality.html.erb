@@ -71,13 +71,19 @@
       </tr>
       <tr>
         <th scope="row"><%= heading_check.human_type %></th>
-        <td><%= heading_check.completed? && heading_check.comparison.present? ? heading_check.human_explanation : muted_dash %></td>
+        <td><%= heading_check.completed? ? heading_check.human_explanation : muted_dash %></td>
         <td><%= validity_badge(heading_check) %></td>
         <td>
           <% unless heading_check.conform? %>
-            <%= t("audits.show.headings_fix_hint") %><br>
+            <ul class="fr-list">
+              <% headings_fix_hints(heading_check).each do |hint| %>
+                <li><%= hint %></li>
+              <% end %>
+            </ul>
           <% end %>
-          <%= tag.button t("audits.show.see_headings"), type: "button", class: "fr-btn fr-btn--secondary fr-btn--sm fr-icon-table-line fr-btn--icon-left fr-mt-1w", disabled: true %>
+          <% if heading_check.completed? %>
+            <%= dsfr_button(label: t("audits.show.see_headings"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "headings-modal" }) %>
+          <% end %>
         </td>
       </tr>
       <tr>
@@ -93,5 +99,9 @@
         <td><%= validity_comment(plan_check) || muted_dash %></td>
       </tr>
     <% end %>
+  <% end %>
+
+  <% if heading_check.completed? %>
+    <%= render "audits/headings", check: heading_check %>
   <% end %>
 <% end %>

@@ -34,6 +34,12 @@ RSpec.describe Checks::AccessibilityPageHeading do
         end
         expect(comparison).to eq expected_result
       end
+
+      it "returns no level shift" do
+        analyze
+
+        expect(check.heading_offset).to eq 0
+      end
     end
 
     context "when the headings are valid but shifted by one level" do
@@ -46,6 +52,12 @@ RSpec.describe Checks::AccessibilityPageHeading do
           [heading, level, :ok, shifted_heading]
         end
         expect(comparison).to eq expected_result
+      end
+
+      it "returns the level shift" do
+        analyze
+
+        expect(check.heading_offset).to eq 1
       end
     end
 
