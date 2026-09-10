@@ -79,3 +79,50 @@ Fonctionnalité: Vérifications de l'analyse de la page d'accessibilité
       | contenu                                                                      | résultat |
       | <p>Conformément à l'article 47 de la loi n° 2005-102 du 11 février 2005.</p> | Oui      |
       | <p>C'est hyper</p>                                                           | Non      |
+
+  Scénario: détaille la hiérarchie des titres de la déclaration
+    Sachant que le site "https://foobar.com/" renvoie "<h1>Déclaration d'accessibilité</h1><h2>État de conformité</h2><h2>Résultats des tests</h2><h2>Voies de recours utiles</h2>" pour la déclaration d'accessibilité
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Et que je clique sur "Voir le résultat"
+    Alors le tableau des titres contient :
+      | Titres                   | Niveau trouvé | Niveau attendu | État       |
+      | État de conformité       | H2            | -              | Conforme   |
+      | Résultats des tests      | H2            | H3             | À corriger |
+      | Contenus non accessibles | -             | H2             | Non trouvé |
+    Et la rangée "Voies de recours" contient "Titre retenu : Voies de recours utiles"
+    Et la page ne contient pas "Ce décalage est toléré"
+    Et la page contient "Un titre n'est pas au bon niveau de hiérarchie."
+
+  Scénario: tient compte du décalage de niveau de la déclaration
+    Sachant que le site "https://foobar.com/" renvoie "<h1>Site</h1><h2>Déclaration d'accessibilité</h2><h3>État de conformité</h3><h3>Contenus non accessibles</h3><h4>Non-conformités</h4>" pour la déclaration d'accessibilité
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Et que je clique sur "Voir le résultat"
+    Alors le tableau des titres contient :
+      | Titres              | Niveau trouvé | Niveau attendu | État       |
+      | État de conformité  | H3            | -              | Conforme   |
+      | Résultats des tests | -             | H4             | Non trouvé |
+    Et la page contient "Ce décalage est toléré"
+
+  Scénario: signale une déclaration entièrement conforme
+    Sachant que le site "https://foobar.com/" renvoie "<h1>Déclaration d'accessibilité</h1><h2>État de conformité</h2><h3>Résultats des tests</h3><h2>Contenus non accessibles</h2><h3>Non-conformités</h3><h3>Dérogations pour charge disproportionnée</h3><h3>Contenus non soumis à l'obligation d'accessibilité</h3><h2>Établissement de cette déclaration d'accessibilité</h2><h3>Technologies utilisées pour la réalisation du site</h3><h3>Environnement de test</h3><h3>Outils pour évaluer l'accessibilité</h3><h3>Pages du site ayant fait l'objet de la vérification de conformité</h3><h2>Retour d'information et contact</h2><h2>Voies de recours</h2>" pour la déclaration d'accessibilité
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Et que je clique sur "Voir le résultat"
+    Alors la page contient "Tous les titres attendus ont été trouvés"
+    Et le tableau des titres contient :
+      | Titres           | Niveau trouvé | Niveau attendu | État     |
+      | Voies de recours | H2            | -              | Conforme |
+
+  Scénario: signale un titre placé dans le mauvais ordre
+    Sachant que le site "https://foobar.com/" renvoie "<h1>Déclaration d'accessibilité</h1><h2>Voies de recours</h2><h2>État de conformité</h2>" pour la déclaration d'accessibilité
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Et que je clique sur "Voir le résultat"
+    Alors le tableau des titres contient :
+      | Titres             | Niveau trouvé | Niveau attendu | État       |
+      | État de conformité | H2            | -              | Conforme   |
+      | Voies de recours   | H2            | -              | À corriger |
+    Et la page contient "Un titre n'est pas dans le bon ordre."
+    Et la page contient "Consulter le modèle de déclaration d'accessibilité"

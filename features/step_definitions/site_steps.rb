@@ -176,6 +176,12 @@ Alors('la vérification {string} de la carte {string} contient un lien vers {str
   expect(card.find("th", text: check_name).ancestor("tr")).to have_link(href: href)
 end
 
+Alors('le tableau des titres contient :') do |table|
+  within("#headings-modal") do
+    table.diff!(all("tr").map { |row| row.all("th, td").map(&:text) }, surplus_row: false)
+  end
+end
+
 Quand("je choisis {string} dans le menu principal") do |item|
   within("nav[aria-label='Menu principal']") do
     click_link_or_button(item)
