@@ -9,6 +9,20 @@
     <p class="fr-text--sm fr-text-mention--grey"><%= notice %></p>
   <% end %>
 
+  <% incorrect_order = check.heading_statuses.count(&:incorrect_order?) %>
+  <% if incorrect_order.positive? %>
+    <%= dsfr_alert(type: :warning, size: :sm, html_attributes: { class: "fr-mb-2w" }) do %>
+      <p><%= t(".incorrect_order_alert", count: incorrect_order) %> <%= declaration_template_link %></p>
+    <% end %>
+  <% end %>
+
+  <% incorrect_level = check.heading_statuses.count(&:incorrect_level?) %>
+  <% if incorrect_level.positive? %>
+    <%= dsfr_alert(type: :warning, size: :sm, html_attributes: { class: "fr-mb-2w" }) do %>
+      <p><%= t(".incorrect_level_alert", count: incorrect_level) %> <%= declaration_template_link %></p>
+    <% end %>
+  <% end %>
+
   <%= dsfr_table(caption: t(".caption"), html_attributes: { class: "fr-mb-0" }) do |table| %>
     <% table.with_head do %>
       <tr>

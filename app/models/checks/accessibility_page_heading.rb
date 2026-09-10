@@ -18,6 +18,7 @@ module Checks
       [2, "Voies de recours"],
     ].freeze
     COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
+    TEMPLATE_URL = "https://accessibilite.numerique.gouv.fr/ressources/modele-de-declaration/".freeze
 
     delegate :expected_headings, to: :class
 

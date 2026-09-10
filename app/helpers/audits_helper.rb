@@ -63,6 +63,20 @@ module AuditsHelper
     check.page_headings.to_h { |level, heading| [heading, level] }
   end
 
+  def headings_fix_hint(check)
+    statuses = check.heading_statuses
+    hints = []
+    hints << t("audits.show.headings_fix.missing") if statuses.any?(&:missing?)
+    hints << t("audits.show.headings_fix.incorrect_level") if statuses.any?(&:incorrect_level?)
+    hints << t("audits.show.headings_fix.incorrect_order") if statuses.any?(&:incorrect_order?)
+
+    hints.join(" ") if hints.any?
+  end
+
+  def declaration_template_link
+    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.headings.template_link"))
+  end
+
   def declaration_level_offset_notice(check)
     return if check.heading_offset.zero?
 

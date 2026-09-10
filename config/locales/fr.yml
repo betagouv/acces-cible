@@ -47,8 +47,15 @@ fr:
       description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
       expected_level: Niveau attendu
       found_level: Niveau trouvé
+      incorrect_level_alert:
+        one: Un titre n'est pas au bon niveau de hiérarchie.
+        other: "%{count} titres ne sont pas au bon niveau de hiérarchie."
+      incorrect_order_alert:
+        one: Un titre n'est pas dans le bon ordre.
+        other: "%{count} titres ne sont pas dans le bon ordre."
       level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
       status: État
+      template_link: Consulter le modèle de déclaration d'accessibilité
       title: Hiérarchie des titres de la déclaration
     index:
       caption: Mes évaluations
@@ -107,7 +114,10 @@ fr:
       element_checked: Élément vérifié
       form: Formulaire de contact
       general_comment: Commentaire général
-      headings_fix_hint: "Corrigez l'ordre et le niveau des titres de la page."
+      headings_fix:
+        incorrect_level: Corrigez le niveau de certains titres.
+        incorrect_order: "Corrigez l'ordre des titres."
+        missing: Ajoutez les titres manquants.
       how_to_fix: Comment corriger
       launched_by: "évaluation lancée par un membre de %{team}"
       legal_obligations_comment:
