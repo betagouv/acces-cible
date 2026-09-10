@@ -37,13 +37,13 @@
       </tr>
       <tr>
         <th scope="row"><%= t("checks.analyze_accessibility_page.standard") %></th>
-        <td><%= accessibility_page_analysis.standard.presence || muted_dash %></td>
+        <td><%= truncated_value(accessibility_page_analysis.standard).presence || muted_dash %></td>
         <td><%= presence_badge(accessibility_page_analysis.standard.present?) %></td>
         <td><%= muted_dash %></td>
       </tr>
       <tr>
         <th scope="row"><%= t("checks.analyze_accessibility_page.auditor") %></th>
-        <td><%= accessibility_page_analysis.auditor.presence || muted_dash %></td>
+        <td><%= truncated_value(accessibility_page_analysis.auditor).presence || muted_dash %></td>
         <td><%= presence_badge(accessibility_page_analysis.auditor.present?) %></td>
         <td><%= muted_dash %></td>
       </tr>

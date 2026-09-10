@@ -10,6 +10,15 @@ module ApplicationHelper
     tag.p(class: "fr-hr-or fr-my-4w") { t("shared.or") }
   end
 
+  def truncated(text)
+    text.to_s.truncate(TRUNCATION_LENGTH)
+  end
+
+  def truncated_value(text)
+    short = truncated(text)
+    short == text.to_s ? short : tag.span(short, title: text)
+  end
+
   def external_link_to(url, text, **options)
     label = text + t("shared.new_window")
     dsfr_link_to(text, url, icon_right: "external-link-line", title: label, "aria-label": label, target: "_blank", rel: "noopener noreferrer", **options)

@@ -10,14 +10,14 @@
 
 <div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters fr-mb-1w">
   <div class="fr-col">
-    <h1 class="fr-mb-0"><%= t(".title") %> <%= @site.normalized_url %> </h1>
+    <h1 class="fr-mb-0"><%= t(".title") %> <%= dsfr_link_to truncated_value(@site.normalized_url), site_path(@site) %></h1>
   </div>
   <div class="fr-col-auto">
     <%= button_to t("shared.new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
   </div>
 </div>
 <p class="fr-text--sm fr-mb-3w">
-  <%= @site.normalized_url %> - <%= l(@audit.created_at, format: :long) %>
+  <%= dsfr_link_to truncated_value(@site.normalized_url), site_path(@site) %> - <%= l(@audit.created_at, format: :long) %>
   <% if @audit.user %> - <%= t(".launched_by", team: @audit.team.organization_label) %>
   <% end %>
 </p>
