@@ -23,10 +23,6 @@ RSpec.describe Checks::AccessibilityPageHeading do
       expect(comparison).to be_an(Array)
     end
 
-    it "returns the level shift between the page and the expected headings" do
-      expect(analyze[:heading_offset]).to eq 0
-    end
-
     context "when the headings are valid" do
       let(:fixture_file_name) { :valid }
 
@@ -37,6 +33,10 @@ RSpec.describe Checks::AccessibilityPageHeading do
           [heading, level, :ok, actual_page_heading]
         end
         expect(comparison).to eq expected_result
+      end
+
+      it "returns no level shift" do
+        expect(analyze[:heading_offset]).to eq 0
       end
     end
 
