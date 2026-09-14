@@ -10,7 +10,7 @@
     <% t.with_body do %>
       <% @tags.each do |tag| %>
         <tr>
-          <td><%= dsfr_link_to truncated_value(tag.name), tag %></td>
+          <td><%= dsfr_link_to truncated(tag.name), tag, title: tag.name %></td>
           <td><%= dsfr_link_to t('.see_sites', tag: truncated(tag.name), count: tag.sites_count), audits_path(filter: { tag_id: tag.id }) %></td>
         </tr>
       <% end %>

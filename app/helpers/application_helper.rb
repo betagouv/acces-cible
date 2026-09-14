@@ -25,7 +25,7 @@ module ApplicationHelper
   end
 
   def email_link_to(email)
-    dsfr_link_to(email, "mailto:#{email}", size: "sm", icon_right: "mail-line", title: email)
+    dsfr_link_to(truncated(email), "mailto:#{email}", size: "sm", icon_right: "mail-line", title: email)
   end
 
   def card_with_header(title:, description: nil, &block)
