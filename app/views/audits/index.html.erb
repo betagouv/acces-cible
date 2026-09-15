@@ -1,3 +1,4 @@
+<%= render "audits/modals/columns" %>
 <%= turbo_stream_from [current_user.team, :sites] %>
 <% scope_options = [[t(".scope_me"), "me"], [t(".scope_team", organization: current_user.team.organization_label), "team"]] %>
 
@@ -47,8 +48,13 @@
   </div>
 <% end %>
 
-<div class="fr-grid-row fr-mb-2w">
-  <div class="fr-col">
+
+<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
+  <div class="fr-col-2">
+    <%= dsfr_button(label: t(".displayed_columns"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "columns-modal" }) %>
+  </div>
+
+  <div class="fr-col-2">
     <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
   </div>
 </div>
