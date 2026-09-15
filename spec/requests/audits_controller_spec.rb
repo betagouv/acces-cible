@@ -153,6 +153,26 @@ RSpec.describe "Audits" do
     end
   end
 
+  describe "PATCH /audits/columns" do
+    it "stores the selected columns in the session" do
+      patch columns_audits_path, params: { columns: ["", "auditor", "tags"] }
+
+      expect(session[:audits_columns]).to eq(["auditor", "tags"])
+    end
+
+    it "redirects to the audits index" do
+      patch columns_audits_path, params: { columns: ["", "auditor"] }
+
+      expect(response).to redirect_to(audits_path)
+    end
+
+    it "ignores unknown columns" do
+      patch columns_audits_path, params: { columns: ["", "unknown"] }
+
+      expect(session[:audits_columns]).to eq([])
+    end
+  end
+
   describe "GET /audits/csv_export" do
     subject(:get_csv) { get csv_export_audits_path(format: :csv), params: request_params }
 

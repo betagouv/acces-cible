@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :audits, only: [:index] do
     collection do
       get :csv_export
+      patch :columns
     end
   end
   resources :sites, only: [:new, :create, :show, :edit, :update] do

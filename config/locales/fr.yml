@@ -44,24 +44,42 @@ fr:
       notice: Vérification créée
     index:
       caption: Mes évaluations
-      compliance_rate: Taux d'accessibilité déclaré
-      declaration_quality: Qualité de la déclaration
-      declared_level: Niveau d'accessibilité déclaré
+      columns:
+        accessibility_mention: Mention d'accessibilité
+        accessibility_page: Déclaration d'accessibilité
+        auditor: Auditeur
+        automated_tests_applicable: Tests auto RGAA applicables
+        automated_tests_inapplicable: Tests auto non applicables
+        automated_tests_passed: Tests auto RGAA réussis
+        automated_tests_result: Résultat des tests auto RGAA
+        compliance_rate: Taux d'accessibilité déclaré
+        contact: Adresse email de contact (ou formulaire de contact)
+        declaration_date: Date de déclaration
+        declaration_format: Format de la déclaration
+        declaration_quality: Qualité de la déclaration
+        declared_level: Niveau d'accessibilité déclaré
+        evaluator: Évaluateur
+        last_audit_at: Lancée le
+        law_article: Article de loi
+        legal_obligations: Respect des obligations légales
+        organization_label: Organisation
+        plan: Plan d'action
+        plan_quality: Plan d'action (qualité)
+        reachable: Site joignable
+        schema: Schéma pluriannuel
+        schema_quality: Schéma pluriannuel (qualité)
+        standard: Référentiel
+        tags: Étiquettes
       displayed_columns: Colonnes affichées
-      evaluator: Évaluateur
       export_to_csv: Export CSV
-      last_audit_at: Lancée le
-      legal_obligations: Respect des obligations légales
       no_results: Aucune évaluation à afficher.
       no_search_results: Aucune évaluation ne correspond à votre recherche.
-      organization_label: Organisation
       search: Rechercher un site
       scope_filter: Périmètre des évaluations affichées
       scope_me: Mes évaluations
       scope_team: "Mon organisation (%{organization})"
       site: Site
       tag_filter: Filtrer par étiquette
-      tags: Étiquettes
       title: Mes évaluations
     show:
       accessibility_rate: Taux d'accessibilité
@@ -159,32 +177,6 @@ fr:
     modals:
       columns:
         apply: Appliquer
-        columns:
-          accessibility_mention: Mention d'accessibilité
-          accessibility_page: Déclaration d'accessibilité
-          auditor: Auditeur
-          automated_tests_applicable: Tests auto RGAA applicables
-          automated_tests_inapplicable: Tests auto non applicables
-          automated_tests_passed: Tests auto RGAA réussis
-          automated_tests_result: Résultat des tests auto RGAA
-          compliance_rate: Taux d'accessibilité déclaré
-          contact: Adresse email de contact (ou formulaire de contact)
-          declaration_date: Date de déclaration
-          declaration_format: Format de la déclaration
-          declaration_quality: Qualité de la déclaration
-          declared_level: Niveau d'accessibilité déclaré
-          evaluator: Évaluateur
-          last_audit_at: Lancée le
-          law_article: Article de loi
-          legal_obligations: Respect des obligations légales
-          organization_label: Organisation
-          plan: Plan d'action
-          plan_quality: Plan d'action (qualité)
-          reachable: Site joignable
-          schema: Schéma pluriannuel
-          schema_quality: Schéma pluriannuel (qualité)
-          standard: Référentiel
-          tags: Étiquettes
         description: Choisissez les informations à afficher dans le tableau. La colonne « Site » reste toujours visible.
         groups:
           automated_tests: Tests automatiques RGAA

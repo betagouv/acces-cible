@@ -1,27 +1,31 @@
 <%= dsfr_modal(title: t(".title"), html_attributes: { id: "columns-modal" }) do |modal| %>
   <p class="fr-text--sm"><%= t(".description") %></p>
 
-  <div class="fr-grid-row fr-grid-row--gutters">
-    <% [@columns.slice(:main_results), @columns.except(:main_results)].each do |groups| %>
-      <div class="fr-col-12 fr-col-md-6">
-        <% groups.each do |group, columns| %>
-          <fieldset class="fr-fieldset">
-            <legend class="fr-fieldset__legend"><%= t(".groups.#{group}") %></legend>
-            <% columns.each do |column, displayed| %>
-              <div class="fr-fieldset__element">
-                <div class="fr-checkbox-group fr-checkbox-group--sm">
-                  <%= check_box_tag "columns[]", column, displayed, id: "column_#{column}" %>
-                  <%= label_tag "column_#{column}", t(".columns.#{column}"), class: "fr-label" %>
+  <%= form_with url: columns_audits_path, method: :patch, id: "columns-form" do %>
+    <%= hidden_field_tag "columns[]", "", id: nil %>
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <% columns = AuditsController::INDEX_COLUMNS %>
+      <% [columns.slice(:main_results), columns.except(:main_results)].each do |groups| %>
+        <div class="fr-col-12 fr-col-md-6">
+          <% groups.each do |group, group_columns| %>
+            <fieldset class="fr-fieldset">
+              <legend class="fr-fieldset__legend"><%= t(".groups.#{group}") %></legend>
+              <% group_columns.each do |column| %>
+                <div class="fr-fieldset__element">
+                  <div class="fr-checkbox-group fr-checkbox-group--sm">
+                    <%= check_box_tag "columns[]", column, column.in?(@displayed_columns), id: "column_#{column}" %>
+                    <%= label_tag "column_#{column}", t("audits.index.columns.#{column}"), class: "fr-label" %>
+                  </div>
                 </div>
-              </div>
-            <% end %>
-          </fieldset>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+              <% end %>
+            </fieldset>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 
   <% modal.with_button do %>
-    <li><%= dsfr_button(label: t(".apply"), html_attributes: { "aria-controls": "columns-modal" }) %></li>
+    <li><%= dsfr_button(label: t(".apply"), html_attributes: { type: :submit, form: "columns-form" }) %></li>
   <% end %>
 <% end %>

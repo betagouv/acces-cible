@@ -63,15 +63,13 @@
   <% t.with_head do %>
     <tr>
       <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
-      <th scope="col" class="fr-cell--center"><%= t('checks.reachable.type') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.compliance_rate') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.declared_level') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.legal_obligations') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.declaration_quality') %></th>
-      <th scope="col"><%= t('.evaluator') %></th>
-      <th scope="col"><%= t('.organization_label') %></th>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.last_audit_at'), :last_audited_at %></th>
-      <th scope="col"><%= t('.tags') %></th>
+      <% @displayed_columns.each do |column| %>
+        <% if column == "last_audit_at" %>
+          <th scope="col" class="fr-cell--sort" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.columns.last_audit_at'), :last_audited_at %></th>
+        <% else %>
+          <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>"><%= t(".columns.#{column}") %></th>
+        <% end %>
+      <% end %>
     </tr>
   <% end %>
 
@@ -80,7 +78,7 @@
       <%= render partial: "audit", collection: @audits, as: :audit %>
     <% else %>
       <tr>
-        <td colspan="10">
+        <td colspan="<%= @displayed_columns.size + 1 %>">
           <% if params.dig(:filter, :q).present? %>
             <%= t(".no_search_results") %>
           <% else %>
