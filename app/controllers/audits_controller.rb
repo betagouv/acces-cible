@@ -1,5 +1,4 @@
 class AuditsController < ApplicationController
-  include ActionController::Live
   include AuditsFiltering
   before_action :set_site, only: [:create, :show]
 
@@ -8,14 +7,6 @@ class AuditsController < ApplicationController
     params[:sort] ||= { last_audited_at: AuditsFiltering::DEFAULT_DIRECTION }
     @tags = current_user.team.tags.in_alphabetical_order
     @pagy, @audits = pagy(scoped_audits.displayable)
-  end
-
-  # GET /audits/csv_export
-  def csv_export
-    set_csv_headers
-    AuditCsvExport.stream_csv_to(response.stream, scoped_audits.displayable)
-  ensure
-    response.stream.close
   end
 
   # POST /sites/1/audits
@@ -38,12 +29,5 @@ class AuditsController < ApplicationController
 
   def set_site
     @site = current_user.team.sites.preloaded.friendly.find(params.expect(:site_id))
-  end
-
-  def set_csv_headers
-    response.headers["Content-Type"] = "text/csv; charset=utf-8"
-    response.headers["Content-Disposition"] = "attachment; filename=#{AuditCsvExport.filename}"
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["Last-Modified"] = Time.now.httpdate
   end
 end
