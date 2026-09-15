@@ -19,8 +19,8 @@ module ApplicationHelper
     short == text.to_s ? short : tag.span(short, title: text)
   end
 
-  def external_link_to(url, text, **options)
-    label = text + t("shared.new_window")
+  def external_link_to(url, text, label: text, **options)
+    label += t("shared.new_window")
     dsfr_link_to(text, url, icon_right: "external-link-line", title: label, "aria-label": label, target: "_blank", rel: "noopener noreferrer", **options)
   end
 

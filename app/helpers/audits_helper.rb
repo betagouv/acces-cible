@@ -27,7 +27,8 @@ module AuditsHelper
       check.found? ? truncated_value("#{check.mention_text}") : muted_dash
     when Checks::AnalyzeSchema, Checks::AnalyzePlan
       if check.link_url.present?
-        external_link_to(check.link_url, truncated(check.link_text.presence || check.link_url))
+        label = check.link_text.presence || check.link_url
+        external_link_to(check.link_url, truncated(label), label:)
       else
         truncated_value(check.text).presence || muted_dash
       end
