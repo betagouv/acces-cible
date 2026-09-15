@@ -1,0 +1,9 @@
+FROM debian:trixie-slim
+
+EXPOSE 9222
+
+RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get install --no-install-recommends -y chromium-headless-shell
+
+CMD ["chromium-headless-shell", "--no-sandbox", "--remote-debugging-port=9222", "--remote-allow-origins=*"]
