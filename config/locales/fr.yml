@@ -42,24 +42,6 @@ fr:
       row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
-    headings:
-      caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
-      description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
-      expected_level: Niveau attendu
-      found_level: Niveau trouvé
-      incorrect_level_alert:
-        one: "un titre n'est pas au bon niveau de hiérarchie"
-        other: "%{count} titres ne sont pas au bon niveau de hiérarchie"
-      incorrect_order_alert:
-        one: "un titre n'est pas dans le bon ordre"
-        other: "%{count} titres ne sont pas dans le bon ordre"
-      missing_alert:
-        one: un titre est manquant
-        other: "%{count} titres sont manquants"
-      level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
-      status: État
-      template_link: Consulter le modèle de déclaration d'accessibilité
-      title: Hiérarchie des titres de la déclaration
     index:
       caption: Mes évaluations
       columns:
@@ -206,6 +188,24 @@ fr:
           main_results: Résultats principaux de l'évaluation
           meta: Méta
         title: Colonnes affichées
+      headings:
+        caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
+        description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
+        expected_level: Niveau attendu
+        found_level: Niveau trouvé
+        incorrect_level_alert:
+          one: "un titre n'est pas au bon niveau de hiérarchie"
+          other: "%{count} titres ne sont pas au bon niveau de hiérarchie"
+        incorrect_order_alert:
+          one: "un titre n'est pas dans le bon ordre"
+          other: "%{count} titres ne sont pas dans le bon ordre"
+        missing_alert:
+          one: un titre est manquant
+          other: "%{count} titres sont manquants"
+        level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
+        status: État
+        template_link: Consulter le modèle de déclaration d'accessibilité
+        title: Hiérarchie des titres de la déclaration
   check:
     completed_at: Vérification effectuée le
     status:

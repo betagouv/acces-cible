@@ -3,10 +3,6 @@ module DsfrHelper
     render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, selectable:, html_attributes:), &block
   end
 
-  def dsfr_modal(title:, opened: false, html_attributes: {}, &block)
-    render Dsfr::ModalComponent.new(title:, opened:, html_attributes:), &block
-  end
-
   def dsfr_tooltip(text, title:, type: :button)
     render Dsfr::TooltipComponent.new(text, title:, type:)
   end

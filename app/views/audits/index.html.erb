@@ -62,14 +62,13 @@
 <%= dsfr_table(caption: t('.caption'), border: true, size: :lg) do |t| %>
   <% t.with_head do %>
     <tr>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
+      <th scope="col" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
+
       <% @displayed_columns.each do |column| %>
-        <% if column == "last_audit_at" %>
-          <th scope="col" class="fr-cell--sort" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.columns.last_audit_at'), :last_audited_at %></th>
-        <% else %>
-          <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>"><%= t(".columns.#{column}") %></th>
-        <% end %>
+        <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>"><%= t(".columns.#{column}") %></th>
       <% end %>
+
+      <th scope="col" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.columns.last_audit_at'), :last_audited_at %></th>
     </tr>
   <% end %>
 

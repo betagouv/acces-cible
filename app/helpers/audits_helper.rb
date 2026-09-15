@@ -94,21 +94,21 @@ module AuditsHelper
     orders = statuses.count(&:incorrect_order?)
 
     issues = []
-    issues << t("audits.headings.missing_alert", count: missing) if missing.positive?
-    issues << t("audits.headings.incorrect_level_alert", count: levels) if levels.positive?
-    issues << t("audits.headings.incorrect_order_alert", count: orders) if orders.positive?
+    issues << t("audits.modals.headings.missing_alert", count: missing) if missing.positive?
+    issues << t("audits.modals.headings.incorrect_level_alert", count: levels) if levels.positive?
+    issues << t("audits.modals.headings.incorrect_order_alert", count: orders) if orders.positive?
     issues
   end
 
   def declaration_template_link
-    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.headings.template_link"))
+    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.modals.headings.template_link"))
   end
 
   def declaration_level_offset_notice(check)
     return if check.heading_offset.zero?
 
     section_level = check.heading_statuses.map(&:expected_level).min
-    t("audits.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
+    t("audits.modals.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
   end
 
   def heading_severity(heading_status)
@@ -163,6 +163,7 @@ module AuditsHelper
 
   def audit_cell(audit, column)
     case column
+    when "site" then tag.th(site_link(audit.site))
     when "evaluator" then tag.td(truncated_value(audit.user.to_s))
     when "organization_label" then tag.td(truncated_value(audit.team.organization_label))
     when "last_audit_at" then tag.td(audit_date_link(audit))
@@ -200,6 +201,12 @@ module AuditsHelper
     when "automated_tests_inapplicable" then axe.inapplicable || muted_dash
     when "reachable" then check_badge(audit.reachable, hover: false, no_icon: true)
     end
+  end
+
+  def site_link(site)
+    site_label = t('audits.audit.row_label', url: site.normalized_url)
+
+    dsfr_link_to(truncated(site.normalized_url), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label)
   end
 
   def audit_date_link(audit)

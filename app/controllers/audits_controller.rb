@@ -5,9 +5,9 @@ class AuditsController < ApplicationController
   INDEX_COLUMNS = {
     main_results: %w[compliance_rate declared_level legal_obligations declaration_quality],
     legal_obligations: %w[accessibility_page accessibility_mention schema plan],
+    meta: %w[reachable evaluator organization_label tags],
     declaration_quality: %w[declaration_date standard auditor law_article contact declaration_format schema_quality plan_quality],
     automated_tests: %w[automated_tests_result automated_tests_applicable automated_tests_passed automated_tests_inapplicable],
-    meta: %w[reachable evaluator organization_label last_audit_at tags]
   }.freeze
   DEFAULT_INDEX_COLUMNS = %w[reachable compliance_rate declared_level legal_obligations declaration_quality  evaluator organization_label last_audit_at tags].freeze
 
