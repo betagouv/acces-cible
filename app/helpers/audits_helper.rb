@@ -59,6 +59,68 @@ module AuditsHelper
     end
   end
 
+  def page_heading_levels(check)
+    check.page_headings.to_h { |level, heading| [heading, level] }
+  end
+
+  def headings_fix_hints(check)
+    statuses = check.heading_statuses
+    hints = []
+    hints << t("audits.show.headings_fix.missing") if statuses.any?(&:missing?)
+    hints << t("audits.show.headings_fix.incorrect_level") if statuses.any?(&:incorrect_level?)
+    hints << t("audits.show.headings_fix.incorrect_order") if statuses.any?(&:incorrect_order?)
+
+    hints
+  end
+
+  def heading_issues(check)
+    statuses = check.heading_statuses
+    missing = statuses.count(&:missing?)
+    levels = statuses.count(&:incorrect_level?)
+    orders = statuses.count(&:incorrect_order?)
+
+    issues = []
+    issues << t("audits.headings.missing_alert", count: missing) if missing.positive?
+    issues << t("audits.headings.incorrect_level_alert", count: levels) if levels.positive?
+    issues << t("audits.headings.incorrect_order_alert", count: orders) if orders.positive?
+    issues
+  end
+
+  def declaration_template_link
+    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.headings.template_link"))
+  end
+
+  def declaration_level_offset_notice(check)
+    return if check.heading_offset.zero?
+
+    section_level = check.heading_statuses.map(&:expected_level).min
+    t("audits.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
+  end
+
+  def heading_severity(heading_status)
+    case
+    when heading_status.ok? then :success
+    when heading_status.warning? then :warning
+    else :error
+    end
+  end
+
+  def heading_status_badge(heading_status)
+    badge(status: heading_severity(heading_status), text: heading_status.message)
+  end
+
+  def found_level_badge(level)
+    return muted_dash unless level
+
+    badge(status: nil, text: "H#{level}", no_icon: true)
+  end
+
+  def expected_level_badge(heading_status, offset:)
+    return muted_dash unless heading_status.missing? || heading_status.incorrect_level?
+
+    badge(status: heading_severity(heading_status), text: "H#{heading_status.expected_level + offset}", no_icon: true)
+  end
+
   def automated_test_status_badge(automated_test_result)
     status = automated_test_result[:status]
     label = t("audits.show.status_#{status}")

@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   end
   resources :audits, only: [:index] do
     collection do
-      get :csv_export
+      get :csv_export, controller: :audit_csv_exports
     end
   end
   resources :sites, only: [:show, :edit, :update] do
