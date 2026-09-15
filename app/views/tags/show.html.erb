@@ -8,7 +8,7 @@
     <% t.with_body do %>
       <% @sites.each do |site| %>
         <tr>
-          <td><%= dsfr_link_to site.normalized_url, site %></td>
+          <td><%= dsfr_link_to truncated(site.normalized_url), site, title: site.normalized_url %></td>
         </tr>
       <% end %>
     <% end %>

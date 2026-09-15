@@ -20,7 +20,7 @@
   <% if @site.tags.present? %>
     <%= muted_dash %>
     <% @site.tags.each do |tag| %>
-      <%= dsfr_tag(title: tag.name.truncate(ApplicationHelper::TRUNCATION_LENGTH),
+      <%= dsfr_tag(title: truncated(tag.name),
                    size: :sm,
                    html_attributes: { title: t(".tag", name: tag.name) }) %>
     <% end %>

@@ -24,12 +24,13 @@ module AuditsHelper
 
       external_link_to(check.url, t("checks.find_accessibility_page.link_to_page"))
     when Checks::AccessibilityMention
-      check.found? ? "« #{check.mention_text} »" : muted_dash
+      check.found? ? truncated_value("#{check.mention_text}") : muted_dash
     when Checks::AnalyzeSchema, Checks::AnalyzePlan
       if check.link_url.present?
-        external_link_to(check.link_url, check.link_text.presence || check.link_url)
+        label = check.link_text.presence || check.link_url
+        external_link_to(check.link_url, truncated(label), label:)
       else
-        check.text.presence || muted_dash
+        truncated_value(check.text).presence || muted_dash
       end
     else
       muted_dash
@@ -46,6 +47,19 @@ module AuditsHelper
     conform = check.conform
 
     badge(status: conform ? :success : :warning, text: conform ? t("shared.valid") : t("shared.invalid"))
+  end
+
+  def validity_value(check)
+    case check
+    when Checks::AccessibilityPageHeading
+      return muted_dash unless check.completed? && check.comparison.present?
+
+      safe_join(check.human_explanation.split("\n"), tag.br)
+    when Checks::AnalyzeSchema, Checks::AnalyzePlan
+      check.years.present? ? check.years.join("-") : muted_dash
+    else
+      muted_dash
+    end
   end
 
   def validity_comment(check)
@@ -149,8 +163,8 @@ module AuditsHelper
 
   def audit_cell(audit, column)
     case column
-    when "evaluator" then tag.td(audit.user.to_s)
-    when "organization_label" then tag.td(audit.team.organization_label)
+    when "evaluator" then tag.td(truncated_value(audit.user.to_s))
+    when "organization_label" then tag.td(truncated_value(audit.team.organization_label))
     when "last_audit_at" then tag.td(audit_date_link(audit))
     when "tags" then tag.td(site_tags(audit.site), class: "fr-cell--multiline")
     else tag.td(audit_cell_content(audit, column), class: "fr-cell--center")
@@ -191,8 +205,9 @@ module AuditsHelper
   def audit_date_link(audit)
     local_time = audit.created_at.in_time_zone
     date = l(local_time.to_date)
+    label = t('audits.audit.audit_label', url: audit.site.normalized_url, date:)
 
-    link_to site_audit_path(audit.site, audit), class: "fr-link ac-row-link__stretched", "aria-label": t("audits.audit.audit_label", url: audit.site.normalized_url, date:) do
+    dsfr_link_to site_audit_path(audit.site, audit), class: "ac-row-link__stretched", "aria-label": label do
       time_tag local_time, date, title: l(local_time, format: :long)
     end
   end
