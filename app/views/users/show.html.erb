@@ -10,9 +10,9 @@
   <% end %>
   <% t.with_body do %>
     <tr>
-      <td><%= @user.email %></td>
-      <td><%= @user.team.organization_label %></td>
-      <td><%= @user.siret %></td>
+      <td><%= truncated_value(@user.email) %></td>
+      <td><%= truncated_value(@user.team.organization_label) %></td>
+      <td><%= truncated_value(@user.siret) %></td>
     </tr>
   <% end %>
 <% end %>

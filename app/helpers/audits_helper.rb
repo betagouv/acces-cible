@@ -24,12 +24,13 @@ module AuditsHelper
 
       external_link_to(check.url, t("checks.find_accessibility_page.link_to_page"))
     when Checks::AccessibilityMention
-      check.found? ? "« #{check.mention_text} »" : muted_dash
+      check.found? ? truncated_value("#{check.mention_text}") : muted_dash
     when Checks::AnalyzeSchema, Checks::AnalyzePlan
       if check.link_url.present?
-        external_link_to(check.link_url, check.link_text.presence || check.link_url)
+        label = check.link_text.presence || check.link_url
+        external_link_to(check.link_url, truncated(label), label:)
       else
-        check.text.presence || muted_dash
+        truncated_value(check.text).presence || muted_dash
       end
     else
       muted_dash
@@ -46,6 +47,19 @@ module AuditsHelper
     conform = check.conform
 
     badge(status: conform ? :success : :warning, text: conform ? t("shared.valid") : t("shared.invalid"))
+  end
+
+  def validity_value(check)
+    case check
+    when Checks::AccessibilityPageHeading
+      return muted_dash unless check.completed? && check.comparison.present?
+
+      safe_join(check.human_explanation.split("\n"), tag.br)
+    when Checks::AnalyzeSchema, Checks::AnalyzePlan
+      check.years.present? ? check.years.join("-") : muted_dash
+    else
+      muted_dash
+    end
   end
 
   def validity_comment(check)

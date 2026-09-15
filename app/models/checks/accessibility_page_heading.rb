@@ -67,8 +67,13 @@ module Checks
     end
 
     def human_explanation
+      return t("checks.accessibility_page_heading.explanation", count: 0) if failures.empty?
+
       found_titles = t("checks.accessibility_page_heading.found_titles", count: found_count)
-      t("checks.accessibility_page_heading.explanation", found_titles:, total:, count: failures.count)
+      [
+        t("checks.accessibility_page_heading.explanation", found_titles:, total:, count: failures.count),
+        t("checks.accessibility_page_heading.bad_level", count: failures.count)
+      ].join("\n")
     end
 
     alias custom_badge_text human_success_rate

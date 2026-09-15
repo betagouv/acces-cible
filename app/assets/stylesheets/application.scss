@@ -24,6 +24,11 @@ form.button_to {
   box-shadow: none;
 }
 
+main .fr-link {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .link--icon-only {
   background-image: none; // Underline uses a background-image
   &.fr-link--icon-left::before,

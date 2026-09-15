@@ -197,10 +197,14 @@ fr:
       table_header: Mention
       type: Mention du niveau d'accessibilité
     accessibility_page_heading:
+      allowed_level_differences: |
+        Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
+        Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
+      bad_level: "%{count} au mauvais niveau"
       expectations: "Voici la hiérarchie attendue :"
       explanation:
-        one: "%{found_titles} sur %{total} - %{count} problème relevé"
-        other: "%{found_titles} sur %{total} - %{count} problèmes relevés"
+        one: "%{found_titles} sur %{total}"
+        other: "%{found_titles} sur %{total}"
         zero: "Tous les titres attendus ont été trouvés, dans le bon ordre et avec la bonne hiérarchie."
       found_titles:
         one: "%{count} titre trouvé"
@@ -377,6 +381,7 @@ fr:
     mentions_legales:
       title: Mentions légales
     plan:
+      home: Page d'accueil
       title: Plan du site
   pagy:
     p11n: 'OneUptoTwoOther'
@@ -409,6 +414,7 @@ fr:
     "no": Non
     "yes": Oui
     absent: Absent
+    accessibility_status: "Accessibilité : non conforme"
     actions: Actions
     add: Ajouter
     help_and_resources: Aides et ressources
@@ -422,6 +428,9 @@ fr:
     dash: "-"
     desc: décroissant
     filter: Filtrer
+    footer:
+      open_licence: licence etalab-2.0
+      source_code: Code source (version %{version})
     help: Aide
     invalid: Invalide
     present: Présent
@@ -440,6 +449,7 @@ fr:
         one: Une ligne par page
         other: "%{count} lignes par page"
       per_page_label: Nombre de lignes par page
+    personal_data: Données personnelles
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
     save: Enregistrer
     saving: Enregistrement…
@@ -450,6 +460,7 @@ fr:
       other: lignes sélectionnées
     send: Envoyer
     sort_by: "Trier par %{column} %{direction}"
+    source_code: Code source (version %{version})
     x_more: Et %{x} de plus…
   site:
     name: "Nom du site"

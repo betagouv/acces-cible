@@ -170,7 +170,7 @@ module Checks
             impact: rule["impact"],
             description: rule["description"],
             help: rule["help"],
-            help_url: rule["helpUrl"],
+            help_url: "#{rule["helpUrl"]}&lang=fr",
             nodes: nodes&.map do |node|
               {
                 html: node["html"],
