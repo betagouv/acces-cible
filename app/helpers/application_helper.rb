@@ -21,7 +21,7 @@ module ApplicationHelper
   end
 
   def card_with_header(title:, description: nil, &block)
-    tag.section(class: "rounded audit-card fr-mb-3w") do
+    tag.section(class: "bordered-card fr-mb-3w") do
       header = capture do
         concat tag.h3(title, class: "fr-h4 fr-mb-0")
         concat tag.p(description, class: "fr-text--sm fr-mb-0 fr-mt-1v") if description

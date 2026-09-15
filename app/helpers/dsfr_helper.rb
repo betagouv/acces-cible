@@ -1,5 +1,5 @@
 module DsfrHelper
-  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: false, selectable: false, **html_attributes, &block)
+  def dsfr_table(caption:, pagy: @pagy, size: :md, scroll: true, border: true, selectable: false, **html_attributes, &block)
     render Dsfr::TableComponent.new(caption:, pagy:, size:, scroll:, border:, selectable:, html_attributes:), &block
   end
 
@@ -13,9 +13,9 @@ module DsfrHelper
     content_tag :th, class: "fr-cell--fixed fr-enlarge-input", scope: "row" do
       content_tag :div, class: "fr-checkbox-group fr-checkbox-group--sm", title: text do
         safe_join([
-          check_box_tag("id[]", record.id, false, id: input_id, form: "table_form", data: { fr_row_select: "true", action: "table#toggle", table_target: "checkbox" }),
-          label_tag(input_id, text, class: "fr-label")
-        ])
+                    check_box_tag("id[]", record.id, false, id: input_id, form: "table_form", data: { fr_row_select: "true", action: "table#toggle", table_target: "checkbox" }),
+                    label_tag(input_id, text, class: "fr-label")
+                  ])
       end
     end
   end
@@ -26,9 +26,9 @@ module DsfrHelper
     content_tag :th, class: "fr-cell--fixed fr-enlarge-input", role: "columnheader" do
       content_tag :div, class: "fr-checkbox-group fr-checkbox-group--sm", title: text do
         safe_join([
-          check_box_tag(nil, nil, false, id: input_id, data: { action: "table#toggleAll", table_target: "toggleAll" }),
-          label_tag(input_id, text, class: "fr-label")
-        ])
+                    check_box_tag(nil, nil, false, id: input_id, data: { action: "table#toggleAll", table_target: "toggleAll" }),
+                    label_tag(input_id, text, class: "fr-label")
+                  ])
       end
     end
   end

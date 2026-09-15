@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SiteCsvExport do
+RSpec.describe AuditCsvExport do
   let(:team) { create(:team) }
   let(:tags) { ["Gouvernment", "Santé publique"].map { |name| create(:tag, name:, team:) } }
   let(:site) { create(:site, :completed, url: "https://example.com", team:, tags:) }
@@ -9,7 +9,7 @@ RSpec.describe SiteCsvExport do
   describe ".filename" do
     it "generates filename with current date" do
       travel_to Time.zone.local(2024, 3, 15, 10, 30) do
-        expect(described_class.filename).to match(/^sites_.*\.csv$/)
+        expect(described_class.filename).to match(/^audits_.*\.csv$/)
       end
     end
   end
@@ -18,9 +18,9 @@ RSpec.describe SiteCsvExport do
     subject(:parsed_csv) { CSV.parse(csv_without_bom, col_sep: ";", headers: true) }
 
     let(:csv_output) do
-      output = StringIO.new
-      described_class.stream_csv_to(output, Site.where(id: site.id))
-      output.string
+      io = StringIO.new
+      described_class.stream_csv_to(io, site.audits)
+      io.string
     end
 
     it "prefixes the CSV with a UTF-8 BOM" do

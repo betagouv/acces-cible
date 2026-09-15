@@ -58,9 +58,8 @@ RSpec.describe Site do
         site.reload
       end
 
-      it "is ignored by both readers" do
+      it "is ignored" do
         expect(site.last_audit).to eq(launched)
-        expect(site.last_audit_without_html).to eq(launched)
       end
     end
   end

@@ -1,0 +1,11 @@
+<%# locals: (number:, title:, description:, optional: false) %>
+<div class="fr-col-12 fr-col-md-6 fr-col-lg-3">
+  <div class="bordered-card fr-p-3w fr-background-default--grey">
+    <p class="home-feature__number fr-mb-2w fr-background-action-low--blue-france" aria-hidden="true"><%= number %></p>
+    <h3 class="fr-h6 fr-mb-1w"><%= title %></h3>
+    <% if optional %>
+      <%= dsfr_badge(status: :info, html_attributes: { class: "fr-badge--sm fr-mb-1w" }) { t("pages.home.optional") } %>
+    <% end %>
+    <p class="fr-text--sm fr-text-mention--grey fr-mb-0"><%= description %></p>
+  </div>
+</div>

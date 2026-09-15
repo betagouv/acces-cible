@@ -16,20 +16,24 @@ Rails.application.routes.draw do
       patch "steps/:step", action: :update_step
     end
   end
-  resources :sites, only: [:index, :show, :edit, :update] do
+  resources :audits, only: [:index] do
+    collection do
+      get :csv_export
+    end
+  end
+  resources :sites, only: [:show, :edit, :update] do
     collection do
       post :upload
-      get :csv_export
     end
     resources :audits, only: [:create, :show]
   end
-  get "/sites", to: "sites#index", as: :authenticated_root
+  get "/audits", to: "audits#index", as: :authenticated_root
 
   resource :user, only: [:show]
 
   # Static pages
   scope controller: :pages do
-    root action: :accueil
+    root action: :home
     get "accessibilite", as: :accessibilite
     get "plan", as: :plan
     get "contact", as: :contact

@@ -20,7 +20,7 @@ RSpec.describe "AuditBatches" do
     it "sends the back button to the site list on the first step" do
       get_new
 
-      expect(response.body).to have_link(I18n.t("shared.back"), href: sites_path)
+      expect(response.body).to have_link(I18n.t("shared.back"), href: audits_path)
     end
   end
 
@@ -227,7 +227,7 @@ RSpec.describe "AuditBatches" do
       expect { launch }.to change { audit_batch.reload.status }.from("draft").to("launched")
 
       expect(audit_batch.audits).to all(be_launched)
-      expect(response).to redirect_to(sites_path)
+      expect(response).to redirect_to(audits_path)
     end
 
     it "sends a batch without addresses back to them, without launching it" do
@@ -246,7 +246,7 @@ RSpec.describe "AuditBatches" do
     it "abandons the batch and returns to the site list" do
       expect { delete audit_batch_path(audit_batch) }.to change(AuditBatch, :count).by(-1)
 
-      expect(response).to redirect_to(sites_path)
+      expect(response).to redirect_to(audits_path)
     end
   end
 end

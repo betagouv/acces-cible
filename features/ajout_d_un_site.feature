@@ -5,7 +5,7 @@ Fonctionnalité: Ajout d'un site
   Contexte:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
-    Et que je clique sur "Lancer une évaluation"
+    Et que je choisis "Lancer une évaluation" dans le menu principal
     Et que je choisis "Saisir des adresses"
     Et que je clique sur "Continuer"
 

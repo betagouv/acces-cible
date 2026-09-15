@@ -6,7 +6,7 @@ Fonctionnalité:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
 
-   # TODO: réécrire après implementation de l'import CSV
+  # TODO: réécrire après implementation de l'import CSV
   # Scénario: Un agent peut filtrer les sites par nom de tag
     # Sachant que je possède un fichier "tmp/sites.csv" qui contient
       # """
@@ -18,9 +18,9 @@ Fonctionnalité:
     # Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     # Quand je clique sur "Importer"
     # Et que l'import est terminé
-    # Et que je clique sur "Tous les sites"
+    # Et que je clique sur "Mes évaluations"
     # Et que je filtre par étiquette "public"
-    # Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
+    # Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       # | suresnes.fr       |
       # | numerique.gouv.fr |
 
@@ -36,14 +36,14 @@ Fonctionnalité:
     # Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     # Quand je clique sur "Importer"
     # Et que l'import est terminé
-    # Et que je clique sur "Tous les sites"
-    # Et que je clique sur "Trier par Adresse du site croissant"
-    # Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
+    # Et que je clique sur "Mes évaluations"
+    # Et que je clique sur "Trier par Site croissant"
+    # Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       # | beta.gouv.fr      |
       # | numerique.gouv.fr |
       # | suresnes.fr       |
 
-  # TODO: réécrire pour le tunnel, cette feature teste le formulaire d'ajout supprimé
+  # TODO: réécrire après implementation de l'import CSV
   # Scénario: Un agent peut combiner tri, filtre par tag et recherche
     # Sachant que je possède un fichier "tmp/sites.csv" qui contient
       # """
@@ -58,14 +58,13 @@ Fonctionnalité:
       # https://kappa.gouv.fr;public
       # https://lambda.gouv.fr;public
       # https://psi.gouv.fr;public
-      # https://omega.gouv.fr;public
     # """
     # Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
     # Quand je clique sur "Importer"
     # Et que l'import est terminé
-    # Et que je clique sur "Tous les sites"
-    # Et que je clique sur "Trier par Adresse du site croissant"
-    # Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
+    # Et que je clique sur "Mes évaluations"
+    # Et que je clique sur "Trier par Site croissant"
+    # Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       # | alpha.gouv.fr   |
       # | beta.gouv.fr    |
       # | delta.gouv.fr   |
@@ -74,17 +73,16 @@ Fonctionnalité:
       # | iota.gouv.fr    |
       # | kappa.gouv.fr   |
       # | lambda.gouv.fr  |
-      # | omega.gouv.fr   |
       # | psi.gouv.fr     |
       # | theta.gouv.fr   |
     # Quand je filtre par étiquette "beta"
-    # Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
+    # Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       # | alpha.gouv.fr   |
       # | beta.gouv.fr    |
       # | delta.gouv.fr   |
       # | epsilon.gouv.fr |
     # Quand je recherche "a.gouv"
-    # Alors la colonne "Adresse du site" du tableau "Tous les sites" contient dans l'ordre :
+    # Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       # | alpha.gouv.fr |
       # | beta.gouv.fr  |
       # | delta.gouv.fr |
@@ -93,20 +91,22 @@ Fonctionnalité:
     Sachant que je rajoute un site "https://example1.gouv.fr"
     Et que je rajoute un site "https://example2.gouv.fr"
     Et que le site "https://example1.gouv.fr" a les étiquettes "production, public"
-    Quand je clique sur "Tous les sites"
+    Quand je clique sur "Mes évaluations"
     Alors la page contient un tableau
     Et la page contient un lien vers "https://example1.gouv.fr"
     Et la page contient un lien vers "https://example2.gouv.fr"
     Et la page contient "production"
     Et la page contient "public"
 
-  Scénario: Un agent peut voir les statuts de vérification pour chaque site
+  Scénario: Un agent peut voir les résultats de l'évaluation pour chaque site
     Sachant que je possède un site "https://example.gouv.fr" avec des données
-    Quand je clique sur "Tous les sites"
-    Alors la page contient un tableau
-    Et la page contient toutes les vérifications du site "https://example.gouv.fr" avec le préfixe "sites_table"
+    Quand je clique sur "Mes évaluations"
+    Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
+      | example.gouv.fr |
+    Et la colonne "Site joignable" du tableau "Mes évaluations" contient dans l'ordre :
+      | Oui |
 
   Scénario: Un agent voit un message quand aucun site n'existe
-    Quand je clique sur "Tous les sites"
+    Quand je clique sur "Mes évaluations"
     Alors la page contient un tableau
-    Et la page contient "Aucun site"
+    Et la page contient "Aucune évaluation à afficher."

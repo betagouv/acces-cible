@@ -28,8 +28,16 @@ RSpec.describe Checks::Reachable do
       it { is_expected.to eq(:info) }
     end
 
-    context "when the page does not redirect" do
+    context "when the site is reachable" do
+      before { check.found = true }
+
       it { is_expected.to eq(:success) }
+    end
+
+    context "when the site is not reachable" do
+      before { check.found = false }
+
+      it { is_expected.to eq(:error) }
     end
   end
 

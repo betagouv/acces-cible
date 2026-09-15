@@ -28,7 +28,7 @@ module Checks
 
     def custom_badge_status
       { nil => :error,
-        non: :warning,
+        non: :error,
         partiellement: :new,
         totalement: :success }[mention&.to_sym]
     end

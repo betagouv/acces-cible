@@ -7,7 +7,7 @@
       <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--icon-left">
         <li>
           <%= link_to t("shared.back"),
-                previous_step ? step_audit_batch_path(audit_batch, previous_step) : sites_path,
+                previous_step ? step_audit_batch_path(audit_batch, previous_step) : audits_path,
                 class: icon_class("arrow-left", line: true, btn: :secondary) %>
         </li>
       </ul>

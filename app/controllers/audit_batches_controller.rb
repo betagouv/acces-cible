@@ -37,7 +37,7 @@ class AuditBatchesController < ApplicationController
   # DELETE /audit_batches/1
   def destroy
     @audit_batch.abandon!
-    redirect_to sites_path, notice: t(".cancelled"), status: :see_other
+    redirect_to audits_path, notice: t(".cancelled"), status: :see_other
   end
 
   private
@@ -71,7 +71,7 @@ class AuditBatchesController < ApplicationController
 
   def launch
     @audit_batch.launched!
-    redirect_to sites_path, notice: t(".launched", count: @audit_batch.audits.size)
+    redirect_to audits_path, notice: t(".launched", count: @audit_batch.audits.size)
   end
 
   def next_step_path

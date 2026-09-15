@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+def current_user
+  @current_user ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email])
+end
+
 def team
-  @team ||= User.find_by(email: OmniAuth.config.mock_auth[:proconnect][:info][:email]).team
+  current_user.team
 end
 
 Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
@@ -110,31 +114,31 @@ end
 Quand("je filtre par étiquette {string}") do |tag|
   steps %(
     Quand je sélectionne "#{tag}" pour "Filtrer par étiquette"
-    Et que je clique sur "Filtrer"
+    Et que je clique sur "Rechercher un site"
   )
 end
 
 Quand("je recherche {string}") do |term|
-  fill_in "Rechercher", with: term
-  click_button "Rechercher"
+  fill_in "Rechercher un site", with: term
+  click_button "Rechercher un site"
 end
 
 Quand("je rajoute un site {string}") do |url|
   steps %(
-    Quand je clique sur "Lancer une évaluation"
+    Quand je choisis "Lancer une évaluation" dans le menu principal
     Et que je choisis "Saisir des adresses"
     Et que je clique sur "Continuer"
     Et que je remplis "Adresse du site" avec "#{url}"
     Et que je clique sur "Continuer"
     Et que je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
-    Et que je clique sur "Voir la fiche de #{Link.url_without_scheme_and_www(url)}"
+    Et que je clique sur "#{Link.url_without_scheme_and_www(url)}"
   )
 end
 
 Quand("je possède un site {string} avec des données") do |url|
   site = FactoryBot.create(:site, :with_data, url:, team:)
-  site.reload
+  site.last_audit.update!(user: current_user)
 end
 
 Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
@@ -155,28 +159,12 @@ Alors("la page contient un tableau") do
   expect(page).to have_css("table")
 end
 
-Alors("la page contient toutes les vérifications du site {string} avec le préfixe {string}") do |url, prefix|
-  site = team.sites.find_by(url:)
-  expect(page).to have_css("table") if prefix.present?
-  site.last_audit.checks.each do |check|
-    expect(page).to have_content(check.class.table_header)
-  end
-end
-
-Alors("la page contient un tableau avec toutes les vérifications du site {string}") do |url|
-  site = team.sites.find_by(url:)
-  expect(page).to have_css("table")
-  site.last_audit.checks.each do |check|
-    expect(page).to have_content(check.table_header)
-  end
-end
-
 Alors('la carte {string} indique {string}') do |title, str|
-  expect(find("section.audit-card", text: title)).to have_content(str)
+  expect(find("section.bordered-card", text: title)).to have_content(str)
 end
 
 Alors('la carte {string} n\'indique pas {string}') do |title, str|
-  expect(find("section.audit-card", text: title)).not_to have_content(str)
+  expect(find("section.bordered-card", text: title)).not_to have_content(str)
 end
 
 Alors('le résumé {string} indique {string}') do |label, str|
@@ -184,12 +172,12 @@ Alors('le résumé {string} indique {string}') do |label, str|
 end
 
 Alors('la vérification {string} de la carte {string} indique {string}') do |check_name, card_title, str|
-  card = find("section.audit-card", text: card_title)
+  card = find("section.bordered-card", text: card_title)
   expect(card.find("th", text: check_name).ancestor("tr")).to have_content(str)
 end
 
 Alors('la vérification {string} de la carte {string} contient un lien vers {string}') do |check_name, card_title, href|
-  card = find("section.audit-card", text: card_title)
+  card = find("section.bordered-card", text: card_title)
   expect(card.find("th", text: check_name).ancestor("tr")).to have_link(href: href)
 end
 
