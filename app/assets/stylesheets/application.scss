@@ -424,3 +424,8 @@ main .fr-link {
   border-radius: 50%;
   font-weight: 700;
 }
+
+.modal--wide > .fr-container > .fr-grid-row > * {
+  flex: 0 0 100%;
+  max-width: 100%;
+}

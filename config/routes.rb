@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   resources :tags, only: [:index, :create, :show]
   resources :audits, only: [:index] do
     collection do
-      get :csv_export
+      get :csv_export, controller: :audit_csv_exports
     end
   end
   resources :sites, only: [:new, :create, :show, :edit, :update] do
