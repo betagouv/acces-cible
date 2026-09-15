@@ -18,6 +18,7 @@ module Checks
       [2, "Voies de recours"],
     ].freeze
     COMPARISON_OPTIONS = { fuzzy: 0.65, ignore_case: true }.freeze
+    TEMPLATE_URL = "https://accessibilite.numerique.gouv.fr/ressources/modele-de-declaration/".freeze
 
     delegate :expected_headings, to: :class
 
@@ -80,6 +81,26 @@ module Checks
       end
     end
 
+    def heading_offset
+      @heading_offset ||= begin
+        matches = []
+
+        indexed_expected_headings.each do |_, expected_heading, expected_level|
+          indexed_page_headings.each do |_, page_heading, page_level|
+            score = similarity_ratio(expected_heading, page_heading, partial: false)
+
+            if score >= COMPARISON_OPTIONS[:fuzzy]
+              matches << [expected_level, page_level, score]
+            end
+          end
+        end
+        return 0 if matches.empty?
+
+        expected_level, page_level, _ = matches.max_by { |_, _, score| score }
+        page_level - expected_level
+      end
+    end
+
     private
 
     def analyze!
@@ -129,7 +150,7 @@ module Checks
           # Determine status
           status = if original_index < last_matched_index
             :incorrect_order
-          elsif heading_level != expected_level + first_heading_offset
+          elsif heading_level != expected_level + heading_offset
             :incorrect_level
           else
             :ok
@@ -165,25 +186,6 @@ module Checks
       best_match
     end
 
-    def first_heading_offset
-      @first_heading_offset ||= begin
-        matches = []
-
-        indexed_expected_headings.each do |_, expected_heading, expected_level|
-          indexed_page_headings.each do |_, page_heading, page_level|
-            score = similarity_ratio(expected_heading, page_heading, partial: false)
-
-            if score >= COMPARISON_OPTIONS[:fuzzy]
-              matches << [expected_level, page_level, score]
-            end
-          end
-        end
-        return 0 if matches.empty?
-
-        expected_level, page_level, _ = matches.max_by { |_, _, score| score }
-        page_level - expected_level
-      end
-    end
 
     def similarity_ratio(a, b, options = {})
       StringComparison.similarity_ratio(a, b, **COMPARISON_OPTIONS.merge(options))
