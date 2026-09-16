@@ -8,13 +8,21 @@ RSpec.describe "AuditBatches" do
 
   before { login_as(user) }
 
-  describe "GET /audit_batches/new?step=" do
-    subject(:get_step) { get new_audit_batch_path, params: { step:, audit_batch: { kind: "manual", urls: ["https://example.com"] } } }
+  describe "GET /audit_batches/new" do
+    it "shows the first step" do
+      get new_audit_batch_path
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "POST /audit_batches?requested_step=" do
+    subject(:post_step) { post audit_batches_path, params: { requested_step: step, audit_batch: { kind: "manual", urls: ["https://example.com"] } } }
 
     let(:step) { "summary" }
 
     it "creates nothing" do
-      expect { get_step }.not_to change(Site, :count)
+      expect { post_step }.not_to change(Site, :count)
 
       expect(response).to have_http_status(:ok)
     end
@@ -23,7 +31,7 @@ RSpec.describe "AuditBatches" do
       let(:step) { "teleport" }
 
       it "returns not found" do
-        get_step
+        post_step
 
         expect(response).to have_http_status(:not_found)
       end

@@ -42,7 +42,6 @@ fr:
     url: URL
   audit_batches:
     launch: Lancer l'évaluation
-    launching: Lancement…
     create:
       launched:
         one: Évaluation lancée. Les résultats arriveront dans quelques minutes.

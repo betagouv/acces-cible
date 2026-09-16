@@ -12,13 +12,10 @@
           next_title: (t("audit_batches.steps.#{next_step}.title") if next_step),
           header_level: 2) %>
 
-    <%= form_with(model: @audit_batch,
-          url: next_step ? new_audit_batch_path : audit_batches_path,
-          method: next_step ? :get : :post) do |f| %>
-      <%= hidden_field_tag :step, next_step if next_step %>
+    <%= form_with(model: @audit_batch, data: { turbo: false }) do |f| %>
       <%= render "audit_batches/hidden_fields", f:, audit_batch: @audit_batch, step: @step %>
       <%= render "audit_batches/steps/#{@step}", f:, audit_batch: @audit_batch %>
-      <%= render "audit_batches/step_actions", step: @step %>
+      <%= render "audit_batches/step_actions", step: @step, next_step: %>
     <% end %>
   </div>
 </div>
