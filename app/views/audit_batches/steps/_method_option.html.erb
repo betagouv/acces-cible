@@ -1,0 +1,17 @@
+<%# locals: (f:, kind:, pictogram:, disabled: false) %>
+<div class="fr-fieldset__element">
+  <div class="fr-radio-group fr-radio-rich">
+    <%= f.radio_button :kind, kind, disabled: %>
+    <%= f.label :kind, value: kind, class: "fr-label" do %>
+      <%= t("audit_batches.steps.method.#{kind}") %>
+      <span class="fr-hint-text"><%= t("audit_batches.steps.method.#{kind}_hint") %></span>
+    <% end %>
+    <div class="fr-radio-rich__pictogram">
+      <svg aria-hidden="true" class="fr-artwork" viewBox="0 0 80 80" width="80px" height="80px">
+        <% %w[decorative minor major].each do |layer| %>
+          <use class="fr-artwork-<%= layer %>" href="<%= asset_path(pictogram) %>#artwork-<%= layer %>"></use>
+        <% end %>
+      </svg>
+    </div>
+  </div>
+</div>

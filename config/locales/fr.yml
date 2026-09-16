@@ -23,6 +23,12 @@ fr:
       attributes:
         url:
           invalid: "n'est pas valide"
+      models:
+        audit_batch:
+          attributes:
+            urls:
+              too_long: Vous ne pouvez pas évaluer plus de %{count} adresses à la fois.
+              too_short: Saisissez au moins une adresse.
     models:
       site:
         one: Site
@@ -34,6 +40,46 @@ fr:
     redirect_url: URL de redirection
     site_url_address: Adresse du site
     url: URL
+  audit_batches:
+    launch: Lancer l'évaluation
+    create:
+      launched:
+        one: Évaluation lancée. Les résultats arriveront dans quelques minutes.
+        other: "%{count} évaluations lancées. Les résultats arriveront dans quelques minutes."
+    new:
+      intro: "Chaque adresse donne lieu à une nouvelle évaluation : niveau d'accessibilité déclaré, respect des obligations légales, qualité de la déclaration et, en option, une série de tests automatiques du RGAA."
+      title: Lancer une évaluation
+    steps:
+      checks:
+        title: Tests automatiques (optionnel)
+        heading: Tests automatiques du RGAA
+        optional: Optionnel
+        intro_html: En complément de l'analyse de la déclaration, Accès cible peut exécuter une série de <strong>%{count} tests automatiques</strong> couvrant <strong>1/3 des critères du RGAA</strong> sur la page d'accueil de chaque site.
+        toggle: Lancer les tests automatiques sur la page d'accueil
+        enabled: Activés
+        disabled: Désactivés
+        hint: Ces tests sont lancés systématiquement. Le choix arrivera dans une prochaine version.
+      method:
+        title: Méthode d'ajout
+        legend: Comment souhaitez-vous ajouter les sites ?
+        manual: Saisir des adresses
+        manual_hint: Saisissez de 1 à 10 adresses, une par champ.
+        csv_import: Importer un CSV
+        csv_import_hint: Bientôt disponible.
+      summary:
+        title: Récapitulatif et étiquettes
+        heading: Récapitulatif
+        intro_html:
+          one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>, vous pouvez lui ajouter des étiquettes.
+          other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>, vous pouvez leur ajouter des étiquettes.
+        tags: Étiquettes de %{site}
+      urls:
+        title: Adresses à évaluer
+        legend: Adresses des sites à évaluer
+        hint: Une adresse par champ (https://…). Jusqu'à %{max} sites.
+        label: Adresse du site
+        add: Ajouter un site
+        remove: Supprimer cette adresse
   audits:
     audit:
       audit_label: "Voir l'audit de %{url} du %{date}"
@@ -422,9 +468,11 @@ fr:
     apply: Appliquer
     applying: Appliquer…
     asc: croissant
+    back: Retour
     back_to_home: "Revenir à la page d'accueil"
     back_to_list: "Revenir à la liste"
     cancel: Annuler
+    continue: Continuer
     dash: "-"
     desc: décroissant
     filter: Filtrer
@@ -440,7 +488,7 @@ fr:
     invalid_url: URL invalide
     login: Se connecter
     logout: Se déconnecter
-    new_audit: Lancer une évaluation
+    new_audit: Relancer une évaluation
     new_window: " (nouvelle fenêtre)"
     or: ou
     page_unavailable: Cette page n'est pas disponible.
@@ -465,21 +513,9 @@ fr:
   site:
     name: "Nom du site"
   sites:
-    add: Ajouter un site
     all: Tous les sites
-    create:
-      created: Site ajouté
-      new_audit: Site existant, nouvel audit programmé
     edit:
       title: Modifier les étiquettes du site
-    form:
-      url: Adresse du site
-      url_hint: Saisissez une url valide, commençant par https:// ou http://
-    new:
-      file: Fichier CSV
-      file_hint: "Format attendu : fichier CSV avec une colonne obligatoire 'URL', une colonne 'Tags' optionnelle avec les tags séparés par une virgule, et une colonne optionnelle 'Nom'. Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
-      import: Importer des sites depuis un fichier
-      title: Ajouter un site
     show:
       audit_history: Historique des vérifications (%{total})
       audit_history_hint: "Chaque vérification reste consultable. Sélectionnez-en une pour afficher son résultat détaillé."
@@ -495,12 +531,6 @@ fr:
       new: Nouvelle étiquette
     update:
       notice: Étiquettes modifiées
-    upload:
-      title: Importer des sites
-      started:
-        zero: L'import du fichier CSV a commencé. Aucun site n’a été détecté.
-        one: L'import du fichier CSV a commencé. 1 site sera ajouté.
-        other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
     index:

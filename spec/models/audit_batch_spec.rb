@@ -46,6 +46,28 @@ RSpec.describe AuditBatch do
     end
   end
 
+  describe "#submitted_sites" do
+    subject(:submitted_sites) { build(:audit_batch, user:, urls:).submitted_sites }
+
+    let(:user) { create(:user) }
+
+    context "with blank entries and variants of the same address" do
+      let(:urls) { ["https://example.com", "", " https://www.example.com/ "] }
+
+      it "keeps a single unsaved site" do
+        expect(submitted_sites.map(&:url)).to eq(["https://example.com/"])
+        expect(submitted_sites).to all(be_new_record)
+      end
+    end
+
+    context "with an address the team already has" do
+      let!(:site) { create(:site, team: user.team, url: "https://example.com") }
+      let(:urls) { ["https://www.example.com"] }
+
+      it { is_expected.to eq([site]) }
+    end
+  end
+
   describe "enums" do
     it { is_expected.to define_enum_for(:kind).with_values(manual: "manual", csv_import: "csv_import").backed_by_column_of_type(:string) }
   end

@@ -1,0 +1,18 @@
+<%# locals: (f:, audit_batch:) %>
+<% sites = audit_batch.submitted_sites %>
+
+<h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
+<p><%= t(".intro_html", count: sites.size) %></p>
+
+<ol class="fr-raw-list">
+  <% sites.each do |site| %>
+    <li class="fr-border-default--grey fr-p-2w fr-mb-2w">
+      <p class="fr-text--bold fr-mb-2w">
+        <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
+      </p>
+      <%= render "audit_batches/site_tags_form",
+            site_url: site.normalized_url,
+            object: Site.new(tag_ids: audit_batch.site_tags.dig(site.normalized_url, :tag_ids)) %>
+    </li>
+  <% end %>
+</ol>

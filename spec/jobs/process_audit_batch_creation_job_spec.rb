@@ -2,10 +2,11 @@ require "rails_helper"
 
 RSpec.describe ProcessAuditBatchCreationJob do
   describe "#perform" do
-    subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids, user.id) }
+    subject(:run_job) { described_class.new.perform(sites_data, team.id, extra_tag_ids, user.id, audit_batch.id) }
 
     let(:user) { create(:user) }
     let(:team) { create(:team, users: [user]) }
+    let(:audit_batch) { create(:audit_batch, user:) }
     let(:url) { "https://example.com/" }
     let(:sites_data) do
       [
@@ -17,6 +18,12 @@ RSpec.describe ProcessAuditBatchCreationJob do
 
     it "processes all sites in the batch" do
       expect { run_job }.to change(Site, :count).by(2)
+    end
+
+    it "attaches the audits to the batch" do
+      run_job
+
+      expect(audit_batch.audits.count).to eq(2)
     end
 
     it "broadcasts a sites index refresh after the batch" do

@@ -10,15 +10,13 @@ Rails.application.routes.draw do
   end
 
   resources :tags, only: [:index, :create, :show]
+  resources :audit_batches, only: [:new, :create]
   resources :audits, only: [:index] do
     collection do
       get :csv_export, controller: :audit_csv_exports
     end
   end
-  resources :sites, only: [:new, :create, :show, :edit, :update] do
-    collection do
-      post :upload
-    end
+  resources :sites, only: [:show, :edit, :update] do
     resources :audits, only: [:create, :show]
   end
   get "/audits", to: "audits#index", as: :authenticated_root
