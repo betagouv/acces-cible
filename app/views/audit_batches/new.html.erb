@@ -1,0 +1,24 @@
+<% steps = AuditBatch::STEPS %>
+<% next_step = steps[steps.index(@step) + 1] %>
+
+<p><%= t("audit_batches.new.intro") %></p>
+
+<div class="fr-grid-row fr-grid-row--center">
+  <div class="fr-col-12 fr-col-md-10 fr-col-lg-8 fr-border-default--grey fr-p-4w fr-mt-4w">
+    <%= dsfr_stepper(
+          title: t("audit_batches.steps.#{@step}.title"),
+          value: steps.index(@step) + 1,
+          max: steps.size,
+          next_title: (t("audit_batches.steps.#{next_step}.title") if next_step),
+          header_level: 2) %>
+
+    <%= form_with(model: @audit_batch,
+          url: next_step ? new_audit_batch_path : audit_batches_path,
+          method: next_step ? :get : :post) do |f| %>
+      <%= hidden_field_tag :step, next_step if next_step %>
+      <%= render "audit_batches/hidden_fields", f:, audit_batch: @audit_batch, step: @step %>
+      <%= render "audit_batches/steps/#{@step}", f:, audit_batch: @audit_batch %>
+      <%= render "audit_batches/step_actions", step: @step %>
+    <% end %>
+  </div>
+</div>

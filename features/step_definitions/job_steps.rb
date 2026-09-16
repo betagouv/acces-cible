@@ -13,6 +13,10 @@ Quand("l'import est terminé") do
   perform_enqueued_jobs(only: ProcessAuditBatchCreationJob)
 end
 
+Quand("le lancement est terminé") do
+  perform_enqueued_jobs(only: ProcessAuditBatchCreationJob)
+end
+
 # ce step sert à délencher et épuiser toutes les tâches qu'une tâche
 # elle-même peut programmer, ex : ProcessAuditJob déclenche plusieurs
 # RunCheckJobs.

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe AuditBatchCreationService do
   describe "#process" do
-    subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids, user:).process(site_data) }
+    subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids, user:, audit_batch:).process(site_data) }
 
     let(:team) { create(:team) }
     let(:user) { create(:user) }
@@ -17,6 +17,24 @@ RSpec.describe AuditBatchCreationService do
       }
     end
     let(:extra_tag_ids) { [] }
+    let(:audit_batch) { create(:audit_batch, user:) }
+
+    it "attaches the audit to the batch" do
+      process_site
+
+      expect(created_site.audits.last.audit_batch).to eq(audit_batch)
+    end
+
+    context "with tag ids in the site data" do
+      let!(:site_tag) { create(:tag, team:, name: "site_tag") }
+      let(:site_data) { { "url" => url, "tag_ids" => ["", site_tag.id], "tag_names" => [] } }
+
+      it "associates them" do
+        process_site
+
+        expect(site_tags).to contain_exactly("site_tag")
+      end
+    end
 
     context "when the site does not exist" do
       it "creates a new site" do
