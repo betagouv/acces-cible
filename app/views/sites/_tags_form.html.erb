@@ -1,8 +1,8 @@
-<%# locals: (object:, scope: object.model_name.param_key, id: dom_class(object, :tags), title: t("sites.tags_form.all"), url: tags_path, collapsible: true, focus: false, team: current_user.team) %>
-<%= turbo_frame_tag id, data: { controller: :frame, "frame-action-value": url } do %>
-  <% fields = capture do %>
+<%# locals: (object:, scope: object.model_name.param_key, id: dom_class(object, :tags), title: t("sites.tags_form.all"), focus: false, team: current_user.team) %>
+<%= turbo_frame_tag id, data: { controller: :frame, "frame-action-value": tags_path } do %>
+  <%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
     <%= fields_for(scope, object) do |f| %>
-      <%= f.dsfr_collection_check_boxes(:tag_ids, team.tags, :id, :name, { legend: title }, class: "fr-legend--hidden fr-mb-0") %>
+      <%= f.dsfr_collection_check_boxes(:tag_ids, team.tags, :id, :name, { legend: title }, class: "fr-legend--hidden") %>
       <div class="fr-input-group--inline fr-mb-0">
         <%= f.fields_for :tags_attributes, Tag.new do |ff| %>
           <%= ff.dsfr_text_field :name, label: t('.new') %>
@@ -12,11 +12,5 @@
       </div>
     <% end %>
     <%= set_focus(dom_id(object, :tag_name)) if focus %>
-  <% end %>
-
-  <% if collapsible %>
-    <%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) { fields } %>
-  <% else %>
-    <%= fields %>
   <% end %>
 <% end %>
