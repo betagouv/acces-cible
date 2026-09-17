@@ -357,7 +357,6 @@ fr:
       need_help_title: Besoin d’aide ?
       title: Aide
     home:
-      all_audits: Voir toutes mes évaluations
       audits_count_detail: dont %{count} cette semaine
       audits_count_label: Évaluations lancées
       automated_tests_description: Exécute une série de 28 tests automatiques du RGAA sur la page d’accueil du site.
