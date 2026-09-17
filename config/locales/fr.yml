@@ -201,6 +201,7 @@ fr:
         Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
         Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
       bad_level: "%{count} au mauvais niveau"
+      bad_order: "%{count} dans le mauvais ordre"
       expectations: "Voici la hiérarchie attendue :"
       explanation:
         one: "%{found_titles} sur %{total}"
