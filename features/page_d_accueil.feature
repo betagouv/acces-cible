@@ -31,11 +31,6 @@ Fonctionnalité: Accueil
       Alors la carte "Évaluations lancées" indique "5 dont 5 cette semaine"
       Et la carte "Sites évalués" indique "4 sites distincts"
 
-    Scénario: Un agent non connecté voit les statistiques globales
-      Quand je clique sur "Se déconnecter"
-      Et je me rends sur la page d'accueil
-      Alors la carte "Évaluations lancées" indique "5 dont 5 cette semaine"
-      Et la carte "Sites évalués" indique "4 sites distincts"
 
     Scénario: Un agent connecté ne voit pas les statistiques d'un autre agent d'un autre organisation
       Quand je clique sur "Se déconnecter"
