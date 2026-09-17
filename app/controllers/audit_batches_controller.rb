@@ -38,6 +38,6 @@ class AuditBatchesController < ApplicationController
   end
 
   def audit_batch_params
-    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, urls: [], site_tags: {})
+    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, :file, urls: [], site_tags: {})
   end
 end

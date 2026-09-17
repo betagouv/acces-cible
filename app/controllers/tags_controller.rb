@@ -14,7 +14,7 @@ class TagsController < ApplicationController
 
     tag = current_user.team.tags.find_or_create_by(name:)
     tag_ids = (tag_params[:tag_ids] || []).push(tag.id).compact
-    object = template_object_klass.new(tag_ids:, team: current_user.team)
+    object = Site.new(tag_ids:, team: current_user.team)
 
     if funnel_site_url
       render turbo_stream: turbo_stream.replace("site_tags_#{funnel_site_url.parameterize}", partial: "audit_batches/site_tags_form", locals: { site_url: funnel_site_url, object:, focus: true })
@@ -30,10 +30,6 @@ class TagsController < ApplicationController
 
   private
 
-  def upload?
-    params.key?(:site_upload)
-  end
-
   def funnel_site_url
     @funnel_site_url ||= params.dig(:audit_batch, :site_tags)&.keys&.first
   end
@@ -45,15 +41,9 @@ class TagsController < ApplicationController
   def scoped_params
     if funnel_site_url
       params.require(:audit_batch).require(:site_tags).require(funnel_site_url)
-    elsif upload?
-      params.require(:site_upload)
     else
       params.require(:site)
     end
-  end
-
-  def template_object_klass
-    upload? ? SiteUpload : Site
   end
 
   def set_tag

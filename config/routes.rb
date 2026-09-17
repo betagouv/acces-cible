@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :tags, only: [:index, :create, :show]
   resources :audit_batches, only: [:new, :create]
+  get "/audit_batches", to: redirect("/audit_batches/new")
   resources :audits, only: [:index] do
     collection do
       get :csv_export, controller: :audit_csv_exports
