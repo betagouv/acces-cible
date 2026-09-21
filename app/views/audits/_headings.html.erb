@@ -1,19 +1,15 @@
 <%= dsfr_modal(title: t(".title"), html_attributes: { id: "headings-modal", class: "modal--wide" }) do %>
   <% page_levels = page_heading_levels(check) %>
 
-  <p class="fr-mb-1w"><%= check.human_explanation %></p>
   <p class="fr-text--sm fr-text-mention--grey">
     <%= t(".description") %>
   </p>
   <% if notice = declaration_level_offset_notice(check) %>
     <p class="fr-text--sm fr-text-mention--grey"><%= notice %></p>
   <% end %>
-
   <% issues = heading_issues(check) %>
   <% if issues.any? %>
-    <%= dsfr_alert(type: :warning, size: :sm, html_attributes: { class: "fr-mb-2w" }) do %>
-      <p><%= issues.to_sentence.upcase_first %>. <%= declaration_template_link %></p>
-    <% end %>
+    <p class="fr-text--sm"><strong><%= issues.to_sentence.upcase_first %>.</strong> <%= declaration_template_link %></p>
   <% end %>
 
   <%= dsfr_table(caption: t(".caption"), html_attributes: { class: "fr-mb-0" }) do |table| %>

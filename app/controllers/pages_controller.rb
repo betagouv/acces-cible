@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   allow_unauthenticated_access
   before_action :set_check_pages, only: :help
-  before_action :set_home_stats, only: :home
+  before_action :set_home_stats, only: :home, if: :authenticated?
 
   def home; end
 
@@ -13,11 +13,10 @@ class PagesController < ApplicationController
   private
 
   def set_home_stats
-    audit = authenticated? ? current_user.team.audits : Audit.all
-    site = authenticated? ? current_user.team.sites : Site.all
-    @audits_count = audit.count
-    @audits_this_week_count = audit.where(created_at: Time.zone.today.all_week).count
-    @audited_sites_count = site.where.not(audits_count: 0).count
+    audits = current_user.audits
+    @audits_count = audits.count
+    @audits_this_week_count = audits.where(created_at: Time.zone.today.all_week).count
+    @audited_sites_count = audits.distinct.count(:site_id)
   end
 
   def set_check_pages
