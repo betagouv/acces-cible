@@ -125,7 +125,8 @@ end
 
 Quand("je rajoute un site {string}") do |url|
   steps %(
-    Quand je choisis "Lancer une évaluation" dans le menu principal
+    Quand je choisis "Mes évaluations" dans le menu principal
+    Et que je clique sur "Lancer une évaluation"
     Et que je choisis "Saisir des adresses"
     Et que je clique sur "Continuer"
     Et que je remplis "Adresse du site" avec "#{url}"
@@ -141,6 +142,19 @@ end
 Quand("je possède un site {string} avec des données") do |url|
   site = FactoryBot.create(:site, :with_data, url:, team:)
   site.last_audit.update!(user: current_user)
+end
+
+Quand("je crée l'étiquette {string} pour le site {string}") do |tag, site|
+  within(find("li", text: site)) do
+    fill_in "Nouvelle étiquette", with: tag
+    click_button "Ajouter"
+  end
+end
+
+Alors("l'étiquette {string} est sélectionnée pour le site {string}") do |tag, site|
+  within(find("li", text: site)) do
+    expect(page).to have_checked_field(tag)
+  end
 end
 
 Quand("le site {string} a les étiquettes {string}") do |url, tags_str|

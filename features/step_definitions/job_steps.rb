@@ -8,11 +8,6 @@ Quand("les tâches de fond sont terminées") do
   perform_enqueued_jobs
 end
 
-Quand("l'import est terminé") do
-  perform_enqueued_jobs(only: ProcessSiteUploadJob)
-  perform_enqueued_jobs(only: ProcessAuditBatchCreationJob)
-end
-
 Quand("le lancement est terminé") do
   perform_enqueued_jobs(only: ProcessAuditBatchCreationJob)
 end

@@ -15,25 +15,21 @@ Fonctionnalité: Export d'un CSV
     Et que je clique sur "Export CSV"
     Alors la page retourne un CSV dont une ligne commence par "foobar.com;https://foobar.com"
 
-# TODO: réécrire après implementation de l'import CSV
-#  Scénario: je peux exporter uniquement le site sélectionné après filtre et tri
-#    Sachant que je possède un fichier "tmp/sites.csv" qui contient
-#      """
-#      url;tags
-#      https://beta.gouv.fr;beta
-#      https://numerique.gouv.fr;gouv,public
-#      https://www.suresnes.fr;public
-#      """
-#    Et que les sites suivants renvoient des réponses HTML normales pour leur page d'accueil et leur déclaration d'accessibilité :
-#      | https://beta.gouv.fr/      |
-#      | https://numerique.gouv.fr/ |
-#      | https://www.suresnes.fr/   |
-#    Et que je choisis "Ajouter un site" dans le menu principal
-#    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-#    Quand je clique sur "Importer"
-#    Et que l'import est terminé
-#    Et que je choisis "Mes évaluations" dans le menu principal
-#    Et que je clique sur "Trier par Site croissant"
-#    Et que je filtre par étiquette "public"
-#    Et que je clique sur "Export CSV"
-#    Alors la page retourne un CSV qui contient strictement les sites "numerique.gouv.fr, suresnes.fr"
+  Scénario: je peux exporter uniquement le site sélectionné après filtre et tri
+    Sachant que je possède un fichier "tmp/sites.csv" qui contient
+      """
+      url;tags
+      https://beta.gouv.fr;beta
+      https://numerique.gouv.fr;gouv,public
+      https://www.suresnes.fr;public
+      """
+    Et que les sites suivants renvoient des réponses HTML normales pour leur page d'accueil et leur déclaration d'accessibilité :
+      | https://beta.gouv.fr/      |
+      | https://numerique.gouv.fr/ |
+      | https://www.suresnes.fr/   |
+    Et que j'importe le fichier CSV "tmp/sites.csv"
+    Et que je choisis "Mes évaluations" dans le menu principal
+    Et que je clique sur "Trier par Site croissant"
+    Et que je filtre par étiquette "public"
+    Et que je clique sur "Export CSV"
+    Alors la page retourne un CSV qui contient strictement les sites "numerique.gouv.fr, suresnes.fr"

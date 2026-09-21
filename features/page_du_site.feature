@@ -13,7 +13,7 @@ Fonctionnalité: Page du site
 
   Scénario: Un agent peut demander une nouvelle vérification d'un site
     Sachant que je rajoute un site "https://beta.gouv.fr"
-    Quand je clique sur "Relancer une évaluation"
+    Quand je clique sur "Lancer une évaluation"
     Alors la page contient "Historique des vérifications (2)"
 
 # TODO: Implement tags edit action when design will be there.
@@ -40,6 +40,6 @@ Fonctionnalité: Page du site
 
   Scénario: Un agent peut voir l'historique des audits
     Sachant que je rajoute un site "https://example.gouv.fr"
-    Et que je clique sur "Relancer une évaluation"
+    Et que je clique sur "Lancer une évaluation"
     Alors la page contient "Historique des vérifications (2)"
     Alors la page contient "La plus récente"
