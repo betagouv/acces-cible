@@ -71,8 +71,7 @@ fr:
         csv_intro_html:
           one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>. Vous pouvez lui ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
           other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>. Vous pouvez leur ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
-        new_tags: Nouvelles étiquettes
-        new_tags_hint: Séparez les étiquettes par des virgules.
+        new_tag: Nouvelle étiquette
         tags: Étiquettes de %{site}
       urls:
         title: Adresses à évaluer

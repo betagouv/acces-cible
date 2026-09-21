@@ -22,6 +22,7 @@ class AuditBatchesController < ApplicationController
   private
 
   def show_step
+    @audit_batch.add_new_tag_names(params[:add_tags]) if params[:add_tags]
     @step = unfinished_step(requested_step) || requested_step
     @pagy, @sites = pagy(@audit_batch.submitted_sites) if @step == "summary"
     render :new
@@ -39,6 +40,6 @@ class AuditBatchesController < ApplicationController
   end
 
   def audit_batch_params
-    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, :file, urls: [], site_tag_names: {})
+    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, :file, urls: [], site_tag_names: {}, new_tag_names: {})
   end
 end

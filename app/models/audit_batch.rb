@@ -9,6 +9,7 @@ class AuditBatch < ApplicationRecord
 
   attribute :urls, default: -> { [] }
   attribute :site_tag_names, default: -> { {} }
+  attribute :new_tag_names, default: -> { {} }
   attribute :file
   normalizes :urls, with: ->(list) { list.compact_blank.uniq { Link.url_without_scheme_and_www(it) } }
 
@@ -29,6 +30,10 @@ class AuditBatch < ApplicationRecord
 
   def site_tag_names=(names_by_site)
     self[:site_tag_names] = names_by_site.to_h.transform_values { Tag.parse_names(it) }
+  end
+
+  def add_new_tag_names(site_url)
+    self.site_tag_names = site_tag_names.merge(site_url => Array(site_tag_names[site_url]) + Tag.parse_names(new_tag_names[site_url]))
   end
 
   def launch

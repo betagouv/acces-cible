@@ -14,14 +14,9 @@
       <p class="fr-text--bold fr-mb-2w">
         <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
       </p>
-      <%= render "audit_batches/tags_form",
-            field_name: "audit_batch[site_tag_names][#{site.normalized_url}][]",
-            selected_names: Array(audit_batch.site_tag_names[site.normalized_url]),
-            title: t(".tags", site: site.normalized_url),
-            id: "site_tags_#{site.normalized_url.parameterize}",
-            tags: available_tags %>
+      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: available_tags, add_tags_url: url_for(page: @pagy.page, requested_step: "summary") %>
     </li>
   <% end %>
 </ol>
 
-<%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary" } %>
+<%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary", data: { turbo: false } } %>

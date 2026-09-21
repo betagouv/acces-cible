@@ -12,7 +12,7 @@
           next_title: (t("audit_batches.steps.#{next_step}.title") if next_step),
           header_level: 2) %>
 
-    <%= form_with(model: @audit_batch, data: { turbo: false }) do |f| %>
+    <%= form_with(model: @audit_batch) do |f| %>
       <%= render "audit_batches/hidden_fields", f:, audit_batch: @audit_batch, step: @step, sites: @sites %>
       <%= render "audit_batches/steps/#{@step}", f:, audit_batch: @audit_batch %>
       <%= render "audit_batches/step_actions", step: @step, next_step: %>

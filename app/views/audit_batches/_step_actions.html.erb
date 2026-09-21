@@ -9,12 +9,12 @@
           <%= dsfr_button(
                 label: t("shared.continue"),
                 icon: "arrow-right-line",
-                html_attributes: { type: "submit", name: "requested_step", value: next_step }) %>
+                html_attributes: { type: "submit", name: "requested_step", value: next_step, data: { turbo: false } }) %>
         <% else %>
           <%= dsfr_button(
                 label: t("audit_batches.launch"),
                 icon: "play-circle-line",
-                html_attributes: { type: "submit" }) %>
+                html_attributes: { type: "submit", data: { turbo: false } }) %>
         <% end %>
       </li>
     </ul>
@@ -26,7 +26,7 @@
           <%= dsfr_button(
                 label: t("shared.back"),
                 level: :secondary,
-                html_attributes: { type: "submit", name: "requested_step", value: previous_step, formnovalidate: true }) %>
+                html_attributes: { type: "submit", name: "requested_step", value: previous_step, formnovalidate: true, data: { turbo: false } }) %>
         </li>
       </ul>
     <% end %>
