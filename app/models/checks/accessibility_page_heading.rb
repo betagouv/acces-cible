@@ -47,7 +47,7 @@ module Checks
     end
 
     def found_count
-      heading_statuses.count(&:ok?)
+      heading_statuses.count { !it.missing? }
     end
 
     def score
@@ -70,10 +70,13 @@ module Checks
       return t("checks.accessibility_page_heading.explanation", count: 0) if failures.empty?
 
       found_titles = t("checks.accessibility_page_heading.found_titles", count: found_count)
+      bad_levels = heading_statuses.count(&:incorrect_level?)
+      bad_orders = heading_statuses.count(&:incorrect_order?)
       [
         t("checks.accessibility_page_heading.explanation", found_titles:, total:, count: failures.count),
-        t("checks.accessibility_page_heading.bad_level", count: failures.count)
-      ].join("\n")
+        (t("checks.accessibility_page_heading.bad_level", count: bad_levels) if bad_levels.positive?),
+        (t("checks.accessibility_page_heading.bad_order", count: bad_orders) if bad_orders.positive?)
+      ].compact.join("\n")
     end
 
     alias custom_badge_text human_success_rate

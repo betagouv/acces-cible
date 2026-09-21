@@ -231,6 +231,7 @@ fr:
         Il est cependant autorisé qu'un ou plusieurs titres précèdent les titres attendus, tant que leur structure est respectée.
         Les titres attendus doivent se retrouver dans l'ordre indiqué, avec le niveau de titre approprié (h1, h2, h3).
       bad_level: "%{count} au mauvais niveau"
+      bad_order: "%{count} dans le mauvais ordre"
       expectations: "Voici la hiérarchie attendue :"
       explanation:
         one: "%{found_titles} sur %{total}"
@@ -386,7 +387,6 @@ fr:
       need_help_title: Besoin d’aide ?
       title: Aide
     home:
-      all_audits: Voir toutes mes évaluations
       audits_count_detail: dont %{count} cette semaine
       audits_count_label: Évaluations lancées
       automated_tests_description: Exécute une série de 28 tests automatiques du RGAA sur la page d’accueil du site.
