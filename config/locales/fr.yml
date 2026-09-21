@@ -493,7 +493,7 @@ fr:
     invalid_url: URL invalide
     login: Se connecter
     logout: Se déconnecter
-    new_audit: Relancer une évaluation
+    new_audit: Lancer une évaluation
     new_window: " (nouvelle fenêtre)"
     or: ou
     page_unavailable: Cette page n'est pas disponible.
