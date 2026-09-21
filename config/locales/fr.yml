@@ -1,20 +1,8 @@
 fr:
-  activemodel:
-    attributes:
-      site_upload:
-        file: Import
-    errors:
-      models:
-        site_upload:
-          attributes:
-            file:
-              invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
-              invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
-              invalid_row_url: "Le fichier contient une URL invalide à la ligne %{line_number} : %{url}"
-              invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
-              malformed_csv: Le fichier CSV est mal formé. Veuillez ré-exporter votre fichier depuis votre tableur et vérifier sa structure.
   activerecord:
     attributes:
+      audit_batch:
+        file: Fichier CSV
       site:
         url: Adresse du site
       tag:
@@ -26,6 +14,14 @@ fr:
       models:
         audit_batch:
           attributes:
+            file:
+              blank: doit contenir au moins une adresse.
+              invalid_format: n'est pas reconnu comme un fichier CSV.
+              invalid_headers: n'a pas les bons en-têtes de colonne.
+              invalid_row_url: "contient une adresse invalide à la ligne %{line_number} : %{url}"
+              invalid_size: est trop lourd. Merci de le découper en plusieurs fichiers.
+              too_many_rows: "ne doit pas dépasser %{max} adresses. Merci de le découper en plusieurs fichiers."
+              malformed_csv: est mal formé. Veuillez le ré-exporter depuis votre tableur et vérifier sa structure.
             urls:
               too_long: Vous ne pouvez pas évaluer plus de %{count} adresses à la fois.
               too_short: Saisissez au moins une adresse.
@@ -65,21 +61,31 @@ fr:
         manual: Saisir des adresses
         manual_hint: Saisissez de 1 à 10 adresses, une par champ.
         csv_import: Importer un CSV
-        csv_import_hint: Bientôt disponible.
+        csv_import_hint: Importez une liste d'adresses depuis un fichier CSV.
       summary:
         title: Récapitulatif et étiquettes
         heading: Récapitulatif
         intro_html:
           one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>, vous pouvez lui ajouter des étiquettes.
           other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>, vous pouvez leur ajouter des étiquettes.
+        csv_intro_html:
+          one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>. Vous pouvez lui ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
+          other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>. Vous pouvez leur ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
+        new_tags: Nouvelles étiquettes
+        new_tags_hint: Séparez les étiquettes par des virgules.
         tags: Étiquettes de %{site}
       urls:
         title: Adresses à évaluer
-        legend: Adresses des sites à évaluer
-        hint: Une adresse par champ (https://…). Jusqu'à %{max} sites.
-        label: Adresse du site
-        add: Ajouter un site
-        remove: Supprimer cette adresse
+        manual:
+          legend: Adresses des sites à évaluer
+          hint: Une adresse par champ (https://…). Jusqu'à %{max} sites.
+          label: Adresse du site
+          add: Ajouter un site
+          remove: Supprimer cette adresse
+        csv_import:
+          legend: Fichier des sites à évaluer
+          hint: Une colonne « url » obligatoire et une colonne « tags » facultative (étiquettes séparées par des virgules). 2 000 adresses et 5 Mo maximum.
+          example: Télécharger un fichier d'exemple
   audits:
     audit:
       audit_label: "Voir l'audit de %{url} du %{date}"
@@ -493,10 +499,15 @@ fr:
     or: ou
     page_unavailable: Cette page n'est pas disponible.
     pagination:
+      current_page: Page %{page}, page actuelle
+      label: Pagination
+      next: Page suivante
+      page: Page %{page}
       per_page:
         one: Une ligne par page
         other: "%{count} lignes par page"
       per_page_label: Nombre de lignes par page
+      previous: Page précédente
     personal_data: Données personnelles
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
     save: Enregistrer

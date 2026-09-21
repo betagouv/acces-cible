@@ -1,0 +1,28 @@
+<%# locals: (field_name:, selected_names:, title:, id:, tags:) %>
+<% existing_tag_names = tags.map(&:name) %>
+<div id="<%= id %>">
+  <%= dsfr_accordion_section(title:, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
+    <fieldset class="fr-fieldset fr-legend--hidden">
+      <legend class="fr-fieldset__legend fr-fieldset__legend--regular"><%= title %></legend>
+      <%= hidden_field_tag field_name, "", id: nil %>
+
+      <% tags.each do |tag_record| %>
+        <% checkbox_id = "#{id}_#{tag_record.id}" %>
+        <div class="fr-fieldset__element">
+          <div class="fr-checkbox-group">
+            <%= check_box_tag field_name, tag_record.name, selected_names.include?(tag_record.name), id: checkbox_id %>
+            <%= label_tag checkbox_id, tag_record.name, class: "fr-label" %>
+          </div>
+        </div>
+      <% end %>
+    </fieldset>
+
+    <div class="fr-input-group fr-mb-0">
+      <%= label_tag "#{id}_new", class: "fr-label" do %>
+        <%= t("audit_batches.steps.summary.new_tags") %>
+        <span class="fr-hint-text"><%= t("audit_batches.steps.summary.new_tags_hint") %></span>
+      <% end %>
+      <%= text_field_tag field_name, (selected_names - existing_tag_names).join(", "), id: "#{id}_new", class: "fr-input" %>
+    </div>
+  <% end %>
+</div>

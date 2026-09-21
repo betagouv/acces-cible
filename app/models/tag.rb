@@ -11,6 +11,11 @@ class Tag < ApplicationRecord
   validates :name, uniqueness: { scope: :team_id }, if: :name_changed?
 
   scope :in_alphabetical_order, -> { order(:name) }
+
+  def self.parse_names(names)
+    Array(names).flat_map { it.to_s.split(",") }.map(&:strip).compact_blank.uniq
+  end
+
   def to_s
     name
   end

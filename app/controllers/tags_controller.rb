@@ -9,18 +9,13 @@ class TagsController < ApplicationController
 
   # POST /tags
   def create
-    name = tag_params.dig(:tags_attributes, :name)
+    name = site_params.dig(:tags_attributes, :name)
     return head :unprocessable_content if name.blank?
 
     tag = current_user.team.tags.find_or_create_by(name:)
-    tag_ids = (tag_params[:tag_ids] || []).push(tag.id).compact
+    tag_ids = (site_params[:tag_ids] || []).push(tag.id).compact
     object = Site.new(tag_ids:, team: current_user.team)
-
-    if funnel_site_url
-      render turbo_stream: turbo_stream.replace("site_tags_#{funnel_site_url.parameterize}", partial: "audit_batches/site_tags_form", locals: { site_url: funnel_site_url, object:, focus: true })
-    else
-      render turbo_stream: turbo_stream.replace(dom_class(object, :tags), partial: "sites/tags_form", locals: { object:, focus: true })
-    end
+    render turbo_stream: turbo_stream.replace(dom_class(object, :tags), partial: "sites/tags_form", locals: { object:, focus: true })
   end
 
   # GET /tags/1
@@ -30,20 +25,8 @@ class TagsController < ApplicationController
 
   private
 
-  def funnel_site_url
-    @funnel_site_url ||= params.dig(:audit_batch, :site_tags)&.keys&.first
-  end
-
-  def tag_params
-    scoped_params.permit(tag_ids: [], tags_attributes: :name)
-  end
-
-  def scoped_params
-    if funnel_site_url
-      params.require(:audit_batch).require(:site_tags).require(funnel_site_url)
-    else
-      params.require(:site)
-    end
+  def site_params
+    params.require(:site).permit(tag_ids: [], tags_attributes: :name)
   end
 
   def set_tag

@@ -126,21 +126,7 @@ class CsvSiteParser
   end
 
   def merge_site_data!(sites_by_url, url, row)
-    site_data = sites_by_url[url] || build_site_data(url, row)
-    site_data["tag_names"] = (site_data["tag_names"] + extract_tag_names(row)).uniq
-    sites_by_url[url] = site_data
-  end
-
-  def build_site_data(url, row)
-    {
-      "url" => url,
-      "tag_names" => []
-    }
-  end
-
-  def extract_tag_names(row)
-    return [] if row["tags"].blank?
-
-    row["tags"].split(",").map(&:strip).compact_blank.uniq
+    site_data = sites_by_url[url] ||= { "url" => url, "tag_names" => [] }
+    site_data["tag_names"] = (site_data["tag_names"] + Tag.parse_names(row["tags"])).uniq
   end
 end

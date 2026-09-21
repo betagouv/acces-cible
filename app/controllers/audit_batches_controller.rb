@@ -23,6 +23,7 @@ class AuditBatchesController < ApplicationController
 
   def show_step
     @step = unfinished_step(requested_step) || requested_step
+    @pagy, @sites = pagy(@audit_batch.submitted_sites) if @step == "summary"
     render :new
   end
 
@@ -38,6 +39,6 @@ class AuditBatchesController < ApplicationController
   end
 
   def audit_batch_params
-    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, :file, urls: [], site_tags: {})
+    params.fetch(:audit_batch, { kind: :manual }).permit(:kind, :file, urls: [], site_tag_names: {})
   end
 end

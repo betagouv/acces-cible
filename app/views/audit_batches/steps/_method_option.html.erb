@@ -1,7 +1,7 @@
-<%# locals: (f:, kind:, pictogram:, disabled: false) %>
+<%# locals: (f:, kind:, pictogram:) %>
 <div class="fr-fieldset__element">
   <div class="fr-radio-group fr-radio-rich">
-    <%= f.radio_button :kind, kind, disabled: %>
+    <%= f.radio_button :kind, kind %>
     <%= f.label :kind, value: kind, class: "fr-label" do %>
       <%= t("audit_batches.steps.method.#{kind}") %>
       <span class="fr-hint-text"><%= t("audit_batches.steps.method.#{kind}_hint") %></span>

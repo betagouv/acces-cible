@@ -1,15 +1,15 @@
-<%# locals: (f:, audit_batch:, step:) %>
+<%# locals: (f:, audit_batch:, step:, sites:) %>
 <%= f.hidden_field :kind unless step == "method" %>
 <% unless step == "urls" %>
   <% audit_batch.urls.each do |url| %>
     <%= f.hidden_field :urls, multiple: true, value: url, id: nil %>
   <% end %>
 <% end %>
-<% unless step == "summary" %>
-  <% audit_batch.site_tags.each do |site_url, attributes| %>
-    <% Array(attributes[:tag_ids]).each do |tag_id| %>
-      <%= hidden_field_tag "audit_batch[site_tags][#{site_url}][tag_ids][]", tag_id, id: nil %>
-    <% end %>
-    <%= hidden_field_tag "audit_batch[site_tags][#{site_url}][tags_attributes][name]", attributes.dig(:tags_attributes, :name), id: nil %>
+<% editable_site_urls = step == "summary" ? sites.map(&:normalized_url) : [] %>
+<% audit_batch.site_tag_names.each do |site_url, names| %>
+  <% next if editable_site_urls.include?(site_url) %>
+
+  <% names.each do |name| %>
+    <%= hidden_field_tag "audit_batch[site_tag_names][#{site_url}][]", name, id: nil %>
   <% end %>
 <% end %>

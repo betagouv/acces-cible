@@ -1,7 +1,6 @@
 class AuditBatchCreationService
-  def initialize(team:, user:, audit_batch:, tag_ids: [])
+  def initialize(team:, user:, audit_batch:)
     @team = team
-    @tag_ids = tag_ids
     @user = user
     @audit_batch = audit_batch
   end
@@ -26,8 +25,7 @@ class AuditBatchCreationService
   end
 
   def site_tag_ids(site_data)
-    tag_ids = @tag_ids + (site_data["tag_ids"] || []) + tag_ids_from_names(site_data["tag_names"] || [])
-    tag_ids.compact_blank.map(&:to_i).uniq
+    tag_ids_from_names(site_data["tag_names"] || []).uniq
   end
 
   def tag_ids_from_names(tag_names)

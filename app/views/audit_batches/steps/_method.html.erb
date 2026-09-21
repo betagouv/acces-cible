@@ -6,7 +6,7 @@
 
   <%= render "audit_batches/steps/method_option", f:, kind: :manual,
         pictogram: "artwork/pictograms/digital/internet.svg" %>
-  <%= render "audit_batches/steps/method_option", f:, kind: :csv_import, disabled: true,
+  <%= render "audit_batches/steps/method_option", f:, kind: :csv_import,
         pictogram: "artwork/pictograms/document/document-add.svg" %>
 
   <% if audit_batch.errors[:kind].any? %>

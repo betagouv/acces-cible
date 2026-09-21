@@ -1,0 +1,34 @@
+<%# locals: (pagy:, submit:) %>
+<% page_numbers = [1, pagy.page - 1, pagy.page, pagy.page + 1, pagy.pages].select { it.between?(1, pagy.pages) }.uniq.sort %>
+
+<nav role="navigation" class="fr-pagination" aria-label="<%= t("shared.pagination.label") %>">
+  <ul class="fr-pagination__list">
+    <% if pagy.previous %>
+      <li>
+        <%= button_tag t("shared.pagination.previous"), type: :submit, formaction: url_for(page: pagy.previous), **submit,
+              class: "fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" %>
+      </li>
+    <% end %>
+
+    <% page_numbers.each_with_index do |page_number, index| %>
+      <% if index.positive? && page_number > page_numbers[index - 1] + 1 %>
+        <li><span class="fr-pagination__link" aria-hidden="true">…</span></li>
+      <% end %>
+      <li>
+        <% if page_number == pagy.page %>
+          <span class="fr-pagination__link" aria-current="page" title="<%= t("shared.pagination.current_page", page: page_number) %>"><%= page_number %></span>
+        <% else %>
+          <%= button_tag page_number, type: :submit, formaction: url_for(page: page_number), **submit, class: "fr-pagination__link",
+                title: t("shared.pagination.page", page: page_number) %>
+        <% end %>
+      </li>
+    <% end %>
+
+    <% if pagy.next %>
+      <li>
+        <%= button_tag t("shared.pagination.next"), type: :submit, formaction: url_for(page: pagy.next), **submit,
+              class: "fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" %>
+      </li>
+    <% end %>
+  </ul>
+</nav>

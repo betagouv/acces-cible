@@ -1,18 +1,27 @@
 <%# locals: (f:, audit_batch:) %>
-<% sites = audit_batch.submitted_sites %>
+<% available_tags = current_user.team.tags.in_alphabetical_order.load %>
 
 <h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
-<p><%= t(".intro_html", count: sites.size) %></p>
+<% if audit_batch.csv_import? %>
+  <p><%= t(".csv_intro_html", count: @pagy.count) %></p>
+<% else %>
+  <p><%= t(".intro_html", count: @pagy.count) %></p>
+<% end %>
 
 <ol class="fr-raw-list">
-  <% sites.each do |site| %>
+  <% @sites.each do |site| %>
     <li class="fr-border-default--grey fr-p-2w fr-mb-2w">
       <p class="fr-text--bold fr-mb-2w">
         <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
       </p>
-      <%= render "audit_batches/site_tags_form",
-            site_url: site.normalized_url,
-            object: Site.new(tag_ids: audit_batch.site_tags.dig(site.normalized_url, :tag_ids)) %>
+      <%= render "audit_batches/tags_form",
+            field_name: "audit_batch[site_tag_names][#{site.normalized_url}][]",
+            selected_names: Array(audit_batch.site_tag_names[site.normalized_url]),
+            title: t(".tags", site: site.normalized_url),
+            id: "site_tags_#{site.normalized_url.parameterize}",
+            tags: available_tags %>
     </li>
   <% end %>
 </ol>
+
+<%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary" } %>
