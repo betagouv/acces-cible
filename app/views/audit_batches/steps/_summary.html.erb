@@ -19,4 +19,6 @@
   <% end %>
 </ol>
 
-<%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary", data: { turbo: false } } %>
+<% if @pagy.pages > 1 %>
+  <%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary", data: { turbo: false } } %>
+<% end %>
