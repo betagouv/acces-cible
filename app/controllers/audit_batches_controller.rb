@@ -11,7 +11,7 @@ class AuditBatchesController < ApplicationController
     if params[:requested_step]
       set_step(requested_step)
       render :new
-    elsif @audit_batch.launch
+    elsif @audit_batch.launch!
       redirect_to audits_path, notice: t(".launched", count: @audit_batch.submitted_sites.size)
     else
       set_step("urls")

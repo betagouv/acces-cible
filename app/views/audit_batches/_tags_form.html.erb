@@ -2,7 +2,7 @@
 <% id = "site_tags_#{site.normalized_url.parameterize}" %>
 <% title = t("audit_batches.steps.summary.tags", site: site.normalized_url) %>
 <% field_name = "audit_batch[site_tag_names][#{site.normalized_url}][]" %>
-<% selected_names = audit_batch.site_tag_names.fetch(site.normalized_url, []) %>
+<% selected_names = audit_batch.tag_names_for(site) %>
 <% focus = params[:add_tags] == site.normalized_url %>
 <%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
   <%= turbo_frame_tag id do %>

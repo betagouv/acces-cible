@@ -22,11 +22,15 @@ class AuditBatch < ApplicationRecord
 
   delegate :team, to: :user
 
+  def tag_names_for(site)
+    site_tag_names[site.normalized_url] || []
+  end
+
   def submitted_sites
     @submitted_sites ||= urls.map { team.sites.new(url: it).tap(&:set_normalized_url) }
   end
 
-  def launch
+  def launch!
     return false unless save(context: :urls_step)
 
     ProcessSiteUploadJob.perform_later(sites_data, team.id, user.id, id)
@@ -56,7 +60,7 @@ class AuditBatch < ApplicationRecord
     submitted_sites.map do |site|
       {
         "url" => site.url,
-        "tag_names" => site_tag_names.fetch(site.normalized_url, [])
+        "tag_names" => tag_names_for(site)
       }
     end
   end
