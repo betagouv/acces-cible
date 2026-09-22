@@ -1,18 +1,16 @@
 <%# locals: (f:, audit_batch:) %>
-<% sites = audit_batch.submitted_sites.presence || [Site.new] %>
-
 <fieldset class="fr-fieldset fr-pb-0">
   <legend class="fr-fieldset__legend fr-h5 fr-mb-0">
     <%= t(".legend") %>
   </legend>
 
-  <p class="fr-fieldset__element"><%= t(".hint", max: AuditBatch::MAX_SITES) %></p>
+  <p class="fr-fieldset__element"><%= t(".hint", max: AuditBatch::MAX_MANUAL_SITES) %></p>
 
   <div class="fr-fieldset__element fr-mb-0"
        data-controller="repeatable-fields"
-       data-repeatable-fields-max-value="<%= AuditBatch::MAX_SITES %>">
+       data-repeatable-fields-max-value="<%= AuditBatch::MAX_MANUAL_SITES %>">
     <ol class="fr-raw-list" data-repeatable-fields-target="list">
-      <% sites.each_with_index do |site, index| %>
+      <% @sites.each_with_index do |site, index| %>
         <%= render "audit_batches/steps/urls/url_field", f:, site:, index: %>
       <% end %>
     </ol>

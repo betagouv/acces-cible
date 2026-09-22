@@ -1,5 +1,6 @@
 class AuditBatch < ApplicationRecord
-  MAX_SITES = 10
+  MAX_MANUAL_SITES = 10
+  MAX_CSV_SITES = 2000
   STEPS = %w[method urls summary checks].freeze
 
   belongs_to :user
@@ -9,37 +10,26 @@ class AuditBatch < ApplicationRecord
 
   attribute :urls, default: -> { [] }
   attribute :site_tag_names, default: -> { {} }
-  attribute :new_tag_names, default: -> { {} }
   attribute :file
   normalizes :urls, with: ->(list) { list.compact_blank.uniq { Link.url_without_scheme_and_www(it) } }
+  normalizes :site_tag_names, with: ->(names_by_site) { names_by_site.to_h.transform_values(&:compact_blank) }
 
   validates :kind, presence: true
-  validates :urls, length: { minimum: 1, maximum: MAX_SITES }, on: :urls_step, if: :manual?
-  validate :import_csv, on: :urls_step, if: -> { csv_import? && urls.empty? }
-  validates :urls, length: { maximum: CsvSiteParser::MAX_ROWS }, on: :urls_step, if: :csv_import?
+  validates :urls, length: { minimum: 1, maximum: MAX_MANUAL_SITES }, on: :urls_step, if: :manual?
   validate :submitted_sites_urls, on: :urls_step, if: :manual?
+  validate :import_csv, on: :urls_step, if: -> { csv_import? && urls.empty? }
+  validates :urls, length: { maximum: MAX_CSV_SITES }, on: :urls_step, if: :csv_import?
 
   delegate :team, to: :user
 
   def submitted_sites
-    @submitted_sites ||= urls.map do |url|
-      normalized_url = Link.url_without_scheme_and_www(url)
-      existing_sites[normalized_url] || team.sites.new(url:, normalized_url:)
-    end
-  end
-
-  def site_tag_names=(names_by_site)
-    self[:site_tag_names] = names_by_site.to_h.transform_values { Tag.parse_names(it) }
-  end
-
-  def add_new_tag_names(site_url)
-    self.site_tag_names = site_tag_names.merge(site_url => Array(site_tag_names[site_url]) + Tag.parse_names(new_tag_names[site_url]))
+    @submitted_sites ||= urls.map { team.sites.new(url: it).tap(&:set_normalized_url) }
   end
 
   def launch
-    return false unless save(context: [:method_step, :urls_step])
+    return false unless save(context: :urls_step)
 
-    sites_data.in_groups_of(100, false) { ProcessAuditBatchCreationJob.perform_later(it, team.id, user.id, id) }
+    ProcessSiteUploadJob.perform_later(sites_data, team.id, user.id, id)
   end
 
   def complete?
@@ -52,12 +42,8 @@ class AuditBatch < ApplicationRecord
 
   private
 
-  def existing_sites
-    @existing_sites ||= team.sites.where(normalized_url: urls.map { Link.url_without_scheme_and_www(it) }).index_by(&:normalized_url)
-  end
-
   def submitted_sites_urls
-    errors.add(:submitted_sites, :invalid) if submitted_sites.select(&:new_record?).reject(&:valid?).any?
+    errors.add(:submitted_sites, :invalid) unless submitted_sites.all?(&:valid?)
   end
 
   def import_csv
@@ -70,7 +56,7 @@ class AuditBatch < ApplicationRecord
     submitted_sites.map do |site|
       {
         "url" => site.url,
-        "tag_names" => Array(site_tag_names[site.normalized_url])
+        "tag_names" => site_tag_names.fetch(site.normalized_url, [])
       }
     end
   end

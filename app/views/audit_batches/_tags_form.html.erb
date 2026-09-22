@@ -2,10 +2,10 @@
 <% id = "site_tags_#{site.normalized_url.parameterize}" %>
 <% title = t("audit_batches.steps.summary.tags", site: site.normalized_url) %>
 <% field_name = "audit_batch[site_tag_names][#{site.normalized_url}][]" %>
-<% selected_names = Array(audit_batch.site_tag_names[site.normalized_url]) %>
-<% focus = audit_batch.new_tag_names[site.normalized_url].present? %>
-<%= turbo_frame_tag id do %>
-  <%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
+<% selected_names = audit_batch.site_tag_names.fetch(site.normalized_url, []) %>
+<% focus = params[:add_tags] == site.normalized_url %>
+<%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
+  <%= turbo_frame_tag id do %>
     <fieldset class="fr-fieldset fr-legend--hidden">
       <legend class="fr-fieldset__legend fr-fieldset__legend--regular"><%= title %></legend>
       <%= hidden_field_tag field_name, "", id: nil %>
@@ -24,7 +24,7 @@
     <div class="fr-input-group--inline fr-mb-0">
       <div class="fr-input-group fr-mb-0">
         <%= label_tag "#{id}_new", t("audit_batches.steps.summary.new_tag"), class: "fr-label" %>
-        <%= text_field_tag "audit_batch[new_tag_names][#{site.normalized_url}]", nil, id: "#{id}_new", class: "fr-input" %>
+        <%= text_field_tag field_name, nil, id: "#{id}_new", class: "fr-input" %>
       </div>
       <%= dsfr_button(
             label: t("shared.add"),

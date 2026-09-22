@@ -5,7 +5,6 @@ class CsvSiteParser
   FIRST_DATA_ROW_NUMBER = 2 # Row 1 contains CSV headers
   SUPPORTED_SEPARATORS = [",", ";"].freeze
   REQUIRED_HEADERS = ["url"].freeze
-  MAX_ROWS = 2000
   MAX_FILE_SIZE = 5.megabytes
   ALLOWED_CONTENT_TYPES = [
     "text/csv",
@@ -41,11 +40,11 @@ class CsvSiteParser
       next unless url
 
       merge_site_data!(sites_by_url, url, row)
-      break if sites_by_url.size > MAX_ROWS
+      break if sites_by_url.size > AuditBatch::MAX_CSV_SITES
     end
 
-    if sites_by_url.size > MAX_ROWS
-      errors.add(:file, :too_many_rows, max: MAX_ROWS)
+    if sites_by_url.size > AuditBatch::MAX_CSV_SITES
+      errors.add(:file, :too_many_rows, max: AuditBatch::MAX_CSV_SITES)
       return []
     end
 
@@ -127,6 +126,6 @@ class CsvSiteParser
 
   def merge_site_data!(sites_by_url, url, row)
     site_data = sites_by_url[url] ||= { "url" => url, "tag_names" => [] }
-    site_data["tag_names"] = (site_data["tag_names"] + Tag.parse_names(row["tags"])).uniq
+    site_data["tag_names"] += row["tags"].to_s.split(",").map(&:strip)
   end
 end

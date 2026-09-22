@@ -1,6 +1,4 @@
 <%# locals: (f:, audit_batch:) %>
-<% available_tags = current_user.team.tags.in_alphabetical_order.load %>
-
 <h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
 <% if audit_batch.csv_import? %>
   <p><%= t(".csv_intro_html", count: @pagy.count) %></p>
@@ -14,7 +12,7 @@
       <p class="fr-text--bold fr-mb-2w">
         <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
       </p>
-      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: available_tags, add_tags_url: url_for(page: @pagy.page, requested_step: "summary") %>
+      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: @tags, add_tags_url: url_for(page: @pagy.page, requested_step: "summary") %>
     </li>
   <% end %>
 </ol>
