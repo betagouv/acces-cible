@@ -42,43 +42,44 @@ fr:
       row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
-    headings:
-      caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
-      description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
-      expected_level: Niveau attendu
-      found_level: Niveau trouvé
-      incorrect_level_alert:
-        one: "un titre n'est pas au bon niveau de hiérarchie"
-        other: "%{count} titres ne sont pas au bon niveau de hiérarchie"
-      incorrect_order_alert:
-        one: "un titre n'est pas dans le bon ordre"
-        other: "%{count} titres ne sont pas dans le bon ordre"
-      missing_alert:
-        one: un titre est manquant
-        other: "%{count} titres sont manquants"
-      level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
-      status: État
-      template_link: Consulter le modèle de déclaration d'accessibilité
-      title: Hiérarchie des titres de la déclaration
     index:
       caption: Mes évaluations
-      compliance_rate: Taux d'accessibilité déclaré
-      declaration_quality: Qualité de la déclaration
-      declared_level: Niveau d'accessibilité déclaré
-      evaluator: Évaluateur
+      columns:
+        accessibility_mention: Mention d'accessibilité
+        accessibility_page: Déclaration d'accessibilité
+        auditor: Auditeur
+        automated_tests_applicable: Tests auto RGAA applicables
+        automated_tests_inapplicable: Tests auto non applicables
+        automated_tests_passed: Tests auto RGAA réussis
+        automated_tests_result: Résultat des tests auto RGAA
+        compliance_rate: Taux d'accessibilité déclaré
+        contact: Adresse email de contact (ou formulaire de contact)
+        declaration_date: Date de déclaration
+        declaration_format: Format de la déclaration
+        declaration_quality: Qualité de la déclaration
+        declared_level: Niveau d'accessibilité déclaré
+        evaluator: Évaluateur
+        last_audit_at: Lancée le
+        law_article: Article de loi
+        legal_obligations: Respect des obligations légales
+        organization_label: Organisation
+        plan: Plan d'action
+        plan_quality: Plan d'action (qualité)
+        reachable: Site joignable
+        schema: Schéma pluriannuel
+        schema_quality: Schéma pluriannuel (qualité)
+        standard: Référentiel
+        tags: Étiquettes
+      displayed_columns: Colonnes affichées
       export_to_csv: Export CSV
-      last_audit_at: Lancée le
-      legal_obligations: Respect des obligations légales
       no_results: Aucune évaluation à afficher.
       no_search_results: Aucune évaluation ne correspond à votre recherche.
-      organization_label: Organisation
       search: Rechercher un site
       scope_filter: Périmètre des évaluations affichées
       scope_me: Mes évaluations
       scope_team: "Mon organisation (%{organization})"
       site: Site
       tag_filter: Filtrer par étiquette
-      tags: Étiquettes
       title: Mes évaluations
     show:
       accessibility_rate: Taux d'accessibilité
@@ -176,6 +177,35 @@ fr:
       unreachable_what_to_do_text: "Vérifiez que l'adresse est correcte et que le site est en ligne, puis relancez l'évaluation. Si le site est temporairement indisponible, réessayez plus tard."
       unreachable_what_to_do_title: Que faire ?
       value_found: Valeur trouvée
+    modals:
+      columns:
+        apply: Appliquer
+        description: Choisissez les informations à afficher dans le tableau. La colonne « Site » reste toujours visible.
+        groups:
+          automated_tests: Tests automatiques RGAA
+          declaration_quality: Qualité de la déclaration
+          legal_obligations: Respect des obligations légales
+          main_results: Résultats principaux de l'évaluation
+          meta: Méta
+        title: Colonnes affichées
+      headings:
+        caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
+        description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.
+        expected_level: Niveau attendu
+        found_level: Niveau trouvé
+        incorrect_level_alert:
+          one: "un titre n'est pas au bon niveau de hiérarchie"
+          other: "%{count} titres ne sont pas au bon niveau de hiérarchie"
+        incorrect_order_alert:
+          one: "un titre n'est pas dans le bon ordre"
+          other: "%{count} titres ne sont pas dans le bon ordre"
+        missing_alert:
+          one: un titre est manquant
+          other: "%{count} titres sont manquants"
+        level_offset: "Les sections de cette déclaration commencent en h%{found} là où le modèle attend h%{expected}. Ce décalage est toléré : les niveaux attendus ci-dessous en tiennent compte."
+        status: État
+        template_link: Consulter le modèle de déclaration d'accessibilité
+        title: Hiérarchie des titres de la déclaration
   check:
     completed_at: Vérification effectuée le
     status:

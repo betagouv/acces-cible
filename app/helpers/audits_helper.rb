@@ -94,21 +94,21 @@ module AuditsHelper
     orders = statuses.count(&:incorrect_order?)
 
     issues = []
-    issues << t("audits.headings.missing_alert", count: missing) if missing.positive?
-    issues << t("audits.headings.incorrect_level_alert", count: levels) if levels.positive?
-    issues << t("audits.headings.incorrect_order_alert", count: orders) if orders.positive?
+    issues << t("audits.modals.headings.missing_alert", count: missing) if missing.positive?
+    issues << t("audits.modals.headings.incorrect_level_alert", count: levels) if levels.positive?
+    issues << t("audits.modals.headings.incorrect_order_alert", count: orders) if orders.positive?
     issues
   end
 
   def declaration_template_link
-    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.headings.template_link"))
+    external_link_to(Checks::AccessibilityPageHeading::TEMPLATE_URL, t("audits.modals.headings.template_link"))
   end
 
   def declaration_level_offset_notice(check)
     return if check.heading_offset.zero?
 
     section_level = check.heading_statuses.map(&:expected_level).min
-    t("audits.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
+    t("audits.modals.headings.level_offset", expected: section_level, found: section_level + check.heading_offset)
   end
 
   def heading_severity(heading_status)
@@ -161,7 +161,72 @@ module AuditsHelper
     end
   end
 
+  def audit_cell(audit, column)
+    case column
+    when "site" then tag.th(site_link(audit.site))
+    when "evaluator" then tag.td(truncated_value(audit.user.to_s))
+    when "organization_label" then tag.td(truncated_value(audit.team.organization_label))
+    when "last_audit_at" then tag.td(audit_date_link(audit))
+    when "tags" then tag.td(site_tags(audit.site), class: "fr-cell--multiline")
+    else tag.td(audit_cell_content(audit, column), class: "fr-cell--center")
+    end
+  end
+
   private
+
+  def audit_cell_content(audit, column)
+    declaration = audit.analyze_accessibility_page
+    axe = audit.run_axe_on_homepage
+
+    case column
+    when "compliance_rate" then declaration.human_compliance_rate || check_badge(declaration, hover: false, no_icon: true)
+    when "declared_level" then check_badge(audit.accessibility_mention, hover: false, no_icon: true)
+    when "legal_obligations" then star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.audit.legal_obligations"))
+    when "declaration_quality" then star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.audit.declaration_quality"))
+    when "accessibility_page" then obligation_badge(audit.find_accessibility_page)
+    when "accessibility_mention" then obligation_badge(audit.accessibility_mention)
+    when "schema" then obligation_badge(audit.analyze_schema)
+    when "plan" then obligation_badge(audit.analyze_plan)
+    when "declaration_date" then presence_badge(declaration.audit_date.present?)
+    when "standard" then presence_badge(declaration.standard.present?)
+    when "auditor" then presence_badge(declaration.auditor.present?)
+    when "law_article" then presence_badge(declaration.mentions_article)
+    when "contact" then presence_badge(declaration.contact_email.present? || declaration.contact_form.present?)
+    when "declaration_format" then validity_badge(audit.accessibility_page_heading)
+    when "schema_quality" then validity_badge(audit.analyze_schema)
+    when "plan_quality" then validity_badge(audit.analyze_plan)
+    when "automated_tests_result" then axe.completed? ? t("audits.show.automated_tests_results", count: axe.passes, total: axe.applicable_total) : muted_dash
+    when "automated_tests_applicable" then axe.applicable_total || muted_dash
+    when "automated_tests_passed" then axe.passes || muted_dash
+    when "automated_tests_inapplicable" then axe.inapplicable || muted_dash
+    when "reachable" then check_badge(audit.reachable, hover: false, no_icon: true)
+    end
+  end
+
+  def site_link(site)
+    site_label = t("audits.audit.row_label", url: site.normalized_url)
+
+    dsfr_link_to(truncated(site.normalized_url), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label)
+  end
+
+  def audit_date_link(audit)
+    local_time = audit.created_at.in_time_zone
+    date = l(local_time.to_date)
+    label = t("audits.audit.audit_label", url: audit.site.normalized_url, date:)
+
+    dsfr_link_to site_audit_path(audit.site, audit), class: "ac-row-link__stretched", "aria-label": label do
+      time_tag local_time, date, title: l(local_time, format: :long)
+    end
+  end
+
+  def site_tags(site)
+    names = site.tags.collect(&:name)
+
+    safe_join([
+                *names.take(3).map { dsfr_tag(title: it.truncate(ApplicationHelper::TRUNCATION_LENGTH), size: :sm) },
+                (dsfr_tooltip(t("shared.x_more", x: names.size - 3), type: :link, title: names[3..].to_sentence) if names.size > 3)
+              ])
+  end
 
   def star_modifier_class(position, filled_star_count, has_half_star)
     if position < filled_star_count

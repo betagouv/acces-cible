@@ -154,6 +154,14 @@ Alors("la page contient un tableau") do
   expect(page).to have_css("table")
 end
 
+Alors("le tableau {string} contient la colonne {string}") do |caption, column|
+  within_table(caption) { expect(page).to have_css("thead th", exact_text: column) }
+end
+
+Alors("le tableau {string} ne contient pas la colonne {string}") do |caption, column|
+  within_table(caption) { expect(page).to have_no_css("thead th", exact_text: column) }
+end
+
 Alors('la carte {string} indique {string}') do |title, str|
   expect(find("section.bordered-card", text: title)).to have_content(str)
 end

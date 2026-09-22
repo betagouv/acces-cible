@@ -64,7 +64,7 @@ module ApplicationHelper
       arrow = [:arrow, :up, :down]
     end
 
-    "#{text} #{link_icon(arrow, "", { params: link_params }, options.merge(btn: :sort, size: :sm, line: true))}".html_safe
+    tag.div(class: "fr-cell--sort") { safe_join([text, link_icon(arrow, "", { params: link_params }, options.merge(btn: :sort, size: :sm, line: true))], " ") }
   end
 
   def set_focus(selector)

@@ -1,0 +1,33 @@
+<%= dsfr_modal(title: t(".title"), html_attributes: { id: "columns-modal", class: "modal--wide" }) do |modal| %>
+  <p class="fr-text--sm"><%= t(".description") %></p>
+
+  <%= form_with url: columns_audits_path, method: :patch, id: "columns-form" do %>
+    <%= hidden_field_tag "columns[]", "", id: nil %>
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <% AuditsController::INDEX_COLUMNS.each_slice(3) do |groups| %>
+        <div class="fr-col-12 fr-col-md-6">
+          <% groups.each do |group, group_columns| %>
+            <fieldset class="fr-fieldset fr-mb-4w">
+              <legend class="fr-fieldset__legend">
+                <%= t(".groups.#{group}") %>
+              </legend>
+              <hr class="fr-hr fr-col-8">
+              <% group_columns.each do |column| %>
+                <div class="fr-fieldset__element fr-mb-1v">
+                  <div class="fr-checkbox-group fr-checkbox-group--sm">
+                    <%= check_box_tag "columns[]", column, column.in?(@displayed_columns), id: "column_#{column}" %>
+                    <%= label_tag "column_#{column}", t("audits.index.columns.#{column}"), class: "fr-label" %>
+                  </div>
+                </div>
+              <% end %>
+            </fieldset>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% modal.with_button do %>
+    <li><%= dsfr_button(label: t(".apply"), html_attributes: { type: :submit, form: "columns-form" }) %></li>
+  <% end %>
+<% end %>

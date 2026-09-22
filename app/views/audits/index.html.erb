@@ -1,3 +1,4 @@
+<%= render "audits/modals/columns" %>
 <%= turbo_stream_from [current_user.team, :sites] %>
 <% scope_options = [[t(".scope_me"), "me"], [t(".scope_team", organization: current_user.team.organization_label), "team"]] %>
 
@@ -47,8 +48,13 @@
   </div>
 <% end %>
 
-<div class="fr-grid-row fr-mb-2w">
-  <div class="fr-col">
+
+<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
+  <div class="fr-col-2">
+    <%= dsfr_button(label: t(".displayed_columns"), icon: "table-line", level: :secondary, size: :sm, html_attributes: { class: "fr-mt-1w", "data-fr-opened": false, "aria-controls": "columns-modal" }) %>
+  </div>
+
+  <div class="fr-col-2">
     <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
   </div>
 </div>
@@ -56,16 +62,13 @@
 <%= dsfr_table(caption: t('.caption'), border: true, size: :lg) do |t| %>
   <% t.with_head do %>
     <tr>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
-      <th scope="col" class="fr-cell--center"><%= t('checks.reachable.type') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.compliance_rate') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.declared_level') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.legal_obligations') %></th>
-      <th scope="col" class="fr-cell--center"><%= t('.declaration_quality') %></th>
-      <th scope="col"><%= t('.evaluator') %></th>
-      <th scope="col"><%= t('.organization_label') %></th>
-      <th scope="col" class="fr-cell--sort" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.last_audit_at'), :last_audited_at %></th>
-      <th scope="col"><%= t('.tags') %></th>
+      <th scope="col" <%= aria_sort(:url) %>><%= sortable_header t('.site'), :url %></th>
+
+      <% @displayed_columns.each do |column| %>
+        <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>"><%= t(".columns.#{column}") %></th>
+      <% end %>
+
+      <th scope="col" <%= aria_sort(:last_audited_at) %>><%= sortable_header t('.columns.last_audit_at'), :last_audited_at %></th>
     </tr>
   <% end %>
 
@@ -74,7 +77,7 @@
       <%= render partial: "audit", collection: @audits, as: :audit %>
     <% else %>
       <tr>
-        <td colspan="10">
+        <td colspan="<%= @displayed_columns.size + 2 %>">
           <% if params.dig(:filter, :q).present? %>
             <%= t(".no_search_results") %>
           <% else %>

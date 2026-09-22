@@ -104,6 +104,18 @@ Fonctionnalité:
     Et la colonne "Site joignable" du tableau "Mes évaluations" contient dans l'ordre :
       | Oui |
 
+  Scénario: Un agent peut choisir les colonnes affichées
+    Sachant que je possède un site "https://example.gouv.fr" avec des données
+    Quand je clique sur "Mes évaluations"
+    Alors le tableau "Mes évaluations" contient la colonne "Évaluateur"
+    Et le tableau "Mes évaluations" ne contient pas la colonne "Auditeur"
+    Quand je coche "Auditeur"
+    Et que je décoche "Évaluateur"
+    Et que je clique sur le premier lien ou bouton "Appliquer"
+    Et que je rafraîchis la page
+    Alors le tableau "Mes évaluations" contient la colonne "Auditeur"
+    Et le tableau "Mes évaluations" ne contient pas la colonne "Évaluateur"
+
   Scénario: Un agent voit un message quand aucun site n'existe
     Quand je clique sur "Mes évaluations"
     Alors la page contient un tableau
