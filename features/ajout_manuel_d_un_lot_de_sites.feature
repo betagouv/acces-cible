@@ -10,6 +10,10 @@ Fonctionnalité: Ajout manuel d'un lot de sites
     Et que je choisis "Saisir des adresses"
     Et que je clique sur "Continuer"
 
+  Scénario: L'adresse du site est obligatoire
+    Quand je clique sur "Continuer"
+    Alors la page contient "Saisissez au moins une adresse."
+
   Scénario: Un agent peut ajouter un site manuellement
     Sachant que je remplis "Adresse du site" avec "beta.gouv.fr"
     Quand je clique sur "Continuer"

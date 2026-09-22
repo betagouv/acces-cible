@@ -4,7 +4,7 @@ RSpec.describe CsvSiteParser do
   subject(:parser) { described_class.new(file:, team:, errors:) }
 
   let(:team) { create(:team) }
-  let(:errors) { ActiveModel::Errors.new(SiteUpload.new) }
+  let(:errors) { ActiveModel::Errors.new(AuditBatch.new) }
   let(:expected_sites_data) do
     [
       { "url" => "https://example.com/", "tag_names" => [] },
@@ -32,6 +32,61 @@ RSpec.describe CsvSiteParser do
 
     it "returns an array of site hashes" do
       expect(parsed_data).to eq(expected_sites_data)
+    end
+
+    context "when file is empty" do
+      let(:csv_content) { nil }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :invalid_size)).to be true
+      end
+    end
+
+    context "when file size is too large" do
+      before { allow(file).to receive(:size).and_return(CsvSiteParser::MAX_FILE_SIZE + 1) }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :invalid_size)).to be true
+      end
+    end
+
+    context "when file has too many addresses" do
+      let(:csv_content) { "url\n" + (1..AuditBatch::MAX_CSV_SITES + 1).map { "https://site#{it}.example.com/" }.join("\n") }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :too_many_rows, max: AuditBatch::MAX_CSV_SITES)).to be true
+      end
+    end
+
+    context "when file format is incorrect" do
+      before { allow(file).to receive(:content_type).and_return("application/pdf") }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :invalid_format)).to be true
+      end
+    end
+
+    context "when headers are invalid" do
+      let(:csv_content) { "invalid_header\nhttps://example.com/" }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :invalid_headers)).to be true
+      end
+    end
+
+    context "when encoding is not UTF-8" do
+      let(:encoding) { Encoding::ISO_8859_1 }
+      let(:csv_content) { "URL,næme\nhttps://example.com/,Example Saïte".encode(encoding) }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :invalid_headers)).to be true
+      end
     end
 
     context "with mixed case headers" do
@@ -66,6 +121,24 @@ RSpec.describe CsvSiteParser do
       it "deduplicates normalized URLs and merges tags" do
         expect(parsed_data.length).to eq(1)
         expect(parsed_data.first["tag_names"]).to contain_exactly("tag1", "tag2")
+      end
+    end
+
+    context "without a file" do
+      let(:file) { nil }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :blank)).to be true
+      end
+    end
+
+    context "without any address" do
+      let(:csv_content) { "url,tags\n,\n" }
+
+      it "adds an error and returns nothing" do
+        expect(parsed_data).to be_empty
+        expect(errors.added?(:file, :blank)).to be true
       end
     end
 
