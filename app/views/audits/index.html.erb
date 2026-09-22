@@ -77,7 +77,7 @@
       <%= render partial: "audit", collection: @audits, as: :audit %>
     <% else %>
       <tr>
-        <td colspan="<%= @displayed_columns.size + 1 %>">
+        <td colspan="<%= @displayed_columns.size + 2 %>">
           <% if params.dig(:filter, :q).present? %>
             <%= t(".no_search_results") %>
           <% else %>

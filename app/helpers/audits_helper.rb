@@ -204,7 +204,7 @@ module AuditsHelper
   end
 
   def site_link(site)
-    site_label = t('audits.audit.row_label', url: site.normalized_url)
+    site_label = t("audits.audit.row_label", url: site.normalized_url)
 
     dsfr_link_to(truncated(site.normalized_url), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label)
   end
@@ -212,7 +212,7 @@ module AuditsHelper
   def audit_date_link(audit)
     local_time = audit.created_at.in_time_zone
     date = l(local_time.to_date)
-    label = t('audits.audit.audit_label', url: audit.site.normalized_url, date:)
+    label = t("audits.audit.audit_label", url: audit.site.normalized_url, date:)
 
     dsfr_link_to site_audit_path(audit.site, audit), class: "ac-row-link__stretched", "aria-label": label do
       time_tag local_time, date, title: l(local_time, format: :long)

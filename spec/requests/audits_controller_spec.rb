@@ -157,7 +157,13 @@ RSpec.describe "Audits" do
     it "stores the selected columns in the session" do
       patch columns_audits_path, params: { columns: ["", "auditor", "tags"] }
 
-      expect(session[:audits_columns]).to eq(["auditor", "tags"])
+      expect(session[:audits_columns]).to eq(["tags", "auditor"])
+    end
+
+    it "keeps default columns in their default order, before the other columns" do
+      patch columns_audits_path, params: { columns: ["", "auditor", *AuditsController::DEFAULT_INDEX_COLUMNS.reverse] }
+
+      expect(session[:audits_columns]).to eq([*AuditsController::DEFAULT_INDEX_COLUMNS, "auditor"])
     end
 
     it "redirects to the audits index" do
