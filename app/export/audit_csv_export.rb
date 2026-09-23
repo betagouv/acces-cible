@@ -2,30 +2,8 @@ class AuditCsvExport
   COL_SEP = ";"
   UTF8_BOM = "\uFEFF"
 
-  HEADERS = [
-    I18n.t("audit.site_url_address"),
-    I18n.t("audit.url"),
-    I18n.t("audit.redirect_url"),
-    I18n.t("tags.all"),
-    I18n.t("check.completed_at"),
-    I18n.t("checks.reachable.type"),
-    I18n.t("checks.language_indication.type"),
-    I18n.t("checks.accessibility_mention.type"),
-    I18n.t("checks.find_accessibility_page.type"),
-    I18n.t("checks.find_accessibility_page.hosted_on_audited_site"),
-    I18n.t("checks.analyze_accessibility_page.auditor"),
-    I18n.t("checks.analyze_accessibility_page.compliance_rate"),
-    I18n.t("checks.analyze_accessibility_page.audit_date"),
-    I18n.t("checks.analyze_accessibility_page.audit_update_date"),
-    I18n.t("checks.analyze_accessibility_page.contact_email"),
-    I18n.t("checks.analyze_accessibility_page.contact_form"),
-    I18n.t("checks.analyze_schema.type"),
-    I18n.t("checks.analyze_schema.years"),
-    I18n.t("checks.analyze_plan.type"),
-    I18n.t("checks.analyze_plan.years"),
-    I18n.t("checks.accessibility_page_heading.type"),
-    I18n.t("checks.run_axe_on_homepage.success_rate"),
-  ].freeze
+  COLUMNS = (%w[site evaluated_url redirect_url] | AuditColumns::ALL | %w[declaration_url schema_url plan_url contact_email contact_form audit_url]).freeze
+  HEADERS = COLUMNS.map { I18n.t("audits.index.columns.#{it}") }.freeze
 
   def self.filename
     "audits_#{I18n.l(Time.zone.now, format: :file)}.csv"
@@ -41,62 +19,22 @@ class AuditCsvExport
   end
 
   def self.row_for(audit)
-    site = audit.site
-    reachable = audit.reachable
-    language = audit.language_indication
-    mention = audit.accessibility_mention
-    find_accessibility = audit.find_accessibility_page
-    analysis = audit.analyze_accessibility_page
-    schema = audit.analyze_schema
-    plan = audit.analyze_plan
-    heading = audit.accessibility_page_heading
-    axe = audit.run_axe_on_homepage
-
-    [
-      site.normalized_url,
-      site.url,
-      reachable.redirect_url,
-      site.tags_list,
-      audit.completed_at,
-      reachable.completed?.to_s,
-      extract_value(language, language.indication),
-      extract_value(mention, mention.mention_text),
-      extract_value(find_accessibility, find_accessibility.url),
-      extract_value(find_accessibility, find_accessibility.internal.to_s),
-      extract_value(analysis, analysis.auditor),
-      extract_value(analysis, analysis.human_compliance_rate),
-      extract_value(analysis, analysis.audit_date),
-      extract_value(analysis, analysis.audit_update_date),
-      extract_value(analysis, analysis.contact_email),
-      extract_value(analysis, analysis.contact_form),
-      extract_value(schema, link_or_found(schema, "analyze_schema.in_main_text")),
-      extract_value(schema, schema.years&.join("-")),
-      extract_value(plan, link_or_found(plan, "analyze_plan.in_main_text")),
-      extract_value(plan, plan.years&.join("-")),
-      extract_value(heading, heading.human_success_rate),
-      extract_value(axe, axe.human_success_rate),
-    ]
+    COLUMNS.map { value(audit, it) }
   end
 
-  def self.extract_value(check, data)
-    return I18n.t("check.status.failed") if check.nil?
-
-    if check.aborted? || check.errored? || check.failed?
-      check.human_status
-    elsif data.blank?
-      I18n.t("check.status.failed")
+  def self.value(audit, column)
+    case column
+    when "evaluated_url" then audit.site.url
+    when "redirect_url" then audit.reachable.redirect_url
+    when "declaration_url" then audit.find_accessibility_page.url
+    when "schema_url" then audit.analyze_schema.link_url
+    when "plan_url" then audit.analyze_plan.link_url
+    when "contact_email" then audit.analyze_accessibility_page.contact_email
+    when "contact_form" then audit.analyze_accessibility_page.contact_form
+    when "audit_url" then Rails.application.routes.url_helpers.site_audit_url(audit.site, audit)
     else
-      data
-    end
-  end
-
-  def self.link_or_found(check, translation_key)
-    return nil if check.nil?
-
-    if check.text.present?
-      I18n.t("checks.#{translation_key}")
-    else
-      check.link_url
+      value = AuditColumns.value(audit, column)
+      value.is_a?(Hash) ? value[:text] : value
     end
   end
 end

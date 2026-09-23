@@ -96,13 +96,20 @@ Fonctionnalité:
     Et la page contient "production"
     Et la page contient "public"
 
-  Scénario: Un agent peut voir les résultats de l'évaluation pour chaque site
+  Scénario: Un agent voit les résultats de l'évaluation dans les colonnes par défaut
     Sachant que je possède un site "https://example.gouv.fr" avec des données
     Quand je clique sur "Mes évaluations"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       | example.gouv.fr |
-    Et la colonne "Site joignable" du tableau "Mes évaluations" contient dans l'ordre :
-      | Oui |
+    Et le tableau "Mes évaluations" contient les colonnes :
+      | Taux d'accessibilité déclaré     |
+      | Niveau d'accessibilité déclaré   |
+      | Respect des obligations légales  |
+      | Qualité de la déclaration        |
+      | Évaluateur                       |
+      | Organisation                     |
+      | Étiquettes                       |
+    Et le tableau "Mes évaluations" ne contient pas la colonne "Site joignable"
 
   Scénario: Un agent peut choisir les colonnes affichées
     Sachant que je possède un site "https://example.gouv.fr" avec des données
@@ -115,6 +122,39 @@ Fonctionnalité:
     Et que je rafraîchis la page
     Alors le tableau "Mes évaluations" contient la colonne "Auditeur"
     Et le tableau "Mes évaluations" ne contient pas la colonne "Évaluateur"
+
+  Scénario: Un agent peut afficher toutes les colonnes
+    Sachant que je possède un site "https://example.gouv.fr" avec des données
+    Quand je clique sur "Mes évaluations"
+    Et que je coche toutes les cases
+    Et que je clique sur le premier lien ou bouton "Appliquer"
+    Alors le tableau "Mes évaluations" contient les colonnes :
+      | Site                                                |
+      | Taux d'accessibilité déclaré                        |
+      | Niveau d'accessibilité déclaré                       |
+      | Respect des obligations légales                     |
+      | Qualité de la déclaration                            |
+      | Déclaration d'accessibilité                          |
+      | Mention d'accessibilité                              |
+      | Schéma pluriannuel                                   |
+      | Plan d'action                                        |
+      | Site joignable                                       |
+      | Évaluateur                                           |
+      | Organisation                                         |
+      | Étiquettes                                           |
+      | Hébergement de la déclaration                        |
+      | Date de déclaration                                  |
+      | Référentiel                                          |
+      | Auditeur                                             |
+      | Article de loi                                       |
+      | Adresse email de contact (ou formulaire de contact)  |
+      | Format de la déclaration                             |
+      | Schéma pluriannuel (qualité)                         |
+      | Plan d'action (qualité)                              |
+      | Résultat des tests auto RGAA                         |
+      | Tests auto RGAA applicables                          |
+      | Tests auto RGAA réussis                              |
+      | Tests auto non applicables                           |
 
   Scénario: Un agent voit un message quand aucun site n'existe
     Quand je clique sur "Mes évaluations"

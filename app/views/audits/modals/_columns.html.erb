@@ -4,7 +4,7 @@
   <%= form_with url: columns_audits_path, method: :patch, id: "columns-form" do %>
     <%= hidden_field_tag "columns[]", "", id: nil %>
     <div class="fr-grid-row fr-grid-row--gutters">
-      <% AuditsController::INDEX_COLUMNS.each_slice(3) do |groups| %>
+      <% AuditColumns::GROUPS.each_slice(3) do |groups| %>
         <div class="fr-col-12 fr-col-md-6">
           <% groups.each do |group, group_columns| %>
             <fieldset class="fr-fieldset fr-mb-4w">

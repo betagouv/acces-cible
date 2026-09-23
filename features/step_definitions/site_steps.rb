@@ -162,6 +162,12 @@ Alors("le tableau {string} ne contient pas la colonne {string}") do |caption, co
   within_table(caption) { expect(page).to have_no_css("thead th", exact_text: column) }
 end
 
+Alors("le tableau {string} contient les colonnes :") do |caption, table|
+  within_table(caption) do
+    table.raw.flatten.each { |column| expect(page).to have_css("thead th", exact_text: column) }
+  end
+end
+
 Alors('la carte {string} indique {string}') do |title, str|
   expect(find("section.bordered-card", text: title)).to have_content(str)
 end

@@ -19,7 +19,7 @@ RSpec.describe AuditCsvExport do
 
     let(:csv_output) do
       io = StringIO.new
-      described_class.stream_csv_to(io, site.audits)
+      described_class.stream_csv_to(io, site.reload.audits)
       io.string
     end
 
@@ -27,25 +27,65 @@ RSpec.describe AuditCsvExport do
       expect(csv_output).to start_with(described_class::UTF8_BOM)
     end
 
+    it "includes headers" do
+      expect(parsed_csv.headers).to eq([
+                                         "Site",
+                                         "Url évaluée",
+                                         "Url de redirection",
+                                         "Taux d'accessibilité déclaré",
+                                         "Niveau d'accessibilité déclaré",
+                                         "Respect des obligations légales",
+                                         "Qualité de la déclaration",
+                                         "Déclaration d'accessibilité",
+                                         "Mention d'accessibilité",
+                                         "Schéma pluriannuel",
+                                         "Plan d'action",
+                                         "Site joignable",
+                                         "Évaluateur",
+                                         "Organisation",
+                                         "Étiquettes",
+                                         "Hébergement de la déclaration",
+                                         "Date de déclaration",
+                                         "Référentiel",
+                                         "Auditeur",
+                                         "Article de loi",
+                                         "Adresse email de contact (ou formulaire de contact)",
+                                         "Format de la déclaration",
+                                         "Schéma pluriannuel (qualité)",
+                                         "Plan d'action (qualité)",
+                                         "Résultat des tests auto RGAA",
+                                         "Tests auto RGAA applicables",
+                                         "Tests auto RGAA réussis",
+                                         "Tests auto non applicables",
+                                         "Lancée le",
+                                         "URL de la déclaration",
+                                         "URL schéma pluriannuel",
+                                         "URL plan d'action",
+                                         "Adresse email",
+                                         "Formulaire de contact",
+                                         "URL évaluation accès cible"
+                                       ])
+    end
+
     context "with completed checks" do
       before do
         audit = site.last_audit.reload
         audit.checks.destroy_all
 
-        create(:check, :reachable, :completed, audit:)
-        create(:check, :language_indication, audit:, indication: nil)
-        create(:check, :accessibility_mention, :completed, audit:, mention: "totalement")
-        create(:check, :find_accessibility_page, :completed, audit:, url: "https://example.com/accessibilite", internal: true)
-        create(:check, :analyze_accessibility_page, audit:, data: {
+        create(:check, :reachable, :completed, audit:, found: true, data: { redirect_url: "https://www.example.com/" })
+        create(:check, :accessibility_mention, :completed, audit:, found: true, conform: true, mention: "totalement")
+        create(:check, :find_accessibility_page, :completed, audit:, url: "https://example.com/accessibilite", internal: true, conform: true)
+        create(:check, :analyze_accessibility_page, :completed, audit:, data: {
           compliance_rate: 85.5,
           audit_date: Date.new(2023, 6, 15),
           audit_update_date: Date.new(2025, 8, 20),
-          auditor: "Bear & Bee"
+          auditor: "Bear & Bee",
+          contact_form: "https://example.com/contact"
         })
-        create(:check, :analyze_schema, audit:, data: {
+        create(:check, :analyze_schema, :completed, audit:, found: true, conform: true, data: {
           link_url: "https://example.com/schema.pdf", years: [2023, 2024]
         })
-        create(:check, :analyze_plan, audit:, data: {
+        create(:check, :analyze_plan, :completed, audit:, found: true, conform: false, data: {
           link_url: "https://example.com/plan.pdf", years: [2025]
         })
         create(:check, :run_axe_on_homepage, :completed, audit:, data: {
@@ -54,7 +94,7 @@ RSpec.describe AuditCsvExport do
           inapplicable: 10,
           violations: 3,
         })
-        create(:check, :accessibility_page_heading, :completed, audit:, data: {
+        create(:check, :accessibility_page_heading, :completed, audit:, found: true, data: {
           page_headings: [
             [1, "Déclaration d'accessibilité"]
           ],
@@ -62,81 +102,56 @@ RSpec.describe AuditCsvExport do
             ["Déclaration d'accessibilité", 1, :ok, "Déclaration d'accessibilité"]
           ]
         })
-      end
-
-      it "includes headers" do
-        expect(parsed_csv.headers).to eq([
-                                           "Adresse du site",
-                                           "URL",
-                                           "URL de redirection",
-                                           "Toutes les étiquettes",
-                                           "Vérification effectuée le",
-                                           "Site joignable",
-                                           "Indication de la langue",
-                                           "Mention du niveau d'accessibilité",
-                                           "Présence d'une déclaration d'accessibilité",
-                                           "Déclaration hébergée sur le site audité",
-                                           "Audit réalisé par",
-                                           "Taux de conformité",
-                                           "Date de la déclaration",
-                                           "Déclaration mise à jour le",
-                                           "Adresse email de contact",
-                                           "Formulaire de contact",
-                                           "Schéma pluriannuel d'accessibilité",
-                                           "Années de validité du schéma",
-                                           "Plan d'action",
-                                           "Année(s) du plan",
-                                           "Titres de la déclaration d'accessibilité",
-                                           "Taux de réussite"
-                                         ])
+        audit.update_columns(legal_obligation_score: 3, declaration_quality_score: 2.5)
       end
 
       it "generates correct row data" do
         row = parsed_csv.first
         audit = site.last_audit.reload
 
-        expect(row["Adresse du site"]).to eq(site.normalized_url)
-        expect(row["URL"]).to eq(site.url)
-        expect(row["URL de redirection"]).to be_nil
-        expect(row["Toutes les étiquettes"]).to eq(tags.collect(&:name).join(", "))
-        expect(row["Vérification effectuée le"]).to eq(audit.completed_at.to_s)
-        expect(row["Site joignable"]).to eq("true")
-        expect(row["Indication de la langue"]).to eq("Non trouvé")
-        expect(row["Mention du niveau d'accessibilité"]).to eq("Totalement conforme")
-        expect(row["Présence d'une déclaration d'accessibilité"]).to eq("https://example.com/accessibilite")
-        expect(row["Déclaration hébergée sur le site audité"]).to eq("true")
-        expect(row["Audit réalisé par"]).to eq("Bear & Bee")
-        expect(row["Taux de conformité"]).to eq("85,5%")
-        expect(row["Date de la déclaration"]).to eq("2023-06-15")
-        expect(row["Déclaration mise à jour le"]).to eq("2025-08-20")
-        expect(row["Adresse email de contact"]).to eq("Non trouvé")
-        expect(row["Formulaire de contact"]).to eq("Non trouvé")
-        expect(row["Schéma pluriannuel d'accessibilité"]).to eq("https://example.com/schema.pdf")
-        expect(row["Années de validité du schéma"]).to eq("2023-2024")
-        expect(row["Plan d'action"]).to eq("https://example.com/plan.pdf")
-        expect(row["Année(s) du plan"]).to eq("2025")
+        expect(row.to_h).to eq(
+                              "Site" => "example.com",
+                              "Site joignable" => "Oui",
+                              "Url évaluée" => "https://example.com/",
+                              "Url de redirection" => "https://www.example.com/",
+                              "Taux d'accessibilité déclaré" => "85,5%",
+                              "Niveau d'accessibilité déclaré" => "Totalement conforme",
+                              "Respect des obligations légales" => "3",
+                              "Déclaration d'accessibilité" => "Présent",
+                              "URL de la déclaration" => "https://example.com/accessibilite",
+                              "Mention d'accessibilité" => "Présent",
+                              "Schéma pluriannuel" => "Présent",
+                              "URL schéma pluriannuel" => "https://example.com/schema.pdf",
+                              "Plan d'action" => "Présent",
+                              "URL plan d'action" => "https://example.com/plan.pdf",
+                              "Qualité de la déclaration" => "2.5",
+                              "Hébergement de la déclaration" => "Valide",
+                              "Date de déclaration" => "Valide",
+                              "Référentiel" => "Invalide",
+                              "Auditeur" => "Valide",
+                              "Article de loi" => "Invalide",
+                              "Adresse email de contact (ou formulaire de contact)" => "Valide",
+                              "Adresse email" => nil,
+                              "Formulaire de contact" => "https://example.com/contact",
+                              "Format de la déclaration" => "Invalide",
+                              "Schéma pluriannuel (qualité)" => "Valide",
+                              "Plan d'action (qualité)" => "Invalide",
+                              "Résultat des tests auto RGAA" => "45 / 50 réussis",
+                              "Tests auto RGAA applicables" => "50",
+                              "Tests auto RGAA réussis" => "45",
+                              "Tests auto non applicables" => "10",
+                              "URL évaluation accès cible" => "http://example.com/sites/example-com/audits/#{audit.id}",
+                              "Évaluateur" => audit.user.to_s,
+                              "Organisation" => audit.team.organization_label,
+                              "Lancée le" => I18n.l(audit.created_at.to_date),
+                              "Étiquettes" => "Gouvernment, Santé publique"
+                            )
       end
 
-      it "keeps not found when the accessibility declaration host is unknown" do
-        site.last_audit.reload.find_accessibility_page.update!(url: "https://example.com/accessibilite", internal: nil)
+      it "marks an externally hosted declaration as invalid" do
+        site.last_audit.reload.find_accessibility_page.update!(internal: false, conform: false)
 
-        row = parsed_csv.first
-
-        expect(row["Déclaration hébergée sur le site audité"]).to eq("Non trouvé")
-      end
-    end
-
-    context "with failed check" do
-      before do
-        audit = site.last_audit.reload
-        audit.checks.destroy_all
-
-        create(:check, :reachable, :failed, audit:)
-      end
-
-      it "shows human_status for failed check" do
-        row = parsed_csv.first
-        expect(row["Indication de la langue"]).to eq("Non trouvé")
+        expect(parsed_csv.first["Hébergement de la déclaration"]).to eq("Invalide")
       end
     end
 
@@ -149,8 +164,7 @@ RSpec.describe AuditCsvExport do
       end
 
       it "shows human_status for errored check" do
-        row = parsed_csv.first
-        expect(row["Mention du niveau d'accessibilité"]).to eq("Erreur")
+        expect(parsed_csv.first["Niveau d'accessibilité déclaré"]).to eq("Erreur")
       end
     end
 
@@ -163,38 +177,7 @@ RSpec.describe AuditCsvExport do
       end
 
       it "shows human_status for aborted check" do
-        row = parsed_csv.first
-        expect(row["Mention du niveau d'accessibilité"]).to eq("Annulé")
-      end
-    end
-  end
-
-  describe ".extract_value" do
-    let(:check) { instance_double(Check) }
-
-    context "when check is nil" do
-      it "returns not found" do
-        expect(described_class.extract_value(nil, nil)).to eq("Non trouvé")
-      end
-    end
-
-    context "when check is aborted" do
-      before do
-        allow(check).to receive_messages(aborted?: true, errored?: false, failed?: false, human_status: "Aborted")
-      end
-
-      it "returns human_status" do
-        expect(described_class.extract_value(check, "something")).to eq("Aborted")
-      end
-    end
-
-    context "when check is completed" do
-      before do
-        allow(check).to receive_messages(aborted?: false, errored?: false, failed?: false)
-      end
-
-      it "yields and returns block value" do
-        expect(described_class.extract_value(check, "something")).to eq("something")
+        expect(parsed_csv.first["Niveau d'accessibilité déclaré"]).to eq("Annulé")
       end
     end
   end
