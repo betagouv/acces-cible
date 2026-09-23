@@ -5,7 +5,6 @@ Fonctionnalité:
   Contexte:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
-    Et que je clique sur "Ajouter un site"
 
   Scénario: Un agent peut filtrer les sites par nom de tag
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
@@ -14,10 +13,8 @@ Fonctionnalité:
       https://beta.gouv.fr;beta
       https://numerique.gouv.fr;gouv,public
       https://www.suresnes.fr;public
-    """
-    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-    Quand je clique sur "Importer"
-    Et que l'import est terminé
+      """
+    Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je clique sur "Mes évaluations"
     Et que je filtre par étiquette "public"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
@@ -31,10 +28,8 @@ Fonctionnalité:
       https://beta.gouv.fr
       https://www.suresnes.fr
       https://numerique.gouv.fr
-    """
-    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-    Quand je clique sur "Importer"
-    Et que l'import est terminé
+      """
+    Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je clique sur "Mes évaluations"
     Et que je clique sur "Trier par Site croissant"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
@@ -56,10 +51,8 @@ Fonctionnalité:
       https://kappa.gouv.fr;public
       https://lambda.gouv.fr;public
       https://psi.gouv.fr;public
-    """
-    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-    Quand je clique sur "Importer"
-    Et que l'import est terminé
+      """
+    Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je clique sur "Mes évaluations"
     Et que je clique sur "Trier par Site croissant"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :

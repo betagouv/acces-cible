@@ -1,0 +1,22 @@
+<%# locals: (f:, audit_batch:) %>
+<h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
+<% if audit_batch.csv_import? %>
+  <p><%= t(".csv_intro_html", count: @pagy.count) %></p>
+<% else %>
+  <p><%= t(".intro_html", count: @pagy.count) %></p>
+<% end %>
+
+<ol class="fr-raw-list">
+  <% @sites.each do |site| %>
+    <li class="fr-border-default--grey fr-p-2w fr-mb-2w">
+      <p class="fr-text--bold fr-mb-2w">
+        <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
+      </p>
+      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: @tags, add_tags_url: url_for(page: @pagy.page, requested_step: audit_batch.current_step) %>
+    </li>
+  <% end %>
+</ol>
+
+<% if paginated?(@pagy) %>
+  <%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: audit_batch.current_step, data: { turbo: false } } %>
+<% end %>

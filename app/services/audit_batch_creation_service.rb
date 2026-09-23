@@ -1,19 +1,19 @@
 class AuditBatchCreationService
-  def initialize(team:, tag_ids:, user:)
+  def initialize(team:, user:, audit_batch:)
     @team = team
-    @tag_ids = tag_ids
     @user = user
+    @audit_batch = audit_batch
   end
 
   def process(site_data)
     tag_ids = site_tag_ids(site_data)
-    site = @team.sites.find_by(url: site_data["url"])
+    site = @team.sites.find_by(normalized_url: Link.url_without_scheme_and_www(site_data["url"]))
 
     if site
       update_site(site, site_data, tag_ids)
-      site.audit!(user: @user)
+      site.audit!(user: @user, audit_batch: @audit_batch)
     else
-      Site.create!(url: site_data["url"], team: @team, tag_ids:).audit!(user: @user)
+      Site.create!(url: site_data["url"], team: @team, tag_ids:).audit!(user: @user, audit_batch: @audit_batch)
     end
   end
 
@@ -25,8 +25,7 @@ class AuditBatchCreationService
   end
 
   def site_tag_ids(site_data)
-    tag_ids = @tag_ids + tag_ids_from_names(site_data["tag_names"] || [])
-    tag_ids.compact_blank.map(&:to_i).uniq
+    tag_ids_from_names(site_data["tag_names"] || []).uniq
   end
 
   def tag_ids_from_names(tag_names)

@@ -114,9 +114,8 @@ search:
 
 ## Consider these keys used:
 ignore_unused:
-  - 'activemodel.attributes.site_upload.file'
-  - 'activemodel.errors.models.site_upload.attributes.file.*'
-  - 'activerecord.attributes.{site,tag}.*'
+  - 'activerecord.attributes.{audit_batch,site,tag}.*'
+  - 'activerecord.errors.models.audit_batch.attributes.file.*'
   - 'activerecord.errors.attributes.url.invalid'
   - 'activerecord.models.site*'
   - 'activerecord.models.team*'

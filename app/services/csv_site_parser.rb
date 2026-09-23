@@ -4,6 +4,20 @@ class CsvSiteParser
   BOM = /^\xEF\xBB\xBF/
   FIRST_DATA_ROW_NUMBER = 2 # Row 1 contains CSV headers
   SUPPORTED_SEPARATORS = [",", ";"].freeze
+  REQUIRED_HEADERS = ["url"].freeze
+  MAX_FILE_SIZE = 5.megabytes
+  ALLOWED_CONTENT_TYPES = [
+    "text/csv",
+    "text/comma-separated-values",
+    "text/x-csv",
+    "text/plain",
+    "application/csv",
+    "application/vnd.ms-excel",
+    "application/excel",
+    "application/x-excel",
+    "application/x-msexcel",
+    "application/octet-stream"
+  ].freeze
 
   def initialize(file:, team:, errors:)
     @file = file
@@ -12,6 +26,8 @@ class CsvSiteParser
   end
 
   def parse_data!
+    return [] unless valid_file?
+
     sites_by_url = {}
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8", col_sep:).with_index(FIRST_DATA_ROW_NUMBER) do |row, line_number|
@@ -24,8 +40,15 @@ class CsvSiteParser
       next unless url
 
       merge_site_data!(sites_by_url, url, row)
+      break if sites_by_url.size > AuditBatch::MAX_CSV_SITES
     end
 
+    if sites_by_url.size > AuditBatch::MAX_CSV_SITES
+      errors.add(:file, :too_many_rows, max: AuditBatch::MAX_CSV_SITES)
+      return []
+    end
+
+    errors.add(:file, :blank) if sites_by_url.empty? && errors[:file].none?
     sites_by_url.values
   rescue CSV::MalformedCSVError => error
     report_malformed_csv(error)
@@ -39,6 +62,23 @@ class CsvSiteParser
   private
 
   attr_reader :file, :team, :errors
+
+  def valid_file?
+    if file.nil?
+      errors.add(:file, :blank)
+    else
+      errors.add(:file, :invalid_size) if file.size.zero? || file.size > MAX_FILE_SIZE
+      errors.add(:file, :invalid_format) unless file.original_filename.to_s.ends_with?(".csv") && ALLOWED_CONTENT_TYPES.include?(file.content_type)
+      errors.add(:file, :invalid_headers) unless valid_headers?
+    end
+    errors[:file].none?
+  end
+
+  def valid_headers?
+    (REQUIRED_HEADERS - headers).empty?
+  rescue StandardError
+    false
+  end
 
   def first_line
     @first_line ||= File.open(file.path, &:gets)&.strip&.sub(BOM, "") || ""
@@ -62,7 +102,7 @@ class CsvSiteParser
 
   def report_malformed_csv(error)
     Rails.logger.warn(
-      "site_upload_malformed_csv " \
+      "csv_import_malformed_csv " \
         "team_id=#{team&.id} " \
         "filename=#{file&.original_filename} " \
         "error_class=#{error.class.name} " \
@@ -73,7 +113,7 @@ class CsvSiteParser
 
   def report_invalid_url(error, raw_url, line_number)
     Rails.logger.warn(
-      "site_upload_invalid_url " \
+      "csv_import_invalid_url " \
         "team_id=#{team&.id} " \
         "filename=#{file&.original_filename} " \
         "line_number=#{line_number} " \
@@ -85,21 +125,7 @@ class CsvSiteParser
   end
 
   def merge_site_data!(sites_by_url, url, row)
-    site_data = sites_by_url[url] || build_site_data(url, row)
-    site_data["tag_names"] = (site_data["tag_names"] + extract_tag_names(row)).uniq
-    sites_by_url[url] = site_data
-  end
-
-  def build_site_data(url, row)
-    {
-      "url" => url,
-      "tag_names" => []
-    }
-  end
-
-  def extract_tag_names(row)
-    return [] if row["tags"].blank?
-
-    row["tags"].split(",").map(&:strip).compact_blank.uniq
+    site_data = sites_by_url[url] ||= { "url" => url, "tag_names" => [] }
+    site_data["tag_names"] += row["tags"].to_s.split(",").map(&:strip)
   end
 end

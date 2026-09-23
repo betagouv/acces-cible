@@ -1,0 +1,17 @@
+<%# locals: (f:, audit_batch:) %>
+<fieldset class="fr-fieldset">
+  <legend class="fr-fieldset__legend fr-h4">
+    <%= t(".legend") %>
+  </legend>
+
+  <%= render "audit_batches/steps/method_option", f:, kind: :manual,
+        pictogram: "artwork/pictograms/digital/internet.svg" %>
+  <%= render "audit_batches/steps/method_option", f:, kind: :csv_import,
+        pictogram: "artwork/pictograms/document/document-add.svg" %>
+
+  <% if audit_batch.errors[:kind].any? %>
+    <div class="fr-messages-group" role="alert">
+      <p class="fr-message fr-message--error"><%= audit_batch.errors.full_messages_for(:kind).to_sentence %></p>
+    </div>
+  <% end %>
+</fieldset>

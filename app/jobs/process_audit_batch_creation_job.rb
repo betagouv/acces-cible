@@ -1,13 +1,14 @@
 class ProcessAuditBatchCreationJob < ApplicationJob
   include ActiveJob::Continuable
 
-  def perform(sites_data, team_id, tag_ids, user_id)
+  def perform(sites_data, team_id, user_id, audit_batch_id)
     team = Team.find(team_id)
     user = team.users.find(user_id)
 
     return unless user.present?
 
-    audit_batch_creation = AuditBatchCreationService.new(team:, tag_ids:, user:)
+    audit_batch = user.audit_batches.find(audit_batch_id)
+    audit_batch_creation = AuditBatchCreationService.new(team:, user:, audit_batch:)
 
     step :process_sites do |step|
       start_index = step.cursor || 0

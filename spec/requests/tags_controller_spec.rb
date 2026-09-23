@@ -89,20 +89,6 @@ RSpec.describe "Tags" do
         end
       end
     end
-
-    context "when creating a tag from SiteUpload form" do
-      let(:params) { { site_upload: { tags_attributes: { name: "upload tag" }, tag_ids: [] } } }
-      let(:frame_id) { "tags_site_upload" }
-
-      it "creates a new tag for upload context" do
-        expect { create_tag }.to change(Tag, :count).by(1)
-
-        tag = Tag.last
-        expect(tag.name).to eq("upload tag")
-        expect(response.media_type).to eq(turbo_stream)
-        expect(response.body).to have_css("turbo-stream[action='replace'][target='#{frame_id}']")
-      end
-    end
   end
 
   describe "GET /tags/:id" do

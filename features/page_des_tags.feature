@@ -5,7 +5,6 @@ Fonctionnalité: Page des étiquettes
   Contexte:
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
-    Et que je clique sur "Ajouter un site"
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
       """
       url;tags
@@ -13,9 +12,7 @@ Fonctionnalité: Page des étiquettes
       https://numerique.gouv.fr;gouv,secret
       https://www.suresnes.fr;secret
       """
-    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-    Quand je clique sur "Importer"
-    Et que l'import est terminé
+    Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je clique sur "Toutes les étiquettes"
 
   Scénario: Un agent peut voir les sites associés à un tag depuis la page des tags
