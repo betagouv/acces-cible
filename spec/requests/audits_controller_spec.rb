@@ -161,9 +161,9 @@ RSpec.describe "Audits" do
     end
 
     it "keeps default columns in their default order, before the other columns" do
-      patch columns_audits_path, params: { columns: ["", "auditor", *AuditsController::DEFAULT_INDEX_COLUMNS.reverse] }
+      patch columns_audits_path, params: { columns: ["", "auditor", *AuditColumns::DEFAULT.reverse] }
 
-      expect(session[:audits_columns]).to eq([*AuditsController::DEFAULT_INDEX_COLUMNS, "auditor"])
+      expect(session[:audits_columns]).to eq([*AuditColumns::DEFAULT, "auditor"])
     end
 
     it "redirects to the audits index" do
@@ -204,8 +204,8 @@ RSpec.describe "Audits" do
 
       csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
       expect(csv.count).to eq(2)
-      expect(csv[0]["Adresse du site"]).to eq(site.normalized_url)
-      expect(csv[1]["Adresse du site"]).to eq(other_site.normalized_url)
+      expect(csv[0]["Site"]).to eq(site.normalized_url)
+      expect(csv[1]["Site"]).to eq(other_site.normalized_url)
     end
 
     context "when filtering by tag id" do
@@ -216,7 +216,7 @@ RSpec.describe "Audits" do
 
         csv = CSV.parse(csv_without_bom, col_sep: ";", headers: true)
         expect(csv.count).to eq(1)
-        expect(csv.first["Adresse du site"]).to eq(other_site.normalized_url)
+        expect(csv.first["Site"]).to eq(other_site.normalized_url)
       end
     end
   end

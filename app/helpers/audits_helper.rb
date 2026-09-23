@@ -1,8 +1,6 @@
 module AuditsHelper
   def obligation_badge(check)
-    return badge(status: :error, text: t("shared.absent")) unless check.found?
-
-    badge(status: check.conform? ? :success : :info, text: t("shared.present"))
+    badge(**AuditColumns.obligation(check))
   end
 
   def obligation_comment(check)
@@ -38,15 +36,13 @@ module AuditsHelper
   end
 
   def presence_badge(present)
-    present ? badge(status: :success, text: t("shared.present")) : badge(status: :error, text: t("shared.absent"))
+    badge(**AuditColumns.presence(present))
   end
 
   def validity_badge(check)
-    return badge(status: :error, text: t("shared.absent")) unless check.found?
+    return presence_badge(false) unless check.found?
 
-    conform = check.conform
-
-    badge(status: conform ? :success : :warning, text: conform ? t("shared.valid") : t("shared.invalid"))
+    badge(**AuditColumns.validity(check.conform))
   end
 
   def validity_value(check)
@@ -164,8 +160,7 @@ module AuditsHelper
   def audit_cell(audit, column)
     case column
     when "site" then tag.th(site_link(audit.site))
-    when "evaluator" then tag.td(truncated_value(audit.user.to_s))
-    when "organization_label" then tag.td(truncated_value(audit.team.organization_label))
+    when "evaluator", "organization_label" then tag.td(truncated_value(AuditColumns.value(audit, column)))
     when "last_audit_at" then tag.td(audit_date_link(audit))
     when "tags" then tag.td(site_tags(audit.site), class: "fr-cell--multiline")
     else tag.td(audit_cell_content(audit, column), class: "fr-cell--center")
@@ -175,31 +170,12 @@ module AuditsHelper
   private
 
   def audit_cell_content(audit, column)
-    declaration = audit.analyze_accessibility_page
-    axe = audit.run_axe_on_homepage
+    value = AuditColumns.value(audit, column)
 
     case column
-    when "compliance_rate" then declaration.human_compliance_rate || check_badge(declaration, hover: false, no_icon: true)
-    when "declared_level" then check_badge(audit.accessibility_mention, hover: false, no_icon: true)
-    when "legal_obligations" then star_rating(filled: audit.legal_obligation_score.to_i, total: 4, color: "blue", label: t("audits.audit.legal_obligations"))
-    when "declaration_quality" then star_rating(filled: audit.declaration_quality_score.to_f, total: 4, color: "gold", label: t("audits.audit.declaration_quality"))
-    when "accessibility_page" then obligation_badge(audit.find_accessibility_page)
-    when "accessibility_mention" then obligation_badge(audit.accessibility_mention)
-    when "schema" then obligation_badge(audit.analyze_schema)
-    when "plan" then obligation_badge(audit.analyze_plan)
-    when "declaration_date" then presence_badge(declaration.audit_date.present?)
-    when "standard" then presence_badge(declaration.standard.present?)
-    when "auditor" then presence_badge(declaration.auditor.present?)
-    when "law_article" then presence_badge(declaration.mentions_article)
-    when "contact" then presence_badge(declaration.contact_email.present? || declaration.contact_form.present?)
-    when "declaration_format" then validity_badge(audit.accessibility_page_heading)
-    when "schema_quality" then validity_badge(audit.analyze_schema)
-    when "plan_quality" then validity_badge(audit.analyze_plan)
-    when "automated_tests_result" then axe.completed? ? t("audits.show.automated_tests_results", count: axe.passes, total: axe.applicable_total) : muted_dash
-    when "automated_tests_applicable" then axe.applicable_total || muted_dash
-    when "automated_tests_passed" then axe.passes || muted_dash
-    when "automated_tests_inapplicable" then axe.inapplicable || muted_dash
-    when "reachable" then check_badge(audit.reachable, hover: false, no_icon: true)
+    when "legal_obligations" then star_rating(filled: value, total: 4, color: "blue", label: t("audits.audit.legal_obligations"))
+    when "declaration_quality" then star_rating(filled: value, total: 4, color: "gold", label: t("audits.audit.declaration_quality"))
+    else value.is_a?(Hash) ? badge(**value) : value || muted_dash
     end
   end
 
