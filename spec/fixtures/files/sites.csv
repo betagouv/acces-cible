@@ -1,3 +1,3 @@
-url,name
-https://example.com,Example Site
-https://test.com,Test Site
+url;tags
+https://example.com;public
+https://test.com;public,ministère

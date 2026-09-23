@@ -126,6 +126,11 @@ main .fr-link {
   height: 0;
 }
 
+// Put the main submit button first in the DOM (so tapping Enter triggers it) while displaying it on the right
+.fr-grid-row--reverse {
+  flex-direction: row-reverse;
+}
+
 // Allow placing input and buttons side-by-side
 .fr-input-group--inline {
   display: flex;

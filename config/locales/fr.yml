@@ -1,20 +1,8 @@
 fr:
-  activemodel:
-    attributes:
-      site_upload:
-        file: Import
-    errors:
-      models:
-        site_upload:
-          attributes:
-            file:
-              invalid_format: Le fichier n'est pas reconnu comme un fichier CSV.
-              invalid_headers: Le fichier n'a pas les bons en-têtes de colonne.
-              invalid_row_url: "Le fichier contient une URL invalide à la ligne %{line_number} : %{url}"
-              invalid_size: Le fichier est trop lourd. Merci de le découper en plusieurs fichiers.
-              malformed_csv: Le fichier CSV est mal formé. Veuillez ré-exporter votre fichier depuis votre tableur et vérifier sa structure.
   activerecord:
     attributes:
+      audit_batch:
+        file: Fichier CSV
       site:
         url: Adresse du site
       tag:
@@ -23,6 +11,20 @@ fr:
       attributes:
         url:
           invalid: "n'est pas valide"
+      models:
+        audit_batch:
+          attributes:
+            file:
+              blank: doit contenir au moins une adresse.
+              invalid_format: n'est pas reconnu comme un fichier CSV.
+              invalid_headers: n'a pas les bons en-têtes de colonne.
+              invalid_row_url: "contient une adresse invalide à la ligne %{line_number} : %{url}"
+              invalid_size: est trop lourd. Merci de le découper en plusieurs fichiers.
+              too_many_rows: "ne doit pas dépasser %{max} adresses. Merci de le découper en plusieurs fichiers."
+              malformed_csv: est mal formé. Veuillez le ré-exporter depuis votre tableur et vérifier sa structure.
+            urls:
+              too_long: Vous ne pouvez pas évaluer plus de %{count} adresses à la fois.
+              too_short: Saisissez au moins une adresse.
     models:
       site:
         one: Site
@@ -30,6 +32,55 @@ fr:
       team:
         one: Équipe
         other: Équipes
+  audit_batches:
+    launch: Lancer l'évaluation
+    create:
+      launched:
+        one: Évaluation lancée. Les résultats arriveront dans quelques minutes.
+        other: "%{count} évaluations lancées. Les résultats arriveront dans quelques minutes."
+    new:
+      intro: "Chaque adresse donne lieu à une nouvelle évaluation : niveau d'accessibilité déclaré, respect des obligations légales, qualité de la déclaration et, en option, une série de tests automatiques du RGAA."
+      title: Lancer une évaluation
+    steps:
+      checks:
+        title: Tests automatiques (optionnel)
+        heading: Tests automatiques du RGAA
+        optional: Optionnel
+        intro_html: En complément de l'analyse de la déclaration, Accès cible peut exécuter une série de <strong>%{count} tests automatiques</strong> couvrant <strong>1/3 des critères du RGAA</strong> sur la page d'accueil de chaque site.
+        toggle: Lancer les tests automatiques sur la page d'accueil
+        enabled: Activés
+        disabled: Désactivés
+        hint: Ces tests sont lancés systématiquement. Le choix arrivera dans une prochaine version.
+      method:
+        title: Méthode d'ajout
+        legend: Comment souhaitez-vous ajouter les sites ?
+        manual: Saisir des adresses
+        manual_hint: Saisissez de 1 à 10 adresses, une par champ.
+        csv_import: Importer un CSV
+        csv_import_hint: Importez une liste d'adresses depuis un fichier CSV.
+      summary:
+        title: Récapitulatif et étiquettes
+        heading: Récapitulatif
+        intro_html:
+          one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>, vous pouvez lui ajouter des étiquettes.
+          other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>, vous pouvez leur ajouter des étiquettes.
+        csv_intro_html:
+          one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>. Vous pouvez lui ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
+          other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>. Vous pouvez leur ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
+        new_tag: Nouvelle étiquette
+        tags: Étiquettes de %{site}
+      urls:
+        title: Adresses à évaluer
+        manual:
+          legend: Adresses des sites à évaluer
+          hint: Une adresse par champ (https://…). Jusqu'à %{max} sites.
+          label: Adresse du site
+          add: Ajouter un site
+          remove: Supprimer cette adresse
+        csv_import:
+          legend: Fichier des sites à évaluer
+          hint: Une colonne « url » obligatoire et une colonne « tags » facultative (étiquettes séparées par des virgules). 2 000 adresses et 5 Mo maximum.
+          example: Télécharger un fichier d'exemple
   audits:
     audit:
       audit_label: "Voir l'audit de %{url} du %{date}"
@@ -448,9 +499,11 @@ fr:
     apply: Appliquer
     applying: Appliquer…
     asc: croissant
+    back: Retour
     back_to_home: "Revenir à la page d'accueil"
     back_to_list: "Revenir à la liste"
     cancel: Annuler
+    continue: Continuer
     dash: "-"
     desc: décroissant
     filter: Filtrer
@@ -471,10 +524,15 @@ fr:
     or: ou
     page_unavailable: Cette page n'est pas disponible.
     pagination:
+      current_page: Page %{page}, page actuelle
+      label: Pagination
+      next: Page suivante
+      page: Page %{page}
       per_page:
         one: Une ligne par page
         other: "%{count} lignes par page"
       per_page_label: Nombre de lignes par page
+      previous: Page précédente
     personal_data: Données personnelles
     required_fields: Les champs obligatoires sont indiqués par un astérisque.
     save: Enregistrer
@@ -491,21 +549,9 @@ fr:
   site:
     name: "Nom du site"
   sites:
-    add: Ajouter un site
     all: Tous les sites
-    create:
-      created: Site ajouté
-      new_audit: Site existant, nouvel audit programmé
     edit:
       title: Modifier les étiquettes du site
-    form:
-      url: Adresse du site
-      url_hint: Saisissez une url valide, commençant par https:// ou http://
-    new:
-      file: Fichier CSV
-      file_hint: "Format attendu : fichier CSV avec une colonne obligatoire 'URL', une colonne 'Tags' optionnelle avec les tags séparés par une virgule, et une colonne optionnelle 'Nom'. Taille maximale : 5Mo. Les noms de colonnes peuvent être en majuscule ou en minuscule."
-      import: Importer des sites depuis un fichier
-      title: Ajouter un site
     show:
       audit_history: Historique des vérifications (%{total})
       audit_history_hint: "Chaque vérification reste consultable. Sélectionnez-en une pour afficher son résultat détaillé."
@@ -521,12 +567,6 @@ fr:
       new: Nouvelle étiquette
     update:
       notice: Étiquettes modifiées
-    upload:
-      title: Importer des sites
-      started:
-        zero: L'import du fichier CSV a commencé. Aucun site n’a été détecté.
-        one: L'import du fichier CSV a commencé. 1 site sera ajouté.
-        other: L'import du fichier CSV a commencé. %{count} sites seront ajoutés progressivement.
   tags:
     all: Toutes les étiquettes
     index:

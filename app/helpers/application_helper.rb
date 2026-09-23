@@ -81,6 +81,10 @@ module ApplicationHelper
     request.path == "/"
   end
 
+  def paginated?(pagy)
+    pagy.present? && pagy.last > 1
+  end
+
   def current_version
     ENV["CONTAINER_VERSION"] || "local"
   end

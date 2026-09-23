@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe AuditBatchCreationService do
   describe "#process" do
-    subject(:process_site) { described_class.new(team:, tag_ids: extra_tag_ids, user:).process(site_data) }
+    subject(:process_site) { described_class.new(team:, user:, audit_batch:).process(site_data) }
 
     let(:team) { create(:team) }
     let(:user) { create(:user) }
@@ -16,7 +16,13 @@ RSpec.describe AuditBatchCreationService do
         "tag_names" => ["tag_1", "tag_2"]
       }
     end
-    let(:extra_tag_ids) { [] }
+    let(:audit_batch) { create(:audit_batch, user:) }
+
+    it "attaches the audit to the batch" do
+      process_site
+
+      expect(created_site.audits.last.audit_batch).to eq(audit_batch)
+    end
 
     context "when the site does not exist" do
       it "creates a new site" do
@@ -45,17 +51,6 @@ RSpec.describe AuditBatchCreationService do
 
         expect(Site.last.last_audit.user).to eq(user)
       end
-
-      context "with extra tags" do
-        let(:extra_tag) { create(:tag, team:, name: "extra_tag") }
-        let(:extra_tag_ids) { [extra_tag.id] }
-
-        it "associates CSV tags and extra tags" do
-          process_site
-
-          expect(site_tags).to contain_exactly("tag_1", "tag_2", "extra_tag")
-        end
-      end
     end
 
     context "when the site already exists" do
@@ -82,9 +77,8 @@ RSpec.describe AuditBatchCreationService do
         expect(existing_site.last_audit.user).to eq(user)
       end
 
-      context "when a selected tag is already attached and present in the CSV" do
+      context "when a selected tag is already attached" do
         let(:site_data) { { "url" => url, "tag_names" => ["existing_tag"] } }
-        let(:extra_tag_ids) { [existing_tag.id.to_s] }
 
         it "does not try to attach the same tag twice" do
           process_site
@@ -101,23 +95,11 @@ RSpec.describe AuditBatchCreationService do
           "tag_names" => ["tag", "tag"]
         }
       end
-      let(:duplicate_tag) { create(:tag, team:, name: "tag") }
-      let(:extra_tag_ids) { [duplicate_tag.id] }
 
       it "deduplicates tags" do
         process_site
 
         expect(site_tags).to contain_exactly("tag")
-      end
-
-      context "when selected tag IDs include a blank value from the form" do
-        let(:extra_tag_ids) { [""] }
-
-        it "ignores blank tag IDs" do
-          process_site
-
-          expect(site_tags).to contain_exactly("tag")
-        end
       end
     end
   end

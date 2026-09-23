@@ -1,0 +1,14 @@
+<%# locals: (f:, audit_batch:) %>
+<fieldset class="fr-fieldset fr-pb-0">
+  <legend class="fr-fieldset__legend fr-h5 fr-mb-0">
+    <%= t(".legend") %>
+  </legend>
+
+  <div class="fr-fieldset__element">
+    <%= f.dsfr_file_field :file, hint: t(".hint"), accept: ".csv,text/csv" %>
+  </div>
+
+  <div class="fr-fieldset__element fr-mb-0">
+    <%= link_to t(".example"), "/exemple.csv", download: "exemple", class: icon_class("download", line: true, side: :left) %>
+  </div>
+</fieldset>

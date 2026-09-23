@@ -27,10 +27,7 @@ Fonctionnalité: Export d'un CSV
       | https://beta.gouv.fr/      |
       | https://numerique.gouv.fr/ |
       | https://www.suresnes.fr/   |
-    Et que je choisis "Ajouter un site" dans le menu principal
-    Et que j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
-    Quand je clique sur "Importer"
-    Et que l'import est terminé
+    Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je choisis "Mes évaluations" dans le menu principal
     Et que je clique sur "Trier par Site croissant"
     Et que je filtre par étiquette "public"

@@ -1,0 +1,37 @@
+<%# locals: (pagy:, submit:) %>
+<% querify = ->(params) { params.slice!("page") } %>
+
+<div class="fr-text--sm">
+  <%== pagy.info_tag %>
+</div>
+
+<nav role="navigation" class="fr-pagination" aria-label="<%= t("shared.pagination.label") %>">
+  <ul class="fr-pagination__list">
+    <% if pagy.previous %>
+      <li>
+        <%= button_tag t("shared.pagination.previous"), type: :submit, formaction: pagy.page_url(pagy.previous, querify:), **submit,
+              class: "fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" %>
+      </li>
+    <% end %>
+
+    <% pagy.data_hash(data_keys: %i[series], querify:)[:series].each do |page| %>
+      <li>
+        <% if page.is_a?(Integer) %>
+          <%= button_tag page, type: :submit, formaction: pagy.page_url(page, querify:), **submit, class: "fr-pagination__link",
+                title: t("shared.pagination.page", page:) %>
+        <% elsif page.is_a?(String) %>
+          <span class="fr-pagination__link" aria-current="page" title="<%= t("shared.pagination.current_page", page:) %>"><%= page %></span>
+        <% elsif page == :gap %>
+          <span class="fr-pagination__link" aria-hidden="true"><%== t("pagy.gap") %></span>
+        <% end %>
+      </li>
+    <% end %>
+
+    <% if pagy.next %>
+      <li>
+        <%= button_tag t("shared.pagination.next"), type: :submit, formaction: pagy.page_url(pagy.next, querify:), **submit,
+              class: "fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" %>
+      </li>
+    <% end %>
+  </ul>
+</nav>
