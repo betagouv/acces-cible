@@ -1,11 +1,8 @@
 class AuditBatch < ApplicationRecord
   MAX_MANUAL_SITES = 10
   MAX_CSV_SITES = 2000
-  METHOD_STEP = "method".freeze
-  URLS_STEP = "urls".freeze
-  SUMMARY_STEP = "summary".freeze
-  CHECKS_STEP = "checks".freeze
-  STEPS = [METHOD_STEP, URLS_STEP, SUMMARY_STEP, CHECKS_STEP].freeze
+  STEPS = %w[method urls summary checks].freeze
+  METHOD_STEP, URLS_STEP, SUMMARY_STEP, CHECKS_STEP = STEPS
 
   belongs_to :user
   has_many :audits
