@@ -4,7 +4,7 @@
 <% field_name = "audit_batch[site_tag_names][#{site.normalized_url}][]" %>
 <% selected_names = audit_batch.tag_names_for(site) %>
 <% focus = params[:add_tags] == site.normalized_url %>
-<%= dsfr_accordion_section(title:, expanded: focus, header_level: 2, html_attributes: { class: "fr-mb-2w" }) do %>
+<%= dsfr_accordion_section(title:, expanded: focus, header_level: 4, html_attributes: { class: "fr-mb-2w" }) do %>
   <%= turbo_frame_tag id do %>
     <fieldset class="fr-fieldset fr-legend--hidden">
       <legend class="fr-fieldset__legend fr-fieldset__legend--regular"><%= title %></legend>
