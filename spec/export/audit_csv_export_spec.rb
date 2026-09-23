@@ -142,7 +142,7 @@ RSpec.describe AuditCsvExport do
                               "Tests auto non applicables" => "10",
                               "URL évaluation accès cible" => "http://example.com/sites/example-com/audits/#{audit.id}",
                               "Évaluateur" => audit.user.to_s,
-                              "Organisation" => audit.team.organization_label,
+                              "Organisation" => audit.user.team.organization_label,
                               "Lancée le" => I18n.l(audit.created_at.to_date),
                               "Étiquettes" => "Gouvernment, Santé publique"
                             )

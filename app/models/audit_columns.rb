@@ -35,7 +35,7 @@ module AuditColumns
       when "last_audit_at" then I18n.l(audit.created_at.in_time_zone.to_date)
       when "law_article" then validity(declaration.mentions_article)
       when "legal_obligations" then audit.legal_obligation_score.to_i
-      when "organization_label" then audit.team.organization_label
+      when "organization_label" then audit.user.team.organization_label
       when "plan" then obligation(audit.analyze_plan)
       when "plan_quality" then validity(audit.analyze_plan.conform)
       when "reachable" then check_status(audit.reachable)

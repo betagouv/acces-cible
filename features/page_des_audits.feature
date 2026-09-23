@@ -95,14 +95,13 @@ Fonctionnalité:
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       | example.gouv.fr |
     Et le tableau "Mes évaluations" contient les colonnes :
-      | Taux d'accessibilité déclaré     |
-      | Niveau d'accessibilité déclaré   |
-      | Respect des obligations légales  |
-      | Qualité de la déclaration        |
-      | Évaluateur                       |
-      | Organisation                     |
-      | Étiquettes                       |
-    Et le tableau "Mes évaluations" ne contient pas la colonne "Site joignable"
+      | Taux d'accessibilité déclaré    |
+      | Niveau d'accessibilité déclaré  |
+      | Respect des obligations légales |
+      | Qualité de la déclaration       |
+      | Évaluateur                      |
+      | Organisation                    |
+      | Étiquettes                      |
 
   Scénario: Un agent peut choisir les colonnes affichées
     Sachant que je possède un site "https://example.gouv.fr" avec des données
@@ -124,30 +123,30 @@ Fonctionnalité:
     Alors le tableau "Mes évaluations" contient les colonnes :
       | Site                                                |
       | Taux d'accessibilité déclaré                        |
-      | Niveau d'accessibilité déclaré                       |
+      | Niveau d'accessibilité déclaré                      |
       | Respect des obligations légales                     |
-      | Qualité de la déclaration                            |
-      | Déclaration d'accessibilité                          |
-      | Mention d'accessibilité                              |
-      | Schéma pluriannuel                                   |
-      | Plan d'action                                        |
-      | Site joignable                                       |
-      | Évaluateur                                           |
-      | Organisation                                         |
-      | Étiquettes                                           |
-      | Hébergement de la déclaration                        |
-      | Date de déclaration                                  |
-      | Référentiel                                          |
-      | Auditeur                                             |
-      | Article de loi                                       |
-      | Adresse email de contact (ou formulaire de contact)  |
-      | Format de la déclaration                             |
-      | Schéma pluriannuel (qualité)                         |
-      | Plan d'action (qualité)                              |
-      | Résultat des tests auto RGAA                         |
-      | Tests auto RGAA applicables                          |
-      | Tests auto RGAA réussis                              |
-      | Tests auto non applicables                           |
+      | Qualité de la déclaration                           |
+      | Déclaration d'accessibilité                         |
+      | Mention d'accessibilité                             |
+      | Schéma pluriannuel                                  |
+      | Plan d'action                                       |
+      | Site joignable                                      |
+      | Évaluateur                                          |
+      | Organisation                                        |
+      | Étiquettes                                          |
+      | Hébergement de la déclaration                       |
+      | Date de déclaration                                 |
+      | Référentiel                                         |
+      | Auditeur                                            |
+      | Article de loi                                      |
+      | Adresse email de contact (ou formulaire de contact) |
+      | Format de la déclaration                            |
+      | Schéma pluriannuel (qualité)                        |
+      | Plan d'action (qualité)                             |
+      | Résultat des tests auto RGAA                        |
+      | Tests auto RGAA applicables                         |
+      | Tests auto RGAA réussis                             |
+      | Tests auto non applicables                          |
 
   Scénario: Un agent voit un message quand aucun site n'existe
     Quand je clique sur "Mes évaluations"
