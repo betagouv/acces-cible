@@ -1,6 +1,8 @@
 require "active_support/core_ext/integer/time"
 require "debug/open_nonstop" if File.exist?("/.dockerenv")
 
+Rails.application.routes.default_url_options = { host: "localhost", port: "3000" }
+
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
   config.annotations.register_directories("features")
@@ -12,7 +14,7 @@ Rails.application.configure do
   # `rails server` does this broadcast itself, but bin/jobs (SolidQueue) does not.
   # https://api.rubyonrails.org/classes/ActiveSupport/BroadcastLogger.html
   stdout_logger = ActiveSupport::Logger.new(STDOUT)
-  file_logger   = ActiveSupport::Logger.new(Rails.root.join("log/development.log"))
+  file_logger = ActiveSupport::Logger.new(Rails.root.join("log/development.log"))
   config.logger = ActiveSupport::BroadcastLogger.new(stdout_logger, file_logger)
 
   # Make code changes take effect immediately without server restart.

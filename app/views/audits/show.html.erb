@@ -19,7 +19,7 @@
 <p class="fr-text--sm fr-mb-3w">
   <%= dsfr_link_to truncated(@site.normalized_url), site_path(@site), title: @site.normalized_url %>
   - <%= l(@audit.created_at, format: :long) %>
-  <% if @audit.user %> - <%= t(".launched_by", team: @audit.team.organization_label) %>
+  <% if @audit.user %> - <%= t(".launched_by", team: @audit.user.team.organization_label) %>
   <% end %>
 </p>
 

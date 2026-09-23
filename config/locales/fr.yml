@@ -32,10 +32,6 @@ fr:
       team:
         one: Équipe
         other: Équipes
-  audit:
-    redirect_url: URL de redirection
-    site_url_address: Adresse du site
-    url: URL
   audit_batches:
     launch: Lancer l'évaluation
     create:
@@ -98,6 +94,7 @@ fr:
       columns:
         accessibility_mention: Mention d'accessibilité
         accessibility_page: Déclaration d'accessibilité
+        audit_url: URL évaluation accès cible
         auditor: Auditeur
         automated_tests_applicable: Tests auto RGAA applicables
         automated_tests_inapplicable: Tests auto non applicables
@@ -105,10 +102,15 @@ fr:
         automated_tests_result: Résultat des tests auto RGAA
         compliance_rate: Taux d'accessibilité déclaré
         contact: Adresse email de contact (ou formulaire de contact)
+        contact_email: Adresse email
+        contact_form: Formulaire de contact
         declaration_date: Date de déclaration
         declaration_format: Format de la déclaration
+        declaration_hosting: Hébergement de la déclaration
         declaration_quality: Qualité de la déclaration
+        declaration_url: URL de la déclaration
         declared_level: Niveau d'accessibilité déclaré
+        evaluated_url: Url évaluée
         evaluator: Évaluateur
         last_audit_at: Lancée le
         law_article: Article de loi
@@ -116,9 +118,13 @@ fr:
         organization_label: Organisation
         plan: Plan d'action
         plan_quality: Plan d'action (qualité)
+        plan_url: URL plan d'action
         reachable: Site joignable
+        redirect_url: Url de redirection
         schema: Schéma pluriannuel
         schema_quality: Schéma pluriannuel (qualité)
+        schema_url: URL schéma pluriannuel
+        site: Site
         standard: Référentiel
         tags: Étiquettes
       displayed_columns: Colonnes affichées
@@ -129,7 +135,6 @@ fr:
       scope_filter: Périmètre des évaluations affichées
       scope_me: Mes évaluations
       scope_team: "Mon organisation (%{organization})"
-      site: Site
       tag_filter: Filtrer par étiquette
       title: Mes évaluations
     show:
@@ -258,7 +263,6 @@ fr:
         template_link: Consulter le modèle de déclaration d'accessibilité
         title: Hiérarchie des titres de la déclaration
   check:
-    completed_at: Vérification effectuée le
     status:
       aborted: Annulé
       blocked: Inapplicable
@@ -301,12 +305,8 @@ fr:
       type: Titres de la déclaration d'accessibilité
     analyze_accessibility_page:
       audit_date: Date de la déclaration
-      audit_update_date: Déclaration mise à jour le
       auditor: Audit réalisé par
-      contact_email: Adresse email de contact
-      contact_form: Formulaire de contact
       contact_email_or_form: Adresse email ou formulaire de contact
-      compliance_rate: Taux de conformité
       mentions_article: Mentionne l'article de loi
       missing_data: Déclaration incomplète
       standard: Référentiel
@@ -326,7 +326,6 @@ fr:
       table_header: Plan d'action
       type: Plan d'action
       year_not_found: non détectée
-      years: Année(s) du plan
       years_not_found: Année(s) valides non trouvée(s)
     analyze_schema:
       all_passed: Lien trouvé et valide
@@ -341,11 +340,9 @@ fr:
       table_header: Schéma
       type: Schéma pluriannuel d'accessibilité
       year_not_found: non détectées
-      years: Années de validité du schéma
       years_not_found: Années valides non trouvées
     find_accessibility_page:
       external_explanation: "Cette déclaration est hébergée hors du site audité"
-      hosted_on_audited_site: Déclaration hébergée sur le site audité
       link_to_page: "Déclaration d'accessibilité"
       not_found: Non trouvée
       table_header: Déclaration
@@ -399,7 +396,6 @@ fr:
         table-fake-caption: Tableaux dotés d’une vraie légende
         td-has-header: Cellules de tableau reliées à leurs en-têtes
         valid-lang: Codes de langue valides dans le texte
-      success_rate: Taux de réussite
       table_header: "🤖 : Accueil"
       type: "Contrôles automatiques : page d'accueil"
   date:

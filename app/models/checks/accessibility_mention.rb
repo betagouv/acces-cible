@@ -23,7 +23,7 @@ module Checks
     end
 
     def custom_badge_text
-      mention_text
+      completed? ? mention_text : human_status
     end
 
     def custom_badge_status
