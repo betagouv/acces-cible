@@ -39,6 +39,16 @@ describe CheckStateMachine do
     end
   end
 
+  context "when moving to skipped" do
+    let(:check) { create(:check, :reachable, :ready) }
+
+    it "tells the audit to look at dependent jobs" do
+      expect(check.audit).to receive(:abort_dependent_checks!)
+
+      check.transition_to!(:skipped)
+    end
+  end
+
   context "when moving to errored" do
     let(:check) { create(:check, :reachable, :running) }
 

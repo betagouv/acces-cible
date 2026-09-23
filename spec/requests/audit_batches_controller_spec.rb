@@ -66,6 +66,16 @@ RSpec.describe "AuditBatches" do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context "when moving to the checks step" do
+      let(:step) { "checks" }
+
+      it "shows the automated test toggle checked by default" do
+        post_step
+
+        expect(response.body).to have_checked_field("audit_batch_run_axe_on_homepage")
+      end
+    end
   end
 
   describe "GET /audit_batches" do
@@ -136,6 +146,16 @@ RSpec.describe "AuditBatches" do
 
         expect(ProcessSiteUploadJob).not_to have_been_enqueued
         expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context "when the automated test is unchecked" do
+      let(:audit_batch) { { kind: "manual", urls: ["https://example.com"], run_axe_on_homepage: "0" } }
+
+      it "persists the batch with the automated test disabled" do
+        launch
+
+        expect(AuditBatch.last.run_axe_on_homepage).to be false
       end
     end
   end

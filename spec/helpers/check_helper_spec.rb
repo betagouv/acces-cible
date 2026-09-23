@@ -63,6 +63,7 @@ RSpec.describe CheckHelper do
       ["failed", :error],
       ["pending", :info],
       ["blocked", :info],
+      ["skipped", :info],
     ].each do |state, expected_badge_level|
       context "when the check is in the #{state} state" do
         let(:state) { state }

@@ -54,6 +54,23 @@ RSpec.describe RunCheckJob do
     end
   end
 
+  context "when the check should be skipped" do
+    let(:check) { create(:check, :run_axe_on_homepage, :ready, audit:) }
+    let(:audit) { create(:audit, :without_checks, audit_batch:) }
+    let(:audit_batch) { create(:audit_batch, run_axe_on_homepage: false) }
+
+    it "transitions the check to skipped without running it" do
+      expect_any_instance_of(Check).not_to receive(:run!) # rubocop:disable RSpec/AnyInstance
+
+      perform_enqueued_jobs do
+        expect { described_class.perform_later(check) }
+          .to change { check.reload.current_state }
+                .from("ready")
+                .to("skipped")
+      end
+    end
+  end
+
   context "when check#run! raises an error" do
     before do
       error = Ferrum::TimeoutError.new("Timed out waiting for response")

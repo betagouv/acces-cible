@@ -199,6 +199,26 @@ RSpec.describe Checks::RunAxeOnHomepage do
     end
   end
 
+  describe "#skip?" do
+    subject(:skip) { check.skip? }
+
+    context "when the audit does not belong to a batch" do
+      it { is_expected.to be false }
+    end
+
+    context "when the audit belongs to a batch running the automated test" do
+      before { check.audit.update!(audit_batch: create(:audit_batch, run_axe_on_homepage: true)) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the audit belongs to a batch skipping the automated test" do
+      before { check.audit.update!(audit_batch: create(:audit_batch, run_axe_on_homepage: false)) }
+
+      it { is_expected.to be true }
+    end
+  end
+
   describe "#tooltip?" do
     subject(:tooltip) { check.tooltip? }
 

@@ -44,6 +44,12 @@ module Checks
       !completed?
     end
 
+    def skip?
+      return false unless audit.audit_batch
+
+      !audit.audit_batch.run_axe_on_homepage
+    end
+
     def applicable_total
       completed? ? passes + incomplete + violations : nil
     end

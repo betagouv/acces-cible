@@ -7,10 +7,8 @@
 <p><%= t(".intro_html", count: Checks::RunAxeOnHomepage::AXE_RULE_TO_RGAA_CRITERION.size) %></p>
 
 <div class="fr-toggle fr-toggle--label-left">
-  <input type="checkbox" class="fr-toggle__input" id="audit_batch_axe"
-         checked disabled aria-describedby="audit_batch_axe_hint">
-  <label class="fr-toggle__label" for="audit_batch_axe"
+  <%= f.check_box :run_axe_on_homepage, class: "fr-toggle__input" %>
+  <label class="fr-toggle__label" for="audit_batch_run_axe_on_homepage"
          data-fr-checked-label="<%= t(".enabled") %>"
          data-fr-unchecked-label="<%= t(".disabled") %>"><%= t(".toggle") %></label>
-  <p class="fr-hint-text" id="audit_batch_axe_hint"><%= t(".hint") %></p>
 </div>
