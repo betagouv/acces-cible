@@ -36,7 +36,7 @@
     </div>
   </div>
   <div class="fr-table__footer">
-    <% if paginated? -%>
+    <% if helpers.paginated?(pagy) -%>
       <%= render "shared/pagination", pagy: pagy %>
     <%- end %>
     <% if footer_actions? -%>

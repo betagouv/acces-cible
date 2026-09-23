@@ -118,11 +118,7 @@ RSpec.describe "AuditBatches" do
 
     context "with more addresses than the CSV limit supplied directly" do
       let(:audit_batch) { { kind: "csv_import", urls: } }
-      let(:urls) do
-        Array.new(AuditBatch::MAX_CSV_SITES + 1) do |index|
-          "https://site-#{index}.example.com"
-        end
-      end
+      let(:urls) { (AuditBatch::MAX_CSV_SITES + 1).times.map { "https://site-#{it}.example.com" } }
 
       it "creates nothing" do
         expect { launch }.not_to change(AuditBatch, :count)

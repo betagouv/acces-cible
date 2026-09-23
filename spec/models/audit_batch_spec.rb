@@ -83,7 +83,9 @@ RSpec.describe AuditBatch do
     end
 
     context "with more addresses than the manual limit" do
-      subject(:audit_batch) { build(:audit_batch, user:, urls: Array.new(AuditBatch::MAX_MANUAL_SITES + 1) { "https://site-#{it}.example.com" }) }
+      subject(:audit_batch) { build(:audit_batch, user:, urls:) }
+
+      let(:urls) { (AuditBatch::MAX_MANUAL_SITES + 1).times.map { "https://site-#{it}.example.com" } }
 
       it "rejects the batch" do
         expect(audit_batch.valid?(:urls_step)).to be false

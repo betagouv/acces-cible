@@ -42,10 +42,6 @@ module Dsfr
       )
     end
 
-    def paginated?
-      pagy.present?
-    end
-
     def header_actions?
       header_actions.any?
     end

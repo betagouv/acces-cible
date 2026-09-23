@@ -12,11 +12,11 @@
       <p class="fr-text--bold fr-mb-2w">
         <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
       </p>
-      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: @tags, add_tags_url: url_for(page: @pagy.page, requested_step: "summary") %>
+      <%= render "audit_batches/tags_form", site:, audit_batch:, tags: @tags, add_tags_url: url_for(page: @pagy.page, requested_step: audit_batch.current_step) %>
     </li>
   <% end %>
 </ol>
 
-<% if @pagy.last > 1 %>
-  <%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: "summary", data: { turbo: false } } %>
+<% if paginated?(@pagy) %>
+  <%= render "audit_batches/pagination", pagy: @pagy, submit: { name: "requested_step", value: audit_batch.current_step, data: { turbo: false } } %>
 <% end %>

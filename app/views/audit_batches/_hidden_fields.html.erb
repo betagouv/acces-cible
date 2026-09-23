@@ -1,11 +1,11 @@
-<%# locals: (f:, audit_batch:, step:, sites:) %>
-<%= f.hidden_field :kind unless step == "method" %>
-<% unless step == "urls" %>
+<%# locals: (f:, audit_batch:, sites:) %>
+<%= f.hidden_field :kind unless audit_batch.current_step == AuditBatch::METHOD_STEP %>
+<% unless audit_batch.current_step == AuditBatch::URLS_STEP %>
   <% audit_batch.urls.each do |url| %>
     <%= f.hidden_field :urls, multiple: true, value: url, id: nil %>
   <% end %>
 <% end %>
-<% editable_site_urls = step == "summary" ? sites.map(&:normalized_url) : [] %>
+<% editable_site_urls = audit_batch.current_step == AuditBatch::SUMMARY_STEP ? sites.map(&:normalized_url) : [] %>
 <% audit_batch.site_tag_names.each do |site_url, names| %>
   <% next if editable_site_urls.include?(site_url) %>
 

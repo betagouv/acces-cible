@@ -53,7 +53,7 @@ RSpec.describe CsvSiteParser do
     end
 
     context "when file has too many addresses" do
-      let(:csv_content) { "url\n" + (1..AuditBatch::MAX_CSV_SITES + 1).map { "https://site#{it}.example.com/" }.join("\n") }
+      let(:csv_content) { "url\n" + (AuditBatch::MAX_CSV_SITES + 1).times.map { "https://site#{it}.example.com/" }.join("\n") }
 
       it "adds an error and returns nothing" do
         expect(parsed_data).to be_empty

@@ -1,7 +1,11 @@
 class AuditBatch < ApplicationRecord
   MAX_MANUAL_SITES = 10
   MAX_CSV_SITES = 2000
-  STEPS = %w[method urls summary checks].freeze
+  METHOD_STEP = "method".freeze
+  URLS_STEP = "urls".freeze
+  SUMMARY_STEP = "summary".freeze
+  CHECKS_STEP = "checks".freeze
+  STEPS = [METHOD_STEP, URLS_STEP, SUMMARY_STEP, CHECKS_STEP].freeze
 
   belongs_to :user
   has_many :audits
@@ -11,6 +15,7 @@ class AuditBatch < ApplicationRecord
   attribute :urls, default: -> { [] }
   attribute :site_tag_names, default: -> { {} }
   attribute :file
+  attribute :requested_step
   normalizes :urls, with: ->(list) { list.compact_blank.uniq { Link.url_without_scheme_and_www(it) } }
   normalizes :site_tag_names, with: ->(names_by_site) { names_by_site.to_h.transform_values(&:compact_blank) }
 
@@ -21,6 +26,18 @@ class AuditBatch < ApplicationRecord
   validates :urls, length: { maximum: MAX_CSV_SITES }, on: :urls_step, if: :csv_import?
 
   delegate :team, to: :user
+
+  def current_step
+    @current_step ||= requested_step.in?([SUMMARY_STEP, CHECKS_STEP]) && invalid?(:urls_step) ? URLS_STEP : requested_step
+  end
+
+  def previous_step
+    STEPS[STEPS.index(current_step) - 1] unless current_step == STEPS.first
+  end
+
+  def next_step
+    STEPS[STEPS.index(current_step) + 1]
+  end
 
   def tag_names_for(site)
     site_tag_names[site.normalized_url] || []
