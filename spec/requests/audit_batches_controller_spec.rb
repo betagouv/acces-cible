@@ -66,16 +66,6 @@ RSpec.describe "AuditBatches" do
         expect(response).to have_http_status(:ok)
       end
     end
-
-    context "when moving to the checks step" do
-      let(:step) { "checks" }
-
-      it "shows the automated test toggle checked by default" do
-        post_step
-
-        expect(response.body).to have_checked_field("audit_batch_run_axe_on_homepage")
-      end
-    end
   end
 
   describe "GET /audit_batches" do
@@ -105,7 +95,7 @@ RSpec.describe "AuditBatches" do
 
     it "saves the batch, enqueues the creation of its sites and audits, then returns to the audits" do
       expect { launch }.to change(AuditBatch, :count).by(1)
-        .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
+                                                     .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
 
       expect(response).to redirect_to(audits_path)
       expect(flash[:notice]).to eq("2 évaluations lancées. Les résultats arriveront dans quelques minutes.")

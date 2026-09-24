@@ -139,6 +139,23 @@ Quand("je rajoute un site {string}") do |url|
   )
 end
 
+Quand("je rajoute un site {string} sans lancer les tests automatiques") do |url|
+  steps %(
+    Quand je choisis "Mes évaluations" dans le menu principal
+    Et que je clique sur "Lancer une évaluation"
+    Et que je choisis "Saisir des adresses"
+    Et que je clique sur "Continuer"
+    Et que je remplis "Adresse du site" avec "#{url}"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Continuer"
+    Et que je décoche "Lancer les tests automatiques sur la page d'accueil"
+    Et que je clique sur "Lancer l'évaluation"
+    Et que toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Et que je clique sur "#{Link.url_without_scheme_and_www(url)}"
+  )
+end
+
 Quand("je possède un site {string} avec des données") do |url|
   site = FactoryBot.create(:site, :with_data, url:, team:)
   site.last_audit.update!(user: current_user)

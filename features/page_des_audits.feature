@@ -148,6 +148,16 @@ Fonctionnalité:
       | Tests auto RGAA réussis                             |
       | Tests auto non applicables                          |
 
+  Scénario: Un agent voit que les tests automatiques ignorés n'affichent pas de résultat erroné
+    Sachant que le site "https://example.gouv.fr/" renvoie une réponse HTML normale pour la page d'accueil
+    Et que le site "https://example.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
+    Quand je rajoute un site "https://example.gouv.fr/" sans lancer les tests automatiques
+    Et que je clique sur "Mes évaluations"
+    Et que je coche toutes les cases
+    Et que je clique sur le premier lien ou bouton "Appliquer"
+    Alors la colonne "Résultat des tests auto RGAA" du tableau "Mes évaluations" contient dans l'ordre :
+      | Ignoré |
+
   Scénario: Un agent voit un message quand aucun site n'existe
     Quand je clique sur "Mes évaluations"
     Alors la page contient un tableau
