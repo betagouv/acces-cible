@@ -26,18 +26,24 @@
     <p class="fr-text--sm"><%= t(".intro") %></p>
 
     <% if @audits.none? %>
-      <p><%= t(".creating") %></p>
+      <p>
+        <span class="loader fr-text-action-high--blue-france fr-mr-1w" aria-hidden="true"></span>
+        <%= t(".creating") %>
+      </p>
     <% end %>
 
     <ul class="fr-raw-list">
       <% @audits.each do |audit| %>
         <% site = audit.site %>
         <li class="bordered-card fr-p-2w fr-mb-2w">
-          <% if audit.pending? %>
-            <%= dsfr_badge(status: :info, html_attributes: { class: "fr-badge--sm fr-mr-2w" }) { t(".statuses.pending") } %>
-          <% else %>
-            <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm fr-mr-2w" }) { t(".statuses.completed") } %>
-          <% end %>
+          <span class="audit-batch-status">
+            <% if audit.pending? %>
+              <span class="loader fr-text-action-high--blue-france" aria-hidden="true"></span>
+              <span class="fr-sr-only"><%= t(".statuses.pending") %></span>
+            <% else %>
+              <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm" }) { t(".statuses.completed") } %>
+            <% end %>
+          </span>
           <%= link_to site.normalized_url, site_audit_path(site, audit), class: "fr-text--bold" %>
         </li>
       <% end %>
