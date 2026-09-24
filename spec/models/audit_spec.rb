@@ -177,6 +177,31 @@ RSpec.describe Audit do
     end
   end
 
+  describe "#finalize!" do
+    before { allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to) }
+
+    context "when the audit belongs to a batch" do
+      let(:audit_batch) { create(:audit_batch) }
+      let(:audit) { create(:audit, audit_batch:) }
+
+      it "broadcasts a refresh of the batch page" do
+        audit.finalize!
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with(audit_batch)
+      end
+    end
+
+    context "when the audit has no batch" do
+      let(:audit) { create(:audit) }
+
+      it "does not broadcast any batch refresh" do
+        audit.finalize!
+
+        expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to).with(an_instance_of(AuditBatch))
+      end
+    end
+  end
+
   describe "fetch_resources!" do
     let(:audit) { create(:audit) }
 
