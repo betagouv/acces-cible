@@ -68,6 +68,7 @@ class Audit < ApplicationRecord
             legal_obligation_score: compute_legal_obligation_score,
             declaration_quality_score: compute_declaration_quality_score)
     site.update!(last_audited_at: current_timestamp)
+    Turbo::StreamsChannel.broadcast_refresh_later_to(audit_batch) if audit_batch
   end
 
   def compute_legal_obligation_score

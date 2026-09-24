@@ -489,3 +489,31 @@ main .fr-link {
   flex: 0 0 100%;
   max-width: 100%;
 }
+
+.loader {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: loader-rotation 1s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes loader-rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.audit-batch-status {
+  display: inline-block;
+  min-width: 5.5rem;
+  margin-right: 1rem;
+  text-align: center;
+}

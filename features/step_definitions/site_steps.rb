@@ -134,7 +134,7 @@ Quand("je rajoute un site {string}") do |url|
     Et que je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
     Et que le lancement est terminé
-    Et que je recharge la page
+    Et que je choisis "Mes évaluations" dans le menu principal
     Et que je clique sur "#{Link.url_without_scheme_and_www(url)}"
   )
 end

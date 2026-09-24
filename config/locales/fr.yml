@@ -34,13 +34,22 @@ fr:
         other: Équipes
   audit_batches:
     launch: Lancer l'évaluation
-    create:
-      launched:
-        one: Évaluation lancée. Les résultats arriveront dans quelques minutes.
-        other: "%{count} évaluations lancées. Les résultats arriveront dans quelques minutes."
     new:
       intro: "Chaque adresse donne lieu à une nouvelle évaluation : niveau d'accessibilité déclaré, respect des obligations légales, qualité de la déclaration et, en option, une série de tests automatiques du RGAA."
       title: Lancer une évaluation
+    show:
+      alert_body: "Vos évaluations se poursuivent en arrière-plan. Vous pouvez quitter cette page : elles apparaîtront dans « Mes évaluations » au fur et à mesure."
+      alert_title: Évaluations lancées
+      breadcrumb_home: Accueil
+      completed_title: Toutes les évaluations sont terminées
+      creating: Création des évaluations en cours…
+      heading: Suivi de l'avancée des évaluations
+      intro: État d'avancement de chaque site en cours d'évaluation.
+      launch_more: Lancer d'autres évaluations
+      see_audits: Voir mes évaluations
+      statuses:
+        completed: Terminée
+        pending: En cours
     steps:
       checks:
         title: Tests automatiques (optionnel)

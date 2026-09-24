@@ -27,7 +27,7 @@ Fonctionnalité: Ajout par CSV d'un lot de sites
     Et l'étiquette "public" est sélectionnée pour le site "numerique.gouv.fr"
     Quand je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
-    Alors la page contient "2 évaluations lancées. Les résultats arriveront dans quelques minutes."
+    Alors la page contient "Évaluations lancées"
 
   Scénario: Un agent peut étiqueter un site importé
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
@@ -41,7 +41,7 @@ Fonctionnalité: Ajout par CSV d'un lot de sites
     Et que je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
     Et que le lancement est terminé
-    Et que je recharge la page
+    Et que je choisis "Mes évaluations" dans le menu principal
     Et que je clique sur "beta.gouv.fr"
     Alors la page contient "ministère"
 
@@ -73,3 +73,31 @@ Fonctionnalité: Ajout par CSV d'un lot de sites
     Quand je clique sur "Page précédente"
     Alors la page contient "site-01.example.com"
     Et l'étiquette "premier" est sélectionnée pour le site "site-01.example.com"
+
+  Scénario: La liste des évaluations lancées est paginée
+    Sachant que je possède un fichier "tmp/sites.csv" qui contient
+      """
+      url
+      https://site-01.example.com
+      https://site-02.example.com
+      https://site-03.example.com
+      https://site-04.example.com
+      https://site-05.example.com
+      https://site-06.example.com
+      https://site-07.example.com
+      https://site-08.example.com
+      https://site-09.example.com
+      https://site-10.example.com
+      https://site-11.example.com
+      """
+    Quand j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Lancer l'évaluation"
+    Et que le lancement est terminé
+    Et que je recharge la page
+    Alors la page contient "site-01.example.com"
+    Et la page ne contient pas "site-11.example.com"
+    Quand je clique sur "2"
+    Alors la page contient "site-11.example.com"
+    Et la page ne contient pas "site-01.example.com"

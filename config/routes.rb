@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   end
 
   resources :tags, only: [:index, :create, :show]
-  resources :audit_batches, only: [:new, :create]
+  resources :audit_batches, only: [:new, :create, :show]
   get "/audit_batches", to: redirect("/audit_batches/new")
   resources :audits, only: [:index] do
     collection do

@@ -22,7 +22,26 @@ Fonctionnalité: Ajout manuel d'un lot de sites
     Et que je clique sur "Continuer"
     Et que je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
-    Alors la page contient "Évaluation lancée. Les résultats arriveront dans quelques minutes."
+    Alors la page contient "Évaluations lancées"
+
+  Scénario: Un agent suit l'avancement de ses évaluations
+    Sachant que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la page d'accueil
+    Et que le site "https://beta.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
+    Et que je remplis "Adresse du site" avec "https://beta.gouv.fr/"
+    Et que je clique sur "Continuer"
+    Et que je clique sur "Continuer"
+    Quand je clique sur "Lancer l'évaluation"
+    Alors la page contient "Création des évaluations en cours"
+    Quand le lancement est terminé
+    Et que je recharge la page
+    Alors la page contient "En cours"
+    Et la page contient un lien "beta.gouv.fr"
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Alors la page contient "Terminée"
+    Et la page contient "Toutes les évaluations sont terminées"
+    Quand je clique sur "beta.gouv.fr"
+    Alors le titre de la page contient "beta.gouv.fr"
 
   Scénario: Un agent peut saisir une adresse puis la corriger
     Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr/"
@@ -44,6 +63,6 @@ Fonctionnalité: Ajout manuel d'un lot de sites
     Quand je clique sur "Continuer"
     Et que je clique sur "Lancer l'évaluation"
     Et que le lancement est terminé
-    Et que je recharge la page
+    Et que je choisis "Mes évaluations" dans le menu principal
     Et que je clique sur "beta.gouv.fr"
     Alors la page contient "ministère"

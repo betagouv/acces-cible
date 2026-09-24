@@ -76,6 +76,26 @@ RSpec.describe "AuditBatches" do
     end
   end
 
+  describe "GET /audit_batches/:id" do
+    let(:audit_batch) { create(:audit_batch, user:) }
+
+    it "shows the batch" do
+      get audit_batch_path(audit_batch)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    context "when the batch was launched by another user" do
+      let(:audit_batch) { create(:audit_batch) }
+
+      it "returns not found" do
+        get audit_batch_path(audit_batch)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "POST /audit_batches" do
     subject(:launch) { post audit_batches_path, params: { audit_batch: } }
 
@@ -93,12 +113,11 @@ RSpec.describe "AuditBatches" do
       ]
     end
 
-    it "saves the batch, enqueues the creation of its sites and audits, then returns to the audits" do
+    it "saves the batch, enqueues the creation of its sites and audits, then shows the batch" do
       expect { launch }.to change(AuditBatch, :count).by(1)
                                                      .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
 
-      expect(response).to redirect_to(audits_path)
-      expect(flash[:notice]).to eq("2 évaluations lancées. Les résultats arriveront dans quelques minutes.")
+      expect(response).to redirect_to(audit_batch_path(AuditBatch.last))
     end
 
     context "with addresses and tags parsed from a CSV file" do
