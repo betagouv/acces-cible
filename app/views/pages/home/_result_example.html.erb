@@ -1,0 +1,109 @@
+<h2 class="fr-h4"><%= t(".title") %></h2>
+<p class="fr-text--sm fr-mb-3w"><%= t(".intro") %></p>
+
+<table class="home-result-table fr-mb-3w" role="presentation">
+  <tbody>
+  <tr>
+    <td class="home-result-table__note"></td>
+    <td class="home-result-table__cell home-result-table__cell--header home-result-table__cell--first">
+      <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
+        <div class="fr-col-auto">
+          <h3 class="fr-h6 fr-mb-0">exemple.gouv.fr</h3>
+        </div>
+        <div class="fr-col-auto">
+          <%= dsfr_badge(status: :success, no_icon: true) { t(".reachable") } %>
+        </div>
+      </div>
+      <p class="fr-text--sm fr-mb-0 fr-mt-1v"><%= t(".date") %></p>
+    </td>
+    <td class="home-result-table__note"></td>
+  </tr>
+  <tr>
+    <td class="home-result-table__note">
+      <div class="home-result-table__note-inner">
+        <div>
+          <p class="home-result-table__note-title fr-text--bold fr-mb-1v"><%= t(".declared_level_note_title") %></p>
+          <p class="home-result-table__note-text fr-text--xs fr-text-mention--grey fr-mb-0"><%= t(".declared_level_note_text") %></p>
+        </div>
+        <span class="home-result-table__note-line" aria-hidden="true"></span>
+      </div>
+    </td>
+    <td class="home-result-table__cell">
+      <div class="fr-grid-row fr-grid-row--middle">
+        <div class="fr-col"><p class="fr-text--bold fr-mb-0"><%= t(".declared_level_title") %></p></div>
+        <div class="fr-col-auto home-result-table__value">
+          <%= dsfr_badge(status: :new, no_icon: true) { t("checks.accessibility_mention.mentions.partiellement") } %>
+          <p class="fr-text--sm fr-text-mention--grey"><%= t(".declared_level_detail") %></p>
+        </div>
+      </div>
+    </td>
+    <td class="home-result-table__note"></td>
+  </tr>
+  <tr>
+    <td class="home-result-table__note"></td>
+    <td class="home-result-table__cell">
+      <div class="fr-grid-row fr-grid-row--middle">
+        <div class="fr-col"><p class="fr-text--bold fr-mb-0"><%= t("pages.home.legal_obligations.title") %></p></div>
+        <div class="fr-col-auto home-result-table__value">
+          <%= star_rating(filled: 3, total: 4, color: "blue", label: t("pages.home.legal_obligations.title"), size: :s) %>
+          <p class="fr-text--sm fr-text-mention--grey"><%= t(".legal_obligations_detail") %></p>
+        </div>
+      </div>
+    </td>
+    <td class="home-result-table__note">
+      <div class="home-result-table__note-inner">
+        <span class="home-result-table__note-line" aria-hidden="true"></span>
+        <div>
+          <p class="home-result-table__note-title fr-text--bold fr-mb-1v"><%= t(".legal_obligations_note_title") %></p>
+          <p class="home-result-table__note-text fr-text--xs fr-text-mention--grey fr-mb-0"><%= t(".legal_obligations_note_text") %></p>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class="home-result-table__note">
+      <div class="home-result-table__note-inner">
+        <div>
+          <p class="home-result-table__note-title fr-text--bold fr-mb-1v"><%= t(".declaration_quality_note_title") %></p>
+          <p class="home-result-table__note-text fr-text--xs fr-text-mention--grey fr-mb-0"><%= t(".declaration_quality_note_text") %></p>
+        </div>
+        <span class="home-result-table__note-line" aria-hidden="true"></span>
+      </div>
+    </td>
+    <td class="home-result-table__cell">
+      <div class="fr-grid-row fr-grid-row--middle">
+        <div class="fr-col"><p class="fr-text--bold fr-mb-0"><%= t("pages.home.declaration_quality.title") %></p></div>
+        <div class="fr-col-auto home-result-table__value">
+          <%= star_rating(filled: 3, total: 4, color: "gold", label: t("pages.home.declaration_quality.title"), size: :s) %>
+          <p class="fr-text--sm fr-text-mention--grey"><%= t(".declaration_quality_detail") %></p>
+        </div>
+      </div>
+    </td>
+    <td class="home-result-table__note"></td>
+  </tr>
+  <tr>
+    <td class="home-result-table__note"></td>
+    <td class="home-result-table__cell home-result-table__cell--last">
+      <div class="fr-grid-row fr-grid-row--middle">
+        <div class="fr-col">
+          <p class="fr-text--bold fr-mb-1v"><%= t(".automated_tests_title") %></p>
+          <%= dsfr_badge(status: :info, html_attributes: { class: "fr-badge--sm" }) { t("pages.home.optional") } %>
+        </div>
+        <div class="fr-col-auto home-result-table__value">
+          <p class="fr-text--bold fr-mb-0"><%= t(".automated_tests_result") %></p>
+          <p class="fr-text--sm fr-text-mention--grey"><%= t(".automated_tests_detail") %></p>
+        </div>
+      </div>
+    </td>
+    <td class="home-result-table__note">
+      <div class="home-result-table__note-inner">
+        <span class="home-result-table__note-line" aria-hidden="true"></span>
+        <div>
+          <p class="home-result-table__note-title fr-text--bold fr-mb-1v"><%= t(".automated_tests_note_title") %></p>
+          <p class="home-result-table__note-text fr-text--xs fr-text-mention--grey fr-mb-0"><%= t(".automated_tests_note_text") %></p>
+        </div>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>

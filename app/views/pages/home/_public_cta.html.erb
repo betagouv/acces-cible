@@ -1,0 +1,10 @@
+<div class="fr-grid-row fr-grid-row--gutters">
+  <div class="fr-col-12">
+    <div class="rounded fr-background-alt--blue-france fr-p-4w fr-p-md-6w">
+      <h2 class="fr-h4 fr-mb-1w"><%= t(".title") %></h2>
+      <p class="fr-mb-3w"><%= t(".intro") %></p>
+      <%= dsfr_proconnect_button(target: omniauth_path(provider: :proconnect)) %>
+      <p class="fr-mb-3w"><%= t(".outro") %></p>
+    </div>
+  </div>
+</div>

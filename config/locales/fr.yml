@@ -443,27 +443,75 @@ fr:
       need_help_title: Besoin d’aide ?
       title: Aide
     home:
-      audits_count_detail: dont %{count} cette semaine
-      audits_count_label: Évaluations lancées
-      automated_tests_description: Exécute une série de 28 tests automatiques du RGAA sur la page d’accueil du site.
-      automated_tests_title: Tests automatiques RGAA
-      declaration_quality_description: "Vérifie la validité de chaque élément de la déclaration : chacun est jugé valide, invalide ou absent."
-      declaration_quality_title: Qualité de la déclaration
-      declared_level_description: Détecte le niveau annoncé par le site (non / partiellement / totalement conforme) et le taux RGAA associé.
-      declared_level_title: Niveau d’accessibilité déclaré
-      greeting: Bonjour %{name}
-      intro: Évaluez et suivez l’amélioration de l’accessibilité de vos services numériques en vous conformant aux textes de loi et au référentiel RGAA.
-      legal_obligations_description: "Évalue la présence des éléments obligatoires : déclaration, mention d’accessibilité, schéma pluriannuel et plan d’action."
-      legal_obligations_title: Respect des obligations légales
-      optional: Optionnel
-      sites_count_detail:
-        one: site distinct
-        other: sites distincts
-      sites_count_label: Sites évalués
       title: Accueil
-      welcome: Bienvenue sur Accès cible
-      what_intro: Pour chaque site évalué, Accès cible analyse quatre dimensions distinctes de l’accessibilité numérique.
-      what_title: Que fait Accès cible ?
+      optional: Optionnel
+      declaration_quality:
+        title: Qualité de la déclaration
+        description: "Vérifie la validité de chaque élément de la déclaration : chacun est jugé valide, invalide ou absent."
+        items:
+          declaration_date: Date de déclaration
+          standard: Référentiel
+          auditor: Auditeur
+          law_article: Article de loi
+          contact: Adresse de contact
+          declaration_format: Format de la déclaration
+          schema_quality: Schéma pluriannuel
+          plan_quality: Plan d’action
+      legal_obligations:
+        title: Respect des obligations légales
+        description: "Évalue la présence des éléments obligatoires : déclaration, mention d’accessibilité, schéma pluriannuel et plan d’action."
+        items:
+          accessibility_page: Déclaration d’accessibilité
+          accessibility_mention: Mention du niveau en pied de page
+          schema: Schéma pluriannuel
+          plan: Plan d’action annuel
+      hero:
+        greeting: Bonjour %{name}
+        intro: Évaluez et suivez l’amélioration de l’accessibilité de vos services numériques en vous conformant aux textes de loi et au référentiel RGAA.
+        audits_count_label: Évaluations lancées
+        audits_count_detail: dont %{count} cette semaine
+        sites_count_label: Sites évalués
+        sites_count_detail:
+          one: site distinct
+          other: sites distincts
+        public_badge: Service public numérique
+        welcome: Évaluez l’accessibilité de vos sites internet
+        public_intro: Accès cible analyse un site en quelques minutes et vous indique où il se situe face à ses obligations légales d’accessibilité numérique et au référentiel RGAA.
+      what_we_do:
+        title: Que fait Accès cible ?
+        intro: Pour chaque site évalué, Accès cible attribue deux notations sur quatre étoiles.
+      how_it_works:
+        title: Comment ça marche ?
+        step_addresses_title: Vous saisissez les adresses
+        step_addresses_description: Une adresse, plusieurs adresses, ou un import de fichier CSV pour évaluer un parc de sites en une fois.
+        step_evaluation_title: Accès cible évalue
+        step_evaluation_description: L’évaluation se déroule en arrière-plan. Vous pouvez quitter la page et revenir consulter les résultats plus tard.
+        step_fix_title: Vous corrigez
+        step_fix_description: Chaque point en échec est accompagné d’une indication « comment corriger » et de l’extrait de code concerné.
+      result_example:
+        title: À quoi ressemble un résultat ?
+        intro: "Exemple d’évaluation. Les deux notations sur quatre étoiles comptent les éléments conformes : une étoile par obligation légale remplie, une étoile pour deux éléments valides dans la déclaration."
+        reachable: Site joignable
+        date: Évalué le 12/06/2026
+        declared_level_title: Niveau d’accessibilité déclaré
+        declared_level_detail: "taux déclaré : 77 %"
+        declared_level_note_title: Déclaré par le site
+        declared_level_note_text: Accès cible relève le niveau et le taux annoncés dans la déclaration, sans les vérifier.
+        legal_obligations_detail: 3 sur 4
+        legal_obligations_note_title: 3 étoiles sur 4
+        legal_obligations_note_text: Déclaration, mention d’accessibilité et schéma pluriannuel présents ; le plan d’action manque.
+        declaration_quality_detail: 6 éléments valides sur 8
+        declaration_quality_note_title: 3 étoiles sur 4
+        declaration_quality_note_text: Six des huit éléments de la déclaration sont valides ; le format et le schéma pluriannuel sont à corriger.
+        automated_tests_title: Tests automatiques RGAA
+        automated_tests_result: 21 / 28 réussis
+        automated_tests_detail: 4 en échec, 3 non applicables
+        automated_tests_note_title: Sur demande
+        automated_tests_note_text: 28 tests exécutés sur la page d’accueil, avec le code en cause et la façon de le corriger.
+      public_cta:
+        title: Lancez votre première évaluation
+        intro: L’accès est réservé aux agents publics. Identifiez-vous avec ProConnect pour lancer vos évaluations, les retrouver dans votre espace et suivre leur évolution dans le temps.
+        outro: Une fois identifié, vous accédez également à l'annuaire des sites déjà évalués.
     mentions_legales:
       title: Mentions légales
     plan:
