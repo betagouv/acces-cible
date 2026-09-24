@@ -1,0 +1,39 @@
+<h2 class="fr-h4"><%= t(".title") %></h2>
+<p class="fr-text--sm fr-mb-3w"><%= t(".intro") %></p>
+
+<div class="fr-grid-row fr-grid-row--gutters fr-mb-5w">
+  <div class="fr-col-12 fr-col-md-6">
+    <div class="bordered-card fr-p-3w fr-background-default--grey">
+      <%= star_rating(filled: 4, total: 4, color: "blue", label: t("pages.home.legal_obligations.title"), size: :l) %>
+      <h3 class="fr-h6 fr-mt-2w fr-mb-1w"><%= t("pages.home.legal_obligations.title") %></h3>
+      <p class="fr-text--sm fr-text-mention--grey fr-mb-2w"><%= t("pages.home.legal_obligations.description") %></p>
+      <% items = t("pages.home.legal_obligations.items") %>
+      <div class="fr-grid-row fr-grid-row--gutters">
+        <% items.each_slice(4) do |group| %>
+          <div class="<%= items.size > 4 ? "fr-col-12 fr-col-sm-6" : "fr-col-12" %>">
+            <% group.each do |_key, label| %>
+              <p class="fr-text--sm fr-mb-1v"><%= star_rating(filled: 1, total: 1, color: "blue", label:, size: :s) %> <%= label %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="fr-col-12 fr-col-md-6">
+    <div class="bordered-card fr-p-3w fr-background-default--grey">
+      <%= star_rating(filled: 4, total: 4, color: "gold", label: t("pages.home.declaration_quality.title"), size: :l) %>
+      <h3 class="fr-h6 fr-mt-2w fr-mb-1w"><%= t("pages.home.declaration_quality.title") %></h3>
+      <p class="fr-text--sm fr-text-mention--grey fr-mb-2w"><%= t("pages.home.declaration_quality.description") %></p>
+      <% items = t("pages.home.declaration_quality.items") %>
+      <div class="fr-grid-row fr-grid-row--gutters">
+        <% items.each_slice(4) do |group| %>
+          <div class="<%= items.size > 4 ? "fr-col-12 fr-col-sm-6" : "fr-col-12" %>">
+            <% group.each do |_key, label| %>
+              <p class="fr-text--sm fr-mb-1v"><%= star_rating(filled: 1, total: 1, color: "gold", label:, size: :s) %> <%= label %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
