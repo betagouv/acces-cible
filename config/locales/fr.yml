@@ -440,20 +440,36 @@ fr:
       automated_tests_title: Tests automatiques RGAA
       declaration_quality_description: "Vérifie la validité de chaque élément de la déclaration : chacun est jugé valide, invalide ou absent."
       declaration_quality_title: Qualité de la déclaration
-      declared_level_description: Détecte le niveau annoncé par le site (non / partiellement / totalement conforme) et le taux RGAA associé.
       declared_level_title: Niveau d’accessibilité déclaré
       greeting: Bonjour %{name}
+      how_it_works_title: Comment ça marche ?
       intro: Évaluez et suivez l’amélioration de l’accessibilité de vos services numériques en vous conformant aux textes de loi et au référentiel RGAA.
       legal_obligations_description: "Évalue la présence des éléments obligatoires : déclaration, mention d’accessibilité, schéma pluriannuel et plan d’action."
       legal_obligations_title: Respect des obligations légales
       optional: Optionnel
+      public_badge: Service public numérique
+      public_cta_intro: L’accès est réservé aux agents publics. Identifiez-vous avec ProConnect pour lancer vos évaluations, les retrouver dans votre espace et suivre leur évolution dans le temps.
+      public_cta_title: Lancer votre première évaluation
+      public_intro: Accès cible analyse un site en quelques minutes et vous indique où il se situe face à ses obligations légales d’accessibilité numérique et au référentiel RGAA.
+      result_example_declaration_quality_detail: 2 éléments à corriger sur 8
+      result_example_declared_level_detail: Taux RGAA 77 % · audit du 05/02/2026
+      result_example_intro: Exemple d’évaluation. Les deux notations sur quatre étoiles comptent les éléments conformes.
+      result_example_legal_obligations_detail: 3 obligations sur 4 remplies
+      result_example_tag: Exemple d’évaluation
+      result_example_title: À quoi ressemble un résultat ?
       sites_count_detail:
         one: site distinct
         other: sites distincts
       sites_count_label: Sites évalués
+      step_addresses_description: Une adresse, plusieurs adresses, ou un import de fichier CSV pour évaluer un parc de sites en une fois.
+      step_addresses_title: Vous saisissez les adresses
+      step_evaluation_description: L’évaluation se déroule en arrière-plan. Vous pouvez quitter la page et revenir consulter les résultats plus tard.
+      step_evaluation_title: Accès cible évalue
+      step_fix_description: Chaque point en échec est accompagné d’une indication « comment corriger » et de l’extrait de code concerné.
+      step_fix_title: Vous corrigez
       title: Accueil
-      welcome: Bienvenue sur Accès cible
-      what_intro: Pour chaque site évalué, Accès cible analyse quatre dimensions distinctes de l’accessibilité numérique.
+      welcome: Évaluez l’accessibilité de vos sites internet
+      what_intro: Pour chaque site évalué, Accès cible attribue deux notations sur quatre étoiles.
       what_title: Que fait Accès cible ?
     mentions_legales:
       title: Mentions légales
