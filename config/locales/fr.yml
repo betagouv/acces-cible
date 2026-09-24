@@ -50,7 +50,6 @@ fr:
         toggle: Lancer les tests automatiques sur la page d'accueil
         enabled: Activés
         disabled: Désactivés
-        hint: Ces tests sont lancés systématiquement. Le choix arrivera dans une prochaine version.
       method:
         title: Méthode d'ajout
         legend: Comment souhaitez-vous ajouter les sites ?
@@ -272,6 +271,7 @@ fr:
       pending: Planifié
       ready: Prêt
       running: En cours
+      skipped: Ignoré
   checks:
     accessibility_mention:
       mentions:

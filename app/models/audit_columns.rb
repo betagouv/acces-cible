@@ -20,10 +20,10 @@ module AuditColumns
       when "accessibility_mention" then obligation(audit.accessibility_mention)
       when "accessibility_page" then obligation(audit.find_accessibility_page)
       when "auditor" then validity(declaration.auditor.present?)
-      when "automated_tests_applicable" then axe.applicable_total
-      when "automated_tests_inapplicable" then axe.inapplicable
-      when "automated_tests_passed" then axe.passes
-      when "automated_tests_result" then I18n.t("audits.show.automated_tests_results", count: axe.passes, total: axe.applicable_total) if axe.completed?
+      when "automated_tests_applicable" then axe.applicable_total || check_status(axe)
+      when "automated_tests_inapplicable" then axe.inapplicable || check_status(axe)
+      when "automated_tests_passed" then axe.passes || check_status(axe)
+      when "automated_tests_result" then axe.completed? ? I18n.t("audits.show.automated_tests_results", count: axe.passes, total: axe.applicable_total) : check_status(axe)
       when "compliance_rate" then declaration.human_compliance_rate || check_status(declaration)
       when "contact" then validity(declaration.contact_email.present? || declaration.contact_form.present?)
       when "declaration_date" then validity(declaration.audit_date.present?)

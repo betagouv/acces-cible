@@ -95,7 +95,7 @@ RSpec.describe "AuditBatches" do
 
     it "saves the batch, enqueues the creation of its sites and audits, then returns to the audits" do
       expect { launch }.to change(AuditBatch, :count).by(1)
-        .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
+                                                     .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
 
       expect(response).to redirect_to(audits_path)
       expect(flash[:notice]).to eq("2 évaluations lancées. Les résultats arriveront dans quelques minutes.")
@@ -136,6 +136,16 @@ RSpec.describe "AuditBatches" do
 
         expect(ProcessSiteUploadJob).not_to have_been_enqueued
         expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context "when the automated test is unchecked" do
+      let(:audit_batch) { { kind: "manual", urls: ["https://example.com"], run_axe_on_homepage: "0" } }
+
+      it "persists the batch with the automated test disabled" do
+        launch
+
+        expect(AuditBatch.last.run_axe_on_homepage).to be false
       end
     end
   end

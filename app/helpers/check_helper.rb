@@ -11,6 +11,7 @@ module CheckHelper
     errored: :error,
     failed: :error,
     aborted: :error,
+    skipped: :info,
   }
 
   def status_to_badge_text(check)

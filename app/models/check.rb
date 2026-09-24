@@ -102,6 +102,10 @@ class Check < ApplicationRecord
     true
   end
 
+  def skip?
+    false
+  end
+
   def run!
     self.data = analyze!
 
