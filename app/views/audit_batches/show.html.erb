@@ -1,0 +1,57 @@
+<%= turbo_stream_from @audit_batch %>
+
+<% content_for :breadcrumb do %>
+  <%= dsfr_breadcrumbs do |b| %>
+    <% b.with_breadcrumb(label: t(".breadcrumb_home"), href: root_path) %>
+    <% b.with_breadcrumb(label: page_title) %>
+  <% end %>
+  <h1><%= page_title %></h1>
+<% end %>
+
+<p><%= t("audit_batches.new.intro") %></p>
+
+<div class="fr-grid-row fr-grid-row--center">
+  <div class="fr-col-12 fr-col-md-10 fr-col-lg-8 fr-mt-4w">
+    <div role="status">
+      <% if @audit_batch.complete? %>
+        <%= dsfr_alert(type: :success, title: t(".completed_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) %>
+      <% else %>
+        <%= dsfr_alert(type: :info, title: t(".alert_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) do %>
+          <%= t(".alert_body") %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <h2 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h2>
+    <p class="fr-text--sm"><%= t(".intro") %></p>
+
+    <% if @audits.none? %>
+      <p><%= t(".creating") %></p>
+    <% end %>
+
+    <ul class="fr-raw-list">
+      <% @audits.each do |audit| %>
+        <% site = audit.site %>
+        <li class="bordered-card fr-p-2w fr-mb-2w">
+          <% if audit.pending? %>
+            <%= dsfr_badge(status: :info, html_attributes: { class: "fr-badge--sm fr-mr-2w" }) { t(".statuses.pending") } %>
+          <% else %>
+            <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm fr-mr-2w" }) { t(".statuses.completed") } %>
+          <% end %>
+          <%= link_to site.normalized_url, site_audit_path(site, audit), class: "fr-text--bold" %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if @pagy.last > 1 %>
+      <div class="fr-table__footer">
+        <%= render "shared/pagination" %>
+      </div>
+    <% end %>
+
+    <ul class="fr-btns-group fr-btns-group--inline-md fr-mt-3w">
+      <li><%= link_to t(".see_audits"), audits_path, class: "fr-btn" %></li>
+      <li><%= link_to t(".launch_more"), new_audit_batch_path, class: "fr-btn fr-btn--secondary" %></li>
+    </ul>
+  </div>
+</div>

@@ -22,5 +22,9 @@ class ProcessAuditBatchCreationJob < ApplicationJob
     step :refresh_sites_index do
       Turbo::StreamsChannel.broadcast_refresh_later_to [team, :sites]
     end
+
+    step :refresh_audit_batch do
+      Turbo::StreamsChannel.broadcast_refresh_later_to audit_batch
+    end
   end
 end

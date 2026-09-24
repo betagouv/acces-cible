@@ -14,12 +14,19 @@ class AuditBatchesController < ApplicationController
       set_step_data
       render :new
     elsif @audit_batch.launch!
-      redirect_to audits_path, notice: t(".launched", count: @audit_batch.submitted_sites.size)
+      redirect_to @audit_batch
     else
       @audit_batch.requested_step = AuditBatch::URLS_STEP
       set_step_data
       render :new, status: :unprocessable_content
     end
+  end
+
+  # GET /audit_batches/1
+  def show
+    @audit_batch = current_user.audit_batches.find(params.expect(:id))
+    @pagy, @audits = pagy(@audit_batch.audits.without_html.preload(:site).order(:id))
+    @title = t("audit_batches.new.title")
   end
 
   private
