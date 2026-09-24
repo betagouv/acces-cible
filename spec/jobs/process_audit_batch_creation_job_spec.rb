@@ -32,5 +32,13 @@ RSpec.describe ProcessAuditBatchCreationJob do
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with([team, :sites])
     end
+
+    it "broadcasts a refresh of the batch page once its audits are created" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
+
+      run_job
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with(audit_batch)
+    end
   end
 end
