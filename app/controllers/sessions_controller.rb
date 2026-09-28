@@ -33,7 +33,7 @@ class SessionsController < ApplicationController
     if expected_state.present? && ActiveSupport::SecurityUtils.secure_compare(expected_state, returned_state)
       terminate_local_session
       reset_session
-      redirect_to login_path
+      redirect_to root_path
     else
       Rails.logger.warn("State mismatch on ProConnect logout callback")
       head :unprocessable_content

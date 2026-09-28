@@ -48,7 +48,7 @@ RSpec.describe "Sessions" do
       it "terminates the local session and clears the browser session" do
         expect { logout_callback }.to change(Session, :count).by(-1)
 
-        expect(response).to redirect_to(login_path)
+        expect(response).to redirect_to(root_path)
         expect(cookies[:session_id]).to be_blank
 
         get proconnect_logout_callback_path, params: { state: logout_state }
