@@ -49,6 +49,7 @@ fr:
       progress:
         one: "%{completed} sur %{count} évaluation terminée"
         other: "%{completed} sur %{count} évaluations terminées"
+      see_audit: "Voir l'audit de %{url}"
       see_audits: Voir mes évaluations
       statuses:
         completed: Terminée

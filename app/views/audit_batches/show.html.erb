@@ -33,11 +33,14 @@
     <ul class="fr-raw-list">
       <% @audits.each do |audit| %>
         <% site = audit.site %>
-        <li class="bordered-card fr-p-2w fr-mb-2w">
+        <li class="bordered-card bordered-card--link fr-p-2w fr-mb-2w">
           <span id="<%= dom_id(audit, :status) %>" class="audit-batch-status">
             <%= render "audit_status", audit: %>
           </span>
-          <%= link_to site.normalized_url, site_audit_path(site, audit), class: "fr-text--bold" %>
+          <%= site_link(site) %>
+          <%= link_to site_audit_path(site, audit), class: "ac-row-link__stretched" do %>
+            <span class="fr-sr-only"><%= t(".see_audit", url: site.normalized_url) %></span>
+          <% end %>
         </li>
       <% end %>
     </ul>
