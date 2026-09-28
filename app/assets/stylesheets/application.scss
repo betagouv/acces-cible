@@ -254,6 +254,27 @@ main .fr-link {
   border: 1px solid var(--border-default-grey);
   overflow: hidden;
 
+  &--link {
+    @extend .ac-row-link;
+
+    &:hover,
+    &:focus-within {
+      background-color: var(--background-default-grey-hover);
+    }
+
+    // Make focus outline visible for bordered card
+    .ac-row-link__stretched {
+      outline-width: 0;
+
+      &::before {
+        outline-color: inherit;
+        outline-style: inherit;
+        outline-width: 2px;
+        outline-offset: -2px;
+      }
+    }
+  }
+
   .header {
     padding: 1rem 1.5rem;
     background: var(--background-alt-blue-france);

@@ -35,7 +35,7 @@
     <ul class="fr-raw-list">
       <% @audits.each do |audit| %>
         <% site = audit.site %>
-        <li class="bordered-card fr-p-2w fr-mb-2w">
+        <li class="bordered-card bordered-card--link fr-p-2w fr-mb-2w">
           <span class="audit-batch-status">
             <% if audit.pending? %>
               <span class="loader fr-text-action-high--blue-france" aria-hidden="true"></span>
@@ -44,7 +44,10 @@
               <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm" }) { t(".statuses.completed") } %>
             <% end %>
           </span>
-          <%= link_to site.normalized_url, site_audit_path(site, audit), class: "fr-text--bold" %>
+          <%= site_link(site) %>
+          <%= link_to site_audit_path(site, audit), class: "ac-row-link__stretched" do %>
+            <span class="fr-sr-only"><%= t(".see_audit", url: site.normalized_url) %></span>
+          <% end %>
         </li>
       <% end %>
     </ul>
