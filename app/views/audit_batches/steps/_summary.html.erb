@@ -2,6 +2,11 @@
 <h3 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h3>
 <% if audit_batch.csv_import? %>
   <p><%= t(".csv_intro_html", count: @pagy.count) %></p>
+  <% if audit_batch.duplicate_urls_count&.positive? %>
+    <%= dsfr_alert(type: :info, size: :sm, html_attributes: { class: "fr-mb-4w" }) do %>
+      <p><%= t(".csv_duplicates", count: audit_batch.duplicate_urls_count) %></p>
+    <% end %>
+  <% end %>
 <% else %>
   <p><%= t(".intro_html", count: @pagy.count) %></p>
 <% end %>

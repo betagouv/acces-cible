@@ -75,6 +75,9 @@ fr:
         csv_intro_html:
           one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>. Vous pouvez lui ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
           other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>. Vous pouvez leur ajouter des étiquettes ci-dessous ou en précisant une colonne « tags » dans le fichier CSV (étiquettes séparées par des virgules).
+        csv_duplicates:
+          one: 1 adresse en double dans le fichier a été ignorée.
+          other: "%{count} adresses en double dans le fichier ont été ignorées."
         new_tag: Nouvelle étiquette
         tags: Étiquettes de %{site}
       urls:

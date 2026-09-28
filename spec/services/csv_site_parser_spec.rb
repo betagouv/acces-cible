@@ -124,6 +124,15 @@ RSpec.describe CsvSiteParser do
       end
     end
 
+    context "with the same site written with different schemes or www prefix" do
+      let(:csv_content) { "url\nhttps://example.com/\nhttp://www.example.com/\nhttps://test.com/\nhttps://example.com/" }
+
+      it "keeps the first address and counts duplicates" do
+        expect(parsed_data.pluck("url")).to eq(["https://example.com/", "https://test.com/"])
+        expect(parser.duplicate_count).to eq(2)
+      end
+    end
+
     context "without a file" do
       let(:file) { nil }
 

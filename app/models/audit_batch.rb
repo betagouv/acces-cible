@@ -12,6 +12,7 @@ class AuditBatch < ApplicationRecord
   attribute :urls, default: -> { [] }
   attribute :site_tag_names, default: -> { {} }
   attribute :file
+  attribute :duplicate_urls_count
   attribute :requested_step
   normalizes :urls, with: ->(list) { list.compact_blank.uniq { Link.url_without_scheme_and_www(it) } }
   normalizes :site_tag_names, with: ->(names_by_site) { names_by_site.to_h.transform_values(&:compact_blank) }
@@ -65,7 +66,9 @@ class AuditBatch < ApplicationRecord
   end
 
   def import_csv
-    sites_data = CsvSiteParser.new(file:, team:, errors:).parse_data!
+    parser = CsvSiteParser.new(file:, team:, errors:)
+    sites_data = parser.parse_data!
+    self.duplicate_urls_count = parser.duplicate_count
     self.urls = sites_data.pluck("url")
     self.site_tag_names = sites_data.to_h { [Link.url_without_scheme_and_www(it["url"]), it["tag_names"]] }
   end

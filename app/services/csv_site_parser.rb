@@ -19,10 +19,13 @@ class CsvSiteParser
     "application/octet-stream"
   ].freeze
 
+  attr_reader :duplicate_count
+
   def initialize(file:, team:, errors:)
     @file = file
     @team = team
     @errors = errors
+    @duplicate_count = 0
   end
 
   def parse_data!
@@ -125,7 +128,9 @@ class CsvSiteParser
   end
 
   def merge_site_data!(sites_by_url, url, row)
-    site_data = sites_by_url[url] ||= { "url" => url, "tag_names" => [] }
+    key = Link.url_without_scheme_and_www(url)
+    @duplicate_count += 1 if sites_by_url.key?(key)
+    site_data = sites_by_url[key] ||= { "url" => url, "tag_names" => [] }
     site_data["tag_names"] += row["tags"].to_s.split(",").map(&:strip)
   end
 end
