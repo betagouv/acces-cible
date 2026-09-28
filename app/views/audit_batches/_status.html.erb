@@ -1,0 +1,7 @@
+<% if audit_batch.complete? %>
+  <%= dsfr_alert(type: :success, title: t("audit_batches.show.completed_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) %>
+<% else %>
+  <%= dsfr_alert(type: :info, title: t("audit_batches.show.alert_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) do %>
+    <%= t("audit_batches.show.alert_body") %>
+  <% end %>
+<% end %>

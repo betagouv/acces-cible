@@ -1,0 +1,6 @@
+<% if audit.pending? %>
+  <span class="loader fr-text-action-high--blue-france" aria-hidden="true"></span>
+  <span class="fr-sr-only"><%= t("audit_batches.show.statuses.pending") %></span>
+<% else %>
+  <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm" }) { t("audit_batches.show.statuses.completed") } %>
+<% end %>
