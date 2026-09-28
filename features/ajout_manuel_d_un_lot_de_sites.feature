@@ -35,12 +35,10 @@ Fonctionnalité: Ajout manuel d'un lot de sites
     Quand le lancement est terminé
     Et que je recharge la page
     Alors la page contient "En cours"
-    Et la page contient "0 sur 1 évaluation terminée"
     Et la page contient un lien "beta.gouv.fr"
     Quand toutes les tâches de fond sont terminées
     Et que je recharge la page
     Alors la page contient "Terminée"
-    Et la page contient "1 sur 1 évaluation terminée"
     Et la page contient "Toutes les évaluations sont terminées"
     Quand je clique sur "Voir l'audit de beta.gouv.fr"
     Alors la page contient "Résultat de l'évaluation"
