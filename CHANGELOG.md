@@ -1,5 +1,39 @@
 # Changelog
 
+## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add new audits index to replace sites index ([#704](https://github.com/betagouv/acces-cible/issues/704))
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690))
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689))
+
+### Features
+
+* Add ability to skip accessibility checks on homepage ([#727](https://github.com/betagouv/acces-cible/issues/727)) ([7ccd7a8](https://github.com/betagouv/acces-cible/commit/7ccd7a8317c2f087606efae247ab3135a73943e4))
+* add clickable bordered card ([#737](https://github.com/betagouv/acces-cible/issues/737)) ([bc8992c](https://github.com/betagouv/acces-cible/commit/bc8992c57bdc62e6d4b92989ca77788bf754b3be))
+* add displayed columns modal to audits index ([#723](https://github.com/betagouv/acces-cible/issues/723)) ([555acdd](https://github.com/betagouv/acces-cible/commit/555acddb472781c21fb01cd299ee80ed5bd82e57))
+* Add new audit result view ([#689](https://github.com/betagouv/acces-cible/issues/689)) ([b51e819](https://github.com/betagouv/acces-cible/commit/b51e819deea130d3a3f5922b4f724305b0702128))
+* Add new audits index to replace sites index ([#704](https://github.com/betagouv/acces-cible/issues/704)) ([160fed5](https://github.com/betagouv/acces-cible/commit/160fed52f843cae01ec47e8ddbc660629c5a84fc))
+* add new home page ([#706](https://github.com/betagouv/acces-cible/issues/706)) ([9530bde](https://github.com/betagouv/acces-cible/commit/9530bde1a057ba3bc4432d51cfe3fbcefcc26c5e))
+* Add new site view ([#690](https://github.com/betagouv/acces-cible/issues/690)) ([5b1bce1](https://github.com/betagouv/acces-cible/commit/5b1bce131957dc82cba01f2678244700e7c3cd94))
+* Audit batch tracking page ([#728](https://github.com/betagouv/acces-cible/issues/728)) ([81eaa5d](https://github.com/betagouv/acces-cible/commit/81eaa5da299f9b3fb0c3973da70584f87656dd7e))
+* centralize audit column definitions and add columns to csv ([#724](https://github.com/betagouv/acces-cible/issues/724)) ([1101747](https://github.com/betagouv/acces-cible/commit/11017477a0721bb50ccaec4078adb760bd4cfd1a))
+* Declaration heading view ([#708](https://github.com/betagouv/acces-cible/issues/708)) ([01fb8c8](https://github.com/betagouv/acces-cible/commit/01fb8c86c2f616a3212069edf3c8105805c5452b))
+* Handle unreachable audit case ([#694](https://github.com/betagouv/acces-cible/issues/694)) ([ef1379a](https://github.com/betagouv/acces-cible/commit/ef1379a413c587f05851990c2b6bc2ef9754fdaa))
+* launch audits through audit batch funnel (manual + csv) ([#717](https://github.com/betagouv/acces-cible/issues/717)) ([3b157cb](https://github.com/betagouv/acces-cible/commit/3b157cb4cb5a78071e0bee37bc33e6565ca6321e))
+* Redesign homepage for public and authenticated users ([#729](https://github.com/betagouv/acces-cible/issues/729)) ([cbd53fa](https://github.com/betagouv/acces-cible/commit/cbd53fac96602a4f8d1ce0b62d353ecded5eb95c))
+* redirect to root after logout ([#733](https://github.com/betagouv/acces-cible/issues/733)) ([694f4c2](https://github.com/betagouv/acces-cible/commit/694f4c22870530915aeb783c6d144fa0972dea1f))
+
+
+### Bug Fixes
+
+* Adjust homepage ([#734](https://github.com/betagouv/acces-cible/issues/734)) ([39ef694](https://github.com/betagouv/acces-cible/commit/39ef694d0c664341652c4c32b4503905f0e72d9b))
+* Limit ActionController::Live to CSV export ([#715](https://github.com/betagouv/acces-cible/issues/715)) ([54a687b](https://github.com/betagouv/acces-cible/commit/54a687b23d255e8807e9cce15737ac86c331ba80))
+* remove counter of audit batch progress because of race condition ([#738](https://github.com/betagouv/acces-cible/issues/738)) ([ea17285](https://github.com/betagouv/acces-cible/commit/ea172853ac640482e00d136786a5d5276e2b9b35))
+* use broadcast_update_to instead of refresh on audit_batch#show ([#735](https://github.com/betagouv/acces-cible/issues/735)) ([9b08c8d](https://github.com/betagouv/acces-cible/commit/9b08c8dde6dbf86e520cc7abb2170591dca4f6d2))
+
 ## [2.0.0](https://github.com/betagouv/acces-cible/compare/v1.2.0...v2.0.0) (2026-08-18)
 
 
