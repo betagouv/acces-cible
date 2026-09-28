@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.3"
+gem "rails", "~> 8.1.4"
 gem "rails-i18n"
 
 # unpin when Rails fixes ActiveSupport::JSON.decode for json 3
@@ -42,7 +42,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 # Add a web interface to control jobs
-gem "mission_control-jobs", "~> 1.2"
+gem "mission_control-jobs", "~> 1.3"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
