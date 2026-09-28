@@ -436,6 +436,12 @@ main .fr-link {
   border-spacing: 0;
 
   &__note {
+    display: none;
+
+    @media (min-width: 48em) {
+      display: table-cell;
+    }
+
     width: 22%;
     vertical-align: middle;
     padding: 0 1rem;
@@ -454,13 +460,17 @@ main .fr-link {
   }
 
   &__cell {
-    width: 56%;
+    width: 100%;
     vertical-align: middle;
     background: var(--background-default-grey);
     border-left: 1px solid var(--border-default-grey);
     border-right: 1px solid var(--border-default-grey);
     border-top: 1px solid var(--border-default-grey);
     padding: 1rem 1.5rem;
+
+    @media (min-width: 48em) {
+      width: 56%;
+    }
 
     .fr-grid-row {
       flex-wrap: nowrap;
