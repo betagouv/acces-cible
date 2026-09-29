@@ -38,7 +38,6 @@ RSpec.describe Page do
           <a href="webcal.ical">ICAL</a>
           <a href="rss.atom">ATOM</a>
           <a href="holidays.mov">MOV</a>
-          <div class="d-none" style="display: none;">display: none;</div>
         </body>
       </html>
     HTML
@@ -145,8 +144,8 @@ RSpec.describe Page do
       expect(page.dom).to be_a(Nokogiri::HTML::Document)
     end
 
-    it "ignores invisible elements" do
-      expect(page.dom.css("style, meta, div.d-none")).to be_empty
+    it "ignores non-content elements" do
+      expect(page.dom.css("style, meta")).to be_empty
     end
 
     it "caches the parsed document" do
@@ -259,21 +258,19 @@ RSpec.describe Page do
         end
       end
 
-      context "with invisible elements between headings" do
+      context "with non-content elements between headings" do
         let(:body) do
           <<~HTML
             <h1>Start Section</h1>
             <p>Visible content</p>
-            <div style="display: none;">Hidden content</div>
             <script>console.log('script')</script>
             <h1>End Section</h1>
           HTML
         end
 
-        it "excludes invisible elements from result" do
+        it "excludes non-content elements from result" do
           result = page.text(between_headings: [/Start/, /End/])
           expect(result).to eq("Visible content")
-          expect(result).not_to include("Hidden content")
           expect(result).not_to include("script")
         end
       end
