@@ -46,6 +46,7 @@ fr:
       heading: Suivi de l'avancée des évaluations
       intro: État d'avancement de chaque site en cours d'évaluation.
       launch_more: Lancer d'autres évaluations
+      see_audit: "Voir l'audit de %{url}"
       see_audits: Voir mes évaluations
       statuses:
         completed: Terminée

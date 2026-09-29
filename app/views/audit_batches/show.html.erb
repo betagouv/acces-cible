@@ -12,14 +12,8 @@
 
 <div class="fr-grid-row fr-grid-row--center">
   <div class="fr-col-12 fr-col-md-10 fr-col-lg-8 fr-mt-4w">
-    <div role="status">
-      <% if @audit_batch.complete? %>
-        <%= dsfr_alert(type: :success, title: t(".completed_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) %>
-      <% else %>
-        <%= dsfr_alert(type: :info, title: t(".alert_title"), header_level: 2, html_attributes: { class: "fr-mb-4w" }) do %>
-          <%= t(".alert_body") %>
-        <% end %>
-      <% end %>
+    <div id="<%= dom_id(@audit_batch, :status) %>" role="status">
+      <%= render "status", audit_batch: @audit_batch %>
     </div>
 
     <h2 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h2>
@@ -35,16 +29,14 @@
     <ul class="fr-raw-list">
       <% @audits.each do |audit| %>
         <% site = audit.site %>
-        <li class="bordered-card fr-p-2w fr-mb-2w">
-          <span class="audit-batch-status">
-            <% if audit.pending? %>
-              <span class="loader fr-text-action-high--blue-france" aria-hidden="true"></span>
-              <span class="fr-sr-only"><%= t(".statuses.pending") %></span>
-            <% else %>
-              <%= dsfr_badge(status: :success, html_attributes: { class: "fr-badge--sm" }) { t(".statuses.completed") } %>
-            <% end %>
+        <li class="bordered-card bordered-card--link fr-p-2w fr-mb-2w">
+          <span id="<%= dom_id(audit, :status) %>" class="audit-batch-status">
+            <%= render "audit_status", audit: %>
           </span>
-          <%= link_to site.normalized_url, site_audit_path(site, audit), class: "fr-text--bold" %>
+          <%= site_link(site) %>
+          <%= link_to site_audit_path(site, audit), class: "ac-row-link__stretched" do %>
+            <span class="fr-sr-only"><%= t(".see_audit", url: site.normalized_url) %></span>
+          <% end %>
         </li>
       <% end %>
     </ul>

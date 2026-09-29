@@ -167,6 +167,12 @@ module AuditsHelper
     end
   end
 
+  def site_link(site)
+    site_label = t("audits.audit.row_label", url: site.normalized_url)
+
+    dsfr_link_to(truncated(site.normalized_url), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label)
+  end
+
   private
 
   def audit_cell_content(audit, column)
@@ -177,12 +183,6 @@ module AuditsHelper
     when "declaration_quality" then star_rating(filled: value, total: 4, color: "gold", label: t("audits.audit.declaration_quality"))
     else value.is_a?(Hash) ? badge(**value) : value || muted_dash
     end
-  end
-
-  def site_link(site)
-    site_label = t("audits.audit.row_label", url: site.normalized_url)
-
-    dsfr_link_to(truncated(site.normalized_url), site_path(site), class: "ac-row-link__above", "aria-label": site_label, title: site_label)
   end
 
   def audit_date_link(audit)

@@ -40,8 +40,8 @@ Fonctionnalité: Ajout manuel d'un lot de sites
     Et que je recharge la page
     Alors la page contient "Terminée"
     Et la page contient "Toutes les évaluations sont terminées"
-    Quand je clique sur "beta.gouv.fr"
-    Alors le titre de la page contient "beta.gouv.fr"
+    Quand je clique sur "Voir l'audit de beta.gouv.fr"
+    Alors la page contient "Résultat de l'évaluation"
 
   Scénario: Un agent peut saisir une adresse puis la corriger
     Sachant que je remplis "Adresse du site" avec "https://beta.gouv.fr/"
