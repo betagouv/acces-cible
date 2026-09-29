@@ -19,7 +19,11 @@
     <h2 class="fr-h5 fr-mb-1w"><%= t(".heading") %></h2>
     <p class="fr-text--sm"><%= t(".intro") %></p>
 
-    <% if @audits.none? %>
+    <% if @audits.any? %>
+      <p id="<%= dom_id(@audit_batch, :progress) %>" class="fr-text--bold">
+        <%= render "progress", audit_batch: @audit_batch %>
+      </p>
+    <% else %>
       <p>
         <span class="loader fr-text-action-high--blue-france fr-mr-1w" aria-hidden="true"></span>
         <%= t(".creating") %>
