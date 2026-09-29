@@ -2,10 +2,10 @@ require "rails_helper"
 
 RSpec.describe AuditBatchCreationService do
   describe "#process" do
-    subject(:process_site) { described_class.new(team:, user:, audit_batch:).process(site_data) }
+    subject(:process_site) { described_class.new(audit_batch:).process(site_data) }
 
-    let(:team) { create(:team) }
     let(:user) { create(:user) }
+    let(:team) { user.team }
     let(:created_site) { Site.last }
     let(:site_tags) { created_site.tags.pluck(:name) }
     let(:url) { "https://example.com/" }
