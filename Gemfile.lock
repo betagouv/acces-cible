@@ -679,7 +679,6 @@ DEPENDENCIES
   http
   i18n-tasks (~> 1.1.2)
   importmap-rails
-  json (~> 2.21)
   markdown_views
   memory_profiler
   mission_control-jobs (~> 1.3)
