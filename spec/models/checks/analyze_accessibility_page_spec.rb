@@ -280,6 +280,13 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "le taux de conformité global était de 60,8% [...] le taux de conformité global est de 70,9%." => 70.9,
       "94,03% des critères RGAA sont respectés. Le taux moyen de conformité du service en ligne s’élève à 99%" => 94.03,
       "taux de conformité globale est de 95 pour cent" => 95,
+      "L'audit de conformité réalisé par la société Bearscop révèle que : 92,65 % des critères RGAA sont respectés ; Le taux moyen de conformité du site s'élève à 99 % ." => 92.65,
+      "L’audit initial de conformité au RGAA version 4.1.2 réalisé en octobre 2024 par la société BeesRCute a révélé que sur l’échantillon :
+        Le taux de conformité global est de 74,6 %. Ce taux est obtenu en divisant le nombre de critères conformes par le nombre de critères applicables.
+        Le taux de conformité moyen est de 87,4 %. Ce taux est obtenu en faisant la moyenne des taux de conformité de chaque page.
+        À la suite de la correction de certains critères non conformes, les équipes internes ont mené par elles-mêmes un contre audit en octobre et novembre 2024 qui révèle que sur l’échantillon :
+        Le taux de conformité global est de 83,1 %.
+        Le taux de conformité moyen est de 89 %." => 83.1,
       "Le taux global de conformité était de 51,43% en Juin 2023, mis à jour à 71,21% sur l’ensemble critères du référentiel générale d’amélioration de l’accessibilité (RGAA)." => 71.21,
       "Le taux de conformité global est de 74,6 %.
       Le taux de conformité moyen est de 87,4 %.
