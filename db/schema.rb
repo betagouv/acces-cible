@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_143215) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,8 +34,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
     t.float "legal_obligation_score"
     t.float "declaration_quality_score"
     t.bigint "audit_batch_id"
-    t.text "accessibility_page_html"
-    t.text "home_page_html"
     t.index ["audit_batch_id"], name: "index_audits_on_audit_batch_id"
     t.index ["site_id"], name: "index_audits_on_site_id"
     t.index ["user_id"], name: "index_audits_on_user_id"

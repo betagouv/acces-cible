@@ -25,7 +25,7 @@ class AuditBatchesController < ApplicationController
   # GET /audit_batches/1
   def show
     @audit_batch = current_user.audit_batches.find(params.expect(:id))
-    @pagy, @audits = pagy(@audit_batch.audits.without_html.preload(:site).order(:id))
+    @pagy, @audits = pagy(@audit_batch.audits.preload(:site).order(:id))
     @title = t("audit_batches.new.title")
   end
 
