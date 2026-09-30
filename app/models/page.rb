@@ -1,6 +1,6 @@
 class Page
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
-  INVISIBLE_ELEMENTS = "script, style, noscript, meta, link, iframe[src], [hidden], [style*='display:none'], [style*='display: none'], [style*='visibility:hidden'], [style*='visibility: hidden']".freeze
+  NON_CONTENT_ELEMENTS = "script, style, noscript, meta, link, iframe[src]".freeze
   LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
   MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
   MAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+(?:@|\(at\))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
@@ -73,7 +73,7 @@ class Page
 
   def dom
     @dom ||= Nokogiri::HTML(html).tap do |document|
-      document.css(INVISIBLE_ELEMENTS).each(&:remove)
+      document.css(NON_CONTENT_ELEMENTS).each(&:remove)
       document.xpath("//text()[normalize-space(.) != '']").each { |node| node.content = " #{node.content} " }
     end
   rescue Nokogiri::SyntaxError => e
