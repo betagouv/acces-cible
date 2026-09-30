@@ -31,13 +31,8 @@ class Link
       nil
     end
 
-    def url_without_scheme_and_www(href)
-      return "" unless href
-
-      uri = parse(href)
-      hostname = uri.hostname.to_s.delete_prefix("www.")
-      path = uri.path unless uri.path == "/"
-      [hostname, path].compact.join
+    def normalized_url(href)
+      url_without_scheme_and_www(normalize(href))
     rescue Addressable::URI::InvalidURIError
       ""
     end
@@ -53,6 +48,19 @@ class Link
       uri.query = nil
       uri.path = uri.path.sub(%r{[^/]+\z}, "")
       normalize(uri)
+    end
+
+    private
+
+    def url_without_scheme_and_www(href)
+      return "" unless href
+
+      uri = parse(href)
+      hostname = uri.hostname.to_s.delete_prefix("www.")
+      path = uri.path unless uri.path == "/"
+      [hostname, path].compact.join
+    rescue Addressable::URI::InvalidURIError
+      ""
     end
   end
 end

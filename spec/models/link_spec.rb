@@ -168,38 +168,35 @@ RSpec.describe Link do
     end
   end
 
-  describe ".url_without_scheme_and_www" do
-    subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
-
-    context "when subdomain is www" do
-      let(:url) { "https://www.domain.com/" }
-
-      it "returns the hostname without www" do
-        expect(url_without_scheme_and_www).to eq("domain.com")
-      end
-    end
-
-    context "when subdomain is not www" do
-      let(:url) { "https://sub.domain.com/" }
-
-      it "returns the hostname with subdomain" do
-        expect(url_without_scheme_and_www).to eq("sub.domain.com")
-      end
-    end
-
-    context "when path is empty" do
-      let(:url) { "https://www.example.com/" }
-
-      it "returns hostname only" do
-        expect(url_without_scheme_and_www).to eq("example.com")
-      end
-    end
-
-    context "when path is not empty" do
-      let(:url) { "https://www.example.com/path/to/page#section?query=string" }
-
-      it "returns hostname and path" do
-        expect(url_without_scheme_and_www).to eq("example.com/path/to/page")
+  describe ".normalized_url" do
+    {
+      "http://site.fr" => "site.fr",
+      "http://site.fr/" => "site.fr",
+      "https://site.fr/" => "site.fr",
+      "https://www.site.fr/" => "site.fr",
+      "https://SITE.fr/" => "site.fr",
+      "https://site.fr:443/" => "site.fr",
+      "https://site.fr/#contact" => "site.fr",
+      "https://site.fr./" => "site.fr",
+      "https://site.fr:8080/" => "site.fr", # Not wanted: another port is another server, should stay distinct
+      "https://site.fr/?utm=1" => "site.fr",
+      "https://user@site.fr/" => "site.fr",
+      "  https://site.fr/  " => "site.fr",
+      "https://site.fr/p?id=1" => "site.fr/p", # Not wanted: different query strings are different pages
+      "https://site.fr/page" => "site.fr/page",
+      "https://site.fr//page" => "site.fr/page",
+      "https://site.fr/a/../page" => "site.fr/page",
+      "https://site.fr/~user" => "site.fr/~user",
+      "https://site.fr/%7Euser" => "site.fr/~user",
+      "https://xn--rez-dma.fr/" => "rezé.fr",
+      "https://rezé.fr/" => "rezé.fr",
+      "https://site.fr/page/" => "site.fr/page/",
+      "https://site.fr/Page" => "site.fr/Page",
+      "https://www2.site.fr/" => "www2.site.fr",
+      "https://example.com:abc" => ""
+    }.each do |url, expected_normalized_url|
+      it "returns #{expected_normalized_url.inspect} for #{url.inspect}" do
+        expect(described_class.normalized_url(url)).to eq(expected_normalized_url)
       end
     end
   end

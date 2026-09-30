@@ -124,6 +124,14 @@ RSpec.describe CsvSiteParser do
       end
     end
 
+    context "with addresses of the same site" do
+      let(:csv_content) { "url,tags\nhttps://www.example.com/,tag1\nhttp://example.com,tag2" }
+
+      it "keeps the first address and merges tags" do
+        expect(parsed_data).to eq([{ "url" => "https://www.example.com/", "tag_names" => ["tag1", "tag2"] }])
+      end
+    end
+
     context "without a file" do
       let(:file) { nil }
 
