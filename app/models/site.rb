@@ -25,7 +25,7 @@ class Site < ApplicationRecord
   broadcasts_refreshes
 
   def set_normalized_url
-    self.normalized_url = Link.url_without_scheme_and_www(url)
+    self.normalized_url = Link.normalized_url(url)
   end
 
   def to_s
