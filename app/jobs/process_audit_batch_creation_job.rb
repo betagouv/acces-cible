@@ -8,7 +8,7 @@ class ProcessAuditBatchCreationJob < ApplicationJob
     return unless user.present?
 
     audit_batch = user.audit_batches.find(audit_batch_id)
-    audit_batch_creation = AuditBatchCreationService.new(team:, user:, audit_batch:)
+    audit_batch_creation = AuditBatchCreationService.new(audit_batch:)
 
     step :process_sites do |step|
       start_index = step.cursor || 0
