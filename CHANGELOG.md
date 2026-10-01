@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.0.1](https://github.com/betagouv/acces-cible/compare/v3.0.0...v3.0.1) (2026-10-01)
+
+
+### Bug Fixes
+
+* Improve compliance rate detection ([#751](https://github.com/betagouv/acces-cible/issues/751)) ([d4cd37c](https://github.com/betagouv/acces-cible/commit/d4cd37c7500faba2a361cc82b4baa62788f19212))
+* Upgrade sentry gems and configure structured logging ([#754](https://github.com/betagouv/acces-cible/issues/754)) ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
+
+### Miscellaneous
+
+* Regenerate schema files with Rails 8.1.4 ([#752](https://github.com/betagouv/acces-cible/issues/752)) ([73fc88e](https://github.com/betagouv/acces-cible/commit/73fc88e6ff817daa06abe86ab3490271eb279b4d))
+* Replace `INVISIBLE_ELEMENTS` by `NON_CONTENT_ELEMENTS` ([#744](https://github.com/betagouv/acces-cible/issues/744)) ([eb6f92b](https://github.com/betagouv/acces-cible/commit/eb6f92b3532cc88d8875730553c95b3d929679d9))
+* Upgrade sentry gems and configure structured logging ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
 ## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-28)
 
 
