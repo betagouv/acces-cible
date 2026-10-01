@@ -10,44 +10,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_143215) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "audit_batches", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "kind", null: false
-    t.boolean "run_axe_on_homepage", default: true, null: false
-    t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.string "kind", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "run_axe_on_homepage", default: true, null: false
     t.index ["user_id"], name: "index_audit_batches_on_user_id"
   end
 
   create_table "audits", force: :cascade do |t|
-    t.text "accessibility_page_html"
-    t.string "accessibility_page_url"
-    t.bigint "audit_batch_id"
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.float "declaration_quality_score"
-    t.text "home_page_html"
-    t.string "home_page_url"
-    t.float "legal_obligation_score"
     t.bigint "site_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "completed_at"
+    t.string "accessibility_page_url"
+    t.string "home_page_url"
     t.bigint "user_id", null: false
+    t.float "legal_obligation_score"
+    t.float "declaration_quality_score"
+    t.bigint "audit_batch_id"
     t.index ["audit_batch_id"], name: "index_audits_on_audit_batch_id"
     t.index ["site_id"], name: "index_audits_on_site_id"
     t.index ["user_id"], name: "index_audits_on_user_id"
   end
 
   create_table "check_transitions", force: :cascade do |t|
-    t.integer "check_id", null: false
-    t.datetime "created_at", null: false
-    t.json "metadata", default: {}
-    t.boolean "most_recent", null: false
-    t.integer "sort_key", null: false
     t.string "to_state", null: false
+    t.json "metadata", default: {}
+    t.integer "sort_key", null: false
+    t.integer "check_id", null: false
+    t.boolean "most_recent", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["check_id", "most_recent"], name: "index_check_transitions_parent_most_recent", unique: true, where: "most_recent"
     t.index ["check_id", "sort_key"], name: "index_check_transitions_parent_sort", unique: true
@@ -55,22 +53,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
 
   create_table "checks", force: :cascade do |t|
     t.bigint "audit_id", null: false
-    t.boolean "conform", default: false
-    t.datetime "created_at", null: false
-    t.jsonb "data"
-    t.boolean "found", default: false
-    t.integer "priority", default: 100, null: false
     t.string "type", null: false
+    t.jsonb "data"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "priority", default: 100, null: false
+    t.boolean "conform", default: false
+    t.boolean "found", default: false
     t.index ["audit_id", "type"], name: "index_checks_on_audit_id_and_type", unique: true
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
-    t.datetime "created_at"
-    t.string "scope"
     t.string "slug", null: false
     t.integer "sluggable_id", null: false
     t.string "sluggable_type", limit: 50
+    t.string "scope"
+    t.datetime "created_at"
     t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
@@ -78,21 +76,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
 
   create_table "page_snapshots", force: :cascade do |t|
     t.bigint "audit_id", null: false
-    t.string "content_type"
-    t.datetime "created_at", null: false
-    t.string "current_url"
-    t.text "html"
     t.string "kind", null: false
     t.string "requested_url"
+    t.string "current_url"
+    t.text "html"
     t.integer "status"
+    t.string "content_type"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["audit_id", "kind"], name: "index_page_snapshots_on_audit_id_and_kind", unique: true
   end
 
   create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -105,48 +103,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_162820) do
   end
 
   create_table "sites", force: :cascade do |t|
-    t.integer "audits_count", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "last_audited_at"
-    t.string "normalized_url", null: false
     t.string "slug", null: false
-    t.integer "tags_count", default: 0, null: false
-    t.bigint "team_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "audits_count", default: 0, null: false
+    t.bigint "team_id", null: false
+    t.integer "tags_count", default: 0, null: false
     t.string "url", null: false
+    t.string "normalized_url", null: false
+    t.datetime "last_audited_at"
     t.index ["slug", "team_id"], name: "index_sites_on_slug_and_team_id", unique: true
     t.index ["team_id"], name: "index_sites_on_team_id"
   end
 
   create_table "tags", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.string "name", null: false
-    t.integer "sites_count", default: 0, null: false
     t.string "slug", null: false
     t.bigint "team_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "sites_count", default: 0, null: false
     t.index ["name", "team_id"], name: "index_tags_on_name_and_team_id", unique: true
     t.index ["slug", "team_id"], name: "index_tags_on_slug_and_team_id", unique: true
     t.index ["team_id"], name: "index_tags_on_team_id"
   end
 
   create_table "teams", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "name"
-    t.string "organization_label"
     t.string "siret", null: false
+    t.string "organization_label"
+    t.string "name"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["siret"], name: "index_teams_on_siret", unique: true
   end
 
   create_table "users", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "email", null: false
-    t.string "name", null: false
     t.string "provider", null: false
-    t.string "siret", null: false
     t.string "uid", null: false
+    t.string "email", null: false
+    t.string "siret", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name", null: false
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["siret"], name: "index_users_on_siret"
   end
