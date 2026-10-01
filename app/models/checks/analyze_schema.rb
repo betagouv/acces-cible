@@ -4,7 +4,7 @@ module Checks
     include AccessibilityDocumentAnalyzer
 
     PRIORITY = 23
-    MAX_YEARS_VALIDITY = 3
+    MAX_YEAR_GAP = 2
     # Matches various forms of "schéma/schema" accessibility links:
     # - "schéma pluriannuel de/d' accessibilité (numérique)" or "schéma pluriannuel RGAA"
     # - "schéma annuel d'accessibilité"
@@ -46,7 +46,7 @@ module Checks
 
     def within_three_years?(years)
       return false if years.blank?
-      return false if years.last - years.first > MAX_YEARS_VALIDITY
+      return false if years.last - years.first > MAX_YEAR_GAP
 
       Date.current.year.between?(years.first, years.last)
     end
