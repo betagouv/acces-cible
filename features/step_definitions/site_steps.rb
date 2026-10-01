@@ -135,7 +135,7 @@ Quand("je rajoute un site {string}") do |url|
     Et que je clique sur "Lancer l'évaluation"
     Et que le lancement est terminé
     Et que je choisis "Mes évaluations" dans le menu principal
-    Et que je clique sur "#{Link.url_without_scheme_and_www(url)}"
+    Et que je clique sur "#{Link.normalized_url(url)}"
   )
 end
 
@@ -152,7 +152,7 @@ Quand("je rajoute un site {string} sans lancer les tests automatiques") do |url|
     Et que je clique sur "Lancer l'évaluation"
     Et que toutes les tâches de fond sont terminées
     Et que je recharge la page
-    Et que je clique sur "#{Link.url_without_scheme_and_www(url)}"
+    Et que je clique sur "#{Link.normalized_url(url)}"
   )
 end
 
@@ -184,8 +184,8 @@ Quand("le site {string} a les étiquettes {string}") do |url, tags_str|
 end
 
 Alors("la page contient un lien vers {string}") do |url|
-  url_without_scheme_and_www = Link.url_without_scheme_and_www(url)
-  expect(page).to have_content(url_without_scheme_and_www)
+  normalized_url = Link.normalized_url(url)
+  expect(page).to have_content(normalized_url)
 end
 
 Alors("la page contient un tableau") do
