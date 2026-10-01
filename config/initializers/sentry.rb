@@ -15,6 +15,15 @@ if Rails.env.production?
       active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
     }
 
+    # Filter info logs
+    # https://docs.sentry.io/platforms/ruby/guides/rails/logs/#before_send_log
+    config.before_send_log = lambda do |log|
+      # Skip info logs
+      return if log.level == :info
+
+      log
+    end
+
     # Forward everything logged via Rails.logger to Sentry Logs,
     # but only warn, error and fatal
     # https://docs.sentry.io/platforms/ruby/configuration/options/#std_lib_logger_filter
