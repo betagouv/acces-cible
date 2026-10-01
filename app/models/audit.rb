@@ -6,6 +6,7 @@ class Audit < ApplicationRecord
   has_many :page_snapshots, dependent: :destroy
 
   after_create_commit :fetch_resources!, :create_checks
+  after_update_commit :broadcast_to_audit_batch, if: -> { saved_change_to_completed_at? && audit_batch }
 
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
@@ -67,7 +68,10 @@ class Audit < ApplicationRecord
             legal_obligation_score: compute_legal_obligation_score,
             declaration_quality_score: compute_declaration_quality_score)
     site.update!(last_audited_at: current_timestamp)
-    audit_batch.broadcast_audit_completed(self) if audit_batch
+  end
+
+  def broadcast_to_audit_batch
+    audit_batch.broadcast_audit_completed(self)
   end
 
   def compute_legal_obligation_score
