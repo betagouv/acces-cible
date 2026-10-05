@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.1.0](https://github.com/betagouv/acces-cible/compare/v3.0.0...v3.1.0) (2026-10-05)
+
+
+### Features
+
+* add progress of audit batch ([#739](https://github.com/betagouv/acces-cible/issues/739)) ([42d39ff](https://github.com/betagouv/acces-cible/commit/42d39ff0378a27aa039d35cbb6e90d2bb48be024))
+
+
+### Bug Fixes
+
+* Improve compliance rate detection ([#751](https://github.com/betagouv/acces-cible/issues/751)) ([d4cd37c](https://github.com/betagouv/acces-cible/commit/d4cd37c7500faba2a361cc82b4baa62788f19212))
+* Upgrade sentry gems and configure structured logging ([#754](https://github.com/betagouv/acces-cible/issues/754)) ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
+
+### Refactoring
+
+* derive user and team from audit batch in AuditBatchCreationService ([#748](https://github.com/betagouv/acces-cible/issues/748)) ([8d7eac7](https://github.com/betagouv/acces-cible/commit/8d7eac7b2a24826ba4b0eef1374e369ce7de3e9a))
+
+
+### Miscellaneous
+
+* Regenerate schema files with Rails 8.1.4 ([#752](https://github.com/betagouv/acces-cible/issues/752)) ([73fc88e](https://github.com/betagouv/acces-cible/commit/73fc88e6ff817daa06abe86ab3490271eb279b4d))
+* Replace `INVISIBLE_ELEMENTS` by `NON_CONTENT_ELEMENTS` ([#744](https://github.com/betagouv/acces-cible/issues/744)) ([eb6f92b](https://github.com/betagouv/acces-cible/commit/eb6f92b3532cc88d8875730553c95b3d929679d9))
+* Upgrade sentry gems and configure structured logging ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
 ## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-28)
 
 
