@@ -117,7 +117,7 @@ RSpec.describe "AuditBatches" do
       expect { launch }.to change(AuditBatch, :count).by(1)
                                                      .and have_enqueued_job(ProcessSiteUploadJob).with(sites_data, team.id, user.id, kind_of(Integer))
 
-      expect(response).to redirect_to(audit_batch_path(AuditBatch.last))
+      expect(response).to redirect_to(audit_batch_path(AuditBatch.last, count: 2))
     end
 
     context "with addresses and tags parsed from a CSV file" do

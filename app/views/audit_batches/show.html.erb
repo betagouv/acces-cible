@@ -20,8 +20,9 @@
     <p class="fr-text--sm"><%= t(".intro") %></p>
 
     <% if @audits.any? %>
-      <p id="<%= dom_id(@audit_batch, :progress) %>" class="fr-text--bold">
-        <%= render "progress", audit_batch: @audit_batch %>
+      <p class="fr-text--bold">
+        <span id="<%= dom_id(@audit_batch, :completed_audits_count) %>"><%= @audit_batch.completed_audits_count %></span>
+        <%= t(".progress", count: @count) %>
       </p>
     <% else %>
       <p>

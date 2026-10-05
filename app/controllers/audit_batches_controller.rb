@@ -14,7 +14,7 @@ class AuditBatchesController < ApplicationController
       set_step_data
       render :new
     elsif @audit_batch.launch!
-      redirect_to @audit_batch
+      redirect_to audit_batch_path(@audit_batch, count: @audit_batch.urls.size)
     else
       @audit_batch.requested_step = AuditBatch::URLS_STEP
       set_step_data
@@ -25,7 +25,8 @@ class AuditBatchesController < ApplicationController
   # GET /audit_batches/1
   def show
     @audit_batch = current_user.audit_batches.find(params.expect(:id))
-    @pagy, @audits = pagy(@audit_batch.audits.without_html.preload(:site).order(:id))
+    @count = params[:count]&.to_i || @audit_batch.audits.count
+    @pagy, @audits = pagy(@audit_batch.audits.without_html.preload(:site).order(:id), count: @count)
     @title = t("audit_batches.new.title")
   end
 

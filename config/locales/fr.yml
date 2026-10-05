@@ -47,8 +47,8 @@ fr:
       intro: État d'avancement de chaque site en cours d'évaluation.
       launch_more: Lancer d'autres évaluations
       progress:
-        one: "%{completed} sur %{count} évaluation terminée"
-        other: "%{completed} sur %{count} évaluations terminées"
+        one: "sur %{count} évaluation terminée"
+        other: "sur %{count} évaluations terminées"
       see_audit: "Voir l'audit de %{url}"
       see_audits: Voir mes évaluations
       statuses:
