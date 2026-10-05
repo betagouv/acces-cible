@@ -35,8 +35,11 @@ module Checks
 
     def within_three_years?(years)
       return false if years.blank?
+      current_year = Date.current.year
 
-      years.last.between?(Date.current.year - 1, Date.current.year + 1)
+      return years.first == current_year if years.size == 1
+
+      years.last.between?(current_year - 1, current_year + 1)
     end
   end
 end
