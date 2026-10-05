@@ -9,11 +9,20 @@ if Rails.env.production?
     # By default, Sentry captures :active_record, :action_controller
     # https://docs.sentry.io/platforms/ruby/guides/rails/logs/#structured-logging-subscribers
     # This config enables :active_job and removes :active_record
-    config.enable_logs = true
+    config.rails.structured_logging.enabled = true
     config.rails.structured_logging.subscribers = {
       action_controller: Sentry::Rails::LogSubscribers::ActionControllerSubscriber,
       active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
     }
+
+    # Filter info logs
+    # https://docs.sentry.io/platforms/ruby/guides/rails/logs/#before_send_log
+    config.before_send_log = lambda do |log|
+      # Skip info logs
+      return if log.level == :info
+
+      log
+    end
 
     # Forward everything logged via Rails.logger to Sentry Logs,
     # but only warn, error and fatal
