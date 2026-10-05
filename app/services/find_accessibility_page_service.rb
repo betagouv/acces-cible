@@ -53,10 +53,10 @@ class FindAccessibilityPageService
       page.url,
       audit.site.url,
       audit.home_page_url
-    ].compact.map { |url| Link.url_without_scheme_and_www(url) }.uniq
+    ].compact.map { |url| Link.normalized_url(url) }.uniq
 
     children_links = page.links.reject do |link|
-      excluded_targets.include?(Link.url_without_scheme_and_www(link.href))
+      excluded_targets.include?(Link.normalized_url(link.href))
     end
 
     children_links = links_by_priority(children_links).first(Crawler::MAX_CRAWLED_PAGES)

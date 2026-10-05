@@ -59,6 +59,14 @@ RSpec.describe AuditBatch do
         expect(submitted_sites).to all(be_new_record)
       end
     end
+
+    context "with the same address written differently" do
+      let(:urls) { ["https://example.com/", "https://EXAMPLE.com./"] }
+
+      it "keeps a single site" do
+        expect(submitted_sites.pluck(:url)).to contain_exactly("https://example.com/")
+      end
+    end
   end
 
   describe "validations on the urls step" do

@@ -7,7 +7,7 @@ class AuditBatchCreationService
 
   def process(site_data)
     tag_ids = site_tag_ids(site_data)
-    site = @team.sites.find_by(normalized_url: Link.url_without_scheme_and_www(site_data["url"]))
+    site = @team.sites.find_by(normalized_url: Link.normalized_url(site_data["url"]))
 
     if site
       update_site(site, site_data, tag_ids)
