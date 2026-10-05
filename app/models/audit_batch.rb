@@ -54,12 +54,13 @@ class AuditBatch < ApplicationRecord
     audits.exists? && audits.where(completed_at: nil).none?
   end
 
-  def progress
-    { total: audits.count, completed: audits.completed.count }
+  def completed_audits_count
+    audits.completed.count
   end
 
   def broadcast_audit_completed(audit)
     broadcast_update_to self, target: [audit, :status], partial: "audit_batches/audit_status", locals: { audit: }
+    broadcast_update_to self, target: [self, :completed_audits_count], content: completed_audits_count.to_s
     broadcast_update_to self, target: [self, :status], partial: "audit_batches/status", locals: { audit_batch: self } if complete?
   end
 

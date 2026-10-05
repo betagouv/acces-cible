@@ -29,8 +29,8 @@ RSpec.describe AuditBatch do
     end
   end
 
-  describe "#progress" do
-    subject { audit_batch.progress }
+  describe "#completed_audits_count" do
+    subject { audit_batch.completed_audits_count }
 
     context "with attached audits" do
       before do
@@ -38,11 +38,11 @@ RSpec.describe AuditBatch do
         create(:audit, :without_checks, audit_batch:)
       end
 
-      it { is_expected.to eq(total: 2, completed: 1) }
+      it { is_expected.to eq(1) }
     end
 
     context "when its audits have not been attached yet" do
-      it { is_expected.to eq(total: 0, completed: 0) }
+      it { is_expected.to eq(0) }
     end
   end
 
