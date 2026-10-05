@@ -1,8 +1,8 @@
 class AuditBatchCreationService
-  def initialize(team:, user:, audit_batch:)
-    @team = team
-    @user = user
+  def initialize(audit_batch:)
     @audit_batch = audit_batch
+    @user = @audit_batch.user
+    @team = @audit_batch.team
   end
 
   def process(site_data)
