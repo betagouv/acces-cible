@@ -1,0 +1,6 @@
+<%# locals: (reachable:) %>
+<%= dsfr_callout(title: t("checks.reachable.redirect_title"), header_level: 2, icon_name: :none, html_attributes: { class: "fr-mb-3w" }) do %>
+  <%= t("checks.reachable.redirect_message_html",
+        original: external_link_to(reachable.original_url, reachable.original_url),
+        redirected: external_link_to(reachable.redirect_url, reachable.redirect_url)) %>
+<% end %>

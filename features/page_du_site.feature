@@ -43,3 +43,15 @@ Fonctionnalité: Page du site
     Et que je clique sur "Lancer une évaluation"
     Alors la page contient "Historique des vérifications (2)"
     Alors la page contient "La plus récente"
+
+  Scénario: Un agent voit que le site évalué est redirigé
+    Sachant que je rajoute un site "https://example.gouv.fr/"
+    Et que le site "https://example.gouv.fr/" redirige vers "https://nouveau.example.gouv.fr/"
+    Et que le site "https://example.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
+    Quand toutes les tâches de fond sont terminées
+    Et que je recharge la page
+    Alors la mise en avant "Site en redirection" contient un lien "https://example.gouv.fr/"
+    Et la mise en avant "Site en redirection" contient un lien "https://nouveau.example.gouv.fr/"
+    Quand je clique sur "Voir le résultat"
+    Alors la mise en avant "Site en redirection" contient un lien "https://example.gouv.fr/"
+    Et la mise en avant "Site en redirection" contient un lien "https://nouveau.example.gouv.fr/"

@@ -366,7 +366,8 @@ fr:
       type: Indication de la langue
     reachable:
       reachable: Oui
-      redirect_message: Le site %{original} est redirigé vers %{redirected}. Le site %{redirected} a été évalué par Accès cible.
+      redirect_message_html: Le site %{original} est redirigé vers %{redirected}.<br>Le site %{redirected} a été évalué par Accès cible.
+      redirect_title: Site en redirection
       redirected: Redirection
       not_found: Non
       type: Site joignable

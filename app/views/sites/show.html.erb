@@ -30,9 +30,7 @@
 <% last_audit = @audits.first %>
 <% if last_audit %>
   <% if last_audit.reachable.completed? && last_audit.reachable.redirected? %>
-    <%= dsfr_callout(icon_name: "arrow-right-line", html_attributes: { class: "fr-mb-3w" }) do %>
-      <%= t("checks.reachable.redirect_message", original: last_audit.reachable.original_url, redirected: last_audit.reachable.redirect_url) %>
-    <% end %>
+    <%= render "audits/redirect_callout", reachable: last_audit.reachable %>
   <% end %>
 
   <% if last_audit.completed_at %>
