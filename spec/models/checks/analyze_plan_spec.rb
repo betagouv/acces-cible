@@ -33,7 +33,7 @@ RSpec.describe Checks::AnalyzePlan do
     end
   end
 
-  describe "#within_three_years?" do
+  describe "#within_range?" do
     it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 1], expected: true
     it_behaves_like "validates years", years: [Date.current.year - 1, Date.current.year], expected: true
     it_behaves_like "validates years", years: [Date.current.year + 1], expected: false

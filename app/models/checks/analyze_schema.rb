@@ -26,25 +26,7 @@ module Checks
 
     private
 
-    def analyze!
-      link = find_link
-      text_in_main = find_text_in_main
-      return unless link || text_in_main
-
-      years = extract_valid_years(link&.text, link&.href, text_in_main)
-
-      {
-        years:,
-        link_url: link&.href,
-        link_text: link&.text,
-        link_misplaced: link ? !link_between_headings : nil,
-        valid_years: within_three_years?(years),
-        reachable: Browser.reachable?(link&.href),
-        text: link ? nil : text_in_main
-      }
-    end
-
-    def within_three_years?(years)
+    def within_range?(years)
       return false if years.blank?
       return false if years.last - years.first > MAX_YEAR_GAP
 

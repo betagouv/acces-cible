@@ -33,7 +33,7 @@ RSpec.describe Checks::AnalyzeSchema do
     end
   end
 
-  describe "#within_three_years?" do
+  describe "#within_range?" do
     it_behaves_like "validates years", years: [Date.current.year], expected: true
     it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 3], expected: false
     it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 2], expected: true
