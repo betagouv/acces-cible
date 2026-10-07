@@ -1,6 +1,9 @@
 class SessionsController < ApplicationController
+  PRODUCTION_URL = "https://acces-cible.beta.gouv.fr"
+
   allow_unauthenticated_access only: [:new, :omniauth, :logout_callback]
   redirect_if_authenticated only: [:new, :omniauth]
+  before_action :restrict_staging_to_internal_users, only: :omniauth, if: -> { Rails.application.staging? }
 
   def new
     if request.path == auth_failure_path
@@ -41,6 +44,11 @@ class SessionsController < ApplicationController
   end
 
   private
+
+  def restrict_staging_to_internal_users
+    siret = request.env["omniauth.auth"].extra.raw_info.siret
+    redirect_to login_path, alert: t(".staging_restricted", url: PRODUCTION_URL) unless User.internal_siret?(siret)
+  end
 
   def proconnect_logout
     session["omniauth.state"] = SecureRandom.hex(16)

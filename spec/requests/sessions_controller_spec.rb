@@ -66,4 +66,55 @@ RSpec.describe "Sessions" do
       end
     end
   end
+
+  describe "GET /auth/proconnect/callback" do
+    subject(:login) { get "/auth/proconnect/callback" }
+
+    before do
+      OmniAuth.config.mock_auth[:proconnect] = OmniAuth::AuthHash.new(
+        provider: "proconnect",
+        uid: "123",
+        info: { email: "john.doe@example.com", name: "John Doe" },
+        extra: { raw_info: { siret:, organization_label: "DINUM" } }
+      )
+    end
+
+    after { OmniAuth.config.mock_auth[:proconnect] = nil }
+
+    context "when on staging with an internal siret" do
+      let(:siret) { "13002526500013" }
+
+      before { allow(Rails.application).to receive(:staging?).and_return(true) }
+
+      it "logs the user in" do
+        expect { login }.to change(Session, :count).by(1)
+
+        expect(response).to redirect_to(authenticated_root_url)
+      end
+    end
+
+    context "when on staging with an external siret" do
+      let(:siret) { "12345678901234" }
+
+      before { allow(Rails.application).to receive(:staging?).and_return(true) }
+
+      it "refuses the login without creating the user" do
+        expect { login }.not_to change(User, :count)
+
+        expect(Session.count).to eq(0)
+        expect(response).to redirect_to(login_path)
+        expect(flash[:alert]).to eq(I18n.t("sessions.omniauth.staging_restricted", url: SessionsController::PRODUCTION_URL))
+      end
+    end
+
+    context "when outside staging with an external siret" do
+      let(:siret) { "12345678901234" }
+
+      it "logs the user in" do
+        expect { login }.to change(Session, :count).by(1)
+
+        expect(response).to redirect_to(authenticated_root_url)
+      end
+    end
+  end
 end

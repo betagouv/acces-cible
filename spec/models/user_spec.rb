@@ -35,6 +35,16 @@ RSpec.describe User do
     end
   end
 
+  describe ".internal_siret?" do
+    it "accepts internal sirets" do
+      expect(described_class.internal_siret?("13002526500013")).to be(true)
+    end
+
+    it "refuses other sirets" do
+      expect(described_class.internal_siret?("12345678901234")).to be(false)
+    end
+  end
+
   describe ".from_omniauth" do
     subject(:from_omniauth) { described_class.from_omniauth(auth) }
 

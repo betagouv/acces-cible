@@ -547,6 +547,7 @@ fr:
       login_failed: Nous n'avons pas réussi à vous identifier.
       title: Connexion à Accès Cible
     omniauth:
+      staging_restricted: "Cet environnement de test est réservé à l'équipe Accès Cible. Pour utiliser Accès Cible, connectez-vous sur le site officiel : <a href='%{url}'>%{url}</a>."
       success: Vous êtes maintenant connecté•e.
   shared:
     "no": Non
