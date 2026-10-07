@@ -5,6 +5,27 @@ module AccessibilityDocumentAnalyzer
   YEAR_PATTERN = /20\d{2}/
 
   included do
+    private
+
+    def analyze!
+      link = find_link
+      text_in_main = find_text_in_main
+      return unless link || text_in_main
+
+      years = extract_valid_years(link&.text, link&.href, text_in_main)
+
+      {
+        years:,
+        link_url: link&.href,
+        link_text: link&.text,
+        link_misplaced: link ? !link_between_headings : nil,
+        valid_years: within_range?(years),
+        reachable: Browser.reachable?(link&.href),
+        text: link ? nil : text_in_main
+      }
+    end
+
+
     def find_link
       return unless accessibility_page
 
@@ -59,7 +80,6 @@ module AccessibilityDocumentAnalyzer
       end
     end
 
-    private
 
     def compute_found
       !data.nil?

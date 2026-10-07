@@ -62,8 +62,8 @@ module AuditsHelper
     return nil if check.valid_years || !check.found?
 
     case check
-    when Checks::AnalyzeSchema then t("checks.analyze_schema.invalid_years")
-    when Checks::AnalyzePlan then t("checks.analyze_plan.invalid_years")
+    when Checks::AnalyzeSchema then t("checks.analyze_schema.invalid_years_how_to_fix")
+    when Checks::AnalyzePlan then t("checks.analyze_plan.invalid_years_how_to_fix")
     else
       muted_dash
     end

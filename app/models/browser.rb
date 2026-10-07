@@ -6,7 +6,6 @@ class Browser
   PROCESS_TIMEOUT = 30.seconds
   # Maximum delay waiting for the network to become idle after a page load
   NETWORK_IDLE_TIMEOUT = 10.seconds
-  SUCCESS_CODE = 200
 
   REQUEST_HEADERS = {
     "Accept-Language" => "fr",
@@ -88,28 +87,23 @@ class Browser
 
   class << self
     def reachable?(url)
-      url && head(url)[:status] == SUCCESS_CODE
+      return false if url.blank?
+
+      status = head(url).status
+
+      status.success? || status.redirect?
+    rescue
+      false
     end
 
     def head(url)
-      response = HTTP
-        .headers(request_headers)
-        .timeout(connect: 3, read: 3)
-        .follow(max_hops: 3)
-        .head(url, ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE })
       # Disable SSL because some websites provide CRLs via HTTP,
       # which OpenSSL ignores, throwing connection failure.
       # Harmless for head requests.
-
-      {
-        status: response.code || 0,
-        current_url: Link.normalize(response.uri.to_s)
-      }
-    rescue
-      {
-        status: 0,
-        current_url: Link.normalize(url)
-      }
+      HTTP
+        .headers(request_headers)
+        .timeout(connect: 3, read: 3)
+        .head(url, ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE })
     end
 
     def request_headers
