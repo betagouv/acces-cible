@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include Privileged
 
   MAX_IDLE_TIME = 1.year
+  INTERNAL_SIRETS = %w[13002526500013 11006801200050].freeze
 
   belongs_to :team, foreign_key: :siret, primary_key: :siret, inverse_of: :users, touch: true
   has_many :sites, through: :team
@@ -24,6 +25,10 @@ class User < ApplicationRecord
   end
 
   class << self
+    def internal_siret?(siret)
+      INTERNAL_SIRETS.include?(siret)
+    end
+
     def from_omniauth(auth)
       data_source = auth.info
       extra_data = auth.provider == "developer" ? data_source : auth.extra.raw_info
