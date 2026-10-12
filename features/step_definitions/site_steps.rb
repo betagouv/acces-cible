@@ -8,6 +8,19 @@ def team
   current_user.team
 end
 
+def fake_html
+  <<~HTML
+    <html>
+      <head>
+        <title>Site title</title>
+      </head>
+      <body>
+        <h1>Hello</h1>
+      </body>
+    </html>
+  HTML
+end
+
 Quand("je rajoute un site {string} qui renvoie une réponse HTML normale") do |url|
   steps %(
    Sachant que le site "#{url}" renvoie une réponse HTML normale
@@ -36,17 +49,6 @@ end
 # In the meantime mock our Browser.get method instead but that is NOT
 # NICE and we should do something about it soon.
 Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'accueil") do |url|
-  fake_html = <<~HTML
-    <html>
-      <head>
-        <title>Site title</title>
-      </head>
-      <body>
-        <h1>Hello</h1>
-      </body>
-    </html>
-  HTML
-
   allow(Browser)
     .to receive(:get)
           .with(url)
@@ -55,6 +57,18 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la page d'ac
             status: 200,
             content_type: "text/html",
             current_url: url
+          )
+end
+
+Sachantque("le site {string} redirige vers {string}") do |url, redirect_url|
+  allow(Browser)
+    .to receive(:get)
+          .with(url)
+          .and_return(
+            body: fake_html,
+            status: 200,
+            content_type: "text/html",
+            current_url: redirect_url
           )
 end
 
@@ -97,17 +111,6 @@ Quand("le site {string} ne trouve pas de page d'accessibilité") do |string|
 end
 
 Sachantque("le site {string} renvoie une réponse HTML normale pour la déclaration d'accessibilité") do |url|
-  fake_html = <<~HTML
-    <html>
-      <head>
-        <title>Site title</title>
-      </head>
-      <body>
-        <h1>Hello</h1>
-      </body>
-    </html>
-  HTML
-
   step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end
 
@@ -212,6 +215,10 @@ end
 
 Alors('la carte {string} n\'indique pas {string}') do |title, str|
   expect(find("section.bordered-card", text: title)).not_to have_content(str)
+end
+
+Alors("la mise en avant {string} contient un lien {string}") do |title, link|
+  expect(find(".fr-callout", text: title)).to have_link(link)
 end
 
 Alors('le résumé {string} indique {string}') do |label, str|
