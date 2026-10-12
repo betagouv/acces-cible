@@ -107,6 +107,6 @@ RSpec.shared_examples "validates years" do |years:, expected:|
   include_context "with analyzer setup"
 
   it "returns #{expected} for #{years}" do
-    expect(check.send(:within_three_years?, years)).to eq(expected)
+    expect(check.send(:within_range?, years)).to eq(expected)
   end
 end

@@ -3,7 +3,7 @@ module Checks
     PRIORITY = 21
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
-    ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
+    ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚o]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|établi(?:e)?(?:\s+le)?|en|du|le|au)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_UPDATE_DATE_PATTERN = /(?<full_date>(?:mis(?:e)?\s+à\s+jour(?:\s+le)?|actualisé(?:e)?(?:\s+le)?|modifié(?:e)?(?:\s+le)?)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze

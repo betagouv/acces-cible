@@ -329,6 +329,7 @@ fr:
     analyze_plan:
       all_passed: Lien trouvé et valide
       invalid_years: Année(s) invalide(s)
+      invalid_years_how_to_fix: "Renseignez des dates contenant l'année en cours"
       link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien
@@ -343,6 +344,7 @@ fr:
     analyze_schema:
       all_passed: Lien trouvé et valide
       invalid_years: Années invalides
+      invalid_years_how_to_fix: "Renseignez des dates contenant l'année en cours et dans une plage de maximum 3 ans"
       link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien

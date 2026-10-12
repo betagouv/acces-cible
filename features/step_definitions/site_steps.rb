@@ -252,3 +252,7 @@ Alors('la page retourne un CSV qui contient strictement les sites {string}') do 
     expect(page.body.lines.one? { |line| line.start_with?(site) }).to be_truthy
   end
 end
+
+Sachantque("nous sommes en {int}") do |year|
+  travel_to Time.zone.local(year, 6, 1)
+end

@@ -3,6 +3,7 @@
 Fonctionnalité: Vérifications du plan d'accessibilité
 
   Contexte:
+    Sachant que nous sommes en 2026
     Sachant que je suis "marie.curie@gouv.fr" avec le SIRET 123 de l'organisation "DINUM"
     Et que je me pro-connecte
     Et que je rajoute un site "https://foobar.com/"
@@ -17,11 +18,11 @@ Fonctionnalité: Vérifications du plan d'accessibilité
 
     Exemples:
       | contenu                                 | résultat              |
-      | plan annuel d'accessibilité 2020 - 2024 | Année(s) invalide(s)  |
+      | plan annuel d'accessibilité 2020 - 2024 | Renseignez des dates contenant l'année en cours |
       | plan annuel d'accessibilité 2024 - 2025 | 2024-2025             |
       | plan annuel 2024 - 2025                 | 2024-2025             |
       | plan d'action 2024 - 2025               | 2024-2025             |
-      | plan d'action 1998 - 2000               | Année(s) invalide(s)  |
-      | plan d'action 0946                      | Année(s) invalide(s)  |
+      | plan d'action 1998 - 2000               | Renseignez des dates contenant l'année en cours |
+      | plan d'action 0946                      | Renseignez des dates contenant l'année en cours |
       | plann d'accessibilité 2024 - 2025       | Absent                |
       | plan d'accessibilité                    | Absent                |
