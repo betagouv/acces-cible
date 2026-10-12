@@ -6,8 +6,6 @@ class ApplicationController < ActionController::Base
 
   layout :layout_selector
 
-  before_action :prevent_search_engine_indexing, if: -> { Rails.application.staging? }
-
   helper_method :resource
 
   rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, ActiveStorage::FileNotFoundError do
@@ -37,10 +35,6 @@ class ApplicationController < ActionController::Base
 
   def instance_variable_name
     @instance_variable_name ||= "@#{action_name == "index" ? controller_name : controller_name.singularize}"
-  end
-
-  def prevent_search_engine_indexing
-    response.set_header("X-Robots-Tag", "noindex, nofollow")
   end
 
   def layout_selector
