@@ -35,10 +35,10 @@ RSpec.describe Checks::AnalyzeSchema do
 
   describe "#within_range?" do
     it_behaves_like "validates years", years: [Date.current.year], expected: true
-    it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 3], expected: false
-    it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 2], expected: true
     it_behaves_like "validates years", years: [Date.current.year - 1], expected: false
     it_behaves_like "validates years", years: [Date.current.year + 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 2], expected: true
+    it_behaves_like "validates years", years: [Date.current.year, Date.current.year + 3], expected: false
     it_behaves_like "validates years", years: [Date.current.year - described_class::MAX_YEAR_GAP, Date.current.year], expected: true
     it_behaves_like "validates years", years: [Date.current.year, Date.current.year + described_class::MAX_YEAR_GAP], expected: true
     it_behaves_like "validates years", years: [Date.current.year - 1, Date.current.year + 1], expected: true

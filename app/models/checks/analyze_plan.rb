@@ -3,6 +3,8 @@ module Checks
     store_accessor :data, :link_url, :link_text, :link_misplaced, :years, :reachable, :valid_years, :text
     include AccessibilityDocumentAnalyzer
 
+    MAX_YEAR_GAP = 1
+
     PRIORITY = 24
     PATTERN = /
       plan\s+
@@ -12,16 +14,5 @@ module Checks
         (?:\d{4}\s+)?d['’]action(?:s)?(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?
       )
     /xi
-
-    private
-
-    def within_range?(years)
-      return false if years.blank?
-      current_year = Date.current.year
-
-      return years.first == current_year if years.size == 1
-
-      years.last.between?(current_year - 1, current_year + 1)
-    end
   end
 end

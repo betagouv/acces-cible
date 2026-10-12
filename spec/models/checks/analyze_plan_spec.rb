@@ -39,5 +39,8 @@ RSpec.describe Checks::AnalyzePlan do
     it_behaves_like "validates years", years: [Date.current.year + 1], expected: false
     it_behaves_like "validates years", years: [Date.current.year], expected: true
     it_behaves_like "validates years", years: [Date.current.year - 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year - 1, Date.current.year + 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year - 2, Date.current.year - 1], expected: false
+    it_behaves_like "validates years", years: [Date.current.year - 10, Date.current.year], expected: false
   end
 end

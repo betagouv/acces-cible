@@ -25,6 +25,13 @@ module AccessibilityDocumentAnalyzer
       }
     end
 
+    def within_range?(years)
+      return false if years.blank?
+      return false if years.last - years.first > self.class::MAX_YEAR_GAP
+
+      Date.current.year.between?(years.first, years.last)
+    end
+
 
     def find_link
       return unless accessibility_page

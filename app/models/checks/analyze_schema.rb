@@ -23,14 +23,5 @@ module Checks
         accessibilit[eé]\s+num[eé]rique\s+[—–-]\s+sch[eé]ma\s+annuel(?:\s+\d{4}(?:\s*[-–]\s*\d{4})?)?
       )
     /xi
-
-    private
-
-    def within_range?(years)
-      return false if years.blank?
-      return false if years.last - years.first > MAX_YEAR_GAP
-
-      Date.current.year.between?(years.first, years.last)
-    end
   end
 end
