@@ -42,6 +42,12 @@ class Link
       ""
     end
 
+    def www?(href)
+      parse(href).hostname.to_s.downcase.start_with?("www.")
+    rescue Addressable::URI::InvalidURIError
+      false
+    end
+
     def internal?(href, root)
       url_without_scheme_and_www(href).start_with?(url_without_scheme_and_www(root))
     end
