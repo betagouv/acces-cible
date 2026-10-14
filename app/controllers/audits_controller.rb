@@ -29,7 +29,7 @@ class AuditsController < ApplicationController
   # GET /sites/1/audits/1
   def show
     @audit = @site.audits.displayable.find(params[:id])
-    @title = @site.normalized_url
+    @title = @site.display_url
   end
 
   private

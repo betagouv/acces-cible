@@ -40,7 +40,7 @@
           </span>
           <%= site_link(site) %>
           <%= link_to site_audit_path(site, audit), class: "ac-row-link__stretched" do %>
-            <span class="fr-sr-only"><%= t(".see_audit", url: site.normalized_url) %></span>
+            <span class="fr-sr-only"><%= t(".see_audit", url: site.display_url) %></span>
           <% end %>
         </li>
       <% end %>

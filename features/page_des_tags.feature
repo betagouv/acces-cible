@@ -18,12 +18,12 @@ Fonctionnalité: Page des étiquettes
   Scénario: Un agent peut voir les sites associés à un tag depuis la page des tags
     Et que je clique sur "Sites avec l'étiquette secret (2)"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
-      | suresnes.fr       |
+      | www.suresnes.fr   |
       | numerique.gouv.fr |
 
   Scénario: Un agent peut voir les sites associés à un tag sur sa page
     Et que je clique sur "secret"
     Et que je clique sur "Sites avec l'étiquette secret (2)"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
-      | suresnes.fr       |
+      | www.suresnes.fr   |
       | numerique.gouv.fr |

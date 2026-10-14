@@ -25,6 +25,20 @@ RSpec.describe Site do
     it { is_expected.to have_many(:tags).through(:site_tags) }
   end
 
+  describe "#display_url" do
+    {
+      "https://www.example.com/" => "www.example.com",
+      "https://example.com/" => "example.com",
+      "http://www.example.com/page" => "www.example.com/page"
+    }.each do |url, expected_display_url|
+      it "returns #{expected_display_url.inspect} for #{url.inspect}" do
+        site = create(:site, url:)
+
+        expect(site.display_url).to eq(expected_display_url)
+      end
+    end
+  end
+
   describe "friendly_id" do
     let(:url) { "https://example.com/path?query=1" }
     let(:site) { create(:site, url:) }

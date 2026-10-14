@@ -28,8 +28,12 @@ class Site < ApplicationRecord
     self.normalized_url = Link.url_without_scheme_and_www(url)
   end
 
+  def display_url
+    Link.www?(url) ? "www.#{normalized_url}" : normalized_url
+  end
+
   def to_s
-    normalized_url
+    display_url
   end
 
   def tags_attributes=(attributes)

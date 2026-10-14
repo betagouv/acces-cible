@@ -7,7 +7,7 @@
 
 <%= card_with_header(
       title: t("audits.show.automated_tests_title"),
-      description: t("audits.show.automated_tests_description", site: audit.site.normalized_url, total: Checks::RunAxeOnHomepage::AXE_RULE_TO_RGAA_CRITERION.size)
+      description: t("audits.show.automated_tests_description", site: audit.site.display_url, total: Checks::RunAxeOnHomepage::AXE_RULE_TO_RGAA_CRITERION.size)
     ) do %>
   <% if check.completed? %>
     <p class="fr-text--sm fr-mb-2w">
