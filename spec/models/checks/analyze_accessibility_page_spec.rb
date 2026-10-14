@@ -361,6 +361,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "article 47 loi n°2005-102 du 11 février 2005" => true,
       "art. 47 de la loi numéro 2005-102 du 11 fevrier 2005" => true,
       "à l’article 47 de la loi no 2005-102 du 11 février 2005" => true,
+      "à l’article 47 de la loi n<sup>o</sup>&nbsp;2005-102 du 11&nbsp;février 2005" => true,
       "Contactez-nous pour plus d'informations" => false,
       "" => false
     }.each do |text, expectation|
