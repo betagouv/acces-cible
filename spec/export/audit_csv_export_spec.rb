@@ -143,7 +143,7 @@ RSpec.describe AuditCsvExport do
                               "URL évaluation accès cible" => "http://example.com/sites/example-com/audits/#{audit.id}",
                               "Évaluateur" => audit.user.to_s,
                               "Organisation" => audit.user.team.organization_label,
-                              "Lancée le" => I18n.l(audit.created_at.to_date),
+                              "Lancée le" => I18n.l(audit.created_at.to_datetime, format: :complete),
                               "Étiquettes" => "Gouvernment, Santé publique"
                             )
       end
