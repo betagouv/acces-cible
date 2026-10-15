@@ -336,7 +336,14 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       "L’audit de conformité réalisé par Koena révèle que :" => "Koena",
       "par ailleurs vous pouvez toujours compter sur nous" => nil,
       "réalisé par la société Empreinte Digitale" => "Empreinte Digitale",
-      " l’ Agence Cosiweb" => "Cosiweb"
+      " l’ Agence Cosiweb" => "Cosiweb",
+      "L’audit de conformité réalisé par la Brigade d'Intervention du Numérique de la DINUM révèle que 100 % des critères" => "la Brigade d'Intervention du Numérique de la DINUM",
+      "Le taux est en hausse par rapport au précédent audit. L’audit réalisé par ACCESS MAN révèle" => "ACCESS MAN",
+      "L’audit réalisé par la collectivité elle-même révèle" => "la collectivité elle-même",
+      "Les images sont remplacées par du texte stylé." => nil,
+      "Audit par le CDG46 révèle" => "le CDG46",
+      "réalisé par Tanaguru le 31 mars 2026" => "Tanaguru",
+      "réalisé par Inovagora en janvier 2023" => "Inovagora"
     }.each do |text, expected_auditor|
       context "with '#{text}'" do
         let(:body) do
