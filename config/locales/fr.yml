@@ -139,8 +139,11 @@ fr:
         site: Site
         standard: Référentiel
         tags: Étiquettes
+      all_audits: Toutes les évaluations
       displayed_columns: Colonnes affichées
       export_to_csv: Export CSV
+      history_filter: Évaluations affichées pour chaque site
+      latest_audits: Dernière de chaque site
       no_results: Aucune évaluation à afficher.
       no_search_results: Aucune évaluation ne correspond à votre recherche.
       search: Rechercher un site
@@ -647,7 +650,7 @@ fr:
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
   time:
     formats:
-      complete: "%d/%m/%Y à %H:%M"
+      complete: "%d/%m/%Y %Hh%M"
       file: "%Y%m%d-%Hh%M"
   users:
     show:
