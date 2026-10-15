@@ -41,7 +41,7 @@ module AuditColumns
       when "reachable" then check_status(audit.reachable)
       when "schema" then obligation(audit.analyze_schema)
       when "schema_quality" then validity(audit.analyze_schema.conform)
-      when "site" then audit.site.normalized_url
+      when "site" then audit.site.display_url
       when "standard" then validity(declaration.standard.present?)
       when "tags" then audit.site.tags_list
       else

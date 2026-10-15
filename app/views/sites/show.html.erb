@@ -3,13 +3,13 @@
 <% content_for :breadcrumb do %>
   <%= dsfr_breadcrumbs do |b| %>
     <% b.with_breadcrumb(label: t("audits.show.breadcrumb_sites"), href: audits_path) %>
-    <% b.with_breadcrumb(label: @site.normalized_url) %>
+    <% b.with_breadcrumb(label: @site.display_url) %>
   <% end %>
 <% end %>
 
 <div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters fr-mb-1w">
   <div class="fr-col">
-    <h1 class="fr-mb-0"><%= @site.normalized_url %> </h1>
+    <h1 class="fr-mb-0"><%= @site.display_url %> </h1>
   </div>
   <div class="fr-col-auto">
     <%= button_to t("shared.new_audit"), [@site, :audits], method: :post, class: "fr-btn" %>
