@@ -4,7 +4,7 @@
 
 Vérifier que la page d’accessibilité fournit les informations essentielles :
 
-- Date de l’audit
+- Date de la déclaration
 - Date de mise à jour
 - Taux de conformité
 - Référence au référentiel (RGAA/WCAG)
@@ -13,7 +13,7 @@ Vérifier que la page d’accessibilité fournit les informations essentielles :
 
 Pour que la déclaration soit considérée comme complète, les informations suivantes doivent être présentes :
 
-- Date de l'audit
+- Date de la déclaration
 - Taux de conformité
 - Mention de l'article 47 de la loi du 11 février 2005
 
@@ -43,11 +43,11 @@ La référence au standard peut-être « RGAA » ou « WCAG ».
     <tbody>
       <tr>
         <td><p class="fr-badge fr-badge--success">78%</p></td>
-        <td> <p>Réussi - Déclaration complète (la date d’audit, le taux de conformité et la mention de l’article 47 sont présents). Le badge affiche le taux (ex : « 78% »)</p></td>
+        <td> <p>Réussi - Déclaration complète (la date de la déclaration, le taux de conformité et la mention de l’article 47 sont présents). Le badge affiche le taux (ex : « 78% »)</p></td>
       </tr>
       <tr>
         <td><p class="fr-badge fr-badge--warning"><%= t("checks.analyze_accessibility_page.missing_data") %></p></td>
-        <td> <p>Avertissement - Déclaration incomplète (des informations clés manquent : date de l'audit, taux de conformité, mention de l’article 47) </p></td>
+        <td> <p>Avertissement - Déclaration incomplète (des informations clés manquent : date de la déclaration, taux de conformité, mention de l’article 47) </p></td>
       </tr>
     </tbody>
   </table>
