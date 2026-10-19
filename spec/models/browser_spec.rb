@@ -128,8 +128,9 @@ RSpec.describe Browser do
       allow(network_double).to receive_messages(status: 200, wait_for_idle: true)
       allow(page_double).to receive(:go_to).with(url).and_return("frame-id")
       allow(page_double).to receive(:evaluate).with("document.contentType").and_return("text/html")
-      allow(page_double).to receive_messages(headers: headers_double, network: network_double, body: "<html><body>Test</body></html>", current_url: url)
-      allow(page_double).to receive(:close)
+      allow(page_double).to receive(:command).with("DOM.getDocument", depth: 0).and_return({ "root" => { "nodeId" => 1 } })
+      allow(page_double).to receive(:command).with("DOM.getOuterHTML", nodeId: 1, includeShadowDOM: true).and_return({ "outerHTML" => "<html><body>Test</body></html>" })
+      allow(page_double).to receive_messages(headers: headers_double, network: network_double, current_url: url)
       allow(Link).to receive(:normalize).with(url).and_return(url)
     end
 
