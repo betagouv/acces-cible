@@ -1,5 +1,6 @@
 <%= render "audits/modals/columns" %>
 <%= turbo_stream_from [current_user.team, :sites] %>
+<% history_options =[[t(".all_audits"), "all"], [t(".latest_audits"), "latest"]] %>
 <% scope_options = [[t(".scope_me"), "me"], [t(".scope_team", organization: current_user.team.organization_label), "team"]] %>
 
 <% content_for :breadcrumb do %>
@@ -45,6 +46,15 @@
                        id: "filter_tag_id", class: "fr-select", data: { action: "change->autosubmit#submit" } %>
       </div>
     </div>
+
+    <div class="fr-col-12 fr-col-md-3">
+      <div class="fr-select-group">
+        <label class="fr-label fr-sr-only" for="filter_history"><%= t(".history_filter") %></label>
+        <%= select_tag "filter[history]",
+                       options_for_select(history_options, params.dig(:filter, :history)),
+                       id: "filter_history", class: "fr-select", data: { action: "change->autosubmit#submit" } %>
+      </div>
+    </div>
   </div>
 <% end %>
 
@@ -55,7 +65,7 @@
   </div>
 
   <div class="fr-col-2">
-    <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
+    <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q, :history)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
   </div>
 </div>
 
