@@ -132,7 +132,7 @@ class Browser
         visit(page, url)
 
         {
-          body: page.body,
+          body: deep_root_html(page),
           status: page.network.status,
           content_type: page.evaluate("document.contentType"),
           current_url: Link.normalize(page.current_url)
@@ -158,6 +158,12 @@ class Browser
     end
 
     private
+
+    def deep_root_html(page)
+      node_id = page.command("DOM.getDocument", depth: 0).dig("root", "nodeId")
+
+      page.command("DOM.getOuterHTML", nodeId: node_id, includeShadowDOM: true)["outerHTML"]
+    end
 
     def visit(page, url)
       navigation_issue =
