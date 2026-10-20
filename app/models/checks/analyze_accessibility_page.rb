@@ -6,25 +6,12 @@ module Checks
     LAW_NUMBER = "2005-102".freeze
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|établi(?:e)?(?:\s+le)?|en|du|le|au)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_UPDATE_DATE_PATTERN = /(?<full_date>(?:mis(?:e)?\s+à\s+jour(?:\s+le)?|actualisé(?:e)?(?:\s+le)?|modifié(?:e)?(?:\s+le)?)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
-    AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
     COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux (?:global )?de conformité |conforme à|révèle que|mis(?:e)? à jour à|des crit(?:è|e)res)(?:(?!\bmoyen\b)[^.])*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,3}(?:[.,]\d+)?)\s*%\s*(?:des crit(?:è|e)res(?: RGAA)?(?:\s+sont\s+respect(?:é|e)s)?|au RGAA)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
     AUDITOR_NAME_START = /(?:réalisée?|réalisation)[^.]*?\s+par\s+(?:la\s+société\s+|l[’']\s*agence\s+|la\s+|le\s+|l[’']\s*)?|la\s+société\s+|l[’']\s*agence\s+/i
     AUDITOR_NAME_END = /(?:,| révèle| sur|\.|$|\s(?:le|en)\s+(?:\d|[a-zéûà]+\s+\d{4}))/i
     AUDITOR_PATTERN = /(?:#{AUDITOR_NAME_START})([^,.]+?)#{AUDITOR_NAME_END}/i
-    UPDATE_AUDIT_PATTERNS = [
-      /Au\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4}).*(?:indique|mentionne).*(?:depuis|après).*(?:précédent|dernier)\s+audit/i,
-      /Suite\s+à.*(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})).*(?:dorénavant|désormais|maintenant|actuellement)/i,
-      /(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4}))/i
-    ].freeze
-    UPDATE_AUDIT_KEYWORDS = [
-      "suite à", "actualisation", "actualisé", "mis à jour", "mise à jour", "modification",
-      "revu", "révisé", "révision", "réévaluation", "nouvelle évaluation",
-      "dorénavant", "désormais", "maintenant", "actuellement", "inchangé",
-    ].freeze
-    EMAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
     CONTACT_FORM_REGEX = /aide|form|contact/i
-    MAILTO_PREFIX = "mailto:".freeze
     LAW_DATE = Date.new(2005, 2, 11)
     HEADERS_SCOPE = ["Établissement de cette déclaration d’accessibilité", "État de conformité", "Déclaration d’accessibilité", "Résultats des tests"]
 
