@@ -307,6 +307,20 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
       end
     end
+
+    context "when the rate is not found under 'Résultats des tests'" do
+      let(:body) do
+        <<~HTML
+          <h2>État de conformité</h2>
+          <p>révèle que sur l'échantillon du site audité 50 % des critères du RGAA version 4.1.2 sont respectés.</p>
+          <h2>Stratégie et plan d'action</h2>
+        HTML
+      end
+
+      it "extracts the compliance rate" do
+        expect(check.find_compliance_rate).to eq(50)
+      end
+    end
   end
 
   describe "#find_standard" do
