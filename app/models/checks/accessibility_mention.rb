@@ -1,7 +1,7 @@
 module Checks
   class AccessibilityMention < Check
     PRIORITY = 10
-    MENTION_REGEX = /accessibilit[ée].{0,40}?\b(?<level>non|partiellement|totalement)[\s-]+conforme/iu
+    MENTION_REGEX = /accessibilit[ée][^:]{0,40}?:?[\s(]*(?<level>non|partiellement|totalement)[\s-]+conforme/iu
 
     store_accessor :data, :mention
 
