@@ -719,7 +719,7 @@ DEPENDENCIES
   whiny_validation
 
 RUBY VERSION
-  ruby 4.0.1p0
+  ruby 4.0.7
 
 BUNDLED WITH
   4.0.3
