@@ -307,6 +307,52 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
       end
     end
+
+    context "when the rate is not found under 'Résultats des tests'" do
+      context "with a compliance rate" do
+        let(:body) do
+          <<~HTML
+            <h2>État de conformité</h2>
+            <p>révèle que sur l'échantillon du site audité 50 % des critères du RGAA version 4.1.2 sont respectés.</p>
+            <h2>Stratégie et plan d'action</h2>
+          HTML
+        end
+
+        it "extracts the compliance rate" do
+          expect(check.find_compliance_rate).to eq(50)
+        end
+      end
+
+      context "with an unrelated percentage and no compliance rate" do
+        let(:body) do
+          <<~HTML
+            <h2>État de conformité</h2>
+            <p>Le site est non conforme, aucun audit n'a été réalisé.</p>
+            <h2>Stratégie et plan d'action</h2>
+            <p>Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.</p>
+          HTML
+        end
+
+        it "returns nil" do
+          expect(check.find_compliance_rate).to be_nil
+        end
+      end
+
+      context "with an unrelated percentage after the compliance rate" do
+        let(:body) do
+          <<~HTML
+            <h2>État de conformité</h2>
+            <p>révèle que sur l'échantillon du site audité 50 % des critères du RGAA version 4.1.2 sont respectés.</p>
+            <h2>Stratégie et plan d'action</h2>
+            <p>Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.</p>
+          HTML
+        end
+
+        it "extracts the compliance rate" do
+          expect(check.find_compliance_rate).to eq(50)
+        end
+      end
+    end
   end
 
   describe "#find_standard" do
