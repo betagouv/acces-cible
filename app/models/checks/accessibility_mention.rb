@@ -1,17 +1,7 @@
 module Checks
   class AccessibilityMention < Check
     PRIORITY = 10
-    MENTION_REGEX = /accessibilit[ée]     # Match "accessibilité" or "accessibilite"
-                    (?:\s+\w+\s+site)?    # Optional words followed by " site" (like "du site")
-                    \s*                   # Optional whitespace
-                    :?                    # Optional colon
-                    \s*                   # Optional whitespace
-                    \(?                   # Optional open parenthesis
-                    \s*                   # Optional whitespace
-                    (?<level>non|partiellement|totalement)  # Capture the level
-                    \s+                   # Required whitespace
-                    conforme              # Match "conforme"
-                    /iux # Case insensitive, Unicode, allow comments and whitespace
+    MENTION_REGEX = /accessibilit[ée][^:]{0,40}?:?[\s(]*(?<level>non|partiellement|totalement)[\s-]+conforme/iu
 
     store_accessor :data, :mention
 

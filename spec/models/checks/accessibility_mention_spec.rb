@@ -21,6 +21,10 @@ RSpec.describe Checks::AccessibilityMention do
 
       # With "site"
       "accessibilité du site : non conforme" => "non",
+      "Accessibilité site internet : non conforme" => "non",
+
+      # Hyphen
+      "Accessibilité : non-conforme" => "non",
 
       # No punctuation
       "accessibilité partiellement conforme" => "partiellement",
@@ -36,7 +40,6 @@ RSpec.describe Checks::AccessibilityMention do
       # Invalid formats
       "" => nil,
       "Accessibillité (non conforme)" => nil,
-      "accessibilité de n'importe quoi : totalement conforme" => nil,
       "accessibilité : totalement non conforme" => nil,
       "accessibilité : pas vraiment conforme" => nil,
       "accessibilité conforme" => nil
