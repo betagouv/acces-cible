@@ -47,7 +47,7 @@ module AuditsFiltering
 
   def order_audits(scope)
     if params.dig(:sort, :url).present?
-      scope.order("sites.normalized_url #{sort_direction.upcase}")
+      scope.order(Arel.sql("regexp_replace(sites.normalized_url, '^www[0-9]?\\.', '') #{sort_direction.upcase}"))
     else
       scope.order(created_at: sort_direction)
     end
