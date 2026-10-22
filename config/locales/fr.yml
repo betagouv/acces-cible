@@ -244,8 +244,9 @@ fr:
       unreachable_intro_html: "Le site %{site} n'est pas joignable actuellement. Aucune évaluation n'a pu être exécutée."
       unreachable_no_checks_text: "Le site n'étant pas joignable, aucune des quatre catégories (niveau déclaré, obligations légales, qualité de la déclaration, tests automatiques) n'a pu être évaluée."
       unreachable_no_checks_title: Aucune évaluation exécutée
+      unreachable_report_incorrect_result: "Si toutefois le résultat vous paraît incorrect, signalez-le en cliquant ici."
       unreachable_title: Site injoignable
-      unreachable_what_to_do_text_html: "Vérifiez que l'adresse est correcte et que le site est en ligne.<br>Certains sites ne répondent qu'avec ou sans « www. » : essayez de lancer une évaluation avec l'autre version de l'adresse.<br>Si le site est temporairement indisponible, réessayez plus tard."
+      unreachable_what_to_do_text_html: "<li><strong>L'adresse contient-elle « www » ?</strong> Certains sites ne répondent qu'avec ou sans « www ». Vérifiez l'adresse de votre site et lancez une nouvelle évaluation.</li><li><strong>Avez-vous fait une erreur dans l'adresse de votre site ?</strong> Vérifiez que l'adresse est correcte et lancez une nouvelle évaluation.</li><li><strong>Le site est-il temporairement injoignable ?</strong> S'il est indisponible, lancez une nouvelle évaluation du site plus tard.</li>"
       unreachable_what_to_do_title: Que faire ?
       value_found: Valeur trouvée
     modals:
