@@ -204,6 +204,20 @@ RSpec.describe Link do
     end
   end
 
+  describe ".www?" do
+    {
+      "https://www.site.fr/" => true,
+      "http://WWW.site.fr/page" => true,
+      "https://site.fr/" => false,
+      "https://www2.site.fr/" => false,
+      "https://example.com:abc" => false
+    }.each do |url, expected|
+      it "returns #{expected} for #{url.inspect}" do
+        expect(described_class.www?(url)).to be expected
+      end
+    end
+  end
+
 
   describe "#initialize" do
     it "creates a Link with href and text" do

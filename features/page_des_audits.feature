@@ -18,7 +18,7 @@ Fonctionnalité:
     Et que je clique sur "Mes évaluations"
     Et que je filtre par étiquette "public"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
-      | suresnes.fr       |
+      | www.suresnes.fr   |
       | numerique.gouv.fr |
 
   Scénario: Un agent peut n'afficher que la dernière évaluation de chaque site
@@ -47,7 +47,7 @@ Fonctionnalité:
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       | beta.gouv.fr      |
       | numerique.gouv.fr |
-      | suresnes.fr       |
+      | www.suresnes.fr   |
 
   Scénario: Un agent peut combiner tri, filtre par tag et recherche
     Sachant que je possède un fichier "tmp/sites.csv" qui contient

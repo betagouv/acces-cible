@@ -10,7 +10,7 @@
   <% @sites.each do |site| %>
     <li class="fr-border-default--grey fr-p-2w fr-mb-2w">
       <p class="fr-text--bold fr-mb-2w">
-        <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.normalized_url %>
+        <%= icon("global", line: true, class: "fr-icon--sm fr-mr-1v") %><%= site.display_url %>
       </p>
       <%= render "audit_batches/tags_form", site:, audit_batch:, tags: @tags, add_tags_url: url_for(page: @pagy.page, requested_step: audit_batch.current_step) %>
     </li>
