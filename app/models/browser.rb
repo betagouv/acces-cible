@@ -54,7 +54,6 @@ class Browser
     "play.google.com",
     %r{(?:google\.com|gstatic\.com)/recaptcha}i,
     "sites.statistiques.online",
-    "googleapis.com",
     /hotjar\.(?:com|io)/i,
     "clarity.ms",
     "segment.io",
