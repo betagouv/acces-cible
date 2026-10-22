@@ -101,28 +101,65 @@ fr:
       row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
+    csv_export:
+      columns:
+        accessibility_mention: Mention d'accessibilité
+        accessibility_page: Déclaration d'accessibilité
+        audit_url: URL évaluation accès cible
+        auditor: Auditeur
+        auditor_evaluation: Auditeur (évaluation)
+        automated_tests_applicable: Tests auto RGAA applicables
+        automated_tests_inapplicable: Tests auto non applicables
+        automated_tests_passed: Tests auto RGAA réussis
+        automated_tests_result: Résultat des tests auto RGAA
+        compliance_rate: Taux d'accessibilité déclaré
+        compliance_rate_evaluation: Taux d'accessibilité déclaré (évaluation)
+        contact_email: Adresse email
+        contact_evaluation: Adresse email de contact (ou formulaire de contact) (évaluation)
+        contact_form: Formulaire de contact
+        declaration_date: Date de déclaration
+        declaration_date_evaluation: Date de déclaration (évaluation)
+        declaration_format: Titres de la déclaration d'accessibilité (évaluation)
+        declaration_hosting: Hébergement de la déclaration
+        declaration_quality: Qualité de la déclaration (note /4)
+        declaration_url: URL de la déclaration
+        declared_level: Niveau d'accessibilité déclaré
+        evaluated_url: Url évaluée
+        evaluator: Évaluateur
+        last_audit_at: Lancée le
+        law_article: Article de loi
+        legal_obligations: Respect des obligations légales (note /4)
+        organization_label: Organisation
+        plan: Plan d'action
+        plan_quality: Plan d'action (qualité)
+        plan_url: Plan d'action (lien)
+        reachable: Site joignable
+        redirect_url: Url de redirection
+        redirected: Site en redirection
+        schema: Schéma pluriannuel (évaluation)
+        schema_quality: Schéma pluriannuel (qualité)
+        schema_url: Schéma pluriannuel (lien)
+        site: Site
+        standard: Référentiel
+        standard_evaluation: Référentiel (évaluation)
+        tags: Étiquettes
     index:
       caption: Mes évaluations
       columns:
         accessibility_mention: Mention d'accessibilité
         accessibility_page: Déclaration d'accessibilité
-        audit_url: URL évaluation accès cible
         auditor: Auditeur
         automated_tests_applicable: Tests auto RGAA applicables
         automated_tests_inapplicable: Tests auto non applicables
         automated_tests_passed: Tests auto RGAA réussis
         automated_tests_result: Résultat des tests auto RGAA
         compliance_rate: Taux d'accessibilité déclaré
-        contact: Adresse email de contact (ou formulaire de contact)
         contact_email: Adresse email
         contact_form: Formulaire de contact
         declaration_date: Date de déclaration
         declaration_format: Format de la déclaration
-        declaration_hosting: Hébergement de la déclaration
         declaration_quality: Qualité de la déclaration
-        declaration_url: URL de la déclaration
         declared_level: Niveau d'accessibilité déclaré
-        evaluated_url: Url évaluée
         evaluator: Évaluateur
         last_audit_at: Lancée le
         law_article: Article de loi
@@ -130,12 +167,10 @@ fr:
         organization_label: Organisation
         plan: Plan d'action
         plan_quality: Plan d'action (qualité)
-        plan_url: URL plan d'action
         reachable: Site joignable
-        redirect_url: Url de redirection
+        redirected: Site en redirection
         schema: Schéma pluriannuel
         schema_quality: Schéma pluriannuel (qualité)
-        schema_url: URL schéma pluriannuel
         site: Site
         standard: Référentiel
         tags: Étiquettes

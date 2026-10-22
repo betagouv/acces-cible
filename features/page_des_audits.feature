@@ -146,12 +146,12 @@ Fonctionnalité:
       | Évaluateur                                          |
       | Organisation                                        |
       | Étiquettes                                          |
-      | Hébergement de la déclaration                       |
       | Date de déclaration                                 |
       | Référentiel                                         |
       | Auditeur                                            |
       | Article de loi                                      |
-      | Adresse email de contact (ou formulaire de contact) |
+      | Adresse email                                       |
+      | Formulaire de contact                               |
       | Format de la déclaration                            |
       | Schéma pluriannuel (qualité)                        |
       | Plan d'action (qualité)                             |
@@ -168,7 +168,7 @@ Fonctionnalité:
     Et que je coche toutes les cases
     Et que je clique sur le premier lien ou bouton "Appliquer"
     Alors la colonne "Résultat des tests auto RGAA" du tableau "Mes évaluations" contient dans l'ordre :
-      | Ignoré |
+      | - |
 
   Scénario: Un agent voit un message quand aucun site n'existe
     Quand je clique sur "Mes évaluations"
