@@ -18,7 +18,7 @@ Fonctionnalité:
     Et que je clique sur "Mes évaluations"
     Et que je filtre par étiquette "public"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
-      | suresnes.fr       |
+      | www.suresnes.fr   |
       | numerique.gouv.fr |
 
   Scénario: Un agent peut n'afficher que la dernière évaluation de chaque site
@@ -40,14 +40,16 @@ Fonctionnalité:
       https://beta.gouv.fr
       https://www.suresnes.fr
       https://numerique.gouv.fr
+      https://www.anct.gouv.fr
       """
     Et que j'importe le fichier CSV "tmp/sites.csv"
     Et que je clique sur "Mes évaluations"
     Et que je clique sur "Trier par Site croissant"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
+      | www.anct.gouv.fr  |
       | beta.gouv.fr      |
       | numerique.gouv.fr |
-      | suresnes.fr       |
+      | www.suresnes.fr   |
 
   Scénario: Un agent peut combiner tri, filtre par tag et recherche
     Sachant que je possède un fichier "tmp/sites.csv" qui contient

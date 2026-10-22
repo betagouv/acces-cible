@@ -77,6 +77,27 @@ RSpec.describe AuditBatchCreationService do
         expect(existing_site.last_audit.user).to eq(user)
       end
 
+      context "when the existing site has no www and the submitted address has www" do
+        let(:site_data) { { "url" => "https://www.example.com/", "tag_names" => [] } }
+
+        it "creates a new site with the submitted address" do
+          expect { process_site }.to change(Site, :count).by(1)
+          expect(created_site.url).to eq("https://www.example.com/")
+        end
+
+        it "does not audit the existing site" do
+          expect { process_site }.not_to change { existing_site.reload.audits.count }
+        end
+      end
+
+      context "when the submitted address only changes the scheme" do
+        let(:site_data) { { "url" => "http://example.com/", "tag_names" => [] } }
+
+        it "audits the existing site" do
+          expect { process_site }.to change { existing_site.reload.audits.count }.by(1)
+        end
+      end
+
       context "when a selected tag is already attached" do
         let(:site_data) { { "url" => url, "tag_names" => ["existing_tag"] } }
 

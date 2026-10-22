@@ -31,15 +31,18 @@ class Link
       nil
     end
 
-    def url_without_scheme_and_www(href)
+    def url_without_scheme(href)
       return "" unless href
 
       uri = parse(href)
-      hostname = uri.hostname.to_s.delete_prefix("www.")
       path = uri.path unless uri.path == "/"
-      [hostname, path].compact.join
+      [uri.hostname, path].compact.join
     rescue Addressable::URI::InvalidURIError
       ""
+    end
+
+    def url_without_scheme_and_www(href)
+      url_without_scheme(href).delete_prefix("www.")
     end
 
     def internal?(href, root)
