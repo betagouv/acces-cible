@@ -187,11 +187,11 @@ module AuditsHelper
 
   def audit_date_link(audit)
     local_time = audit.created_at.in_time_zone
-    date = l(local_time.to_date)
+    date = l(local_time, format: :complete)
     label = t("audits.audit.audit_label", url: audit.site.display_url, date:)
 
     dsfr_link_to site_audit_path(audit.site, audit), class: "ac-row-link__stretched", "aria-label": label do
-      time_tag local_time, date, title: l(local_time, format: :long)
+      time_tag local_time, date
     end
   end
 

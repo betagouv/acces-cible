@@ -139,8 +139,11 @@ fr:
         site: Site
         standard: Référentiel
         tags: Étiquettes
+      all_audits: Toutes les évaluations
       displayed_columns: Colonnes affichées
       export_to_csv: Export CSV
+      history_filter: Évaluations affichées pour chaque site
+      latest_audits: Dernière de chaque site
       no_results: Aucune évaluation à afficher.
       no_search_results: Aucune évaluation ne correspond à votre recherche.
       search: Rechercher un site
@@ -151,7 +154,7 @@ fr:
       title: Mes évaluations
     show:
       accessibility_rate: Taux d'accessibilité
-      audit_date: Date de l'audit
+      audit_date: Date de la déclaration
       automated_tests_description: "Tests techniques exécutés automatiquement sur %{site} à l'aide du moteur de test Axe-core. Le nombre de tests applicables peut être inférieur à %{total} selon le contenu du site."
       automated_tests_incomplete_text: "Les résultats détaillés de ce test ne sont plus disponibles. Relancez une évaluation pour obtenir un résultat détaillé."
       automated_tests_incomplete_title: Résultats détaillés indisponibles
@@ -647,7 +650,7 @@ fr:
       see_sites: "Sites avec l'étiquette %{tag} (%{count})"
   time:
     formats:
-      complete: "%d/%m/%Y à %H:%M"
+      complete: "%d/%m/%Y %Hh%M"
       file: "%Y%m%d-%Hh%M"
   users:
     show:

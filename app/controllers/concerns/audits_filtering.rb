@@ -7,7 +7,8 @@ module AuditsFiltering
   private
 
   def scoped_audits(ids: [])
-    scope = current_audits.last_per_site.joins(:site)
+    scope = current_audits.joins(:site)
+    scope = scope.latest_per_site if latest_history?
     scope = scope.where(site_id: ids) if ids.any?
     scope = filter_audits(scope)
 
@@ -16,6 +17,10 @@ module AuditsFiltering
 
   def current_audits
     team_scope? ? Audit.for_team(current_user.team) : Audit.for_user(current_user)
+  end
+
+  def latest_history?
+    params.dig(:filter, :history) == "latest"
   end
 
   def team_scope?

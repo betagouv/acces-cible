@@ -330,13 +330,22 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
   describe "#find_auditor" do
     {
       "par la société ABC," => "ABC",
-      "par XYZ (cabinet d'audit assermenté)," => "XYZ (cabinet d'audit assermenté)",
-      "par Test Corp révèle" => "Test Corp",
-      "par AXS Consulting sur un échantillon…" => "AXS Consulting",
+      "réalisé par XYZ (cabinet d'audit assermenté)," => "XYZ (cabinet d'audit assermenté)",
+      "réalisé par Test Corp révèle" => "Test Corp",
+      "réalisé par AXS Consulting sur un échantillon…" => "AXS Consulting",
       "L’audit de conformité réalisé par Koena révèle que :" => "Koena",
       "par ailleurs vous pouvez toujours compter sur nous" => nil,
       "réalisé par la société Empreinte Digitale" => "Empreinte Digitale",
-      " l’ Agence Cosiweb" => "Cosiweb"
+      " l’ Agence Cosiweb" => "Cosiweb",
+      "L’audit de conformité réalisé par la Mission d'Audit du Numérique de la Préfecture révèle que 100 % des critères" => "Mission d'Audit du Numérique de la Préfecture",
+      "Le taux est en hausse par rapport au précédent audit. L’audit réalisé par AUDIT PLUS révèle" => "AUDIT PLUS",
+      "L’audit réalisé par la collectivité elle-même révèle" => "collectivité elle-même",
+      "Les images sont remplacées par du texte stylé." => nil,
+      "a été réalisé en février 2026 par le SIVU12 révèle" => "SIVU12",
+      "L’audit de conformité réalisé le 5/06/2025 par Epsilon Access révèle" => "Epsilon Access",
+      "L’audit de conformité est en cours de réalisation par Zetaweb, aussi" => "Zetaweb",
+      "réalisé par Etaweb le 31 mars 2026" => "Etaweb",
+      "réalisé par Thetaweb en janvier 2023" => "Thetaweb"
     }.each do |text, expected_auditor|
       context "with '#{text}'" do
         let(:body) do

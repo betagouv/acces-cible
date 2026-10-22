@@ -3,26 +3,15 @@ module Checks
     PRIORITY = 21
     REQUIREMENTS = Check::REQUIREMENTS + [:find_accessibility_page]
 
-    ARTICLE = /(?:art(?:icle)?\.? 47|article 47) (?:de la )?loi (?:n[°˚o]|num(?:éro)?\.?) ?2005-102 du 11 (?:février|fevrier) 2005/i
+    LAW_NUMBER = "2005-102".freeze
     AUDIT_DATE_PATTERN = /(?<full_date>(?:réalisé(?:e)?(?:\s+le)?|établi(?:e)?(?:\s+le)?|en|du|le|au)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
     AUDIT_UPDATE_DATE_PATTERN = /(?<full_date>(?:mis(?:e)?\s+à\s+jour(?:\s+le)?|actualisé(?:e)?(?:\s+le)?|modifié(?:e)?(?:\s+le)?)\s+(?:(?:(?<day>\d{1,2})(?:\s+|er\s+)?)?(?<month>[a-zéûà]+)\s+(?<year>\d{4})|(?<day_num>\d{1,2})[\/\-\.](?<month_num>\d{1,2})[\/\-\.](?<year_num>\d{4})))/i
-    AUDIT_DATE_KEYWORDS = ["audit", "conformité", "accessibilité", "révèle", "finalisé", "réalisé"].freeze
     COMPLIANCE_PATTERN = /(?:(?:avec (?:un |une )?)?taux (?:global )?de conformité |conforme à|révèle que|mis(?:e)? à jour à|des crit(?:è|e)res)(?:(?!\bmoyen\b)[^.])*?(\d+(?:[.,]\d+)?)(?:\s*%| pour cent)|(\d{1,3}(?:[.,]\d+)?)\s*%\s*(?:des crit(?:è|e)res(?: RGAA)?(?:\s+sont\s+respect(?:é|e)s)?|au RGAA)/i
     STANDARD_PATTERN = /(?:au |des critères )?(?:(RGAA(?:[. ](?:version|v)?[. ]?\d+(?:\.\d+(?:\.\d+)?)?)?|(WCAG)))/i
-    AUDITOR_PATTERN = /(?:réalisé(?:e)?\s+par|par|l[’']\s*agence|la\s+société)\s+(?:la\s+société\s+|l[’']\s*agence\s+)?([^,.]+?)(?:,| révèle| sur|\.|$)/i
-    UPDATE_AUDIT_PATTERNS = [
-      /Au\s+(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4}).*(?:indique|mentionne).*(?:depuis|après).*(?:précédent|dernier)\s+audit/i,
-      /Suite\s+à.*(?:réalisé(?:e)?(?:\s+le)?|du|en|le)\s+(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})).*(?:dorénavant|désormais|maintenant|actuellement)/i,
-      /(?:(?:(\d{1,2})(?:\s+|er\s+)?)?([a-zéûà]+)\s+(\d{4})|(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4}))/i
-    ].freeze
-    UPDATE_AUDIT_KEYWORDS = [
-      "suite à", "actualisation", "actualisé", "mis à jour", "mise à jour", "modification",
-      "revu", "révisé", "révision", "réévaluation", "nouvelle évaluation",
-      "dorénavant", "désormais", "maintenant", "actuellement", "inchangé",
-    ].freeze
-    EMAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
+    AUDITOR_NAME_START = /(?:réalisée?|réalisation)[^.]*?\s+par\s+(?:la\s+société\s+|l[’']\s*agence\s+|la\s+|le\s+|l[’']\s*)?|la\s+société\s+|l[’']\s*agence\s+/i
+    AUDITOR_NAME_END = /(?:,| révèle| sur|\.|$|\s(?:le|en)\s+(?:\d|[a-zéûà]+\s+\d{4}))/i
+    AUDITOR_PATTERN = /(?:#{AUDITOR_NAME_START})([^,.]+?)#{AUDITOR_NAME_END}/i
     CONTACT_FORM_REGEX = /aide|form|contact/i
-    MAILTO_PREFIX = "mailto:".freeze
     LAW_DATE = Date.new(2005, 2, 11)
     HEADERS_SCOPE = ["Établissement de cette déclaration d’accessibilité", "État de conformité", "Déclaration d’accessibilité", "Résultats des tests"]
 
@@ -100,13 +89,11 @@ module Checks
 
     def find_auditor
       test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
-
-      match = test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
-      match if match && match.split.size <= 4 # Names longer than 4 words are probably false positives
+      test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
     end
 
     def find_article_mention
-      accessibility_page.text.match?(ARTICLE)
+      accessibility_page.text.include?(LAW_NUMBER)
     end
 
     def custom_badge_status

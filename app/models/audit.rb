@@ -8,10 +8,10 @@ class Audit < ApplicationRecord
   after_create_commit :fetch_resources!, :create_checks
   after_update_commit :broadcast_to_audit_batch, if: -> { saved_change_to_completed_at? && audit_batch }
 
+  scope :latest_per_site, -> { where(id: reselect("DISTINCT ON (audits.site_id) audits.id").reorder(site_id: :asc, created_at: :desc)) }
   scope :sort_by_newest, -> { order(created_at: :desc) }
   scope :completed, -> { where.not(completed_at: nil) }
   scope :displayable, -> { preload(:site, { user: :team, checks: :check_transitions }) }
-  scope :last_per_site, -> { where(id: reselect("DISTINCT ON (audits.site_id) audits.id").reorder(site_id: :asc, created_at: :desc)) }
   scope :for_user, ->(user) { where(user:) }
   scope :for_team, ->(team) { joins(:site).where(sites: { team: }) }
 

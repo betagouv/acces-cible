@@ -21,6 +21,18 @@ Fonctionnalité:
       | www.suresnes.fr   |
       | numerique.gouv.fr |
 
+  Scénario: Un agent peut n'afficher que la dernière évaluation de chaque site
+    Sachant que je rajoute un site "https://example.gouv.fr"
+    Et que je clique sur "Lancer une évaluation"
+    Quand je choisis "Mes évaluations" dans le menu principal
+    Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
+      | example.gouv.fr |
+      | example.gouv.fr |
+    Quand je sélectionne "Dernière de chaque site" pour "Évaluations affichées pour chaque site"
+    Et que je clique sur "Rechercher un site"
+    Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
+      | example.gouv.fr |
+
   Scénario: Un agent peut trier les sites par URL croissantes
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
       """

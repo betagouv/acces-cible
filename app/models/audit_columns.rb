@@ -32,7 +32,7 @@ module AuditColumns
       when "declaration_quality" then audit.declaration_quality_score.to_f
       when "declared_level" then check_status(audit.accessibility_mention)
       when "evaluator" then audit.user.to_s
-      when "last_audit_at" then I18n.l(audit.created_at.in_time_zone.to_date)
+      when "last_audit_at" then I18n.l(audit.created_at.in_time_zone, format: :complete)
       when "law_article" then validity(declaration.mentions_article)
       when "legal_obligations" then audit.legal_obligation_score.to_i
       when "organization_label" then audit.user.team.organization_label
