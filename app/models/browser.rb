@@ -23,7 +23,7 @@ class Browser
 
   FILE_EXTENSIONS = [
     # Fonts
-    ".woff", ".woff2", ".ttf", ".otf", ".eot", ".css", ".less", ".scss", ".sass",
+    ".woff", ".woff2", ".ttf", ".otf", ".eot",
     # Feeds, structured data, calendars, icons, and cursors
     ".xml", ".rss", ".atom", ".ics", ".ical", ".ico", ".cur",
     # Images
