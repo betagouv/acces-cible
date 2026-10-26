@@ -72,15 +72,7 @@ module Checks
 
     def find_compliance_rate
       test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
-      matches = test_results_section.scan(COMPLIANCE_PATTERN)
-
-      return if matches.empty?
-
-      most_recent_match = matches.last
-      rate_string = most_recent_match.compact.first
-      rate = rate_string.tr(",", ".").to_f
-
-      rate % 1 == 0 ? rate.to_i : rate
+      compliance_rate_in(test_results_section) || compliance_rate_in(accessibility_page.text)
     end
 
     def find_standard
@@ -120,6 +112,18 @@ module Checks
     end
 
     private
+
+    def compliance_rate_in(text)
+      matches = text.scan(COMPLIANCE_PATTERN)
+
+      return if matches.empty?
+
+      most_recent_match = matches.last
+      rate_string = most_recent_match.compact.first
+      rate = rate_string.tr(",", ".").to_f
+
+      rate % 1 == 0 ? rate.to_i : rate
+    end
 
     def contact_links
       accessibility_page.links(between_headings: ["Retour d'information et contact", :next])

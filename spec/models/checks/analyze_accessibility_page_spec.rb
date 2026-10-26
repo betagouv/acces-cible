@@ -307,6 +307,41 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
       end
     end
+
+    context "when the rate is not found under 'Résultats des tests'" do
+      [
+        {
+          compliance_text: "révèle que sur l'échantillon du site audité 50 % des critères du RGAA version 4.1.2 sont respectés.",
+          other_text: "Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.",
+          expected_result: 50
+        },
+        {
+          compliance_text: "Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.",
+          other_text: "Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.",
+          expected_result: nil
+        },
+        {
+          compliance_text: "Le plan d'action prévoit de corriger 30 % des pages d'ici la fin de l'année.",
+          other_text: "révèle que sur l'échantillon du site audité 50 % des critères du RGAA version 4.1.2 sont respectés.",
+          expected_result: 50
+        }
+      ].each do |test_case|
+        context "with compliance_text='#{test_case[:compliance_text]}' and other_text='#{test_case[:other_text]}'" do
+          let(:body) do
+            <<~HTML
+              <h2>État de conformité</h2>
+              <p>#{test_case[:compliance_text]}</p>
+              <h2>Stratégie et plan d'action</h2>
+              <p>#{test_case[:other_text]}</p>
+            HTML
+          end
+
+          it "returns #{test_case[:expected_result].inspect}" do
+            expect(check.find_compliance_rate).to eq(test_case[:expected_result])
+          end
+        end
+      end
+    end
   end
 
   describe "#find_standard" do
