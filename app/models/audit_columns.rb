@@ -40,7 +40,7 @@ module AuditColumns
 
       case column
       when "accessibility_mention" then obligation(mention) if mention.completed?
-      when "accessibility_page" then obligation(accessibility_page) unless accessibility_page.aborted?
+      when "accessibility_page" then obligation(accessibility_page) unless accessibility_page.aborted? || accessibility_page.pending?
       when "audit_url" then Rails.application.routes.url_helpers.site_audit_url(audit.site, audit)
       when "auditor" then accessibility_analysis.auditor
       when "auditor_evaluation" then presence(accessibility_analysis.auditor.present?) if accessibility_analysis.completed?
@@ -69,9 +69,9 @@ module AuditColumns
       when "plan" then obligation(plan) if accessibility_page.found?
       when "plan_quality" then validity(plan.conform) if plan.found
       when "plan_url" then plan.link_url
-      when "reachable" then yes_no(audit.reachable.found?)
+      when "reachable" then yes_no(audit.reachable.found?) unless audit.reachable.pending?
       when "redirect_url" then audit.reachable.redirect_url
-      when "redirected" then yes_no(audit.reachable.redirected?)
+      when "redirected" then yes_no(audit.reachable.redirected?) if audit.reachable.found?
       when "schema" then obligation(schema) if accessibility_page.found?
       when "schema_quality" then validity(schema.conform) if schema.found
       when "schema_url" then schema.link_url
@@ -82,7 +82,6 @@ module AuditColumns
       else DASH
       end
     end
-
 
     def check_status(check)
       { status: status_to_badge_level(check), text: status_to_badge_text(check), no_icon: true }
