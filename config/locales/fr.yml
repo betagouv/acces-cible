@@ -155,6 +155,7 @@ fr:
     show:
       accessibility_rate: Taux d'accessibilité
       audit_date: Date de la déclaration
+      audit_update_date: "Mise à jour le"
       automated_tests_description: "Tests techniques exécutés automatiquement sur %{site} à l'aide du moteur de test Axe-core. Le nombre de tests applicables peut être inférieur à %{total} selon le contenu du site."
       automated_tests_incomplete_text: "Les résultats détaillés de ce test ne sont plus disponibles. Relancez une évaluation pour obtenir un résultat détaillé."
       automated_tests_incomplete_title: Résultats détaillés indisponibles
@@ -235,7 +236,7 @@ fr:
       summary_legal_obligations_detail:
         one: "%{count} obligation sur %{total} remplie"
         other: "%{count} obligations sur %{total} remplies"
-      summary_mention_details: "Taux RGAA %{compliance_rate} - audit du %{audit_date}"
+      summary_mention_details: "Taux RGAA %{compliance_rate}"
       summary_title: "Résumé de l'évaluation du site"
       tab_automated_tests: Tests automatiques RGAA
       tab_obligations: Obligations & déclaration

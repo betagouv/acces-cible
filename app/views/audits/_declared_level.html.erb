@@ -1,4 +1,6 @@
 <% accessibility_page_analysis = audit.analyze_accessibility_page %>
+<% audit_date = accessibility_page_analysis.audit_date %>
+<% audit_update_date = accessibility_page_analysis.audit_update_date %>
 
 <%= card_with_header(title: t("audits.show.declared_level_title")) do %>
   <%= dsfr_table(caption: t("audits.show.declared_level_caption"), html_attributes: { class: "fr-mb-0" }) do |t| %>
@@ -15,7 +17,11 @@
       </tr>
       <tr>
         <th scope="row"><%= t("audits.show.audit_date") %></th>
-        <td class="fr-cell--multiline"><%= accessibility_page_analysis.audit_date ? l(accessibility_page_analysis.audit_date) : muted_dash %></td>
+        <td class="fr-cell--multiline"><%= audit_date ? l(audit_date) : muted_dash %></td>
+      </tr>
+      <tr>
+        <th scope="row"><%= t("audits.show.audit_update_date") %></th>
+        <td class="fr-cell--multiline"><%= audit_update_date ? l(audit_update_date) : muted_dash %></td>
       </tr>
     <% end %>
   <% end %>
