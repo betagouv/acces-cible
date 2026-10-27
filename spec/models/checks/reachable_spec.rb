@@ -25,7 +25,9 @@ RSpec.describe Checks::Reachable do
     context "when the page redirects" do
       let(:home_page_url) { "https://www.redirection.org/" }
 
-      it { is_expected.to eq(:info) }
+      before { check.found = true }
+
+      it { is_expected.to eq(:success) }
     end
 
     context "when the site is reachable" do

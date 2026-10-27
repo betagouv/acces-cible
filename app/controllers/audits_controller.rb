@@ -5,7 +5,7 @@ class AuditsController < ApplicationController
   # GET /audits
   def index
     params[:sort] ||= { last_audited_at: AuditsFiltering::DEFAULT_DIRECTION }
-    @displayed_columns = session[:audits_columns] || AuditColumns::DEFAULT
+    @displayed_columns = AuditColumns::EXPORT & AuditColumns::GROUPS.values.flatten & (session[:audits_columns] || AuditColumns::DEFAULT)
     @tags = current_user.team.tags.in_alphabetical_order
     @pagy, @audits = pagy(scoped_audits.displayable)
   end

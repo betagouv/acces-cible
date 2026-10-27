@@ -14,14 +14,10 @@ module Checks
     end
 
     def custom_badge_text
-      return t("checks.reachable.redirected") if redirected?
-
       found ? t("checks.reachable.reachable") : t("checks.reachable.not_found")
     end
 
     def custom_badge_status
-      return :info if redirected?
-
       found ? :success : :error
     end
 
