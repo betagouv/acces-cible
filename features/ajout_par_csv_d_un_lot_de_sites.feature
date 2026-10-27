@@ -29,6 +29,19 @@ Fonctionnalité: Ajout par CSV d'un lot de sites
     Et que je clique sur "Lancer l'évaluation"
     Alors la page contient "Évaluations lancées"
 
+  Scénario: Un agent est prévenu que des adresses en double ont été ignorées
+    Sachant que je possède un fichier "tmp/sites.csv" qui contient
+      """
+      url
+      https://beta.gouv.fr
+      https://beta.gouv.fr
+      http://beta.gouv.fr/
+      """
+    Quand j'attache le fichier "tmp/sites.csv" pour le champ "Fichier CSV"
+    Et que je clique sur "Continuer"
+    Alors la page contient "2 adresses étaient en double, les doublons ont été ignorés."
+    Et la page contient "1 site"
+
   Scénario: Un agent peut étiqueter un site importé
     Sachant que je possède un fichier "tmp/sites.csv" qui contient
       """

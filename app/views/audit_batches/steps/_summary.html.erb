@@ -5,6 +5,11 @@
 <% else %>
   <p><%= t(".intro_html", count: @pagy.count) %></p>
 <% end %>
+<% if audit_batch.ignored_duplicates_count.positive? %>
+  <%= dsfr_alert(type: :info, size: :sm, html_attributes: { class: "fr-mb-2w" }) do %>
+    <%= t(".ignored_duplicates", count: audit_batch.ignored_duplicates_count) %>
+  <% end %>
+<% end %>
 
 <ol class="fr-raw-list">
   <% @sites.each do |site| %>

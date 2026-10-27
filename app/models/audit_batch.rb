@@ -13,7 +13,7 @@ class AuditBatch < ApplicationRecord
   attribute :site_tag_names, default: -> { {} }
   attribute :file
   attribute :requested_step
-  normalizes :urls, with: ->(list) { list.compact_blank.uniq { Link.url_without_scheme_and_www(it) } }
+  normalizes :urls, with: ->(list) { list.compact_blank }
   normalizes :site_tag_names, with: ->(names_by_site) { names_by_site.to_h.transform_values(&:compact_blank) }
 
   validates :kind, presence: true
@@ -40,8 +40,16 @@ class AuditBatch < ApplicationRecord
     site_tag_names[site.normalized_url] || []
   end
 
+  def unique_urls
+    urls.uniq { Link.url_without_scheme_and_www(it) }
+  end
+
+  def ignored_duplicates_count
+    urls.size - unique_urls.size
+  end
+
   def submitted_sites
-    @submitted_sites ||= urls.map { team.sites.new(url: it).tap(&:set_normalized_url) }
+    @submitted_sites ||= unique_urls.map { team.sites.new(url: it).tap(&:set_normalized_url) }
   end
 
   def launch!

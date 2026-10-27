@@ -28,7 +28,7 @@ class CsvSiteParser
   def parse_data!
     return [] unless valid_file?
 
-    sites_by_url = {}
+    sites = []
 
     CSV.foreach(file.path, headers: true, encoding: "bom|utf-8", col_sep:).with_index(FIRST_DATA_ROW_NUMBER) do |row, line_number|
       row = row.to_h.transform_keys { |header| header.to_s.downcase }
@@ -39,17 +39,17 @@ class CsvSiteParser
       url = normalize_url(raw_url, line_number)
       next unless url
 
-      merge_site_data!(sites_by_url, url, row)
-      break if sites_by_url.size > AuditBatch::MAX_CSV_SITES
+      sites << { "url" => url, "tag_names" => row["tags"].to_s.split(",").map(&:strip) }
+      break if sites.size > AuditBatch::MAX_CSV_SITES
     end
 
-    if sites_by_url.size > AuditBatch::MAX_CSV_SITES
+    if sites.size > AuditBatch::MAX_CSV_SITES
       errors.add(:file, :too_many_rows, max: AuditBatch::MAX_CSV_SITES)
       return []
     end
 
-    errors.add(:file, :blank) if sites_by_url.empty? && errors[:file].none?
-    sites_by_url.values
+    errors.add(:file, :blank) if sites.empty? && errors[:file].none?
+    sites
   rescue CSV::MalformedCSVError => error
     report_malformed_csv(error)
     []
@@ -122,10 +122,5 @@ class CsvSiteParser
         "error_message=#{error.message}"
     )
     errors.add(:file, :invalid_row_url, line_number:, url: raw_url)
-  end
-
-  def merge_site_data!(sites_by_url, url, row)
-    site_data = sites_by_url[url] ||= { "url" => url, "tag_names" => [] }
-    site_data["tag_names"] += row["tags"].to_s.split(",").map(&:strip)
   end
 end

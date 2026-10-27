@@ -73,6 +73,9 @@ fr:
       summary:
         title: Récapitulatif et étiquettes
         heading: Récapitulatif
+        ignored_duplicates:
+          one: 1 adresse était en double, le doublon a été ignoré.
+          other: "%{count} adresses étaient en double, les doublons ont été ignorés."
         intro_html:
           one: Vous êtes sur le point de lancer une évaluation de <strong>1 site</strong>, vous pouvez lui ajouter des étiquettes.
           other: Vous êtes sur le point de lancer une évaluation de <strong>%{count} sites</strong>, vous pouvez leur ajouter des étiquettes.
