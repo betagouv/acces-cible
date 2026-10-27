@@ -18,11 +18,13 @@ Fonctionnalité: Vérifications du plan d'accessibilité
 
     Exemples:
       | contenu                                 | résultat              |
-      | plan annuel d'accessibilité 2020 - 2024 | Renseignez des dates contenant l'année en cours |
+      | plan annuel d'accessibilité 2025       | Le plan d'action est obsolète et doit être mis à jour |
+      | plan d'action 2027                      | Le plan d'action doit faire référence à l'année en cours |
+      | plan annuel 2025 - 2028                 | La période ne doit pas dépasser 2 ans |
       | plan annuel d'accessibilité 2024 - 2025 | 2024-2025             |
       | plan annuel 2024 - 2025                 | 2024-2025             |
       | plan d'action 2024 - 2025               | 2024-2025             |
-      | plan d'action 1998 - 2000               | Renseignez des dates contenant l'année en cours |
+      | plan annuel d'accessibilité 2020 - 2024 | Le plan d'action est obsolète et doit être mis à jour |
       | plan d'action 0946                      | Renseignez des dates contenant l'année en cours |
       | plann d'accessibilité 2024 - 2025       | Absent                |
       | plan d'accessibilité                    | Absent                |

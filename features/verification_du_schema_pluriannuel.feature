@@ -18,9 +18,11 @@ Fonctionnalité: Vérifications du schéma pluriannuel d'accessibilité
 
     Exemples:
       | contenu                                        | résultat         |
-      | schéma pluriannuel d'accessibilité 2020 - 2026 | Renseignez des dates contenant l'année en cours et dans une plage de maximum 3 ans |
+      | schéma pluriannuel d'accessibilité 2020 - 2026 | La période ne doit pas dépasser 3 ans |
       | schéma annuel d'accessibilité 2025 - 2026      | 2025-2026        |
       | schéma plurianneul 1998 2000                   | Absent           |
-      | schéma annuel d'accessibilité 1998 - 2000      | Renseignez des dates contenant l'année en cours et dans une plage de maximum 3 ans |
+      | schéma annuel d'accessibilité 1998 - 2000      | Le schéma pluriannuel est obsolète et doit être mis à jour |
+      | schéma annuel d'accessibilité 2027 - 2029      | Le schéma pluriannuel doit s'appliquer sur l'année en cours |
+      | schéma annuel d'accessibilité 2015 - 2020      | Le schéma pluriannuel est obsolète et doit être mis à jour |
       | schéma bizarre d'accessibilité                 | Absent           |
-      | schéma annuel d'accessibilité 0946-0943        | Renseignez des dates contenant l'année en cours et dans une plage de maximum 3 ans |
+      | schéma annuel d'accessibilité 0946-0943        | Renseignez des dates contenant l'année en cours |
