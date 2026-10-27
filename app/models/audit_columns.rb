@@ -40,7 +40,7 @@ module AuditColumns
 
       case column
       when "accessibility_mention" then obligation(mention) if mention.completed?
-      when "accessibility_page" then obligation(accessibility_page) unless accessibility_page.aborted? || accessibility_page.pending?
+      when "accessibility_page" then obligation(accessibility_page) if accessibility_page.done?
       when "audit_url" then Rails.application.routes.url_helpers.site_audit_url(audit.site, audit)
       when "auditor" then accessibility_analysis.auditor
       when "auditor_evaluation" then presence(accessibility_analysis.auditor.present?) if accessibility_analysis.completed?
@@ -69,7 +69,7 @@ module AuditColumns
       when "plan" then obligation(plan) if accessibility_page.found?
       when "plan_quality" then validity(plan.conform) if plan.found
       when "plan_url" then plan.link_url
-      when "reachable" then yes_no(audit.reachable.found?) unless audit.reachable.pending?
+      when "reachable" then yes_no(audit.reachable.found?) if audit.reachable.done?
       when "redirect_url" then audit.reachable.redirect_url
       when "redirected" then yes_no(audit.reachable.redirected?) if audit.reachable.found?
       when "schema" then obligation(schema) if accessibility_page.found?

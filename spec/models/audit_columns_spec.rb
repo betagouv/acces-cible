@@ -15,6 +15,29 @@ RSpec.describe AuditColumns do
       it { is_expected.to include(text: "Oui") }
     end
 
+    context "with an errored reachable check" do
+      let!(:reachable) { create(:check, :reachable, :errored, audit:) }
+
+      context "with the reachable column" do
+        let(:column) { "reachable" }
+
+        it { is_expected.to include(text: "Non") }
+      end
+
+      context "with the redirected column" do
+        let(:column) { "redirected" }
+
+        it { is_expected.to eq(described_class::DASH) }
+      end
+    end
+
+    context "with a pending reachable check" do
+      let!(:reachable) { create(:check, :reachable, :pending, audit:) }
+      let(:column) { "reachable" }
+
+      it { is_expected.to eq(described_class::DASH) }
+    end
+
     context "with an unreachable site" do
       let!(:reachable) { create(:check, :reachable, :failed, audit:) }
       let!(:dependent_checks) { (Check.names - [:reachable]).map { |type| create(:check, type, :aborted, audit:) } }
