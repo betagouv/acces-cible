@@ -7,9 +7,12 @@ class Browser
   # Maximum delay waiting for the network to become idle after a page load
   NETWORK_IDLE_TIMEOUT = 10.seconds
 
+  USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) " \
+               "Chrome/131.0.0.0 Safari/537.36 AccesCible/1.0 (+https://acces-cible.beta.gouv.fr/)"
+
   REQUEST_HEADERS = {
-    "Accept-Language" => "fr",
-    "User-Agent" => "AccesCible/1.0 (+https://acces-cible.beta.gouv.fr/)"
+    "Accept-Language" => "fr-FR,fr;q=0.9",
+    "User-Agent" => USER_AGENT
   }.freeze
 
   DOCUMENT_EXTENSIONS = [
@@ -73,6 +76,10 @@ class Browser
   BLOCKED_DOMAIN_PATTERN = Regexp.union(BLOCKED_DOMAINS)
 
   BLOCKED_URL_PATTERNS = [BLOCKED_FILE_PATTERN, BLOCKED_DOMAIN_PATTERN].freeze
+
+  TIMEZONE = "Europe/Paris".freeze
+
+  VIEWPORT = { width: 1920, height: 1080 }.freeze
 
   BROWSER_OPTIONS = {
     "disable-blink-features" => "AutomationControlled",
@@ -198,6 +205,8 @@ class Browser
     def with_page
       browser.create_page(new_context: true) do |page|
         page.headers.set(request_headers)
+        page.command("Emulation.setTimezoneOverride", timezoneId: TIMEZONE)
+        page.set_viewport(**VIEWPORT)
         page.network.blocklist = BLOCKED_URL_PATTERNS
         yield(page)
       end

@@ -207,6 +207,8 @@ RSpec.describe Browser do
       allow(browser_double).to receive(:create_page).with(new_context: true).and_yield(page_double)
       allow(headers_double).to receive(:set)
       allow(network_double).to receive(:blocklist=)
+      allow(page_double).to receive(:command)
+      allow(page_double).to receive(:set_viewport)
       allow(page_double).to receive_messages(headers: headers_double, network: network_double)
     end
 
