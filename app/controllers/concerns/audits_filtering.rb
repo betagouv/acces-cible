@@ -47,7 +47,8 @@ module AuditsFiltering
 
   def order_audits(scope)
     if params.dig(:sort, :url).present?
-      scope.order(Arel.sql("regexp_replace(sites.normalized_url, '^www[0-9]?\\.', '') #{sort_direction.upcase}"))
+      url_without_www = Arel.sql("regexp_replace(sites.normalized_url, '^www[0-9]?\\.', '')")
+      scope.order(url_without_www.send(sort_direction))
     else
       scope.order(created_at: sort_direction)
     end

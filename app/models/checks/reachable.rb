@@ -8,7 +8,10 @@ module Checks
     def redirected?
       return if audit.home_page_url.blank?
 
-      Link.url_without_scheme_and_www(audit.home_page_url) != Link.url_without_scheme_and_www(audit.site.url)
+      home_page_url = Link.url_without_scheme_and_www(audit.home_page_url)
+      site_url = Link.url_without_scheme_and_www(audit.site.url)
+
+      home_page_url != site_url
     end
 
     def custom_badge_text

@@ -1,13 +1,18 @@
 class KeepWwwInSitesNormalizedUrl < ActiveRecord::Migration[8.1]
   def up
-    Site.find_each do |site|
-      site.update_columns(normalized_url: Link.url_without_scheme(site.url))
-    end
+    execute <<~SQL
+      UPDATE sites
+      SET normalized_url = CONCAT('www.', normalized_url)
+      WHERE (url LIKE 'https://www.%' OR url LIKE 'http://www.%')
+        AND normalized_url NOT LIKE 'www.%'
+    SQL
   end
 
   def down
-    Site.find_each do |site|
-      site.update_columns(normalized_url: Link.url_without_scheme_and_www(site.url))
-    end
+    execute <<~SQL
+      UPDATE sites
+      SET normalized_url = regexp_replace(normalized_url, '^www\\.', '')
+      WHERE url LIKE 'https://www.%' OR url LIKE 'http://www.%'
+    SQL
   end
 end
