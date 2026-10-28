@@ -1,6 +1,7 @@
 class FindAccessibilityPageService
   DECLARATION_TERMS = %w[rgaa conform declaration accessibilit].freeze
   REQUIRED_DECLARATION_HEADINGS = 2
+  DECLARATION_TITLE_REGEX = /d[ée]claration d['’]accessibilit[ée]/iu
 
   def initialize(audit)
     @audit = audit
@@ -39,7 +40,7 @@ class FindAccessibilityPageService
 
   def find_page(crawler, queue, audit)
     crawler.find_page do |current_page|
-      if required_headings_present?(current_page)
+      if required_headings_present?(current_page) || declaration_title_present?(current_page)
         true
       else
         enqueue_children(current_page, queue, audit)
@@ -72,6 +73,12 @@ class FindAccessibilityPageService
     end
 
     matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
+  end
+
+  def declaration_title_present?(current_page)
+    [current_page.title, *current_page.headings].any? do |text|
+      text.match?(DECLARATION_TITLE_REGEX)
+    end
   end
 
   def fuzzy_match?(a, b)
