@@ -69,6 +69,12 @@ RSpec.describe AuditBatch do
     end
   end
 
+  describe "#ignored_duplicates_count" do
+    subject { build(:audit_batch, urls: ["https://example.com", "http://example.com", "https://example.com/"]).ignored_duplicates_count }
+
+    it { is_expected.to eq(2) }
+  end
+
   describe "validations on the urls step" do
     subject(:audit_batch) { build(:audit_batch, :csv_import, user:, file:) }
 

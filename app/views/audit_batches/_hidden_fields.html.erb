@@ -2,7 +2,7 @@
 <%= f.hidden_field :kind unless audit_batch.current_step == AuditBatch::METHOD_STEP %>
 <%= f.hidden_field :run_axe_on_homepage unless audit_batch.current_step == AuditBatch::CHECKS_STEP %>
 <% unless audit_batch.current_step == AuditBatch::URLS_STEP %>
-  <% audit_batch.urls.each do |url| %>
+  <% audit_batch.unique_urls.each do |url| %>
     <%= f.hidden_field :urls, multiple: true, value: url, id: nil %>
   <% end %>
 <% end %>

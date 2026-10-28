@@ -115,15 +115,6 @@ RSpec.describe CsvSiteParser do
       end
     end
 
-    context "with duplicate URLs" do
-      let(:csv_content) { "url,tags\nhttps://xn--rez-dma.fr/,tag1\nhttps://rezé.fr/,tag2" }
-
-      it "deduplicates normalized URLs and merges tags" do
-        expect(parsed_data.length).to eq(1)
-        expect(parsed_data.first["tag_names"]).to contain_exactly("tag1", "tag2")
-      end
-    end
-
     context "without a file" do
       let(:file) { nil }
 

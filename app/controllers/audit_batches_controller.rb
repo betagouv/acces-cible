@@ -14,7 +14,7 @@ class AuditBatchesController < ApplicationController
       set_step_data
       render :new
     elsif @audit_batch.launch!
-      redirect_to audit_batch_path(@audit_batch, count: @audit_batch.urls.size)
+      redirect_to audit_batch_path(@audit_batch, count: @audit_batch.unique_urls.size)
     else
       @audit_batch.requested_step = AuditBatch::URLS_STEP
       set_step_data
