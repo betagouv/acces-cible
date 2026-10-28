@@ -179,4 +179,28 @@ RSpec.describe FindAccessibilityPageService do
       expect(queue).to eq(["https://example.com/a11y"])
     end
   end
+
+  describe "#declaration_text_present?" do
+    subject { described_class.allocate.send(:declaration_text_present?, page) }
+
+    let(:page) { Page.new(url: "https://example.com/accessibilite", html:) }
+
+    context "when the page contains the declaration text" do
+      let(:html) { "<p>Cette déclaration d’accessibilité s'applique au site de la Mairie de Paris.</p>" }
+
+      it { is_expected.to be(true) }
+    end
+
+    context "when only a link contains the declaration text" do
+      let(:html) { "<h1>Mentions légales</h1><footer><a href='/accessibilite'>Déclaration d'accessibilité</a></footer>" }
+
+      it { is_expected.to be(false) }
+    end
+
+    context "when the page does not contain the declaration text" do
+      let(:html) { "<h1>Déclaration de conformité</h1>" }
+
+      it { is_expected.to be(false) }
+    end
+  end
 end
