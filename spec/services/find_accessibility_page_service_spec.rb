@@ -180,25 +180,25 @@ RSpec.describe FindAccessibilityPageService do
     end
   end
 
-  describe "#declaration_title_present?" do
-    subject { described_class.allocate.send(:declaration_title_present?, page) }
+  describe "#declaration_text_present?" do
+    subject { described_class.allocate.send(:declaration_text_present?, page) }
 
     let(:page) { Page.new(url: "https://example.com/accessibilite", html:) }
 
-    context "when a heading contains the declaration title" do
-      let(:html) { "<h1>Déclaration d'accessibilité</h1>" }
+    context "when the page contains the declaration text" do
+      let(:html) { "<p>Cette déclaration d’accessibilité s'applique au site de la Mairie de Paris.</p>" }
 
       it { is_expected.to be(true) }
     end
 
-    context "when the page title contains the declaration title" do
-      let(:html) { "<title>Déclaration d’accessibilité - Mairie de Paris</title>" }
-
-      it { is_expected.to be(true) }
-    end
-
-    context "when only a footer link contains the declaration title" do
+    context "when only a link contains the declaration text" do
       let(:html) { "<h1>Mentions légales</h1><footer><a href='/accessibilite'>Déclaration d'accessibilité</a></footer>" }
+
+      it { is_expected.to be(false) }
+    end
+
+    context "when the page does not contain the declaration text" do
+      let(:html) { "<h1>Déclaration de conformité</h1>" }
 
       it { is_expected.to be(false) }
     end
