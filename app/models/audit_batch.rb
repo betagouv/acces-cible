@@ -41,7 +41,7 @@ class AuditBatch < ApplicationRecord
   end
 
   def unique_urls
-    urls.uniq { Link.url_without_scheme_and_www(it) }
+    urls.uniq { Link.url_without_scheme(it) }
   end
 
   def ignored_duplicates_count
@@ -81,7 +81,7 @@ class AuditBatch < ApplicationRecord
   def import_csv
     sites_data = CsvSiteParser.new(file:, team:, errors:).parse_data!
     self.urls = sites_data.pluck("url")
-    self.site_tag_names = sites_data.to_h { [Link.url_without_scheme_and_www(it["url"]), it["tag_names"]] }
+    self.site_tag_names = sites_data.to_h { [Link.url_without_scheme(it["url"]), it["tag_names"]] }
   end
 
   def sites_data

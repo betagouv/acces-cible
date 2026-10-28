@@ -11,7 +11,7 @@
           <%= check_badge(audit.accessibility_mention, hover: false, no_icon: true) %>
         </div>
         <% if accessibility_page_analysis.conform %>
-          <p class="fr-text--xs fr-text-mention--grey"><%= t("audits.show.summary_mention_details", audit_date: audit_date, compliance_rate: compliance_rate) %></p>
+          <p class="fr-text--xs fr-text-mention--grey"><%= t("audits.show.summary_mention_details", compliance_rate: compliance_rate) %></p>
         <% end %>
       </div>
     </div>

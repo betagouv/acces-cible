@@ -52,17 +52,25 @@ RSpec.describe AuditBatch do
     let(:user) { create(:user) }
 
     context "with blank entries and variants of the same address" do
-      let(:urls) { ["https://example.com", "", " https://www.example.com/ "] }
+      let(:urls) { ["https://example.com", "", " http://example.com/ "] }
 
       it "keeps a single unsaved site" do
         expect(submitted_sites.pluck(:url)).to contain_exactly("https://example.com/")
         expect(submitted_sites).to all(be_new_record)
       end
     end
+
+    context "with the same address with and without www" do
+      let(:urls) { ["https://example.com", "https://www.example.com"] }
+
+      it "keeps both sites" do
+        expect(submitted_sites.pluck(:url)).to contain_exactly("https://example.com/", "https://www.example.com/")
+      end
+    end
   end
 
   describe "#ignored_duplicates_count" do
-    subject { build(:audit_batch, urls: ["https://example.com", "http://example.com", "https://www.example.com"]).ignored_duplicates_count }
+    subject { build(:audit_batch, urls: ["https://example.com", "http://example.com", "https://example.com/"]).ignored_duplicates_count }
 
     it { is_expected.to eq(2) }
   end

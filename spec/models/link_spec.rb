@@ -168,6 +168,18 @@ RSpec.describe Link do
     end
   end
 
+  describe ".url_without_scheme" do
+    {
+      "https://www.example.com/" => "www.example.com",
+      "https://example.com/" => "example.com",
+      "http://www.example.com/page" => "www.example.com/page"
+    }.each do |url, expected|
+      it "returns #{expected.inspect} for #{url.inspect}" do
+        expect(described_class.url_without_scheme(url)).to eq(expected)
+      end
+    end
+  end
+
   describe ".url_without_scheme_and_www" do
     subject(:url_without_scheme_and_www) { described_class.url_without_scheme_and_www(url) }
 

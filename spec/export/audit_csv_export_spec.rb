@@ -31,38 +31,43 @@ RSpec.describe AuditCsvExport do
       expect(parsed_csv.headers).to eq([
                                          "Site",
                                          "Url évaluée",
-                                         "Url de redirection",
-                                         "Taux d'accessibilité déclaré",
-                                         "Niveau d'accessibilité déclaré",
-                                         "Respect des obligations légales",
-                                         "Qualité de la déclaration",
-                                         "Déclaration d'accessibilité",
-                                         "Mention d'accessibilité",
-                                         "Schéma pluriannuel",
-                                         "Plan d'action",
                                          "Site joignable",
-                                         "Évaluateur",
-                                         "Organisation",
-                                         "Étiquettes",
+                                         "Site en redirection",
+                                         "Url de redirection",
+                                         "Déclaration d'accessibilité",
+                                         "URL de la déclaration",
                                          "Hébergement de la déclaration",
+                                         "Taux d'accessibilité déclaré (évaluation)",
+                                         "Taux d'accessibilité déclaré",
+                                         "Mention d'accessibilité",
+                                         "Niveau d'accessibilité déclaré",
+                                         "Schéma pluriannuel (évaluation)",
+                                         "Schéma pluriannuel (lien)",
+                                         "Schéma pluriannuel (qualité)",
+                                         "Plan d'action",
+                                         "Plan d'action (lien)",
+                                         "Plan d'action (qualité)",
+                                         "Date de déclaration (évaluation)",
                                          "Date de déclaration",
+                                         "Référentiel (évaluation)",
                                          "Référentiel",
+                                         "Auditeur (évaluation)",
                                          "Auditeur",
                                          "Article de loi",
-                                         "Adresse email de contact (ou formulaire de contact)",
-                                         "Format de la déclaration",
-                                         "Schéma pluriannuel (qualité)",
-                                         "Plan d'action (qualité)",
+                                         "Adresse email de contact (ou formulaire de contact) (évaluation)",
+                                         "Adresse email",
+                                         "Formulaire de contact",
+                                         "Titres de la déclaration d'accessibilité (évaluation)",
+                                         "Respect des obligations légales (note /4)",
+                                         "Qualité de la déclaration (note /4)",
                                          "Résultat des tests auto RGAA",
                                          "Tests auto RGAA applicables",
                                          "Tests auto RGAA réussis",
                                          "Tests auto non applicables",
+                                         "Évaluateur",
+                                         "Organisation",
+                                         "Étiquettes",
                                          "Lancée le",
-                                         "URL de la déclaration",
-                                         "URL schéma pluriannuel",
-                                         "URL plan d'action",
-                                         "Adresse email",
-                                         "Formulaire de contact",
                                          "URL évaluation accès cible"
                                        ])
     end
@@ -112,28 +117,33 @@ RSpec.describe AuditCsvExport do
         expect(row.to_h).to eq(
                               "Site" => "example.com",
                               "Site joignable" => "Oui",
+                              "Site en redirection" => "Non",
                               "Url évaluée" => "https://example.com/",
                               "Url de redirection" => "https://www.example.com/",
+                              "Taux d'accessibilité déclaré (évaluation)" => "Présent",
                               "Taux d'accessibilité déclaré" => "85,5%",
                               "Niveau d'accessibilité déclaré" => "Totalement conforme",
-                              "Respect des obligations légales" => "3",
+                              "Respect des obligations légales (note /4)" => "3",
                               "Déclaration d'accessibilité" => "Présent",
                               "URL de la déclaration" => "https://example.com/accessibilite",
                               "Mention d'accessibilité" => "Présent",
-                              "Schéma pluriannuel" => "Présent",
-                              "URL schéma pluriannuel" => "https://example.com/schema.pdf",
+                              "Schéma pluriannuel (évaluation)" => "Présent",
+                              "Schéma pluriannuel (lien)" => "https://example.com/schema.pdf",
                               "Plan d'action" => "Présent",
-                              "URL plan d'action" => "https://example.com/plan.pdf",
-                              "Qualité de la déclaration" => "2.5",
+                              "Plan d'action (lien)" => "https://example.com/plan.pdf",
+                              "Qualité de la déclaration (note /4)" => "2.5",
                               "Hébergement de la déclaration" => "Valide",
-                              "Date de déclaration" => "Valide",
-                              "Référentiel" => "Invalide",
-                              "Auditeur" => "Valide",
-                              "Article de loi" => "Invalide",
-                              "Adresse email de contact (ou formulaire de contact)" => "Valide",
-                              "Adresse email" => nil,
+                              "Date de déclaration (évaluation)" => "Présent",
+                              "Date de déclaration" => I18n.l(Date.new(2023, 6, 15)),
+                              "Référentiel (évaluation)" => "Absent",
+                              "Référentiel" => "-",
+                              "Auditeur (évaluation)" => "Présent",
+                              "Auditeur" => "Bear & Bee",
+                              "Article de loi" => "Absent",
+                              "Adresse email de contact (ou formulaire de contact) (évaluation)" => "Présent",
+                              "Adresse email" => "-",
                               "Formulaire de contact" => "https://example.com/contact",
-                              "Format de la déclaration" => "Invalide",
+                              "Titres de la déclaration d'accessibilité (évaluation)" => "Invalide",
                               "Schéma pluriannuel (qualité)" => "Valide",
                               "Plan d'action (qualité)" => "Invalide",
                               "Résultat des tests auto RGAA" => "45 / 50 réussis",
@@ -142,7 +152,7 @@ RSpec.describe AuditCsvExport do
                               "Tests auto non applicables" => "10",
                               "URL évaluation accès cible" => "http://example.com/sites/example-com/audits/#{audit.id}",
                               "Évaluateur" => audit.user.to_s,
-                              "Organisation" => audit.user.team.organization_label,
+                              "Organisation" => "-",
                               "Lancée le" => I18n.l(audit.created_at.to_datetime, format: :complete),
                               "Étiquettes" => "Gouvernment, Santé publique"
                             )
@@ -152,32 +162,6 @@ RSpec.describe AuditCsvExport do
         site.last_audit.reload.find_accessibility_page.update!(internal: false, conform: false)
 
         expect(parsed_csv.first["Hébergement de la déclaration"]).to eq("Invalide")
-      end
-    end
-
-    context "with errored check" do
-      before do
-        audit = site.last_audit.reload
-        audit.checks.destroy_all
-
-        create(:check, :accessibility_mention, :errored, audit:)
-      end
-
-      it "shows human_status for errored check" do
-        expect(parsed_csv.first["Niveau d'accessibilité déclaré"]).to eq("Erreur")
-      end
-    end
-
-    context "with aborted check" do
-      before do
-        audit = site.last_audit.reload
-        audit.checks.destroy_all
-
-        create(:check, :accessibility_mention, :aborted, audit:)
-      end
-
-      it "shows human_status for aborted check" do
-        expect(parsed_csv.first["Niveau d'accessibilité déclaré"]).to eq("Annulé")
       end
     end
   end

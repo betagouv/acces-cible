@@ -5,6 +5,15 @@ module AccessibilityDocumentAnalyzer
   YEAR_PATTERN = /20\d{2}/
 
   included do
+    def years_how_to_fix
+      scope = "checks.#{model_name.element}"
+      return t("#{scope}.years_not_found_how_to_fix") if years.blank?
+      return t("#{scope}.obsolete_how_to_fix") if years.last < Date.current.year
+      return t("#{scope}.future_how_to_fix") if years.first > Date.current.year
+
+      t("#{scope}.range_how_to_fix")
+    end
+
     private
 
     def analyze!

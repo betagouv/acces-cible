@@ -62,8 +62,7 @@ module AuditsHelper
     return nil if check.valid_years || !check.found?
 
     case check
-    when Checks::AnalyzeSchema then t("checks.analyze_schema.invalid_years_how_to_fix")
-    when Checks::AnalyzePlan then t("checks.analyze_plan.invalid_years_how_to_fix")
+    when Checks::AnalyzeSchema, Checks::AnalyzePlan then check.years_how_to_fix
     else
       muted_dash
     end
@@ -158,12 +157,15 @@ module AuditsHelper
   end
 
   def audit_cell(audit, column)
+    value = AuditColumns.value(audit, column)
+    return tag.td(muted_dash, class: "fr-cell--center") if value == AuditColumns::DASH
+
     case column
     when "site" then tag.th(site_link(audit.site))
-    when "evaluator", "organization_label" then tag.td(truncated_value(AuditColumns.value(audit, column)))
+    when "evaluator", "organization_label" then tag.td(truncated_value(value))
     when "last_audit_at" then tag.td(audit_date_link(audit))
     when "tags" then tag.td(site_tags(audit.site), class: "fr-cell--multiline")
-    else tag.td(audit_cell_content(audit, column), class: "fr-cell--center")
+    else tag.td(audit_cell_content(column, value), class: "fr-cell--center")
     end
   end
 
@@ -175,13 +177,11 @@ module AuditsHelper
 
   private
 
-  def audit_cell_content(audit, column)
-    value = AuditColumns.value(audit, column)
-
+  def audit_cell_content(column, value)
     case column
     when "legal_obligations" then star_rating(filled: value, total: 4, color: "blue", label: t("audits.audit.legal_obligations"))
     when "declaration_quality" then star_rating(filled: value, total: 4, color: "gold", label: t("audits.audit.declaration_quality"))
-    else value.is_a?(Hash) ? badge(**value) : value || muted_dash
+    else value.is_a?(Hash) ? badge(**value) : value
     end
   end
 

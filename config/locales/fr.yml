@@ -104,28 +104,65 @@ fr:
       row_label: "Voir le détail de %{url}"
     create:
       notice: Vérification créée
+    csv_export:
+      columns:
+        accessibility_mention: Mention d'accessibilité
+        accessibility_page: Déclaration d'accessibilité
+        audit_url: URL évaluation accès cible
+        auditor: Auditeur
+        auditor_evaluation: Auditeur (évaluation)
+        automated_tests_applicable: Tests auto RGAA applicables
+        automated_tests_inapplicable: Tests auto non applicables
+        automated_tests_passed: Tests auto RGAA réussis
+        automated_tests_result: Résultat des tests auto RGAA
+        compliance_rate: Taux d'accessibilité déclaré
+        compliance_rate_evaluation: Taux d'accessibilité déclaré (évaluation)
+        contact_email: Adresse email
+        contact_evaluation: Adresse email de contact (ou formulaire de contact) (évaluation)
+        contact_form: Formulaire de contact
+        declaration_date: Date de déclaration
+        declaration_date_evaluation: Date de déclaration (évaluation)
+        declaration_format: Titres de la déclaration d'accessibilité (évaluation)
+        declaration_hosting: Hébergement de la déclaration
+        declaration_quality: Qualité de la déclaration (note /4)
+        declaration_url: URL de la déclaration
+        declared_level: Niveau d'accessibilité déclaré
+        evaluated_url: Url évaluée
+        evaluator: Évaluateur
+        last_audit_at: Lancée le
+        law_article: Article de loi
+        legal_obligations: Respect des obligations légales (note /4)
+        organization_label: Organisation
+        plan: Plan d'action
+        plan_quality: Plan d'action (qualité)
+        plan_url: Plan d'action (lien)
+        reachable: Site joignable
+        redirect_url: Url de redirection
+        redirected: Site en redirection
+        schema: Schéma pluriannuel (évaluation)
+        schema_quality: Schéma pluriannuel (qualité)
+        schema_url: Schéma pluriannuel (lien)
+        site: Site
+        standard: Référentiel
+        standard_evaluation: Référentiel (évaluation)
+        tags: Étiquettes
     index:
       caption: Mes évaluations
       columns:
         accessibility_mention: Mention d'accessibilité
         accessibility_page: Déclaration d'accessibilité
-        audit_url: URL évaluation accès cible
         auditor: Auditeur
         automated_tests_applicable: Tests auto RGAA applicables
         automated_tests_inapplicable: Tests auto non applicables
         automated_tests_passed: Tests auto RGAA réussis
         automated_tests_result: Résultat des tests auto RGAA
         compliance_rate: Taux d'accessibilité déclaré
-        contact: Adresse email de contact (ou formulaire de contact)
         contact_email: Adresse email
         contact_form: Formulaire de contact
         declaration_date: Date de déclaration
         declaration_format: Format de la déclaration
-        declaration_hosting: Hébergement de la déclaration
         declaration_quality: Qualité de la déclaration
-        declaration_url: URL de la déclaration
         declared_level: Niveau d'accessibilité déclaré
-        evaluated_url: Url évaluée
         evaluator: Évaluateur
         last_audit_at: Lancée le
         law_article: Article de loi
@@ -133,12 +170,10 @@ fr:
         organization_label: Organisation
         plan: Plan d'action
         plan_quality: Plan d'action (qualité)
-        plan_url: URL plan d'action
         reachable: Site joignable
-        redirect_url: Url de redirection
+        redirected: Site en redirection
         schema: Schéma pluriannuel
         schema_quality: Schéma pluriannuel (qualité)
-        schema_url: URL schéma pluriannuel
         site: Site
         standard: Référentiel
         tags: Étiquettes
@@ -158,6 +193,7 @@ fr:
     show:
       accessibility_rate: Taux d'accessibilité
       audit_date: Date de la déclaration
+      audit_update_date: "Mise à jour le"
       automated_tests_description: "Tests techniques exécutés automatiquement sur %{site} à l'aide du moteur de test Axe-core. Le nombre de tests applicables peut être inférieur à %{total} selon le contenu du site."
       automated_tests_incomplete_text: "Les résultats détaillés de ce test ne sont plus disponibles. Relancez une évaluation pour obtenir un résultat détaillé."
       automated_tests_incomplete_title: Résultats détaillés indisponibles
@@ -238,7 +274,7 @@ fr:
       summary_legal_obligations_detail:
         one: "%{count} obligation sur %{total} remplie"
         other: "%{count} obligations sur %{total} remplies"
-      summary_mention_details: "Taux RGAA %{compliance_rate} - audit du %{audit_date}"
+      summary_mention_details: "Taux RGAA %{compliance_rate}"
       summary_title: "Résumé de l'évaluation du site"
       tab_automated_tests: Tests automatiques RGAA
       tab_obligations: Obligations & déclaration
@@ -247,8 +283,9 @@ fr:
       unreachable_intro: "Le site %{site} n'est pas joignable actuellement. Aucune évaluation n'a pu être exécutée."
       unreachable_no_checks_text: "Le site n'étant pas joignable, aucune des quatre catégories (niveau déclaré, obligations légales, qualité de la déclaration, tests automatiques) n'a pu être évaluée."
       unreachable_no_checks_title: Aucune évaluation exécutée
+      unreachable_report_incorrect_result: "Si toutefois le résultat vous paraît incorrect, signalez-le en cliquant ici."
       unreachable_title: Site injoignable
-      unreachable_what_to_do_text: "Vérifiez que l'adresse est correcte et que le site est en ligne, puis relancez l'évaluation. Si le site est temporairement indisponible, réessayez plus tard."
+      unreachable_what_to_do_text_html: "<li><strong>L'adresse contient-elle « www » ?</strong> Certains sites ne répondent qu'avec ou sans « www ». Vérifiez l'adresse de votre site et lancez une nouvelle évaluation.</li><li><strong>Avez-vous fait une erreur dans l'adresse de votre site ?</strong> Vérifiez que l'adresse est correcte et lancez une nouvelle évaluation.</li><li><strong>Le site est-il temporairement injoignable ?</strong> S'il est indisponible, lancez une nouvelle évaluation du site plus tard.</li>"
       unreachable_what_to_do_title: Que faire ?
       value_found: Valeur trouvée
     modals:
@@ -335,7 +372,10 @@ fr:
     analyze_plan:
       all_passed: Lien trouvé et valide
       invalid_years: Année(s) invalide(s)
-      invalid_years_how_to_fix: "Renseignez des dates contenant l'année en cours"
+      future_how_to_fix: "Le plan d'action doit faire référence à l'année en cours"
+      range_how_to_fix: "La période ne doit pas dépasser 2 ans"
+      obsolete_how_to_fix: "Le plan d'action est obsolète et doit être mis à jour"
+      years_not_found_how_to_fix: "Renseignez des dates contenant l'année en cours"
       link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien
@@ -350,7 +390,10 @@ fr:
     analyze_schema:
       all_passed: Lien trouvé et valide
       invalid_years: Années invalides
-      invalid_years_how_to_fix: "Renseignez des dates contenant l'année en cours et dans une plage de maximum 3 ans"
+      future_how_to_fix: "Le schéma pluriannuel doit s'appliquer sur l'année en cours"
+      range_how_to_fix: "La période ne doit pas dépasser 3 ans"
+      obsolete_how_to_fix: "Le schéma pluriannuel est obsolète et doit être mis à jour"
+      years_not_found_how_to_fix: "Renseignez des dates contenant l'année en cours"
       link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien

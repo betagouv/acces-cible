@@ -102,7 +102,7 @@ RSpec.describe "AuditBatches" do
     let(:audit_batch) do
       {
         kind: "manual",
-        urls: ["https://example.com", "https://www.example.com/", "https://other.example.com"],
+        urls: ["https://example.com", "https://other.example.com"],
         site_tag_names: { "example.com" => ["", "Ministère"] }
       }
     end

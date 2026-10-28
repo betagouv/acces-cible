@@ -42,6 +42,10 @@ class Check < ApplicationRecord
     :run_axe_on_homepage,
   ].freeze
 
+  def done?
+    in_state?(:completed, :failed, :errored)
+  end
+
   # used to signal a check's `run` method has failed
   class RuntimeError < StandardError; end
 
