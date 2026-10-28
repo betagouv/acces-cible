@@ -1,5 +1,48 @@
 # Changelog
 
+## [3.1.0](https://github.com/betagouv/acces-cible/compare/v3.0.0...v3.1.0) (2026-10-28)
+
+
+### Features
+
+* accessibility mention regex more flexible ([#790](https://github.com/betagouv/acces-cible/issues/790)) ([f909dc5](https://github.com/betagouv/acces-cible/commit/f909dc526f0d9eee0f29854cd017e119612b666e))
+* Add "latest audit per site" filter ([#777](https://github.com/betagouv/acces-cible/issues/777)) ([8263859](https://github.com/betagouv/acces-cible/commit/8263859efc91e05c51f167aaeac976f7fd1f8e28))
+* Add and display audit update date in audit views ([#799](https://github.com/betagouv/acces-cible/issues/799)) ([6009ddb](https://github.com/betagouv/acces-cible/commit/6009ddb86b4d87f09571c3f8da4fd42f7d882fe8))
+* Add details for invalid plans and schemas dates ([#800](https://github.com/betagouv/acces-cible/issues/800)) ([ebe9efb](https://github.com/betagouv/acces-cible/commit/ebe9efbaec4cfa091d04ddc6e8e6252c7f4e672b))
+* add progress of audit batch ([#739](https://github.com/betagouv/acces-cible/issues/739)) ([42d39ff](https://github.com/betagouv/acces-cible/commit/42d39ff0378a27aa039d35cbb6e90d2bb48be024))
+* add www to normalized_url ([#795](https://github.com/betagouv/acces-cible/issues/795)) ([95b390b](https://github.com/betagouv/acces-cible/commit/95b390bbaed015651406dd88281713c47b1a4ee4))
+* Extract shadowroot content from body ([#785](https://github.com/betagouv/acces-cible/issues/785)) ([2393573](https://github.com/betagouv/acces-cible/commit/23935731b4bc135a1cc8499fb0716a6f340b954a))
+* redirection callout design change ([#762](https://github.com/betagouv/acces-cible/issues/762)) ([85b75cb](https://github.com/betagouv/acces-cible/commit/85b75cb0e2ea0735f4622b21c712ae1fd307f53a))
+* Revamp CSV export structure ([#796](https://github.com/betagouv/acces-cible/issues/796)) ([89a5f4a](https://github.com/betagouv/acces-cible/commit/89a5f4a65fe249ab8ffa83c14119b668e3e4f246))
+* warn when duplicate urls are ignored ([#801](https://github.com/betagouv/acces-cible/issues/801)) ([bf7cd01](https://github.com/betagouv/acces-cible/commit/bf7cd016d271dcd731c0d211cac68d22f1850a65))
+
+
+### Bug Fixes
+
+* Adjust schema plan and law date analysis ([#759](https://github.com/betagouv/acces-cible/issues/759)) ([eaf7c4e](https://github.com/betagouv/acces-cible/commit/eaf7c4ec8c556edb6dbf713d1c43f97361cf0911))
+* improve accessibility declaration regex ([#774](https://github.com/betagouv/acces-cible/issues/774)) ([48df2e0](https://github.com/betagouv/acces-cible/commit/48df2e0fd08ef9c6f822378480c8a0f8ac58beaa))
+* Improve compliance rate detection ([#751](https://github.com/betagouv/acces-cible/issues/751)) ([d4cd37c](https://github.com/betagouv/acces-cible/commit/d4cd37c7500faba2a361cc82b4baa62788f19212))
+* look for compliance rate in the whole page as fallback ([#789](https://github.com/betagouv/acces-cible/issues/789)) ([cc47a4c](https://github.com/betagouv/acces-cible/commit/cc47a4c62e6b5a1291629d23ca453aec935b4b9a))
+* Update translations ([#769](https://github.com/betagouv/acces-cible/issues/769)) ([1f81891](https://github.com/betagouv/acces-cible/commit/1f81891cc4db27a3e26a9412cdd0578d1630708a))
+* Upgrade sentry gems and configure structured logging ([#754](https://github.com/betagouv/acces-cible/issues/754)) ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
+
+### Refactoring
+
+* derive user and team from audit batch in AuditBatchCreationService ([#748](https://github.com/betagouv/acces-cible/issues/748)) ([8d7eac7](https://github.com/betagouv/acces-cible/commit/8d7eac7b2a24826ba4b0eef1374e369ce7de3e9a))
+
+
+### Miscellaneous
+
+* on staging, change proconnect credentials to production environment and prevent search engine indexing ([#771](https://github.com/betagouv/acces-cible/issues/771)) ([7724447](https://github.com/betagouv/acces-cible/commit/7724447cf63dec3bae046d39f8606dba55fa40c5))
+* Regenerate schema files with Rails 8.1.4 ([#752](https://github.com/betagouv/acces-cible/issues/752)) ([73fc88e](https://github.com/betagouv/acces-cible/commit/73fc88e6ff817daa06abe86ab3490271eb279b4d))
+* Replace `INVISIBLE_ELEMENTS` by `NON_CONTENT_ELEMENTS` ([#744](https://github.com/betagouv/acces-cible/issues/744)) ([eb6f92b](https://github.com/betagouv/acces-cible/commit/eb6f92b3532cc88d8875730553c95b3d929679d9))
+* staging restrictions ([#763](https://github.com/betagouv/acces-cible/issues/763)) ([f2f3de0](https://github.com/betagouv/acces-cible/commit/f2f3de09b98160f6cf951cec603fa673065039be))
+* unblock css + googleapi that can block loading of some SPA ([#794](https://github.com/betagouv/acces-cible/issues/794)) ([cffbccd](https://github.com/betagouv/acces-cible/commit/cffbccd7b104112b6562b53be0950301957811b1))
+* Update translations to rename "date de l'audit" to "date de la déclaration" ([1f81891](https://github.com/betagouv/acces-cible/commit/1f81891cc4db27a3e26a9412cdd0578d1630708a))
+* upgrade ruby version to 4.0.7 ([#791](https://github.com/betagouv/acces-cible/issues/791)) ([4ba8fa6](https://github.com/betagouv/acces-cible/commit/4ba8fa68bd367c305a8ec0f606259b0c1b040959))
+* Upgrade sentry gems and configure structured logging ([ffaefb8](https://github.com/betagouv/acces-cible/commit/ffaefb8be30d2fbffc270936a72056ff0d2c6353))
+
 ## [3.0.0](https://github.com/betagouv/acces-cible/compare/v2.0.0...v3.0.0) (2026-09-28)
 
 
