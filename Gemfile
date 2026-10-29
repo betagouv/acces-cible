@@ -80,7 +80,7 @@ gem "omniauth-proconnect"
 gem "omniauth-rails_csrf_protection"
 
 # Crawl websites using a headless Chrome browser, controlled by Ferrum
-gem "ferrum"
+gem "ferrum", "~> 0.17.2"
 
 # State machine
 gem "statesman"
