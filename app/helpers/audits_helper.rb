@@ -169,6 +169,15 @@ module AuditsHelper
     end
   end
 
+  def audit_filter_options(column)
+    case column
+    when "reachable" then %w[reachable unreachable redirected].map { [t("audits.modals.filters.choices.#{it}"), it] }
+    when "declared_level" then %w[totalement partiellement non].map { [t("audits.modals.filters.choices.#{it}"), it] }
+    when "accessibility_page", "accessibility_mention", "declaration_date", "contact_email" then [[t("audits.modals.filters.choices.present_feminine"), true], [t("audits.modals.filters.choices.absent_feminine"), false]]
+    else [[t("shared.present"), true], [t("shared.absent"), false]]
+    end
+  end
+
   def site_link(site)
     site_label = t("audits.audit.row_label", url: site.normalized_url)
 
