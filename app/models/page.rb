@@ -1,7 +1,7 @@
 class Page
   HEADINGS = "h1,h2,h3,h4,h5,h6".freeze
   NON_CONTENT_ELEMENTS = "script, style, noscript, meta, link, iframe[src]".freeze
-  LINKS_SELECTOR = "a[href]:not([href^='#']):not([href^=mailto]):not([href^=tel])".freeze
+  LINKS_SELECTOR = "a[href]:not([href^='#']:not([href^='#/'])):not([href^=mailto]):not([href^=tel])".freeze
   MAIL_TO_SELECTOR = "a[href^=mailto]".freeze
   MAIL_PATTERN = /(?:[a-zA-Z0-9._%+-]+(?:@|\(at\))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
 

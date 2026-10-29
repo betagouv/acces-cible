@@ -7,6 +7,11 @@ RSpec.describe Link do
       expect(normalized.to_s).to eq("http://example.com/page")
     end
 
+    it "keeps route fragments used by single page applications" do
+      normalized = described_class.normalize("http://example.com/#/pages/accessibilité")
+      expect(normalized).to eq("http://example.com/#/pages/accessibilit%C3%A9")
+    end
+
     it "preserves query parameters" do
       normalized = described_class.normalize("http://example.com/page?param=value")
       expect(normalized).to eq("http://example.com/page?param=value")
