@@ -1,4 +1,4 @@
-FROM ruby:4.0.7-slim
+FROM ruby:4.0.9-slim
 
 ENV WITHIN_DOCKER=1
 
