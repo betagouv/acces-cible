@@ -4,6 +4,8 @@ class Browser
   PAGE_TIMEOUT = 30.seconds
   # Maximum delay for the Chrome process to start, only once when the browser is created
   PROCESS_TIMEOUT = 30.seconds
+  # Maximum delay CDP command
+  PROTOCOL_TIMEOUT = 30.seconds
   # Maximum delay waiting for the network to become idle after a page load
   NETWORK_IDLE_TIMEOUT = 10.seconds
 
@@ -114,6 +116,7 @@ class Browser
         headless: :new,
         timeout: PAGE_TIMEOUT,
         process_timeout: PROCESS_TIMEOUT,
+        protocol_timeout: PROTOCOL_TIMEOUT,
         pending_connection_errors: false,
         extensions: [STEALTH_EXTENSION],
         browser_options: browser_options
