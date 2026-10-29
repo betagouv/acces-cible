@@ -9,6 +9,9 @@ module AuditColumns
     automated_tests: %w[automated_tests_result automated_tests_applicable automated_tests_passed automated_tests_inapplicable],
   }.freeze
   DEFAULT = %w[compliance_rate declared_level legal_obligations declaration_quality evaluator organization_label tags].freeze
+  BOOLEAN_FILTERS = GROUPS.values_at(:legal_obligations, :declaration_quality).flatten.freeze
+  FILTERABLE = (%w[reachable declared_level] + BOOLEAN_FILTERS).freeze
+  ALL = ["site", *GROUPS.values.flatten, "last_audit_at"].freeze
   EXPORT = %w[
     site evaluated_url reachable redirected redirect_url
     accessibility_page declaration_url declaration_hosting

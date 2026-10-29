@@ -182,6 +182,7 @@ fr:
       export_to_csv: Export CSV
       history_filter: Évaluations affichées pour chaque site
       latest_audits: Dernière de chaque site
+      more_filters: Plus de filtres
       no_results: Aucune évaluation à afficher.
       no_search_results: Aucune évaluation ne correspond à votre recherche.
       search: Rechercher un site
@@ -299,6 +300,21 @@ fr:
           main_results: Résultats principaux de l'évaluation
           meta: Méta
         title: Colonnes affichées
+      filters:
+        all: Tous
+        apply: Filtrer
+        choices:
+          absent_feminine: Absente
+          non: Non conforme
+          partiellement: Partiellement conforme
+          present_feminine: Présente
+          reachable: Oui
+          redirected: Redirection
+          totalement: Totalement conforme
+          unreachable: Non
+        description: Choisissez une valeur par colonne. « Tous » n’applique aucun filtre à la colonne. Les filtres se cumulent entre colonnes.
+        reset: Réinitialiser
+        title: Plus de filtres
       headings:
         caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"
         description: Niveau des titres trouvés sur la page de déclaration, comparé au niveau attendu pour une hiérarchie correcte, sans saut de niveau. Les titres propres au site ne sont pas listés.

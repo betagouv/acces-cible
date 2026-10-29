@@ -114,6 +114,10 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la déclarat
   step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end
 
+Quand("je choisis {string} pour le filtre {string}") do |option, filter|
+  within("#filters-modal .fr-segmented", text: filter) { choose option }
+end
+
 Quand("je filtre par étiquette {string}") do |tag|
   steps %(
     Quand je sélectionne "#{tag}" pour "Filtrer par étiquette"
