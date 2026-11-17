@@ -15,11 +15,16 @@ class Link
 
     def normalize(href)
       uri = parse(href)
-      uri.fragment = nil
+      uri.fragment = route_fragment(uri)
       return uri.to_s if uri.relative?
 
       uri.path = uri.path.squeeze("/")
       uri.normalize.display_uri.to_s
+    end
+
+    def route_fragment(href)
+      fragment = parse(href).fragment
+      fragment if fragment&.start_with?("/")
     end
 
     def safe_external_url(href)

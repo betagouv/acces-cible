@@ -519,6 +519,14 @@ RSpec.describe Page do
       end
     end
 
+    context "with route fragment links used by single page applications" do
+      let(:body) { '<a href="#/pages/accessibilite">Accessibilité</a>' }
+
+      it "keeps route fragments" do
+        expect(page.links.collect(&:href)).to eq(["https://éxample.com/#/pages/accessibilite"])
+      end
+    end
+
     context "with skip_files: true (default)" do
       it "excludes links to non-HTML files" do
         expect(page.links.collect(&:text)).not_to include("PDF", "ZIP", "JPG")
