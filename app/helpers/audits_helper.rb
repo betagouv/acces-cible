@@ -169,13 +169,12 @@ module AuditsHelper
     end
   end
 
-  def audit_filter_options(filter)
-    case filter
+  def audit_filter_options(column)
+    case column
     when "reachable" then %w[reachable unreachable redirected].map { [t("audits.modals.filters.choices.#{it}"), it] }
     when "declared_level" then %w[totalement partiellement non].map { [t("audits.modals.filters.choices.#{it}"), it] }
-    when "accessibility_page", "accessibility_mention" then [[t("audits.modals.filters.choices.present_feminine"), true], [t("audits.modals.filters.choices.absent_feminine"), false]]
-    when "schema", "plan" then [[t("shared.present"), true], [t("shared.absent"), false]]
-    else [[t("shared.valid"), true], [t("shared.invalid"), false]]
+    when "accessibility_page", "accessibility_mention", "declaration_date", "contact_email" then [[t("audits.modals.filters.choices.present_feminine"), true], [t("audits.modals.filters.choices.absent_feminine"), false]]
+    else [[t("shared.present"), true], [t("shared.absent"), false]]
     end
   end
 

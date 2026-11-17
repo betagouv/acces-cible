@@ -301,7 +301,6 @@ fr:
           meta: Méta
         title: Colonnes affichées
       filters:
-        all: Tous
         apply: Filtrer
         choices:
           absent_feminine: Absente
@@ -312,8 +311,8 @@ fr:
           redirected: Redirection
           totalement: Totalement conforme
           unreachable: Non
-        description: Choisissez une valeur par colonne. « Tous » n’applique aucun filtre à la colonne. Les filtres se cumulent entre colonnes.
-        reset: Réinitialiser
+        description: Cochez les valeurs à conserver. Sans case cochée, la colonne n’est pas filtrée. Les filtres se cumulent entre colonnes.
+        reset: Tout décocher
         title: Plus de filtres
       headings:
         caption: "Hiérarchie des titres attendue dans la déclaration d'accessibilité"

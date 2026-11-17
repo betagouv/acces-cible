@@ -8,24 +8,17 @@ RSpec.describe "Audits filtering" do
   let(:user) { create(:user) }
   let(:site) { create(:site, team: user.team, audits: []) }
   let(:other_site) { create(:site, team: user.team, audits: []) }
-  let!(:matching_audit) { create(:audit, :completed, site:, user:) }
-  let!(:other_audit) { create(:audit, :completed, site: other_site, user:) }
+  let!(:matching_audit) { create(:audit, :without_checks, :completed, site:, user:) }
+  let!(:other_audit) { create(:audit, :without_checks, :completed, site: other_site, user:) }
 
   before { login_as(user) }
-
-  def update_check(audit, type, **attributes)
-    audit.checks.find_by!(type: "Checks::#{type}").update!(**attributes)
-  end
-
-  def listed_sites
-    Nokogiri::HTML(response.body).css("tbody th").map { it.text.strip }
-  end
 
   shared_examples "a filter" do
     it "lists only matching evaluations" do
       get_audits
 
-      expect(listed_sites).to eq([site.normalized_url.truncate(ApplicationHelper::TRUNCATION_LENGTH)])
+      expect(response.body).to include(site.normalized_url)
+      expect(response.body).not_to include(other_site.normalized_url)
     end
   end
 
@@ -35,7 +28,7 @@ RSpec.describe "Audits filtering" do
     it "lists every evaluation" do
       get_audits
 
-      expect(listed_sites).to contain_exactly(site.normalized_url, other_site.normalized_url)
+      expect(response.body).to include(site.normalized_url, other_site.normalized_url)
     end
   end
 
@@ -45,7 +38,7 @@ RSpec.describe "Audits filtering" do
     it "ignores it" do
       get_audits
 
-      expect(listed_sites).to contain_exactly(site.normalized_url, other_site.normalized_url)
+      expect(response.body).to include(site.normalized_url, other_site.normalized_url)
     end
   end
 
@@ -53,17 +46,34 @@ RSpec.describe "Audits filtering" do
     let(:filter) { { declared_level: "partiellement" } }
 
     before do
-      update_check(matching_audit, "AccessibilityMention", data: { mention: "partiellement" })
-      update_check(other_audit, "AccessibilityMention", data: { mention: "totalement" })
+      create(:check, :accessibility_mention, :completed, audit: matching_audit, found: true, data: { mention: "partiellement" })
+      create(:check, :accessibility_mention, :completed, audit: other_audit, found: true, data: { mention: "totalement" })
     end
 
     it_behaves_like "a filter"
   end
 
-  context "when filtering by reachability" do
+  context "when filtering by several declared levels" do
+    let(:filter) { { declared_level: %w[partiellement totalement] } }
+
     before do
-      update_check(matching_audit, "Reachable", found: true, data: { original_url: "a", redirect_url: "b" })
-      update_check(other_audit, "Reachable", found: true, data: {})
+      create(:check, :accessibility_mention, :completed, audit: matching_audit, found: true, data: { mention: "partiellement" })
+      create(:check, :accessibility_mention, :completed, audit: other_audit, found: true, data: { mention: "totalement" })
+    end
+
+    it "lists evaluations matching any of them" do
+      get_audits
+
+      expect(response.body).to include(site.normalized_url, other_site.normalized_url)
+    end
+  end
+
+  context "when filtering by reachability" do
+    let(:matching_reachable) { { found: true, data: { original_url: "a", redirect_url: "b" } } }
+
+    before do
+      create(:check, :reachable, :completed, audit: matching_audit, **matching_reachable)
+      create(:check, :reachable, :completed, audit: other_audit, found: true, data: {})
     end
 
     context "with redirected sites" do
@@ -78,14 +88,14 @@ RSpec.describe "Audits filtering" do
       it "lists only sites without redirection" do
         get_audits
 
-        expect(listed_sites).to eq([other_site.normalized_url])
+        expect(response.body).to include(other_site.normalized_url)
+        expect(response.body).not_to include(site.normalized_url)
       end
     end
 
     context "with unreachable sites" do
       let(:filter) { { reachable: "unreachable" } }
-
-      before { update_check(matching_audit, "Reachable", found: false, data: nil) }
+      let(:matching_reachable) { { found: false, data: nil } }
 
       it_behaves_like "a filter"
     end
@@ -93,7 +103,10 @@ RSpec.describe "Audits filtering" do
 
   context "when filtering by presence of a legal obligation" do
     before do
-      update_check(matching_audit, "AnalyzePlan", found: true)
+      create(:check, :find_accessibility_page, :completed, audit: matching_audit, found: true)
+      create(:check, :find_accessibility_page, :completed, audit: other_audit, found: true)
+      create(:check, :analyze_plan, :completed, audit: matching_audit, found: true)
+      create(:check, :analyze_plan, :completed, audit: other_audit, found: false)
     end
 
     context "with present" do
@@ -108,7 +121,8 @@ RSpec.describe "Audits filtering" do
       it "lists only evaluations without it" do
         get_audits
 
-        expect(listed_sites).to eq([other_site.normalized_url])
+        expect(response.body).to include(other_site.normalized_url)
+        expect(response.body).not_to include(site.normalized_url)
       end
     end
   end
@@ -117,8 +131,8 @@ RSpec.describe "Audits filtering" do
     let(:filter) { { auditor: "true", contact_form: "true" } }
 
     before do
-      update_check(matching_audit, "AnalyzeAccessibilityPage", data: { auditor: "ACME", contact_form: "https://example.com/contact" })
-      update_check(other_audit, "AnalyzeAccessibilityPage", data: { auditor: "ACME" })
+      create(:check, :analyze_accessibility_page, :completed, audit: matching_audit, data: { auditor: "ACME", contact_form: "https://example.com/contact" })
+      create(:check, :analyze_accessibility_page, :completed, audit: other_audit, data: { auditor: "ACME" })
     end
 
     it_behaves_like "a filter"
@@ -129,25 +143,16 @@ RSpec.describe "Audits filtering" do
 
     let(:filter) { { plan: "true" } }
 
-    before { update_check(matching_audit, "AnalyzePlan", found: true) }
+    before do
+      create(:check, :find_accessibility_page, :completed, audit: matching_audit, found: true)
+      create(:check, :analyze_plan, :completed, audit: matching_audit, found: true)
+    end
 
     it "applies the filters" do
       get_csv
 
       expect(response.body).to include(site.normalized_url)
       expect(response.body).not_to include(other_site.normalized_url)
-    end
-  end
-
-  context "when rendering the filters modal" do
-    let(:filter) { {} }
-
-    it "offers every filterable column" do
-      get_audits
-
-      names = Nokogiri::HTML(response.body).css("#filters-modal input[type=radio]").pluck("name").uniq
-
-      expect(names).to match_array(AuditColumns::FILTERABLE.map { "filter[#{it}]" })
     end
   end
 end

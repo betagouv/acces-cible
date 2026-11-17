@@ -20,7 +20,7 @@ Fonctionnalité: Filtrage des évaluations depuis la modale "Plus de filtres"
     Et que toutes les tâches de fond sont terminées
     Et que je clique sur "Mes évaluations"
     Quand je clique sur "Plus de filtres"
-    Et que je choisis "Totalement conforme" pour le filtre "Niveau d'accessibilité déclaré"
+    Et que je coche "Totalement conforme" pour "Niveau d'accessibilité déclaré"
     Et que je clique sur "Filtrer"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       | alpha.gouv.fr |
@@ -32,7 +32,7 @@ Fonctionnalité: Filtrage des évaluations depuis la modale "Plus de filtres"
     Et que toutes les tâches de fond sont terminées
     Et que je clique sur "Mes évaluations"
     Quand je clique sur "Plus de filtres"
-    Et que je choisis "Absente" pour le filtre "Mention d'accessibilité"
+    Et que je coche "Absente" pour "Mention d'accessibilité"
     Et que je clique sur "Filtrer"
     Alors la colonne "Site" du tableau "Mes évaluations" contient dans l'ordre :
       | beta.gouv.fr |

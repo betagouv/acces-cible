@@ -70,7 +70,7 @@
   </div>
 
   <div class="fr-col-2">
-    <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q, :history, *AuditColumns::FILTERABLE)), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
+    <%= link_to t(".export_to_csv"), csv_export_audits_path(format: :csv, filter: params[:filter]&.permit(:scope, :tag_id, :q, :history, AuditColumns::FILTERABLE.index_with { [] })), class: icon_class("file-download", line: true, btn: :secondary, side: :left, size: :sm), data: { "turbo-prefetch": false } %>
   </div>
 </div>
 
@@ -80,7 +80,7 @@
       <th scope="col" <%= aria_sort(:site) %>><%= sortable_header t('.columns.site'), :site %></th>
 
       <% @displayed_columns.each do |column| %>
-        <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>" <%= aria_sort(column) %>><%= sortable_header t(".columns.#{column}"), column %></th>
+        <th scope="col" class="<%= 'fr-cell--center' unless column.in?(%w[evaluator organization_label tags]) %>" <%= aria_sort(column) %>><%= sortable_column?(column) ? sortable_header(t(".columns.#{column}"), column) : t(".columns.#{column}") %></th>
       <% end %>
 
       <th scope="col" <%= aria_sort(:last_audit_at) %>><%= sortable_header t('.columns.last_audit_at'), :last_audit_at %></th>

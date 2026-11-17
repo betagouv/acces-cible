@@ -1,5 +1,4 @@
-<% reset_params = request.query_parameters.except("page").deep_dup %>
-<% reset_params["filter"]&.except!(*AuditColumns::FILTERABLE) %>
+<% query = request.query_parameters.except("page") %>
 <%= dsfr_modal(title: t(".title"), html_attributes: { id: "filters-modal", class: "modal--wide" }) do |modal| %>
   <p class="fr-text--sm"><%= t(".description") %></p>
 
@@ -9,31 +8,28 @@
         <% groups.each do |group, group_columns| %>
           <% filter_columns = group_columns & AuditColumns::FILTERABLE %>
           <% next if filter_columns.empty? %>
-          <fieldset class="fr-fieldset fr-mb-4w">
-            <legend class="fr-fieldset__legend"><%= t("audits.modals.columns.groups.#{group}") %></legend>
-            <hr class="fr-hr fr-col-8">
-            <% filter_columns.each do |column| %>
-              <fieldset class="fr-segmented fr-segmented--sm fr-fieldset__element">
-                <legend class="fr-segmented__legend"><%= t("audits.index.columns.#{column}") %></legend>
-                <div class="fr-segmented__elements">
-                  <% [[t(".all"), ""], *audit_filter_options(column)].each do |label, value| %>
-                    <% id = "filter_#{column}_#{value.to_s.presence || 'all'}" %>
-                    <div class="fr-segmented__element">
-                      <%= radio_button_tag "filter[#{column}]", value, params.dig(:filter, column).to_s == value.to_s, id:, form: "filters-form" %>
-                      <%= label_tag id, label, class: "fr-label" %>
-                    </div>
-                  <% end %>
+          <h2 class="fr-h6"><%= t("audits.modals.columns.groups.#{group}") %></h2>
+          <% filter_columns.each do |column| %>
+            <fieldset class="fr-fieldset">
+              <legend class="fr-fieldset__legend fr-text--regular"><%= t("audits.index.columns.#{column}") %></legend>
+              <% audit_filter_options(column).each do |label, value| %>
+                <% id = "filter_#{column}_#{value}" %>
+                <div class="fr-fieldset__element">
+                  <div class="fr-checkbox-group fr-checkbox-group--sm">
+                    <%= check_box_tag "filter[#{column}][]", value, Array(params.dig(:filter, column)).include?(value.to_s), id:, form: "filters-form" %>
+                    <%= label_tag id, label, class: "fr-label" %>
+                  </div>
                 </div>
-              </fieldset>
-            <% end %>
-          </fieldset>
+              <% end %>
+            </fieldset>
+          <% end %>
         <% end %>
       </div>
     <% end %>
   </div>
 
   <% modal.with_button do %>
-    <li><%= link_to t(".reset"), audits_path(reset_params), class: "fr-btn fr-btn--secondary" %></li>
+    <li><%= link_to t(".reset"), audits_path(query.merge("filter" => query["filter"]&.except(*AuditColumns::FILTERABLE))), class: "fr-btn fr-btn--secondary" %></li>
     <li><%= dsfr_button(label: t(".apply"), html_attributes: { type: :submit, form: "filters-form" }) %></li>
   <% end %>
 <% end %>

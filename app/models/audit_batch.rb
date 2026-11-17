@@ -62,10 +62,6 @@ class AuditBatch < ApplicationRecord
     audits.exists? && audits.where(completed_at: nil).none?
   end
 
-  def duration
-    Time.at(audits.maximum(:completed_at) - created_at).utc.strftime("%H:%M:%S") if complete?
-  end
-
   def completed_audits_count
     audits.completed.count
   end

@@ -2,14 +2,6 @@ module AuditsFiltering
   extend ActiveSupport::Concern
   include AuditsOrdering
 
-  REDIRECTED = "COALESCE(checks.data->>'redirect_url', '') <> ''".freeze
-  REACHABLE_CONDITIONS = {
-    "reachable" => "(checks.found AND NOT #{REDIRECTED})",
-    "redirected" => "(checks.found AND #{REDIRECTED})",
-    "unreachable" => "NOT checks.found"
-  }.freeze
-  DECLARED_LEVELS = %w[non partiellement totalement].freeze
-
   private
 
   def scoped_audits(ids: [])
@@ -36,9 +28,20 @@ module AuditsFiltering
   def filter_audits(scope)
     scope = filter_by_query(scope)
     scope = filter_by_tag(scope)
-    scope = filter_by_reachable(scope)
-    scope = filter_by_declared_level(scope)
-    filter_by_checks(scope)
+
+    AuditColumns::FILTERABLE.each do |column|
+      values = params.dig(:filter, column)
+      scope = scope.where("#{filter_value(column)} IN (?)", values) if values.present?
+    end
+
+    scope
+  end
+
+  def filter_value(column)
+    case column
+    when "declaration_date", "standard", "auditor", "contact_email", "contact_form" then "(#{column_value(column)} IS NOT NULL)"
+    else column_value(column)
+    end
   end
 
   def filter_by_query(scope)
@@ -52,38 +55,6 @@ module AuditsFiltering
     return scope if selected_tag_id.blank?
 
     scope.joins(site: :site_tags).where(site_tags: { tag_id: selected_tag_id })
-  end
-
-  def filter_by_reachable(scope)
-    condition = REACHABLE_CONDITIONS[params.dig(:filter, :reachable)]
-    return scope unless condition
-
-    scope.where(id: audit_ids_with_check(:reachable, condition))
-  end
-
-  def filter_by_declared_level(scope)
-    level = params.dig(:filter, :declared_level)
-    return scope unless level.in?(DECLARED_LEVELS)
-
-    scope.where(id: audit_ids_with_check(:accessibility_mention, ["checks.data->>'mention' = ?", level]))
-  end
-
-  def filter_by_checks(scope)
-    AuditColumns::BOOLEAN_FILTERS.reduce(scope) { |filtered, column| filter_by_check(filtered, column) }
-  end
-
-  def filter_by_check(scope, column)
-    check, condition = check_and_expression(column)
-
-    case params.dig(:filter, column)
-    when "true" then scope.where(id: audit_ids_with_check(check, condition))
-    when "false" then scope.where.not(id: audit_ids_with_check(check, condition))
-    else scope
-    end
-  end
-
-  def audit_ids_with_check(check, condition)
-    Check.types.fetch(check).where(condition).select(:audit_id)
   end
 
   def selected_tag_id
