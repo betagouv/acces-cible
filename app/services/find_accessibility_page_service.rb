@@ -40,7 +40,7 @@ class FindAccessibilityPageService
 
   def find_page(crawler, queue, audit)
     crawler.find_page do |current_page|
-      if required_headings_present?(current_page) || declaration_text_present?(current_page)
+      if required_headings_present?(current_page) || declaration_in_text?(current_page)
         true
       else
         enqueue_children(current_page, queue, audit)
@@ -75,10 +75,10 @@ class FindAccessibilityPageService
     matching_headings.size >= REQUIRED_DECLARATION_HEADINGS
   end
 
-  def declaration_text_present?(current_page)
-    dom_without_links = current_page.dom.dup
-    dom_without_links.css("a").each(&:remove)
-    dom_without_links.text.match?(DECLARATION_TEXT_REGEX)
+  def declaration_in_text?(page)
+    dom = page.dom.dup
+    dom.css("a").remove
+    dom.text.match?(DECLARATION_TEXT_REGEX)
   end
 
   def fuzzy_match?(a, b)
