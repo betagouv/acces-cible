@@ -159,9 +159,9 @@ class Browser
     private
 
     def deep_root_html(page)
-      node_id = page.command("DOM.getDocument", depth: 0).dig("root", "nodeId")
+      backend_node_id = page.command("DOM.getDocument", depth: 0).dig("root", "backendNodeId")
 
-      page.command("DOM.getOuterHTML", nodeId: node_id, includeShadowDOM: true)["outerHTML"]
+      page.command("DOM.getOuterHTML", backendNodeId: backend_node_id, includeShadowDOM: true)["outerHTML"]
     end
 
     def visit(page, url)
