@@ -180,8 +180,8 @@ RSpec.describe FindAccessibilityPageService do
     end
   end
 
-  describe "#declaration_text_present?" do
-    subject { described_class.allocate.send(:declaration_text_present?, page) }
+  describe "#declaration_in_text?" do
+    subject { described_class.allocate.send(:declaration_in_text?, page) }
 
     let(:page) { Page.new(url: "https://example.com/accessibilite", html:) }
 
