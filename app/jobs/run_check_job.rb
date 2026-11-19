@@ -1,8 +1,9 @@
-require "json/add/exception" # required to serialize errors as JSON
-
 class RunCheckJob < ApplicationJob
   rescue_from Check::RuntimeError do |exception|
-    arguments.first.transition_to!(:errored, exception.cause.as_json)
+    error = exception.cause
+    metadata = { "json_class" => error.class.name, "m" => error.message, "b" => error.backtrace }
+
+    arguments.first.transition_to!(:errored, metadata)
   end
 
   before_perform do |job|
