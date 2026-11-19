@@ -118,8 +118,8 @@ RSpec.describe Link do
       end
     end
 
-    it "raises InvalidUriError for malformed URIs like maitlo:accueil@example.com" do
-      expect { described_class.normalize("maitlo:accueil@example.com") }.to raise_error(Addressable::URI::InvalidURIError)
+    it "returns URIs with an unknown scheme like maitlo:accueil@example.com unchanged" do
+      expect(described_class.normalize("maitlo:accueil@example.com")).to eq("maitlo:accueil@example.com")
     end
 
     it "handles paths with a colon preceded by percent-encoded characters" do
