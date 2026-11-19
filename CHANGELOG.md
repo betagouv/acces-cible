@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.2.0](https://github.com/betagouv/acces-cible/compare/v3.1.0...v3.2.0) (2026-11-19)
+
+
+### Features
+
+* find accessibility declaration if mentionned in the text of the page ([#805](https://github.com/betagouv/acces-cible/issues/805)) ([ebb3d38](https://github.com/betagouv/acces-cible/commit/ebb3d388091cf4d37f5a99719a4dce5a8f4fbf9a))
+* support hash-routed SPA links ([#807](https://github.com/betagouv/acces-cible/issues/807)) ([79ec7d5](https://github.com/betagouv/acces-cible/commit/79ec7d554e508b77d146292035ab56b118204862))
+* support hash-routed SPA links (https://developer.mozilla.org/en-US/docs/Glossary/Hash_routing) ([79ec7d5](https://github.com/betagouv/acces-cible/commit/79ec7d554e508b77d146292035ab56b118204862))
+
+
+### Bug Fixes
+
+* rename declaration_text_present? to declaration_in_text? ([#821](https://github.com/betagouv/acces-cible/issues/821)) ([aff1509](https://github.com/betagouv/acces-cible/commit/aff15090ad3065f4725d9b617544ab03a0c64c73))
+* use backendNodeId in deep_root_html ([#822](https://github.com/betagouv/acces-cible/issues/822)) ([18f2a85](https://github.com/betagouv/acces-cible/commit/18f2a85a84ca19116e34f91d5f0521560f41bf62))
+
 ## [3.1.0](https://github.com/betagouv/acces-cible/compare/v3.0.0...v3.1.0) (2026-10-28)
 
 
