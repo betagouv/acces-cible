@@ -9,7 +9,7 @@ describe FetchResourcesJob do
     end
   end
 
-  let(:audit) { create(:audit) }
+  let(:audit) { create(:audit, home_page_url: "https://example.com/") }
 
   before do
     allow(FetchHomePageService).to receive(:new).with(audit)
@@ -26,6 +26,16 @@ describe FetchResourcesJob do
     fetch_resources_job
 
     expect(FindAccessibilityPageService).to have_received(:new).with(audit)
+  end
+
+  context "when the home page could not be fetched" do
+    let(:audit) { create(:audit, home_page_url: nil) }
+
+    it "does not call the service for the accessibility page" do
+      fetch_resources_job
+
+      expect(FindAccessibilityPageService).not_to have_received(:new)
+    end
   end
 
   it "enqueues a run of ProcessAuditJob" do

@@ -15,7 +15,7 @@ class FetchResourcesJob < ApplicationJob
 
   def perform(audit)
     FetchHomePageService.new(audit)
-    FindAccessibilityPageService.new(audit)
+    FindAccessibilityPageService.new(audit) if audit.home_page_url.present?
   ensure
     ProcessAuditJob.perform_later(audit)
   end
