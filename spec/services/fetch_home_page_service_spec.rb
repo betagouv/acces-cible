@@ -36,4 +36,25 @@ RSpec.describe FetchHomePageService do
 
     expect(audit.reload.home_page_url).to eq("www.example.com")
   end
+
+  context "when the navigation fails" do
+    let(:error) do
+      Browser::NavigationError.new("failed", status: 403, net_error: "net::ERR_HTTP_RESPONSE_CODE_FAILURE")
+    end
+
+    before do
+      allow(Browser).to receive(:get).and_raise(error)
+    end
+
+    it "stores a home page snapshot with the status and the net error" do
+      fetch!
+
+      expect(audit.page_snapshots.find_by(kind: "home")).to have_attributes(
+        requested_url: audit.site.url,
+        html: nil,
+        status: 403,
+        net_error: "net::ERR_HTTP_RESPONSE_CODE_FAILURE"
+      )
+    end
+  end
 end

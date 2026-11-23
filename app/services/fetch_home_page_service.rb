@@ -22,5 +22,12 @@ class FetchHomePageService
 
       @audit.update!(home_page_url: response[:current_url])
     end
+  rescue Browser::NavigationError => error
+    @audit.page_snapshots.create!(
+      kind: "home",
+      requested_url: @audit.site.url,
+      status: error.status,
+      net_error: error.net_error
+    )
   end
 end
