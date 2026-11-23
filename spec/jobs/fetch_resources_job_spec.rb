@@ -41,7 +41,7 @@ describe FetchResourcesJob do
     end
 
     context "when the ressource does not exist" do
-      let(:error) { Ferrum::StatusError.new(audit.site.url) }
+      let(:error) { Browser::NavigationError.new("failed", status: nil, net_error: "net::ERR_NAME_NOT_RESOLVED") }
 
       it "does not crash" do
         expect { fetch_resources_job }.not_to raise_error

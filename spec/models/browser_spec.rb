@@ -169,6 +169,21 @@ RSpec.describe Browser do
       end
     end
 
+    context "when navigation fails" do
+      before do
+        allow(page_double).to receive(:go_to).with(url).and_raise(
+          Ferrum::StatusError.new(url, "Request to #{url} failed (net::ERR_HTTP_RESPONSE_CODE_FAILURE)")
+        )
+        allow(network_double).to receive(:status).and_return(403)
+      end
+
+      it "raises a NavigationError with the status and the net error" do
+        expect { get_result }.to raise_error(Browser::NavigationError) do |error|
+          expect(error).to have_attributes(status: 403, net_error: "net::ERR_HTTP_RESPONSE_CODE_FAILURE")
+        end
+      end
+    end
+
     it "returns response data hash" do
       result = get_result
 

@@ -84,6 +84,16 @@ class Browser
 
   STEALTH_EXTENSION = Rails.root.join("vendor/javascript/stealth.min.js").freeze
 
+  class NavigationError < StandardError
+    attr_reader :status, :net_error
+
+    def initialize(message, status:, net_error:)
+      @status = status
+      @net_error = net_error
+      super(message)
+    end
+  end
+
   class << self
     def reachable?(url)
       return false if url.blank?
@@ -172,6 +182,12 @@ class Browser
           "network not idle after #{NETWORK_IDLE_TIMEOUT.to_i}s"
         end
       log_pending_requests(page, url, reason: navigation_issue) if navigation_issue
+    rescue Ferrum::StatusError => error
+      raise NavigationError.new(
+        error.message,
+        status: page.network.status,
+        net_error: error.message[/net::ERR_\w+/]
+      )
     end
 
     def log_pending_requests(page, url, reason:)
