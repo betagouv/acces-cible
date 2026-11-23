@@ -13,8 +13,8 @@ module AuditColumns
     site evaluated_url reachable redirected redirect_url
     accessibility_page declaration_url declaration_hosting
     compliance_rate_evaluation compliance_rate accessibility_mention declared_level
-    schema schema_url schema_quality
-    plan plan_url plan_quality
+    schema schema_url schema_quality schema_start_year schema_end_year
+    plan plan_url plan_quality plan_years
     declaration_date_evaluation declaration_date standard_evaluation standard auditor_evaluation auditor
     law_article contact_evaluation contact_email contact_form declaration_format
     legal_obligations declaration_quality
@@ -69,12 +69,15 @@ module AuditColumns
       when "plan" then obligation(plan) if accessibility_page.found?
       when "plan_quality" then validity(plan.conform) if plan.found
       when "plan_url" then plan.link_url
+      when "plan_years" then [plan.years&.first, plan.years&.last].uniq.join("-")
       when "reachable" then yes_no(audit.reachable.found?) if audit.reachable.done?
       when "redirect_url" then audit.reachable.redirect_url
       when "redirected" then yes_no(audit.reachable.redirected?) if audit.reachable.found?
       when "schema" then obligation(schema) if accessibility_page.found?
       when "schema_quality" then validity(schema.conform) if schema.found
       when "schema_url" then schema.link_url
+      when "schema_start_year" then schema.years&.first
+      when "schema_end_year" then schema.years&.second
       when "site" then audit.site.normalized_url
       when "standard" then accessibility_analysis.standard
       when "standard_evaluation" then presence(accessibility_analysis.standard.present?) if accessibility_analysis.completed?
