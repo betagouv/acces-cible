@@ -83,6 +83,14 @@ RSpec.describe Checks::Reachable do
     end
   end
 
+  describe "#analyze! when there is no home page snapshot" do
+    let(:root_page) { nil }
+
+    it "returns nil" do
+      expect(check.send(:analyze!)).to be_nil
+    end
+  end
+
   describe "#redirected?" do
     subject(:redirected) { check.redirected? }
 
