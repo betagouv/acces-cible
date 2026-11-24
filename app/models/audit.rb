@@ -112,7 +112,7 @@ class Audit < ApplicationRecord
 
   def page_for(kind)
     snapshot = page_snapshots.find_by(kind:)
-    return unless snapshot
+    return unless snapshot&.html?
 
     Page.new(url: snapshot.current_url, root: home_page_url, html: snapshot.html)
   end
