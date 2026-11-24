@@ -87,6 +87,11 @@ gem "http"
 # Detect main language from text
 gem "cld"
 
+# FIXME: Pin hashie gem
+# Pro connect gem is using hashie and latest release broke the pro connect gem
+# https://github.com/hashie/hashie/pull/639
+gem "hashie", "~> 5"
+
 group :development, :test do
   gem "debug"
 
