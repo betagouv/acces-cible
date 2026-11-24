@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.2.0](https://github.com/betagouv/acces-cible/compare/v3.1.0...v3.2.0) (2026-11-24)
+
+
+### Features
+
+* Add schema and plan years to audit CSV export ([#828](https://github.com/betagouv/acces-cible/issues/828)) ([846b36e](https://github.com/betagouv/acces-cible/commit/846b36e2f16799d40d1e5ec53f95b8e8e3019dfd))
+* find accessibility declaration if mentionned in the text of the page ([#805](https://github.com/betagouv/acces-cible/issues/805)) ([ebb3d38](https://github.com/betagouv/acces-cible/commit/ebb3d388091cf4d37f5a99719a4dce5a8f4fbf9a))
+* support hash-routed SPA links ([#807](https://github.com/betagouv/acces-cible/issues/807)) ([79ec7d5](https://github.com/betagouv/acces-cible/commit/79ec7d554e508b77d146292035ab56b118204862))
+* support hash-routed SPA links (https://developer.mozilla.org/en-US/docs/Glossary/Hash_routing) ([79ec7d5](https://github.com/betagouv/acces-cible/commit/79ec7d554e508b77d146292035ab56b118204862))
+
+
+### Bug Fixes
+
+* rename declaration_text_present? to declaration_in_text? ([#821](https://github.com/betagouv/acces-cible/issues/821)) ([aff1509](https://github.com/betagouv/acces-cible/commit/aff15090ad3065f4725d9b617544ab03a0c64c73))
+* use backendNodeId in deep_root_html ([#822](https://github.com/betagouv/acces-cible/issues/822)) ([18f2a85](https://github.com/betagouv/acces-cible/commit/18f2a85a84ca19116e34f91d5f0521560f41bf62))
+
+
+### Miscellaneous
+
+* Pin hashie gem ([#832](https://github.com/betagouv/acces-cible/issues/832)) ([fc9ceab](https://github.com/betagouv/acces-cible/commit/fc9ceab646760d4c196fdf5769c3cdc2c0f0baef))
+* Upgrade ruby to 4.0.10 && bump all gems ([#826](https://github.com/betagouv/acces-cible/issues/826)) ([1d731b9](https://github.com/betagouv/acces-cible/commit/1d731b9aa3dc785d29dddcca02d0011c8f3b1563))
+
 ## [3.1.0](https://github.com/betagouv/acces-cible/compare/v3.0.0...v3.1.0) (2026-10-28)
 
 
