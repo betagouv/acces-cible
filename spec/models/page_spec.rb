@@ -137,6 +137,18 @@ RSpec.describe Page do
         expect { page }.to raise_error(Page::InvalidTypeError, /Not an HTML page.*application\/pdf/)
       end
     end
+
+    context "when the page could not be fetched" do
+      before do
+        allow(Browser).to receive(:get)
+                            .with(normalized_url)
+                            .and_return({ body: nil, status: nil, error: "net::ERR_NAME_NOT_RESOLVED", content_type: nil, current_url: nil })
+      end
+
+      it "does not raise" do
+        expect { page }.not_to raise_error
+      end
+    end
   end
 
   describe "#dom" do

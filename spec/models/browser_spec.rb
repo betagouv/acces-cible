@@ -169,6 +169,36 @@ RSpec.describe Browser do
       end
     end
 
+    context "when navigation fails" do
+      before do
+        allow(page_double).to receive(:go_to).with(url).and_raise(
+          Ferrum::StatusError.new(url, "Request to #{url} failed (net::ERR_HTTP_RESPONSE_CODE_FAILURE)")
+        )
+        allow(network_double).to receive(:status).and_return(403)
+      end
+
+      it "returns the status and Chrome's error without the page content" do
+        expect(get_result).to eq(
+          body: nil,
+          status: 403,
+          error: "net::ERR_HTTP_RESPONSE_CODE_FAILURE",
+          content_type: nil,
+          current_url: nil
+        )
+      end
+    end
+
+    context "when reading the page times out" do
+      before do
+        allow(page_double).to receive(:command).with("DOM.getDocument", depth: 0).and_raise(Ferrum::TimeoutError)
+        allow(network_double).to receive(:status).and_return(nil)
+      end
+
+      it "returns the timeout as the error" do
+        expect(get_result).to include(body: nil, status: nil, error: "timeout")
+      end
+    end
+
     it "returns response data hash" do
       result = get_result
 

@@ -1,10 +1,6 @@
 class FetchResourcesJob < ApplicationJob
   queue_as :slow
 
-  rescue_from(Ferrum::StatusError, Ferrum::TimeoutError) do |exception|
-    Rails.logger.debug("Failed to fetch SOME home page HTML because: #{exception}")
-  end
-
   # sometimes the underlying Chrome process is [defunct], as show when
   # inspecting the jobs container with `ps -ef`: it hasn't been killed
   # properly so SolidQueue has to wait and timeout the job on
@@ -15,6 +11,8 @@ class FetchResourcesJob < ApplicationJob
 
   def perform(audit)
     FetchHomePageService.new(audit)
+    return audit.abort_dependent_checks!(audit.reachable) unless audit.home_page_snapshot.auditable?
+
     FindAccessibilityPageService.new(audit)
   ensure
     ProcessAuditJob.perform_later(audit)

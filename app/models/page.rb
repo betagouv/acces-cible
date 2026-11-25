@@ -67,10 +67,6 @@ class Page
     "#<#{self.class.name} @url=#{url.inspect} @title=#{title}>"
   end
 
-  def success?
-    status == Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
-  end
-
   def dom
     @dom ||= Nokogiri::HTML(html).tap do |document|
       document.css(NON_CONTENT_ELEMENTS).each(&:remove)
@@ -123,7 +119,8 @@ class Page
   end
 
   def fetch_page_data
-    @actual_url, @status, @content_type, @html = Browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body)
+    @actual_url, @status, @content_type, @html, error = Browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body, :error)
+    return if error
 
     raise InvalidTypeError.new(url, @content_type) unless is_html_page?
   end
