@@ -173,6 +173,9 @@ module AuditsHelper
     case column
     when "reachable" then %w[reachable unreachable redirected].map { [t("audits.modals.filters.choices.#{it}"), it] }
     when "declared_level" then %w[totalement partiellement non].map { [t("audits.modals.filters.choices.#{it}"), it] }
+    when "legal_obligations" then (0..4).map { [it, it] }
+    when "declaration_quality" then %w[0 0.5 1 1.5 2 2.5 3 3.5 4].map { [it, it] }
+    when "declaration_format", "schema_quality", "plan_quality" then [[t("shared.valid"), true], [t("shared.invalid"), false]]
     when "accessibility_page", "accessibility_mention", "declaration_date", "contact_email" then [[t("audits.modals.filters.choices.present_feminine"), true], [t("audits.modals.filters.choices.absent_feminine"), false]]
     else [[t("shared.present"), true], [t("shared.absent"), false]]
     end

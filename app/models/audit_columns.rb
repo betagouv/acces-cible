@@ -9,7 +9,10 @@ module AuditColumns
     automated_tests: %w[automated_tests_result automated_tests_applicable automated_tests_passed automated_tests_inapplicable],
   }.freeze
   DEFAULT = %w[compliance_rate declared_level legal_obligations declaration_quality evaluator organization_label tags].freeze
-  FILTERABLE = %w[reachable declared_level accessibility_page accessibility_mention schema plan declaration_date standard auditor law_article contact_email contact_form].freeze
+  FILTERABLE = %w[
+    reachable declared_level legal_obligations declaration_quality accessibility_page accessibility_mention schema plan
+    declaration_date standard auditor law_article contact_email contact_form declaration_format schema_quality plan_quality
+  ].freeze
   EXPORT = %w[
     site evaluated_url reachable redirected redirect_url
     accessibility_page declaration_url declaration_hosting

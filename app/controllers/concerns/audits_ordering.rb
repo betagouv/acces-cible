@@ -21,6 +21,7 @@ module AuditsOrdering
     when "declaration_date" then declaration_text_value("audit_date")
     when "auditor", "standard", "contact_email", "contact_form" then declaration_text_value(column)
     when "declaration_quality" then "audits.declaration_quality_score"
+    when "declaration_format" then check_value(Checks::AccessibilityPageHeading.in_state(:completed), :conform)
     when "declared_level" then declared_level_value
     when "evaluator" then "users.name"
     when "last_audit_at" then "audits.completed_at"
@@ -30,7 +31,10 @@ module AuditsOrdering
     when "plan" then check_value(Checks::AnalyzePlan, :found)
     when "reachable" then reachable_value
     when "schema" then check_value(Checks::AnalyzeSchema, :found)
+    when "plan_quality" then check_value(Checks::AnalyzePlan.where(found: true), :conform)
+    when "schema_quality" then check_value(Checks::AnalyzeSchema.where(found: true), :conform)
     when "site" then site_value
+    when "tags" then "sites.tags_count"
     end
   end
 
