@@ -132,7 +132,7 @@ Fonctionnalité:
   Scénario: Un agent peut afficher toutes les colonnes
     Sachant que je possède un site "https://example.gouv.fr" avec des données
     Quand je clique sur "Mes évaluations"
-    Et que je coche toutes les cases
+    Et que je coche toutes les cases de la modale des colonnes
     Et que je clique sur le premier lien ou bouton "Appliquer"
     Alors le tableau "Mes évaluations" contient les colonnes :
       | Site                                                |
@@ -167,7 +167,7 @@ Fonctionnalité:
     Et que le site "https://example.gouv.fr/" renvoie une réponse HTML normale pour la déclaration d'accessibilité
     Quand je rajoute un site "https://example.gouv.fr/" sans lancer les tests automatiques
     Et que je clique sur "Mes évaluations"
-    Et que je coche toutes les cases
+    Et que je coche toutes les cases de la modale des colonnes
     Et que je clique sur le premier lien ou bouton "Appliquer"
     Alors la colonne "Résultat des tests auto RGAA" du tableau "Mes évaluations" contient dans l'ordre :
       | - |

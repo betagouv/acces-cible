@@ -114,6 +114,12 @@ Sachantque("le site {string} renvoie une réponse HTML normale pour la déclarat
   step(%(le site "#{url}" renvoie "#{fake_html}" pour la déclaration d'accessibilité))
 end
 
+Quand("je coche {string} pour {string}") do |option, fieldset|
+  within("#filters-modal fieldset", text: fieldset) do
+    check option
+  end
+end
+
 Quand("je filtre par étiquette {string}") do |tag|
   steps %(
     Quand je sélectionne "#{tag}" pour "Filtrer par étiquette"
@@ -262,4 +268,10 @@ end
 
 Sachantque("nous sommes en {int}") do |year|
   travel_to Time.zone.local(year, 6, 1)
+end
+
+Quand("je coche toutes les cases de la modale des colonnes") do
+  within("#columns-modal") do
+    all(:checkbox).each(&:check)
+  end
 end

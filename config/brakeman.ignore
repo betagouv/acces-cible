@@ -3,6 +3,52 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "4ab04b68b5dc067237cf1cf7a628b913a0b0859c293b701f9ec36faba15158c5",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/concerns/audits_ordering.rb",
+      "line": 51,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{column_value((params.fetch(:sort, {}).keys.first or \"last_audit_at\"))} #{(:BRAKEMAN_SAFE_LITERAL or \"desc\")} NULLS #{(\"FIRST\" or \"LAST\")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AuditsOrdering",
+        "method": "order_audits"
+      },
+      "user_input": "params.fetch(:sort, {}).keys.first",
+      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b9f9e132c52bb3b95e4b811dec9798a7e282a5772a71acc9b6eb1225f60636f3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/concerns/audits_filtering.rb",
+      "line": 34,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "filter_by_tag(filter_by_query(scope)).where(\"#{filter_value(:BRAKEMAN_SAFE_LITERAL)} IN (?)\", params.dig(:filter, :BRAKEMAN_SAFE_LITERAL))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AuditsFiltering",
+        "method": "filter_audits"
+      },
+      "user_input": "filter_value(:BRAKEMAN_SAFE_LITERAL)",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "c4cad965475b6097943e188932e000414d4bc34d7a9b5826abdcf5ab14bd684e",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -45,40 +91,7 @@
         89
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "dcb745dd478afa32acb900debefbd57868e3a0635c37699e937461a2e16b522e",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/sites/_site.html.erb",
-      "line": 9,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to((Unresolved Model).new.normalized_url.truncate(35, :separator => /\\W/), (Unresolved Model).new.url, :target => :_blank, :title => (unless ((Unresolved Model).new.normalized_url.truncate(35, :separator => /\\W/) == (Unresolved Model).new.normalized_url) then\n  (Unresolved Model).new.normalized_url\nend))",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "sites/index",
-          "line": 38,
-          "file": "app/views/sites/index.html.erb",
-          "rendered": {
-            "name": "sites/_site",
-            "file": "app/views/sites/_site.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "sites/_site"
-      },
-      "user_input": "(Unresolved Model).new.url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
     }
   ],
-  "brakeman_version": "8.0.5"
+  "brakeman_version": "8.1.0"
 }

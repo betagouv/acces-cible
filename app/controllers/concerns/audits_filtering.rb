@@ -1,8 +1,6 @@
 module AuditsFiltering
   extend ActiveSupport::Concern
-
-  DEFAULT_DIRECTION = :desc
-  SORT_DIRECTIONS = %i[asc desc].freeze
+  include AuditsOrdering
 
   private
 
@@ -29,7 +27,21 @@ module AuditsFiltering
 
   def filter_audits(scope)
     scope = filter_by_query(scope)
-    filter_by_tag(scope)
+    scope = filter_by_tag(scope)
+
+    AuditColumns::FILTERABLE.each do |column|
+      values = params.dig(:filter, column)
+      scope = scope.where("#{filter_value(column)} IN (?)", values) if values.present?
+    end
+
+    scope
+  end
+
+  def filter_value(column)
+    case column
+    when "declaration_date", "standard", "auditor", "contact_email", "contact_form" then "(#{column_value(column)} IS NOT NULL)"
+    else column_value(column)
+    end
   end
 
   def filter_by_query(scope)
@@ -43,24 +55,6 @@ module AuditsFiltering
     return scope if selected_tag_id.blank?
 
     scope.joins(site: :site_tags).where(site_tags: { tag_id: selected_tag_id })
-  end
-
-  def order_audits(scope)
-    if params.dig(:sort, :url).present?
-      url_without_www = Arel.sql("regexp_replace(sites.normalized_url, '^www[0-9]?\\.', '')")
-      scope.order(url_without_www.send(sort_direction))
-    else
-      scope.order(created_at: sort_direction)
-    end
-  end
-
-  def sort_direction
-    direction = (params.dig(:sort, :url) || params.dig(:sort, :last_audited_at)).to_s.presence
-
-    return DEFAULT_DIRECTION if direction.blank?
-
-    direction = direction.to_sym
-    direction.in?(SORT_DIRECTIONS) ? direction : DEFAULT_DIRECTION
   end
 
   def selected_tag_id
