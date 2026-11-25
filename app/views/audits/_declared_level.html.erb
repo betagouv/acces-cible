@@ -13,15 +13,24 @@
     <% t.with_body do %>
       <tr>
         <th scope="row"><%= t("audits.show.accessibility_rate") %></th>
-        <td class="fr-cell--multiline"><%= accessibility_page_analysis.human_compliance_rate.presence || muted_dash %></td>
+        <td class="fr-cell--multiline">
+          <%= accessibility_page_analysis.human_compliance_rate.presence || muted_dash %>
+          <%= tag.div t(".misplaced_compliance_rate") if accessibility_page_analysis.misplaced?(:compliance_rate) %>
+        </td>
       </tr>
       <tr>
         <th scope="row"><%= t("audits.show.audit_date") %></th>
-        <td class="fr-cell--multiline"><%= audit_date ? l(audit_date) : muted_dash %></td>
+        <td class="fr-cell--multiline">
+          <%= audit_date ? l(audit_date) : muted_dash %>
+          <%= tag.div t(".misplaced_audit_date") if accessibility_page_analysis.misplaced?(:audit_date) %>
+        </td>
       </tr>
       <tr>
         <th scope="row"><%= t("audits.show.audit_update_date") %></th>
-        <td class="fr-cell--multiline"><%= audit_update_date ? l(audit_update_date) : muted_dash %></td>
+        <td class="fr-cell--multiline">
+          <%= audit_update_date ? l(audit_update_date) : muted_dash %>
+          <%= tag.div t(".misplaced_audit_update_date") if accessibility_page_analysis.misplaced?(:audit_update_date) %>
+        </td>
       </tr>
     <% end %>
   <% end %>

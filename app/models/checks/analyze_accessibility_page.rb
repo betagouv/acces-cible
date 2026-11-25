@@ -11,11 +11,20 @@ module Checks
     AUDITOR_NAME_START = /(?:réalisée?|réalisation)[^.]*?\s+par\s+(?:la\s+société\s+|l[’']\s*agence\s+|la\s+|le\s+|l[’']\s*)?|la\s+société\s+|l[’']\s*agence\s+/i
     AUDITOR_NAME_END = /(?:,| révèle| sur|\.|$|\s(?:le|en)\s+(?:\d|[a-zéûà]+\s+\d{4}))/i
     AUDITOR_PATTERN = /(?:#{AUDITOR_NAME_START})([^,.]+?)#{AUDITOR_NAME_END}/i
-    CONTACT_FORM_REGEX = /aide|form|contact/i
+    CONTACT_FORM_REGEX = /\b(?:aide|form|contact)/i
     LAW_DATE = Date.new(2005, 2, 11)
-    HEADERS_SCOPE = ["Établissement de cette déclaration d’accessibilité", "État de conformité", "Déclaration d’accessibilité", "Résultats des tests"]
+    SECTIONS = {
+      audit_date: ["Établissement de cette déclaration d’accessibilité", :next],
+      audit_update_date: ["Établissement de cette déclaration d’accessibilité", :next],
+      compliance_rate: ["Résultats des tests", :next],
+      standard: ["État de conformité", "Contenus non accessibles"],
+      auditor: ["Résultats des tests", :next],
+      mentions_article: [:previous, "État de conformité"],
+      contact_email: ["Retour d'information et contact", :next],
+      contact_form: ["Retour d'information et contact", :next]
+    }.freeze
 
-    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article, :contact_email, :contact_form
+    store_accessor :data, :audit_date, :audit_update_date, :compliance_rate, :standard, :auditor, :mentions_article, :contact_email, :contact_form, :misplaced_fields
 
     def tooltip?
       !(completed? && found_required?)
@@ -23,6 +32,10 @@ module Checks
 
     def audit_date
       super&.to_date
+    end
+
+    def misplaced?(field)
+      misplaced_fields&.include?(field.to_s)
     end
 
     def audit_update_date
@@ -53,39 +66,13 @@ module Checks
       nil
     end
 
-    def find_audit_date(pattern)
-      extracted_text = []
+    def find_info(field)
+      value = extract(field, SECTIONS[field])
+      return value if value.present?
 
-      HEADERS_SCOPE.each do |header_scope|
-        extracted_text << accessibility_page.text(between_headings: [header_scope, :next])
-      end
-
-      extracted_text << accessibility_page.text(between_headings: [:previous, "État de conformité"])
-
-      extracted_text = extracted_text.compact.join(" ")
-      matches = extracted_text.scan(pattern)
-
-      return nil if matches.blank?
-
-      extract_date(matches)
-    end
-
-    def find_compliance_rate
-      test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
-      compliance_rate_in(test_results_section) || compliance_rate_in(accessibility_page.text)
-    end
-
-    def find_standard
-      accessibility_page.text.scan(STANDARD_PATTERN).flatten.compact.sort_by(&:length).last
-    end
-
-    def find_auditor
-      test_results_section = accessibility_page.text(between_headings: ["Résultats des tests", :next])
-      test_results_section.match(AUDITOR_PATTERN)&.[](1)&.strip
-    end
-
-    def find_article_mention
-      accessibility_page.text.include?(LAW_NUMBER)
+      value = extract(field, nil)
+      misplaced_fields << field.to_s if value.present?
+      value
     end
 
     def custom_badge_status
@@ -96,22 +83,42 @@ module Checks
       found_required? ? human_compliance_rate : t("checks.analyze_accessibility_page.missing_data")
     end
 
-    def find_contact_email
-      email_in_text = contact_section_text.scan(Page::MAIL_PATTERN).first
-      email_in_text = email_in_text&.gsub("(at)", "@")
-
-      return email_in_text if email_in_text.present?
-
-      accessibility_page.mailto_addresses(between_headings: ["Retour d'information et contact", :next]).first
-    end
-
-    def find_contact_form
-      return if contact_links.blank?
-
-      contact_links.find { |link| CONTACT_FORM_REGEX.match?(link.text) || CONTACT_FORM_REGEX.match?(link.href) }&.href
-    end
-
     private
+
+    def extract(field, between_headings)
+      text = accessibility_page.text(between_headings:)
+
+      case field
+      when :audit_date then extract_date(text.scan(AUDIT_DATE_PATTERN))
+      when :audit_update_date then extract_date(text.scan(AUDIT_UPDATE_DATE_PATTERN))
+      when :compliance_rate then compliance_rate_in(text)
+      when :standard then standard_in(text)
+      when :auditor then auditor_in(text)
+      when :mentions_article then text.include?(LAW_NUMBER)
+      when :contact_email then email_in(text, accessibility_page.mailto_addresses(between_headings:))
+      when :contact_form then contact_form_in(accessibility_page.links(between_headings:))
+      end
+    end
+
+    def standard_in(text)
+      text.scan(STANDARD_PATTERN).flatten.compact.sort_by(&:length).last
+    end
+
+    def auditor_in(text)
+      text.match(AUDITOR_PATTERN)&.[](1)&.strip
+    end
+
+    def email_in(text, mailtos)
+      email_in_text = text.scan(Page::MAIL_PATTERN).first&.gsub("(at)", "@")
+
+      email_in_text.presence || mailtos.first
+    end
+
+    def contact_form_in(links)
+      link = links.find { |link| CONTACT_FORM_REGEX.match?(link.text) && CONTACT_FORM_REGEX.match?(link.href) }
+      link ||= links.find { |link| CONTACT_FORM_REGEX.match?(link.text) || CONTACT_FORM_REGEX.match?(link.href) }
+      link&.href
+    end
 
     def compliance_rate_in(text)
       matches = text.scan(COMPLIANCE_PATTERN)
@@ -123,14 +130,6 @@ module Checks
       rate = rate_string.tr(",", ".").to_f
 
       rate % 1 == 0 ? rate.to_i : rate
-    end
-
-    def contact_links
-      accessibility_page.links(between_headings: ["Retour d'information et contact", :next])
-    end
-
-    def contact_section_text
-      accessibility_page.text(between_headings: ["Retour d'information et contact", :next])
     end
 
     def found_required?
@@ -148,15 +147,18 @@ module Checks
     def analyze!
       return unless accessibility_page
 
+      self.misplaced_fields = [] # FIXME: no [], just nil
+
       {
-        audit_date: find_audit_date(AUDIT_DATE_PATTERN),
-        audit_update_date: find_audit_date(AUDIT_UPDATE_DATE_PATTERN),
-        compliance_rate: find_compliance_rate,
-        standard: find_standard,
-        auditor: find_auditor,
-        mentions_article: find_article_mention,
-        contact_email: find_contact_email,
-        contact_form: find_contact_form
+        audit_date: find_info(:audit_date),
+        audit_update_date: find_info(:audit_update_date),
+        compliance_rate: find_info(:compliance_rate),
+        standard: find_info(:standard),
+        auditor: find_info(:auditor),
+        mentions_article: find_info(:mentions_article),
+        contact_email: find_info(:contact_email),
+        contact_form: find_info(:contact_form),
+        misplaced_fields:
       }
     end
 

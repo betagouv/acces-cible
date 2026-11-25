@@ -7,6 +7,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
 
   before do
     allow(check).to receive(:audit).and_return(instance_double(Audit, page_for: accessibility_page))
+    check.misplaced_fields = []
   end
 
   describe ".analyze!" do
@@ -30,6 +31,104 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
     end
   end
 
+  describe "#run!" do
+    before { allow(check).to receive(:save!) }
+
+    context "when fields are in their expected sections" do
+      let(:body) do
+        <<~HTML
+          <h2>Retour d'information et contact</h2>
+          <p>emily@xie.com</p>
+          <h2>Voies de recours</h2>
+        HTML
+      end
+
+      it "does not flag them as misplaced" do
+        check.run!
+
+        expect(check.contact_email).to eq("emily@xie.com")
+        expect(check.misplaced?(:contact_email)).to be(false)
+      end
+    end
+
+    context "when the standard and the law article are outside their expected sections" do
+      let(:body) do
+        <<~HTML
+          <h2>Contenus non accessibles</h2>
+          <p>Loi n° 2005-102, conforme au RGAA version 4.1.</p>
+        HTML
+      end
+
+      it "returns the values and flags them as misplaced" do
+        check.run!
+
+        expect(check.standard).to eq("RGAA version 4.1")
+        expect(check.mentions_article).to be(true)
+        expect(check.misplaced?(:standard)).to be(true)
+        expect(check.misplaced?(:mentions_article)).to be(true)
+      end
+    end
+
+    context "when the standard and the law article are in their expected sections" do
+      let(:body) do
+        <<~HTML
+          <h1>Déclaration d'accessibilité</h1>
+          <p>Loi n° 2005-102.</p>
+          <h2>État de conformité</h2>
+          <p>Conforme au RGAA version 4.1.</p>
+          <h2>Contenus non accessibles</h2>
+        HTML
+      end
+
+      it "does not flag them as misplaced" do
+        check.run!
+
+        expect(check.standard).to eq("RGAA version 4.1")
+        expect(check.mentions_article).to be(true)
+        expect(check.misplaced?(:standard)).to be(false)
+        expect(check.misplaced?(:mentions_article)).to be(false)
+      end
+    end
+
+    context "when the update date and the rate are outside their expected sections" do
+      let(:body) do
+        <<~HTML
+          <h2>Contenus non accessibles</h2>
+          <p>Déclaration mise à jour le 3 mars 2024, révèle que 75 % des critères sont respectés.</p>
+        HTML
+      end
+
+      it "returns the values and flags them as misplaced" do
+        check.run!
+
+        expect(check.audit_update_date).to eq(Date.new(2024, 3, 3))
+        expect(check.compliance_rate).to eq(75)
+        expect(check.misplaced?(:audit_update_date)).to be(true)
+        expect(check.misplaced?(:compliance_rate)).to be(true)
+      end
+    end
+
+    context "when fields are outside their expected sections" do
+      let(:body) do
+        <<~HTML
+          <h2>Contenus non accessibles</h2>
+          <p>Contactez emily@xie.com ou le <a href="https://www.numerique.gouv.fr/numerique-etat/la-transformation-numerique-des-territoires/">formulaire de contact</a>.</p>
+          <p>Contactez emily@xie.com ou le <a href="/formulaire-contact">formulaire de contact</a>.</p>
+        HTML
+      end
+
+      it "returns the values and flags them as misplaced" do
+        check.run!
+
+        expect(check.contact_email).to eq("emily@xie.com")
+        expect(check.contact_form).to eq("https://www.example.com/formulaire-contact")
+        expect(check.misplaced?(:contact_email)).to be(true)
+        expect(check.misplaced?(:contact_form)).to be(true)
+        expect(check.misplaced?(:auditor)).to be(false)
+      end
+    end
+  end
+
   describe "#find_contact_email" do
     context "when email is between two correct headings" do
       context "when email is in text" do
@@ -43,7 +142,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
             let(:body) { "<h1>Retour d'information et contact</h1><p>#{text}</p><h2>Autre</h2>" }
 
             it "extracts '#{expected_email}'" do
-              expect(check.find_contact_email).to eq(expected_email)
+              expect(check.find_info(:contact_email)).to eq(expected_email)
             end
           end
         end
@@ -72,7 +171,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
             end
 
             it "returns #{test_case[:expected_result]}" do
-              expect(check.find_contact_email).to eq(test_case[:expected_result])
+              expect(check.find_info(:contact_email)).to eq(test_case[:expected_result])
             end
           end
         end
@@ -88,7 +187,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
 
         it "extracts an email from a mailto href" do
-          expect(check.find_contact_email).to eq("jessie@frazelle.com")
+          expect(check.find_info(:contact_email)).to eq("jessie@frazelle.com")
         end
       end
     end
@@ -103,8 +202,8 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
           HTML
         end
 
-        it "does not extract the email from the text" do
-          expect(check.find_contact_email).to be_nil
+        it "extracts the email from the text anywhere in the page" do
+          expect(check.find_info(:contact_email)).to eq("emily@xie.com")
         end
       end
 
@@ -117,8 +216,8 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
           HTML
         end
 
-        it "does not extract the email from the mailto" do
-          expect(check.find_contact_email).to be_nil
+        it "extracts the email from the mailto anywhere in the page" do
+          expect(check.find_info(:contact_email)).to eq("emily@xie.com")
         end
       end
     end
@@ -157,6 +256,16 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         expected_result: nil
       },
       {
+        text: "La transformation numérique des territoires",
+        href: "https://www.numerique.gouv.fr/numerique-etat/la-transformation-numerique-des-territoires/",
+        expected_result: nil
+      },
+      {
+        text: "Plus d'information",
+        href: "/information",
+        expected_result: nil
+      },
+      {
         text: "Contactez-nous",
         href: "mailto:jessie@frazelle.com",
         expected_result: nil
@@ -172,7 +281,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
 
         it "returns #{test_case[:expected_result]}" do
-          expect(check.find_contact_form).to eq(test_case[:expected_result])
+          expect(check.find_info(:contact_form)).to eq(test_case[:expected_result])
         end
       end
     end
@@ -187,8 +296,8 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         HTML
       end
 
-      it "only searches links between the contact heading and the next heading" do
-        expect(check.find_contact_form).to be_nil
+      it "falls back to the links of the whole page" do
+        expect(check.find_info(:contact_form)).to eq("https://www.example.com/formulaire-contact")
       end
     end
   end
@@ -210,7 +319,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         let(:body) { "<h1>État de conformité</h1><p>#{text}</p><h2>Autre</h2>" }
 
         it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}'" do
-          expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(expected_date)
+          expect(check.find_info(:audit_date)).to eq(expected_date)
         end
       end
     end
@@ -227,7 +336,24 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       end
 
       it "only searches for dates with headers" do
-        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2020, 9, 23))
+        expect(check.find_info(:audit_date)).to eq(Date.new(2020, 9, 23))
+      end
+    end
+
+    context "when the date is only under an unexpected header" do
+      let(:body) do
+        <<~HTML
+          <h2>Autre</h2>
+          <p>La déclaration a été réalisée le 23 septembre 2020.</p>
+        HTML
+      end
+
+      it "falls back to the whole page and flags the date as misplaced" do
+        allow(check).to receive(:save!)
+        check.run!
+
+        expect(check.audit_date).to eq(Date.new(2020, 9, 23))
+        expect(check.misplaced?(:audit_date)).to be(true)
       end
     end
 
@@ -242,7 +368,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
       end
 
       it "ignores the law's date" do
-        expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_DATE_PATTERN)).to eq(Date.new(2024, 3, 1))
+        expect(check.find_info(:audit_date)).to eq(Date.new(2024, 3, 1))
       end
     end
   end
@@ -263,7 +389,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
 
         it "extracts '#{expected_date ? I18n.l(expected_date, format: :compact) : nil}'" do
-          expect(check.find_audit_date(Checks::AnalyzeAccessibilityPage::AUDIT_UPDATE_DATE_PATTERN)).to eq(expected_date)
+          expect(check.find_info(:audit_update_date)).to eq(expected_date)
         end
       end
     end
@@ -303,7 +429,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
 
         it "extracts '#{expected_rate}%'" do
-          expect(check.find_compliance_rate).to eq(expected_rate)
+          expect(check.find_info(:compliance_rate)).to eq(expected_rate)
         end
       end
     end
@@ -337,7 +463,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
           end
 
           it "returns #{test_case[:expected_result].inspect}" do
-            expect(check.find_compliance_rate).to eq(test_case[:expected_result])
+            expect(check.find_info(:compliance_rate)).to eq(test_case[:expected_result])
           end
         end
       end
@@ -356,7 +482,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         let(:body) { text }
 
         it "extracts '#{expected_standard}'" do
-          expect(check.find_standard).to eq(expected_standard)
+          expect(check.find_info(:standard)).to eq(expected_standard)
         end
       end
     end
@@ -392,7 +518,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         end
 
         it "extracts '#{expected_auditor}'" do
-          expect(check.find_auditor).to eq(expected_auditor)
+          expect(check.find_info(:auditor)).to eq(expected_auditor)
         end
       end
     end
@@ -412,7 +538,7 @@ RSpec.describe Checks::AnalyzeAccessibilityPage do
         let(:body) { text }
 
         it "returns '#{expectation}'" do
-          expect(check.find_article_mention).to eq(expectation)
+          expect(check.find_info(:mentions_article)).to eq(expectation)
         end
       end
     end

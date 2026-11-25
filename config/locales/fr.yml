@@ -149,6 +149,18 @@ fr:
         standard: Référentiel
         standard_evaluation: Référentiel (évaluation)
         tags: Étiquettes
+    declaration_quality:
+      misplaced_audit_date: "La date est trouvée, mais elle doit se trouver dans la section \"Établissement de cette déclaration d'accessibilité\"."
+      misplaced_auditor: "L'auditeur est trouvé, mais il doit se trouver dans la section \"Résultats des tests\"."
+      misplaced_contact_email: "L'adresse email est trouvée, mais elle doit se trouver dans la section \"Retour d'information et contact\"."
+      misplaced_contact_form: "Le formulaire de contact est trouvé, mais il doit se trouver dans la section \"Retour d'information et contact\"."
+      misplaced_link: "Le lien est trouvé, mais il doit se trouver avant le titre \"État de conformité\"."
+      misplaced_mentions_article: "La mention de l'article de loi est trouvée, mais elle doit se trouver avant le titre \"État de conformité\"."
+      misplaced_standard: "Le référentiel est trouvé, mais il doit se trouver dans la section \"État de conformité\" ou \"Résultats des tests\"."
+    declared_level:
+      misplaced_audit_date: "La date est trouvée, mais elle doit se trouver dans la section \"Établissement de cette déclaration d'accessibilité\"."
+      misplaced_audit_update_date: "La date de mise à jour est trouvée, mais elle doit se trouver dans la section \"Établissement de cette déclaration d'accessibilité\"."
+      misplaced_compliance_rate: "Le taux de conformité est trouvé, mais il doit se trouver dans la section \"Résultats des tests\"."
     index:
       caption: Mes évaluations
       columns:
@@ -379,7 +391,6 @@ fr:
       range_how_to_fix: "La période ne doit pas dépasser 2 ans"
       obsolete_how_to_fix: "Le plan d'action est obsolète et doit être mis à jour"
       years_not_found_how_to_fix: "Renseignez des dates contenant l'année en cours"
-      link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien
       link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
@@ -397,7 +408,6 @@ fr:
       range_how_to_fix: "La période ne doit pas dépasser 3 ans"
       obsolete_how_to_fix: "Le schéma pluriannuel est obsolète et doit être mis à jour"
       years_not_found_how_to_fix: "Renseignez des dates contenant l'année en cours"
-      link_misplaced: "Note : le lien est trouvé, mais il devrait se trouver avant le titre \"État de conformité\"."
       link_not_found: Lien non trouvé
       link_text: Intitulé du lien
       link_unreachable: Attention, le lien pointe vers une page ou un fichier introuvable.
