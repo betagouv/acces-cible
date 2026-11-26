@@ -5,6 +5,7 @@ class Audit < ApplicationRecord
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
   has_one :home_page_snapshot, -> { home }, class_name: "PageSnapshot"
+  has_one :accessibility_page_snapshot, -> { accessibility }, class_name: "PageSnapshot"
 
   after_create_commit :fetch_resources!, :create_checks
   after_update_commit :broadcast_to_audit_batch, if: -> { saved_change_to_completed_at? && audit_batch }
