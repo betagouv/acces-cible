@@ -46,12 +46,5 @@ describe FetchResourcesJob do
 
       expect(FindAccessibilityPageService).not_to have_received(:new)
     end
-
-    it "aborts the checks that depend on Reachable" do
-      fetch_resources_job
-
-      other_checks = audit.reload.checks.reject { |check| check.is_a?(Checks::Reachable) }
-      expect(other_checks.map(&:current_state).uniq).to eq(["aborted"])
-    end
   end
 end

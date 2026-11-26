@@ -11,7 +11,7 @@ class FetchResourcesJob < ApplicationJob
 
   def perform(audit)
     FetchHomePageService.new(audit)
-    return audit.abort_dependent_checks!(audit.reachable) unless audit.home_page_snapshot.auditable?
+    return unless audit.home_page_snapshot.auditable?
 
     FindAccessibilityPageService.new(audit)
   ensure
