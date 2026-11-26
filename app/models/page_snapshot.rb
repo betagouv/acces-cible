@@ -8,6 +8,6 @@ class PageSnapshot < ApplicationRecord
   end
 
   def auditable?
-    HTTP::Response::Status.new(status).success?
+    HTTP::Response::Status.new(status).success? && html? && Page.html_content_type?(content_type)
   end
 end

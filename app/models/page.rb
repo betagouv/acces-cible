@@ -19,6 +19,10 @@ class Page
 
   attr_reader :url, :root, :status, :html, :actual_url
 
+  def self.html_content_type?(content_type)
+    content_type.present? && content_type.include?("text/html")
+  end
+
   def initialize(url:, root: nil, html: nil)
     @url = Link.normalize(url)
     @root = root ? Link.normalize(root) : Link.root_from(url)
@@ -114,15 +118,11 @@ class Page
     @content_type = "text/html"
   end
 
-  def is_html_page?
-    @content_type && @content_type.include?("text/html")
-  end
-
   def fetch_page_data
     @actual_url, @status, @content_type, @html, error = Browser.get(url.to_s).values_at(:current_url, :status, :content_type, :body, :error)
     return if error
 
-    raise InvalidTypeError.new(url, @content_type) unless is_html_page?
+    raise InvalidTypeError.new(url, @content_type) unless Page.html_content_type?(@content_type)
   end
 
   def dom_headings

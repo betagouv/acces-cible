@@ -21,5 +21,13 @@ RSpec.describe PageSnapshot do
     it "is false for an HTTP error" do
       expect(build(:page_snapshot, status: 404)).not_to be_auditable
     end
+
+    it "is false without HTML" do
+      expect(build(:page_snapshot, status: 200, html: "")).not_to be_auditable
+    end
+
+    it "is false for a content type other than HTML" do
+      expect(build(:page_snapshot, status: 200, content_type: "application/pdf")).not_to be_auditable
+    end
   end
 end
