@@ -4,6 +4,8 @@ class Audit < ApplicationRecord
   belongs_to :audit_batch, optional: true
   has_many :checks, -> { prioritized }, dependent: :destroy
   has_many :page_snapshots, dependent: :destroy
+  has_one :home_page_snapshot, -> { home }, class_name: "PageSnapshot"
+  has_one :accessibility_page_snapshot, -> { accessibility }, class_name: "PageSnapshot"
 
   after_create_commit :fetch_resources!, :create_checks
   after_update_commit :broadcast_to_audit_batch, if: -> { saved_change_to_completed_at? && audit_batch }
@@ -112,7 +114,7 @@ class Audit < ApplicationRecord
 
   def page_for(kind)
     snapshot = page_snapshots.find_by(kind:)
-    return unless snapshot
+    return unless snapshot&.html?
 
     Page.new(url: snapshot.current_url, root: home_page_url, html: snapshot.html)
   end

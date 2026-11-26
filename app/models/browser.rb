@@ -84,6 +84,8 @@ class Browser
 
   STEALTH_EXTENSION = Rails.root.join("vendor/javascript/stealth.min.js").freeze
 
+  CHROME_ERROR_CODE = /net::ERR_\w+/
+
   class << self
     def reachable?(url)
       return false if url.blank?
@@ -133,8 +135,17 @@ class Browser
         {
           body: deep_root_html(page),
           status: page.network.status,
+          error: nil,
           content_type: page.evaluate("document.contentType"),
           current_url: Link.normalize(page.current_url)
+        }
+      rescue Ferrum::StatusError, Ferrum::TimeoutError => error
+        {
+          body: nil,
+          status: page.network.status,
+          error: error_code(error),
+          content_type: nil,
+          current_url: nil
         }
       end
     end
@@ -162,6 +173,13 @@ class Browser
       backend_node_id = page.command("DOM.getDocument", depth: 0).dig("root", "backendNodeId")
 
       page.command("DOM.getOuterHTML", backendNodeId: backend_node_id, includeShadowDOM: true)["outerHTML"]
+    end
+
+    def error_code(error)
+      case error
+      when Ferrum::StatusError then error.message[CHROME_ERROR_CODE]
+      when Ferrum::TimeoutError then "timeout"
+      end
     end
 
     def visit(page, url)

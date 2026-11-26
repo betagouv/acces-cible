@@ -17,6 +17,7 @@ class FetchHomePageService
         current_url: response[:current_url],
         html: response[:body],
         status: response[:status],
+        error: response[:error],
         content_type: response[:content_type]
       )
 

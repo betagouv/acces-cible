@@ -32,6 +32,7 @@ class Check < ApplicationRecord
 
   TYPES = [
     :reachable,
+    :auditable,
     :language_indication,
     :accessibility_mention,
     :find_accessibility_page,
@@ -50,7 +51,7 @@ class Check < ApplicationRecord
   class RuntimeError < StandardError; end
 
   PRIORITY = 100 # Override in subclasses if necessary, lower numbers run first
-  REQUIREMENTS = [:reachable]
+  REQUIREMENTS = [:reachable, :auditable]
 
   belongs_to :audit
   has_one :site, through: :audit

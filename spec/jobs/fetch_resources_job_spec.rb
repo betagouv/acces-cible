@@ -12,6 +12,7 @@ describe FetchResourcesJob do
   let(:audit) { create(:audit) }
 
   before do
+    create(:page_snapshot, audit:, kind: "home")
     allow(FetchHomePageService).to receive(:new).with(audit)
     allow(FindAccessibilityPageService).to receive(:new).with(audit)
   end
@@ -35,23 +36,15 @@ describe FetchResourcesJob do
       .with(audit)
   end
 
-  describe "error cases" do
+  context "when the home page cannot be audited" do
     before do
-      allow(Browser).to receive(:get).and_raise(error)
+      audit.home_page_snapshot.update!(status: 404)
     end
 
-    context "when the ressource does not exist" do
-      let(:error) { Ferrum::StatusError.new(audit.site.url) }
+    it "does not call the service for the accessibility page" do
+      fetch_resources_job
 
-      it "does not crash" do
-        expect { fetch_resources_job }.not_to raise_error
-      end
-
-      it "still calls ProcessAuditJob" do
-        fetch_resources_job
-
-        expect(ProcessAuditJob).to have_been_enqueued.exactly(:once).with(audit)
-      end
+      expect(FindAccessibilityPageService).not_to have_received(:new)
     end
   end
 end

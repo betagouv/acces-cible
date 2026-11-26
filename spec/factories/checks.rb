@@ -35,6 +35,8 @@ FactoryBot.define do
         check.data = case check
         when Checks::Reachable
           {}
+        when Checks::Auditable
+          {}
         when Checks::LanguageIndication
           { indication: "fr-FR", detected_code: "fr" }
         when Checks::AccessibilityMention

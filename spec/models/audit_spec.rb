@@ -48,6 +48,17 @@ RSpec.describe Audit do
       end
     end
 
+    context "when the home page snapshot has no HTML" do
+      before do
+        create(:page_snapshot, audit:, kind: "home", current_url: nil, html: nil, status: 403,
+                               error: "net::ERR_HTTP_RESPONSE_CODE_FAILURE")
+      end
+
+      it "returns nil" do
+        expect(home_page).to be_nil
+      end
+    end
+
     context "when no home page snapshot exists" do
       it "returns nil" do
         expect(home_page).to be_nil
